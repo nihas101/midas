@@ -5,6 +5,9 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.textfield.IntegerField;
 import de.nihas101.midas.example.service.NumberWriter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
+
+import java.util.Locale;
 
 @Slf4j
 public class AddNumberButton extends Button {
@@ -12,23 +15,13 @@ public class AddNumberButton extends Button {
     private final NumberWriter numberWriter;
     private final IntegerField numberField;
 
-    public AddNumberButton(
-            final IntegerField numberField,
-            final NumberWriter numberWriter
-    ) {
-        this(
-                "Add",
-                numberField,
-                numberWriter
-        );
-    }
-
     protected AddNumberButton(
-            final String text,
             final IntegerField numberField,
-            final NumberWriter numberWriter
+            final NumberWriter numberWriter,
+            final MessageSource messageSource,
+            final Locale locale
     ) {
-        super(text);
+        super(messageSource.getMessage("add.number.button", null, locale));
         this.numberField = numberField;
         this.numberWriter = numberWriter;
         this.addClickListener(this::addNumber);

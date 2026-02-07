@@ -2,14 +2,14 @@ package de.nihas101.midas.ui.main;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import de.nihas101.midas.config.ThemeConfig;
+import de.nihas101.midas.config.MidasConfig;
 
 public class ThemeToggleButton extends Button {
 
-    public ThemeToggleButton(ThemeConfig themeConfig) {
-        this.setVisible(!themeConfig.isHideThemeToggle());
+    public ThemeToggleButton(MidasConfig config) {
+        this.setVisible(!config.getUi().isHideThemeToggle());
         this.setId("theme-toggle-button");
-        this.addClickListener(event -> getUI()
+        this.addClickListener(event -> this.getUI()
                 .map(UI::getPage)
                 .ifPresent(p -> p.executeJs(
                         """
@@ -33,7 +33,7 @@ public class ThemeToggleButton extends Button {
                             const currentTheme = document.documentElement.getAttribute('theme');
                             button.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
                         }
-                        """.formatted(themeConfig.getDefaultTheme())
+                        """.formatted(config.getTheme().getDefaultTheme())
         );
     }
 }
