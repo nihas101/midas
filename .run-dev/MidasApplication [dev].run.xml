@@ -10,4 +10,20 @@
       <option name="Make" enabled="true" />
     </method>
   </configuration>
+  <configuration default="false" name="MidasApplication [dev]" type="Application" factoryName="Application">
+    <envs>
+      <env name="spring_profiles_active" value="dev" />
+    </envs>
+    <option name="MAIN_CLASS_NAME" value="de.nihas101.midas.MidasApplication" />
+    <module name="midas" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="de.nihas101.midas.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
 </component>
