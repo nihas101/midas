@@ -1,0 +1,16 @@
+/* styles.css */
+@import url('./lumo-dark.css');
+@import url('./lumo-light.css');
+
+:root {
+  /* Default to light theme */
+}
+
+[theme~="dark"] {
+  /* Dark theme styles will be imported from lumo-dark.css */
+}
+
+#theme-toggle-button {
+  width: 2em;
+  height: 2em;
+}
