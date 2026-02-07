@@ -6,8 +6,8 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.select.Select;
 import de.nihas101.midas.config.MidasConfig;
-import de.nihas101.midas.config.ThemeConfig;
-import de.nihas101.midas.config.UIConfig;
+import de.nihas101.midas.ui.theme.ThemeToggleButton;
+import de.nihas101.midas.userconfig.service.UserConfigService;
 import org.springframework.context.MessageSource;
 
 import java.util.Locale;
@@ -18,11 +18,12 @@ public class MainHeader extends HorizontalLayout {
             final MidasConfig config,
             final MessageSource messageSource,
             final Select<Locale> languageSelect,
-            final Locale locale
+            final Locale locale,
+            final UserConfigService userConfigService
     ) {
         this(
                 new H1(messageSource.getMessage("welcome.message", null, locale)),
-                new ThemeToggleButton(config),
+                new ThemeToggleButton(config, userConfigService),
                 languageSelect
         );
     }

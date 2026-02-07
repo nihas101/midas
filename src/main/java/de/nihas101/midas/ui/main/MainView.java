@@ -10,11 +10,16 @@ import com.vaadin.flow.router.RouteAlias;
 import de.nihas101.midas.config.MidasConfig;
 import de.nihas101.midas.example.service.NotifyingNumberWriter;
 import de.nihas101.midas.example.service.NumberService;
+import de.nihas101.midas.ui.locale.LocaleSelect;
+import de.nihas101.midas.ui.locale.MidasLocaleResolver;
+import de.nihas101.midas.userconfig.entity.UserConfig;
+import de.nihas101.midas.userconfig.service.UserConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 // TODO: Fancy drawer etc
 @Slf4j
@@ -27,14 +32,26 @@ public class MainView extends VerticalLayout {
             NumberService numberService,
             MidasConfig config,
             MessageSource messageSource,
-            I18NProvider i18NProvider
+            I18NProvider i18NProvider,
+            UserConfigService userConfigService,
+            MidasLocaleResolver midasLocaleResolver
     ) {
         addClassName("main-view");
         setSizeFull();
         setAlignItems(Alignment.START);
         setJustifyContentMode(JustifyContentMode.START);
 
-        Locale locale = resolveLocale(config);
+        Optional<UserConfig> userConfig = userConfigService.findByUserIdentifier(UserConfigService.DEFAULT_USER);
+        if (userConfig.isEmpty()) {
+            UserConfig newUserConfig = new UserConfig(UserConfigService.DEFAULT_USER);
+            userConfigService.save(newUserConfig);
+            userConfig = Optional.of(newUserConfig);
+        }
+
+        applyTheme(userConfig.get().getTheme(), config.getTheme().getDefaultTheme());
+
+        Locale locale = midasLocaleResolver.resolve();
+
         log.debug("Locale of user: {}", locale);
         final MainHeader mainHeader = new MainHeader(
                 config,
@@ -42,9 +59,11 @@ public class MainView extends VerticalLayout {
                 new LocaleSelect(
                         i18NProvider,
                         locale,
-                        config
+                        config,
+                        userConfigService
                 ),
-                locale
+                locale,
+                userConfigService
         );
 
         final SumDisplay sumDisplay = new SumDisplay(
@@ -86,13 +105,11 @@ public class MainView extends VerticalLayout {
         );
     }
 
-    // TODO: Move to own class
-    private static Locale resolveLocale(final MidasConfig config) {
-        if (config.getI18n().isForceDefaultLanguage()) {
-            return Locale.of(config.getI18n().getDefaultLocale());
-        }
-        // TODO: Also consider local storage
-        Locale locale = UI.getCurrent().getLocale();
-        return locale != null ? locale : Locale.of(config.getI18n().getDefaultLocale());
+    private void applyTheme(String theme, String defaultTheme) {
+        String effectiveTheme = (theme != null && !theme.isBlank()) ? theme : defaultTheme;
+        UI.getCurrent().getPage().executeJs(
+                "document.documentElement.setAttribute('theme', $0);",
+                effectiveTheme
+        );
     }
 }
