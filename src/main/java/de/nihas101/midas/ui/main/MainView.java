@@ -1,6 +1,10 @@
 package de.nihas101.midas.ui.main;
 
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.applayout.AppLayout;
+import com.vaadin.flow.component.applayout.DrawerToggle;
+import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.i18n.I18NProvider;
@@ -21,14 +25,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
-// TODO: Fancy drawer etc
 // TODO: Add ability to set favicon
 // TODO: Add ability to set icon on main page
 @Slf4j
 @Route("main")
 @RouteAlias("")
 @PageTitle("Main")
-public class MainView extends VerticalLayout {
+public class MainView extends AppLayout {
 
     public MainView(
             NumberService numberService,
@@ -38,10 +41,11 @@ public class MainView extends VerticalLayout {
             UserConfigService userConfigService,
             MidasLocaleResolver midasLocaleResolver
     ) {
-        addClassName("main-view");
-        setSizeFull();
-        setAlignItems(Alignment.START);
-        setJustifyContentMode(JustifyContentMode.START);
+        addToNavbar(new DrawerToggle());
+        H1 title = new H1("Midas");
+        title.getStyle().set("margin-left", "var(--lumo-space-m)");
+        addToNavbar(title);
+
 
         Optional<UserConfig> userConfig = userConfigService.findByUserIdentifier(UserConfigService.DEFAULT_USER);
         if (userConfig.isEmpty()) {
@@ -99,12 +103,19 @@ public class MainView extends VerticalLayout {
                 messageSource
         );
 
-        add(
+        VerticalLayout contentLayout = new VerticalLayout();
+        contentLayout.addClassName("main-view-content");
+        contentLayout.setSizeFull();
+        contentLayout.setAlignItems(FlexComponent.Alignment.START);
+        contentLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.START);
+        contentLayout.add(
                 mainHeader,
                 addNumberLayout,
                 numbersTable,
                 sumDisplay
         );
+
+        setContent(contentLayout);
     }
 
     private void applyTheme(String theme, String defaultTheme) {
