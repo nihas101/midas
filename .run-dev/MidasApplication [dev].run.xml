@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="MidasApplication [dev]" type="springBootConfigurationType" factoryName="Spring Boot">
+    <envs>
+      <env name="spring_output_ansi_enabled" value="always" />
+      <env name="spring_profiles_active" value="dev" />
+    </envs>
+    <option name="MAIN_CLASS_NAME" value="de.nihas101.midas.MidasApplication" />
+    <module name="midas" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
