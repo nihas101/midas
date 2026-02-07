@@ -1,4 +1,4 @@
-package de.nihas101.midas.ui.locale;
+package de.nihas101.midas.ui.common;
 
 import com.vaadin.flow.component.UI;
 import de.nihas101.midas.config.MidasConfig;

@@ -1,4 +1,4 @@
-package de.nihas101.midas.ui.locale;
+package de.nihas101.midas.ui.settings;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.select.Select;
@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.Locale;
-
 
 @Slf4j
 public class LocaleSelect extends Select<Locale> {

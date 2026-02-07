@@ -1,4 +1,4 @@
-package de.nihas101.midas.ui.theme;
+package de.nihas101.midas.ui.settings;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
