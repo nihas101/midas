@@ -22,6 +22,8 @@ import java.util.Locale;
 import java.util.Optional;
 
 // TODO: Fancy drawer etc
+// TODO: Add ability to set favicon
+// TODO: Add ability to set icon on main page
 @Slf4j
 @Route("main")
 @RouteAlias("")

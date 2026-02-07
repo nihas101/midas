@@ -1,5 +1,7 @@
 # Midas
 
+**Languages**: [English](README.md) | [Deutsch](README_de.md)
+
 Midas is a planned tool designed to replace an older Clipper application for creating financial reports. It will gather financial data over a year and enable users to generate various reports (text or PDF). The primary goals are future-proofing, long-term compatibility, and a modern, interactive browser-based user interface.
 
 ## Project Goals
@@ -36,17 +38,16 @@ The primary deployment target is a standalone JVM JAR, built using Maven.
 
 Robust logging is implemented using a standard JVM logging framework, with log files rotated based on configured policies to assist with debugging and auditing.
 
-## License
+## Application Properties
 
-Copyright © 2026 nihas101
+The application can be configured using `application.properties`. Below are some of the key properties:
 
-This program and the accompanying materials are made available under the
-terms of the Eclipse Public License 2.0 which is available at
-https://www.eclipse.org/legal/epl-2.0.
-
-This Source Code may also be made available under the following Secondary
-Licenses when the conditions for such availability set forth in the Eclipse
-Public License, v. 2.0 are satisfied: GNU General Public License as published by
-the Free Software Foundation, either version 2 of the License, or (at your
-option) any later version, with the GNU Classpath Exception which is available
-at https://www.gnu.org/software/classpath/license.html.
+*   `midas.i18n.default-locale`: Sets the default locale for the application (e.g., `en`, `de`).
+*   `midas.i18n.force-default-language`: If `true`, forces the application to use the `default-locale` regardless of browser settings.
+*   `midas.theme.default-theme`: Sets the default theme for the application (e.g., `dark`).
+*   `midas.ui.hide-theme-toggle`: If `true`, hides the theme toggle button in the UI.
+*   `midas.ui.hide-language-selector`: If `true`, hides the language selector in the UI.
+*   `server.port`: The port on which the application will run (e.g., `8080`).
+*   `vaadin.launch-browser`: If set to `true`, a browser window will automatically open to the application URL upon startup.
+*   `spring.datasource.url`: The JDBC URL for the SQLite database (e.g., `jdbc:sqlite:midas.db`).
+*   `spring.jpa.show-sql`: If `true`, Hibernate will log all SQL statements to the console.
