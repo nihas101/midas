@@ -16,8 +16,8 @@ public class MidasLocaleResolver {
     private final UserConfigReader userConfigReader;
 
     public MidasLocaleResolver(
-            MidasConfig config,
-            UserConfigReader userConfigReader
+            final MidasConfig config,
+            final UserConfigReader userConfigReader
     ) {
         this.config = config;
         this.userConfigReader = userConfigReader;

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd"
+        objectQuotingStrategy="LEGACY">
+
+    <changeSet id="002-create-shareholders-table" author="midas">
+        <createTable tableName="shareholders">
+            <column name="id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="display_id" type="INTEGER"/>
+            <column name="first_name" type="STRING">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="STRING">
+                <constraints nullable="false"/>
+            </column>
+            <column name="external_id" type="INTEGER"/>
+        </createTable>
+        <!-- Trigger to automatically sync display_id with id on insert -->
+        <sql dbms="sqlite">
+            CREATE TRIGGER set_shareholder_display_id
+            AFTER INSERT ON shareholders
+            FOR EACH ROW
+            WHEN (NEW.display_id IS NULL OR NEW.display_id = 0)
+            BEGIN
+            UPDATE shareholders SET display_id = NEW.id WHERE id = NEW.id;
+            END;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

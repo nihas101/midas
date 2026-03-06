@@ -1,13 +1,20 @@
 package de.nihas101.midas.userconfig.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name = "user_config")
 @Getter
 @Setter
+@NoArgsConstructor
 public class UserConfig {
 
     @Id
@@ -20,9 +27,6 @@ public class UserConfig {
     private String theme;
 
     private String locale;
-
-    public UserConfig() {
-    }
 
     public UserConfig(String userIdentifier) {
         this.userIdentifier = userIdentifier;

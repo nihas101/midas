@@ -13,17 +13,17 @@ public class UserConfigService implements UserConfigReader, UserConfigWriter {
 
     private final UserConfigRepository userConfigRepository;
 
-    public UserConfigService(UserConfigRepository userConfigRepository) {
+    public UserConfigService(final UserConfigRepository userConfigRepository) {
         this.userConfigRepository = userConfigRepository;
     }
 
     @Override
-    public Optional<UserConfig> findByUserIdentifier(String userIdentifier) {
+    public Optional<UserConfig> findByUserIdentifier(final String userIdentifier) {
         return userConfigRepository.findByUserIdentifier(userIdentifier);
     }
 
     @Override
-    public void save(UserConfig userConfig) {
+    public void save(final UserConfig userConfig) {
         userConfigRepository.save(userConfig);
     }
 }

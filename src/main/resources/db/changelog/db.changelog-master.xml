@@ -6,7 +6,7 @@
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd"
         objectQuotingStrategy="LEGACY">
 
-    <include file="db/changelog/001-create-numbers-table.xml"/>
-    <include file="db/changelog/002-create-user-config-table.xml"/>
+    <include file="db/changelog/001-create-user-config-table.xml"/>
+    <include file="db/changelog/002-create-shareholders-table.xml"/>
 
 </databaseChangeLog>

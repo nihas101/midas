@@ -26,36 +26,45 @@ public class MidasPage extends AppLayout {
             final MessageSource messageSource,
             final MidasLocaleResolver midasLocaleResolver
     ) {
-        Optional<UserConfig> userConfig = userConfigService.findByUserIdentifier(UserConfigService.DEFAULT_USER);
-        if (userConfig.isEmpty()) {
-            UserConfig newUserConfig = new UserConfig(UserConfigService.DEFAULT_USER);
-            userConfigService.save(newUserConfig);
-            userConfig = Optional.of(newUserConfig);
-        }
-        applyTheme(userConfig.get().getTheme(), config.getTheme().getDefaultTheme());
-        Locale locale = midasLocaleResolver.resolve();
+        final UserConfig userConfig = getUserConfig(userConfigService);
+        applyTheme(userConfig.getTheme(), config.getTheme().getDefaultTheme());
+        final Locale locale = midasLocaleResolver.resolve();
 
         HorizontalLayout navbarContent = new HorizontalLayout();
         navbarContent.setWidthFull();
         navbarContent.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
         navbarContent.setAlignItems(FlexComponent.Alignment.CENTER);
 
-        H1 title = new H1("Midas");
+        final H1 title = new H1("Midas");
         title.getStyle().set("margin-left", "var(--lumo-space-m)");
 
-        Navbar navbar = new Navbar();
+        final Navbar navbar = new Navbar();
         navbarContent.add(new DrawerToggle(), title, navbar);
         addToNavbar(navbarContent);
 
-        RouterLink mainViewLink = new RouterLink(messageSource.getMessage("main.view", null, locale), MainView.class);
-        RouterLink settingsLink = new RouterLink(messageSource.getMessage("settings", null, locale), SettingsView.class);
+        final RouterLink mainViewLink = new RouterLink(messageSource.getMessage("main.view", null, locale), MainView.class);
+        final RouterLink settingsLink = new RouterLink(messageSource.getMessage("settings", null, locale), SettingsView.class);
 
-        VerticalLayout drawerContent = new VerticalLayout(mainViewLink, settingsLink);
+        final VerticalLayout drawerContent = new VerticalLayout(mainViewLink, settingsLink);
         addToDrawer(drawerContent);
     }
 
-    private void applyTheme(String theme, String defaultTheme) {
-        String effectiveTheme = (theme != null && !theme.isBlank()) ? theme : defaultTheme;
+    private UserConfig getUserConfig(final UserConfigService userConfigService) {
+        final Optional<UserConfig> userConfig = userConfigService.findByUserIdentifier(UserConfigService.DEFAULT_USER);
+        if (userConfig.isEmpty()) {
+            UserConfig newUserConfig = new UserConfig(UserConfigService.DEFAULT_USER);
+            userConfigService.save(newUserConfig);
+            return newUserConfig;
+        } else {
+            return userConfig.get();
+        }
+    }
+
+    private void applyTheme(
+            final String theme,
+            final String defaultTheme
+    ) {
+        final String effectiveTheme = (theme != null && !theme.isBlank()) ? theme : defaultTheme;
         UI.getCurrent().getPage().executeJs(
                 "document.documentElement.setAttribute('theme', $0);",
                 effectiveTheme

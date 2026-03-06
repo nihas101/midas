@@ -6,8 +6,8 @@ import com.vaadin.flow.i18n.I18NProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.nihas101.midas.config.MidasConfig;
-import de.nihas101.midas.ui.common.MidasPage;
 import de.nihas101.midas.ui.common.MidasLocaleResolver;
+import de.nihas101.midas.ui.common.MidasPage;
 import de.nihas101.midas.userconfig.service.UserConfigService;
 import org.springframework.context.MessageSource;
 
@@ -20,11 +20,11 @@ import java.util.Locale;
 public class SettingsView extends MidasPage {
 
     public SettingsView(
-            MidasConfig config,
-            I18NProvider i18NProvider,
-            UserConfigService userConfigService,
-            MessageSource messageSource,
-            MidasLocaleResolver midasLocaleResolver
+            final MidasConfig config,
+            final I18NProvider i18NProvider,
+            final UserConfigService userConfigService,
+            final MessageSource messageSource,
+            final MidasLocaleResolver midasLocaleResolver
     ) {
         super(
                 config,
@@ -38,14 +38,14 @@ public class SettingsView extends MidasPage {
         verticalLayout.setPadding(true);
         verticalLayout.setAlignItems(FlexComponent.Alignment.START);
 
-        Locale locale = midasLocaleResolver.resolve();
+        final Locale locale = midasLocaleResolver.resolve();
 
-        ThemeToggleButton themeToggleButton = new ThemeToggleButton(
+        final ThemeToggleButton themeToggleButton = new ThemeToggleButton(
                 config,
                 userConfigService
         );
 
-        LocaleSelect localeSelect = new LocaleSelect(
+        final LocaleSelect localeSelect = new LocaleSelect(
                 i18NProvider,
                 locale,
                 config,

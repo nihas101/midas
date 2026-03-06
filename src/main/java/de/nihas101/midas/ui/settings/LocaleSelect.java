@@ -14,10 +14,10 @@ import java.util.Locale;
 public class LocaleSelect extends Select<Locale> {
 
     public LocaleSelect(
-            I18NProvider i18NProvider,
+            final I18NProvider i18NProvider,
             final Locale locale,
-            MidasConfig config,
-            UserConfigService userConfigService
+            final MidasConfig config,
+            final UserConfigService userConfigService
     ) {
         final List<Locale> providedLocales = i18NProvider.getProvidedLocales();
         this.setVisible(isVisible(config));
@@ -25,7 +25,7 @@ public class LocaleSelect extends Select<Locale> {
         this.setItemLabelGenerator(loc -> loc.getDisplayName(loc));
         this.setValue(locale);
         this.addValueChangeListener(event -> {
-            Locale selectedLocale = event.getValue();
+            final Locale selectedLocale = event.getValue();
             if (selectedLocale == null) {
                 return;
             }

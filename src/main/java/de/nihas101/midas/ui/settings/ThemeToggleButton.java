@@ -9,8 +9,8 @@ import de.nihas101.midas.userconfig.service.UserConfigService;
 public class ThemeToggleButton extends Button {
 
     public ThemeToggleButton(
-            MidasConfig config,
-            UserConfigService userConfigService
+            final MidasConfig config,
+            final UserConfigService userConfigService
     ) {
         this.setVisible(!config.getUi().isHideThemeToggle());
         this.setId("theme-toggle-button");
@@ -29,12 +29,12 @@ public class ThemeToggleButton extends Button {
                 .ifPresent(userConfig -> setThemeIcon(userConfig.getTheme()));
     }
 
-    private void setTheme(String theme) {
+    private void setTheme(final String theme) {
         UI.getCurrent().getPage().executeJs("document.documentElement.setAttribute('theme', $0);", theme);
         setThemeIcon(theme);
     }
 
-    private void setThemeIcon(String theme) {
+    private void setThemeIcon(final String theme) {
         String icon = "dark".equals(theme) ? "☀️" : "🌙";
         this.setText(icon);
     }
