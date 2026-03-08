@@ -1,4 +1,4 @@
-package de.nihas101.midas.ui.main;
+package de.nihas101.midas.ui.shareholders;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -12,6 +12,7 @@ import com.vaadin.flow.data.binder.Binder;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersReader;
 import de.nihas101.midas.shareholders.service.ShareholdersWriter;
+import de.nihas101.midas.ui.main.Dependant;
 import org.springframework.context.MessageSource;
 
 import java.util.ArrayList;

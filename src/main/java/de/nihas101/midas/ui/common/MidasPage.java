@@ -11,6 +11,7 @@ import com.vaadin.flow.router.RouterLink;
 import de.nihas101.midas.config.MidasConfig;
 import de.nihas101.midas.ui.main.MainView;
 import de.nihas101.midas.ui.settings.SettingsView;
+import de.nihas101.midas.ui.shareholders.ShareholdersView;
 import de.nihas101.midas.userconfig.entity.UserConfig;
 import de.nihas101.midas.userconfig.service.UserConfigService;
 import org.springframework.context.MessageSource;
@@ -43,9 +44,10 @@ public class MidasPage extends AppLayout {
         addToNavbar(navbarContent);
 
         final RouterLink mainViewLink = new RouterLink(messageSource.getMessage("main.view", null, locale), MainView.class);
+        final RouterLink shareholdersViewLink = new RouterLink(messageSource.getMessage("shareholders", null, locale), ShareholdersView.class);
         final RouterLink settingsLink = new RouterLink(messageSource.getMessage("settings", null, locale), SettingsView.class);
 
-        final VerticalLayout drawerContent = new VerticalLayout(mainViewLink, settingsLink);
+        final VerticalLayout drawerContent = new VerticalLayout(mainViewLink, shareholdersViewLink, settingsLink);
         addToDrawer(drawerContent);
     }
 

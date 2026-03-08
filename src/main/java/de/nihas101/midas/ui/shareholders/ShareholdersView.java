@@ -1,11 +1,11 @@
-package de.nihas101.midas.ui.main;
+package de.nihas101.midas.ui.shareholders;
 
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.router.RouteAlias;
 import de.nihas101.midas.config.MidasConfig;
+import de.nihas101.midas.shareholders.service.ShareholdersService;
 import de.nihas101.midas.ui.common.MidasLocaleResolver;
 import de.nihas101.midas.ui.common.MidasPage;
 import de.nihas101.midas.userconfig.service.UserConfigService;
@@ -14,15 +14,13 @@ import org.springframework.context.MessageSource;
 
 import java.util.Locale;
 
-// TODO: Add ability to set favicon
-// TODO: Add ability to set icon on main page
 @Slf4j
-@Route("main")
-@RouteAlias("")
-@PageTitle("Main")
-public class MainView extends MidasPage {
+@Route("shareholders")
+@PageTitle("Shareholders") // TODO: Is it possible to add translations for the page title?
+public class ShareholdersView extends MidasPage {
 
-    public MainView(
+    public ShareholdersView(
+            final ShareholdersService shareholdersService,
             final MidasConfig config,
             final MessageSource messageSource,
             final UserConfigService userConfigService,
@@ -38,12 +36,18 @@ public class MainView extends MidasPage {
         final Locale locale = midasLocaleResolver.resolve();
 
         final VerticalLayout contentLayout = new VerticalLayout();
-        contentLayout.addClassName("main-view-content");
+        contentLayout.addClassName("shareholders-view-content");
         contentLayout.setSizeFull();
         contentLayout.setAlignItems(FlexComponent.Alignment.START);
         contentLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.START);
-
-        // TODO: Add useful content here
+        contentLayout.add(
+                new ShareholdersTable(
+                        shareholdersService,
+                        shareholdersService,
+                        messageSource,
+                        locale
+                )
+        );
 
         setContent(contentLayout);
     }
