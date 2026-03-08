@@ -8,5 +8,5 @@
 
     <include file="db/changelog/001-create-user-config-table.xml"/>
     <include file="db/changelog/002-create-shareholders-table.xml"/>
-
+    <include file="db/changelog/003-create-bookings-table.xml"/>
 </databaseChangeLog>

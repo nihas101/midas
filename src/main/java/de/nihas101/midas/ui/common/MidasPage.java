@@ -45,9 +45,10 @@ public class MidasPage extends AppLayout {
 
         final RouterLink mainViewLink = new RouterLink(messageSource.getMessage("main.view", null, locale), MainView.class);
         final RouterLink shareholdersViewLink = new RouterLink(messageSource.getMessage("shareholders", null, locale), ShareholdersView.class);
+        final RouterLink bookingsViewLink = new RouterLink(messageSource.getMessage("bookings", null, locale), de.nihas101.midas.ui.bookings.BookingsView.class);
         final RouterLink settingsLink = new RouterLink(messageSource.getMessage("settings", null, locale), SettingsView.class);
 
-        final VerticalLayout drawerContent = new VerticalLayout(mainViewLink, shareholdersViewLink, settingsLink);
+        final VerticalLayout drawerContent = new VerticalLayout(mainViewLink, shareholdersViewLink, bookingsViewLink, settingsLink);
         addToDrawer(drawerContent);
     }
 
