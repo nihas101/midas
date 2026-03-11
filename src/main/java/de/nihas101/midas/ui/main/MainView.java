@@ -6,8 +6,8 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import de.nihas101.midas.config.MidasConfig;
-import de.nihas101.midas.ui.common.MidasLocaleResolver;
 import de.nihas101.midas.ui.common.MidasPage;
+import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
 import de.nihas101.midas.userconfig.service.UserConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -44,6 +44,7 @@ public class MainView extends MidasPage {
         contentLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.START);
 
         // TODO: Add useful content here
+        // TODO: Add a section reminiscent of the original here
 
         setContent(contentLayout);
     }

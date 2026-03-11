@@ -11,9 +11,9 @@ import java.time.Month;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public class MonthlySummaryBookingRow implements IBookingRow {
+public class MonthlySummaryBookingRow implements BookingRow { // TODO: Test
 
-    private final BookingRow bookingRow;
+    private final BaseBookingRow bookingRow;
 
     public MonthlySummaryBookingRow(
             final String dateStr,
@@ -36,7 +36,7 @@ public class MonthlySummaryBookingRow implements IBookingRow {
             final MonthlyTotalCalculator monthlyTotalCalculator
     ) {
         this(
-                new BookingRow(
+                new BaseBookingRow(
                         "",
                         dateStr,
                         comment,

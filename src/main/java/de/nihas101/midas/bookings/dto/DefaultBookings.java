@@ -14,15 +14,16 @@ public class DefaultBookings implements Bookings {
     @Override
     public MoneyAmount initialBalance() {
         return bookings.stream()
-                .filter(b -> b.getType() == BookingType.SALDOVORTRAG)
+                .filter(b -> b.getType() == BookingType.OPENING_BALANCE)
                 .map(Booking::getAmount)
                 .reduce(MoneyAmount.ZERO, MoneyAmount::plus);
     }
 
     @Override
-    public List<Booking> groupBookingsByMonth(final Month month) {
-        return bookings.stream()
-                .filter(b -> b.getType() != BookingType.SALDOVORTRAG && month.equals(b.getDate().getMonth()))
+    public MonthlyBookings bookingsInMonth(final Month month) {
+        final List<Booking> monthlyBookings = bookings.stream()
+                .filter(b -> b.getType() != BookingType.OPENING_BALANCE && month.equals(b.getDate().getMonth()))
                 .toList();
+        return new MonthlyBookings(monthlyBookings);
     }
 }

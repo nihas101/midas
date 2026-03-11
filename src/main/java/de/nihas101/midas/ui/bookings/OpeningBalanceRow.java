@@ -8,20 +8,20 @@ import lombok.RequiredArgsConstructor;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public class InitialBalanceRow implements IBookingRow {
+public class OpeningBalanceRow implements BookingRow { // TODO: Test
 
-    private final BookingRow bookingRow;
+    private final BaseBookingRow bookingRow;
 
-    public InitialBalanceRow(
+    public OpeningBalanceRow(
             final String comment,
             final Bookings bookings
     ) {
         this(
-                new BookingRow(
+                new BaseBookingRow(
                         "",
                         "01.01.",
                         comment,
-                        Map.of(BookingType.SALDOVORTRAG, bookings.initialBalance()),
+                        Map.of(BookingType.OPENING_BALANCE, bookings.initialBalance()),
                         MoneyAmount.ZERO,
                         bookings.initialBalance()
                 )

@@ -27,22 +27,31 @@ public class ShareholdersService implements ShareholdersReader, ShareholdersWrit
 
     @Override
     public void create(final Shareholder shareholder) {
+        if (shareholder == null) {
+            throw new IllegalArgumentException("ShareholdersService#create with shareholder == null"); // TODO: i18n
+        }
         if (shareholder.getId() != null) {
-            throw new IllegalArgumentException("ShareholdersService#create with shareholder.getId() != null");
+            throw new IllegalArgumentException("ShareholdersService#create with shareholder.getId() != null"); // TODO: i18n
         }
         repository.save(ShareholderEntity.fromDto(shareholder));
     }
 
     @Override
     public void update(final Shareholder shareholder) {
+        if (shareholder == null) {
+            throw new IllegalArgumentException("ShareholdersService#update with shareholder == null"); // TODO: i18n
+        }
         if (shareholder.getId() == null) {
-            throw new IllegalArgumentException("ShareholdersService#udpate with shareholder.getId() == null");
+            throw new IllegalArgumentException("ShareholdersService#update with shareholder.getId() == null"); // TODO: i18n
         }
         repository.save(ShareholderEntity.fromDto(shareholder));
     }
 
     @Override
     public void delete(final Shareholder shareholder) {
+        if (shareholder == null) {
+            throw new IllegalArgumentException("ShareholdersService#delete with shareholder == null"); // TODO: i18n
+        }
         repository.delete(ShareholderEntity.fromDto(shareholder));
     }
 }

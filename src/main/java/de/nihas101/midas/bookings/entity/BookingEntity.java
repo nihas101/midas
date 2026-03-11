@@ -1,5 +1,6 @@
 package de.nihas101.midas.bookings.entity;
 
+import de.nihas101.midas.bookings.dto.Booking;
 import de.nihas101.midas.bookings.dto.money.MoneyAmount;
 import de.nihas101.midas.shareholders.entity.ShareholderEntity;
 import jakarta.persistence.Column;
@@ -12,9 +13,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.annotations.Generated;
 import org.hibernate.generator.EventType;
 
@@ -22,8 +22,7 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "bookings")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookingEntity {
@@ -51,4 +50,20 @@ public class BookingEntity {
 
     @Column(name = "comment")
     private String comment;
+
+    public static BookingEntity fromDto(final Booking booking, final ShareholderEntity shareholder) {
+        if (booking == null) {
+            return null;
+        }
+
+        return new BookingEntity(
+                booking.getId(),
+                booking.getDisplayId(),
+                shareholder,
+                booking.getDate(),
+                booking.getType(),
+                booking.getAmount(),
+                booking.getComment()
+        );
+    }
 }

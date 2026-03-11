@@ -6,6 +6,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,7 +16,9 @@ import lombok.Setter;
 @Table(name = "user_config")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class UserConfig {
 
     @Id
@@ -28,7 +32,7 @@ public class UserConfig {
 
     private String locale;
 
-    public UserConfig(String userIdentifier) {
+    public UserConfig(final String userIdentifier) {
         this.userIdentifier = userIdentifier;
     }
 }

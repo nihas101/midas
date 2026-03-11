@@ -13,8 +13,8 @@ import de.nihas101.midas.bookings.service.BookingsService;
 import de.nihas101.midas.config.MidasConfig;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersService;
-import de.nihas101.midas.ui.common.MidasLocaleResolver;
 import de.nihas101.midas.ui.common.MidasPage;
+import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
 import de.nihas101.midas.userconfig.service.UserConfigService;
 import org.springframework.context.MessageSource;
 
@@ -38,7 +38,7 @@ public class BookingsView extends MidasPage {
 
     private ComboBox<Shareholder> shareholderPicker;
     private ComboBox<Integer> yearPicker;
-    private Grid<IBookingRow> grid;
+    private Grid<BookingRow> grid;
 
     public BookingsView(
             final ShareholdersService shareholdersService,
@@ -76,7 +76,7 @@ public class BookingsView extends MidasPage {
 
     private void setupShareholderPicker() {
         shareholderPicker = new ComboBox<>(messageSource.getMessage("bookings.shareholder", null, locale));
-        shareholderPicker.setItems(shareholdersService.shareholders().getShareholders());
+        shareholderPicker.setItems(shareholdersService.shareholders().toList());
         shareholderPicker.setItemLabelGenerator(s -> s.getFirstName() + " " + s.getLastName() + " (" + s.getDisplayId() + ")");
         shareholderPicker.setPlaceholder("Search by name or ID..."); // TODO: i18n
         shareholderPicker.setClearButtonVisible(true);
@@ -100,25 +100,31 @@ public class BookingsView extends MidasPage {
         grid = new Grid<>();
         grid.setSizeFull();
 
-        grid.addColumn(IBookingRow::displayId).setHeader(messageSource.getMessage("bookings.table.id", null, locale));
-        grid.addColumn(IBookingRow::dateStr).setHeader(messageSource.getMessage("bookings.table.date", null, locale));
-        grid.addColumn(IBookingRow::comment).setHeader(messageSource.getMessage("bookings.table.comment", null, locale));
-        grid.addColumn(r -> r.amount(BookingType.ENTNAHME).format(locale))
-                .setHeader(messageSource.getMessage("bookings.table.entnahmen", null, locale));
-        grid.addColumn(r -> r.amount(BookingType.STEUERN_VJ).format(locale))
-                .setHeader(messageSource.getMessage("bookings.table.steuern_vj", null, locale));
-        grid.addColumn(r -> r.amount(BookingType.STEUERN_KR).format(locale))
-                .setHeader(messageSource.getMessage("bookings.table.steuern_kr", null, locale));
-        grid.addColumn(r -> r.amount(BookingType.ZINSEN).format(locale))
-                .setHeader(messageSource.getMessage("bookings.table.zinsen", null, locale));
-        grid.addColumn(r -> r.amount(BookingType.VERGUETUNG).format(locale))
-                .setHeader(messageSource.getMessage("bookings.table.verguetung", null, locale));
-        grid.addColumn(r -> r.total().format(locale))
-                .setHeader(messageSource.getMessage("bookings.table.total", null, locale));
-        grid.addColumn(r -> r.balance()
-                .format(locale)).setHeader(messageSource.getMessage("bookings.table.balance", null, locale));
+        setupColumn(grid.addColumn(BookingRow::displayId), "bookings.table.id");
+        setupColumn(grid.addColumn(BookingRow::dateStr), "bookings.table.date");
+        setupColumn(grid.addColumn(BookingRow::comment), "bookings.table.comment");
+
+        setupColumn(BookingType.WITHDRAWAL);
+        setupColumn(BookingType.TAX_PREVIOUS_YEAR);
+        setupColumn(BookingType.TAX_CREDIT);
+        setupColumn(BookingType.INTEREST);
+        setupColumn(BookingType.COMPENSATION);
+
+        setupColumn(grid.addColumn(r1 -> r1.total().format(locale)), "bookings.table.total");
+        setupColumn(grid.addColumn(r -> r.balance().format(locale)), "bookings.table.balance");
 
         content.add(grid);
+    }
+
+    private void setupColumn(final BookingType bookingType) {
+        setupColumn(grid.addColumn(r -> r.amount(bookingType).format(locale)), bookingType.getI18nKey());
+    }
+
+    private void setupColumn(final Grid.Column<BookingRow> column, final String i18nKey) {
+        column.setAutoWidth(true)
+                .setFrozen(true)
+                .setResizable(true)
+                .setHeader(messageSource.getMessage(i18nKey, null, locale));
     }
 
     private void refreshGrid() {
@@ -134,27 +140,27 @@ public class BookingsView extends MidasPage {
         grid.setItems(createRows(bookings));
     }
 
-    private List<IBookingRow> createRows(final Bookings bookings) {
-        List<IBookingRow> rows = new ArrayList<>();
+    private List<BookingRow> createRows(final Bookings bookings) {
+        List<BookingRow> rows = new ArrayList<>();
         rows.add(initialBalanceRow(bookings));
         rows.addAll(monthlySummaryRows(bookings));
         return rows;
     }
 
-    private InitialBalanceRow initialBalanceRow(final Bookings bookings) {
-        return new InitialBalanceRow(
-                messageSource.getMessage("bookings.initial_balance", null, locale),
+    private OpeningBalanceRow initialBalanceRow(final Bookings bookings) {
+        return new OpeningBalanceRow(
+                messageSource.getMessage(BookingType.OPENING_BALANCE.getI18nKey(), null, locale),
                 bookings
         );
     }
 
-    private List<IBookingRow> monthlySummaryRows(final Bookings bookings) {
-        final List<IBookingRow> rows = new ArrayList<>();
+    private List<BookingRow> monthlySummaryRows(final Bookings bookings) {
+        final List<BookingRow> rows = new ArrayList<>();
         for (Month month : Month.values()) {
             if (month.getValue() > LocalDate.now().getMonthValue() && yearPicker.getValue() >= LocalDate.now().getYear()) {
                 continue;
             }
-            final List<IBookingRow> bookingRows = new BookingsToBookingRowConverter(bookings, month).bookingRows();
+            final List<BookingRow> bookingRows = new BookingsToBookingRowConverter(bookings, month).bookingRows();
             if (bookingRows.isEmpty()) {
                 continue;
             }

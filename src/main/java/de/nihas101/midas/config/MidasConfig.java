@@ -1,5 +1,6 @@
 package de.nihas101.midas.config;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -8,11 +9,20 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 
 @Data
 @Configuration
+@AllArgsConstructor
 @ConfigurationProperties(prefix = "midas")
 public class MidasConfig {
-    private ThemeConfig theme = new ThemeConfig();
-    private UIConfig ui = new UIConfig();
-    private I18nConfig i18n = new I18nConfig();
+    private ThemeConfig theme;
+    private UIConfig ui;
+    private I18nConfig i18n;
+
+    public MidasConfig() {
+        this(
+                new ThemeConfig(),
+                new UIConfig(),
+                new I18nConfig()
+        );
+    }
 
     @Bean
     public ReloadableResourceBundleMessageSource messageSource() {

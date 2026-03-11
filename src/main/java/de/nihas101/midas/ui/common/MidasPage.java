@@ -9,6 +9,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.RouterLink;
 import de.nihas101.midas.config.MidasConfig;
+import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
 import de.nihas101.midas.ui.main.MainView;
 import de.nihas101.midas.ui.settings.SettingsView;
 import de.nihas101.midas.ui.shareholders.ShareholdersView;

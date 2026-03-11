@@ -5,5 +5,5 @@ import de.nihas101.midas.userconfig.entity.UserConfig;
 import java.util.Optional;
 
 public interface UserConfigReader {
-    Optional<UserConfig> findByUserIdentifier(String userIdentifier);
+    Optional<UserConfig> findByUserIdentifier(final String userIdentifier);
 }

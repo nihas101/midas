@@ -8,16 +8,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.annotations.Generated;
 import org.hibernate.generator.EventType;
 
 @Entity
 @Table(name = "shareholders")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ShareholderEntity {
@@ -40,6 +38,10 @@ public class ShareholderEntity {
     private Integer externalId;
 
     public static ShareholderEntity fromDto(final Shareholder shareholder) {
+        if (shareholder == null) {
+            return null;
+        }
+
         return new ShareholderEntity(
                 shareholder.getId(),
                 shareholder.getDisplayId(),

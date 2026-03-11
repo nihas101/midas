@@ -15,7 +15,6 @@ import de.nihas101.midas.shareholders.service.ShareholdersWriter;
 import de.nihas101.midas.ui.main.Dependant;
 import org.springframework.context.MessageSource;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -35,8 +34,8 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
         this.shareholdersWriter = shareholdersWriter;
         this.setColumns(); // Clear auto-generated columns to manually add them with editors
 
-        Binder<Shareholder> binder = new Binder<>(Shareholder.class);
-        Editor<Shareholder> editor = this.getEditor();
+        final Binder<Shareholder> binder = new Binder<>(Shareholder.class);
+        final Editor<Shareholder> editor = this.getEditor();
         editor.setBinder(binder);
         editor.setBuffered(true);
 
@@ -56,7 +55,7 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
 
     private void addSaveListener(final ShareholdersWriter shareholdersWriter, final Editor<Shareholder> editor) {
         editor.addSaveListener(e -> {
-            Shareholder item = e.getItem();
+            final Shareholder item = e.getItem();
             if (item.getId() == null) {
                 shareholdersWriter.create(item);
             } else {
@@ -71,9 +70,9 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
             final Locale locale,
             final Editor<Shareholder> editor
     ) {
-        HorizontalLayout actions = new HorizontalLayout();
-        Button saveButton = new Button(messageSource.getMessage("global.save", null, locale), e -> editor.save());
-        Button cancelButton = new Button(messageSource.getMessage("global.cancel", null, locale), e -> editor.cancel());
+        final HorizontalLayout actions = new HorizontalLayout();
+        final Button saveButton = new Button(messageSource.getMessage("global.save", null, locale), e -> editor.save());
+        final Button cancelButton = new Button(messageSource.getMessage("global.cancel", null, locale), e -> editor.cancel());
         actions.add(saveButton, cancelButton);
 
         this.getColumns().getLast().setEditorComponent(actions);
@@ -85,15 +84,15 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
             final Editor<Shareholder> editor
     ) {
         this.addComponentColumn(shareholder -> {
-                    boolean isDummy = shareholder.getId() == null;
+                    final boolean isDummy = shareholder.getId() == null;
 
-                    HorizontalLayout actions = new HorizontalLayout();
+                    final HorizontalLayout actions = new HorizontalLayout();
 
-                    String editButtonText = isDummy
-                            ? messageSource.getMessage("add.shareholder.button", null, locale)
+                    final String editButtonText = isDummy
+                            ? messageSource.getMessage("shareholder.add.button", null, locale)
                             : messageSource.getMessage("global.edit", null, locale);
 
-                    Button editButton = new Button(editButtonText);
+                    final Button editButton = new Button(editButtonText);
                     editButton.addClickListener(e -> {
                         if (editor.isOpen()) {
                             editor.cancel();
@@ -118,7 +117,7 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
             final Locale locale,
             final Shareholder shareholder
     ) {
-        Button deleteButton = new Button(messageSource.getMessage("global.delete", null, locale));
+        final Button deleteButton = new Button(messageSource.getMessage("global.delete", null, locale));
         deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
         deleteButton.addClickListener(e -> {
             final ConfirmDialog dialog = createDeleteShareholderDialog(messageSource, locale, shareholder);
@@ -128,10 +127,10 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
     }
 
     private ConfirmDialog createDeleteShareholderDialog(final MessageSource messageSource, final Locale locale, final Shareholder shareholder) {
-        ConfirmDialog dialog = new ConfirmDialog();
+        final ConfirmDialog dialog = new ConfirmDialog();
         dialog.setHeader(messageSource.getMessage("shareholders.table.delete.confirmation.title", null, locale));
 
-        String[] args = new String[]{
+        final String[] args = new String[]{
                 shareholder.getFirstName(),
                 shareholder.getLastName(),
                 "ID: " + shareholder.getDisplayId()
@@ -154,7 +153,7 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
             final Locale locale,
             final Binder<Shareholder> binder
     ) {
-        IntegerField externalIdField = new IntegerField();
+        final IntegerField externalIdField = new IntegerField();
         externalIdField.setWidthFull();
 
         binder.forField(externalIdField)
@@ -173,14 +172,14 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
             final Locale locale,
             final Binder<Shareholder> binder
     ) {
-        TextField lastNameField = new TextField();
+        final TextField lastNameField = new TextField();
         lastNameField.setWidthFull();
         binder.forField(lastNameField)
-                .asRequired(messageSource.getMessage("shareholder.last_name.label", null, locale) + " is required") // TODO: i18n
+                .asRequired(messageSource.getMessage("shareholder.last-name.label", null, locale) + " is required") // TODO: i18n
                 .bind(Shareholder::getLastName, Shareholder::setLastName);
 
         this.addColumn(Shareholder::getLastName)
-                .setHeader(messageSource.getMessage("shareholders.table.last_name", null, locale))
+                .setHeader(messageSource.getMessage("shareholders.table.last-name", null, locale))
                 .setKey("lastName")
                 .setAutoWidth(true);
 
@@ -192,15 +191,15 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
             final Locale locale,
             final Binder<Shareholder> binder
     ) {
-        TextField firstNameField = new TextField();
+        final TextField firstNameField = new TextField();
         firstNameField.setWidthFull();
 
         binder.forField(firstNameField)
-                .asRequired(messageSource.getMessage("shareholder.first_name.label", null, locale) + " is required") // TODO: i18n
+                .asRequired(messageSource.getMessage("shareholder.first-name.label", null, locale) + " is required") // TODO: i18n
                 .bind(Shareholder::getFirstName, Shareholder::setFirstName);
 
         this.addColumn(Shareholder::getFirstName)
-                .setHeader(messageSource.getMessage("shareholders.table.first_name", null, locale))
+                .setHeader(messageSource.getMessage("shareholders.table.first-name", null, locale))
                 .setKey("firstName")
                 .setAutoWidth(true);
 
@@ -216,7 +215,7 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
 
     @Override
     public void update() {
-        List<Shareholder> shareholders = new ArrayList<>(shareholdersReader.shareholders().getShareholders());
+        final List<Shareholder> shareholders = shareholdersReader.shareholders().toList();
 
         // Add permanent empty row for new shareholder
         Shareholder dummy = new Shareholder();

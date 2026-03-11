@@ -7,9 +7,9 @@ import lombok.RequiredArgsConstructor;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public class DefaultBookingRow implements IBookingRow {
+public class DefaultBookingRow implements BookingRow {
 
-    private final BookingRow bookingRow;
+    private final BaseBookingRow bookingRow;
 
     public DefaultBookingRow(
             final String displayId,
@@ -20,7 +20,7 @@ public class DefaultBookingRow implements IBookingRow {
             final MoneyAmount balance
     ) {
         this(
-                new BookingRow(
+                new BaseBookingRow(
                         displayId,
                         dateStr,
                         comment,

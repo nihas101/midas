@@ -5,14 +5,13 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.Month;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
 public class CachingBookings implements Bookings {
 
     private final Bookings delegate;
-    private final Map<Month, List<Booking>> groupedByMonth;
+    private final Map<Month, MonthlyBookings> groupedByMonth;
     private MoneyAmount initialBalance;
 
     public CachingBookings(final Bookings delegate) {
@@ -31,9 +30,9 @@ public class CachingBookings implements Bookings {
     }
 
     @Override
-    public List<Booking> groupBookingsByMonth(Month month) {
+    public MonthlyBookings bookingsInMonth(Month month) {
         if (!groupedByMonth.containsKey(month)) {
-            groupedByMonth.put(month, delegate.groupBookingsByMonth(month));
+            groupedByMonth.put(month, delegate.bookingsInMonth(month));
         }
         return groupedByMonth.get(month);
     }

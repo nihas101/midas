@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Booking {
     private Integer id;
     private Integer displayId;
@@ -24,10 +24,14 @@ public class Booking {
     private String comment;
 
     public static Booking fromEntity(BookingEntity entity) {
+        if (entity == null) {
+            return null;
+        }
+
         return Booking.builder()
                 .id(entity.getId())
                 .displayId(entity.getDisplayId() != null ? entity.getDisplayId() : entity.getId())
-                .shareholderId(entity.getShareholder().getId())
+                .shareholderId(entity.getShareholder() != null ? entity.getShareholder().getId() : null)
                 .date(entity.getDate())
                 .type(entity.getType())
                 .amount(entity.getAmount())

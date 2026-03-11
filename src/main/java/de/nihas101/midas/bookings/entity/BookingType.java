@@ -8,13 +8,12 @@ import java.util.Arrays;
 @Getter
 @RequiredArgsConstructor
 public enum BookingType {
-    // TODO: Convert to english
-    ENTNAHME(1, "bookings.type.entnahme"),
-    STEUERN_VJ(2, "bookings.type.steuern_vj"),
-    STEUERN_KR(3, "bookings.type.steuern_kr"),
-    ZINSEN(4, "bookings.type.zinsen"),
-    VERGUETUNG(5, "bookings.type.verguetung"),
-    SALDOVORTRAG(31, "bookings.type.saldovortrag");
+    WITHDRAWAL(1, "bookings.type.withdrawal"),
+    TAX_PREVIOUS_YEAR(2, "bookings.type.tax-previous-year"),
+    TAX_CREDIT(3, "bookings.type.tax-credit"),
+    INTEREST(4, "bookings.type.interest"),
+    COMPENSATION(5, "bookings.type.compensation"),
+    OPENING_BALANCE(31, "bookings.type.opening-balance");
 
     private final int id;
     private final String i18nKey;
@@ -23,6 +22,6 @@ public enum BookingType {
         return Arrays.stream(values())
                 .filter(t -> t.id == id)
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Unknown BookingType ID: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Unknown BookingType ID: " + id)); // TODO: i18n
     }
 }

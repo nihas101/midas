@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-public class UserConfigService implements UserConfigReader, UserConfigWriter {
+public class UserConfigService implements UserConfigReader, UserConfigWriter { // TODO: Test
 
     public static final String DEFAULT_USER = "default-user";
 

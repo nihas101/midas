@@ -2,19 +2,17 @@ package de.nihas101.midas.shareholders.dto;
 
 import de.nihas101.midas.shareholders.entity.ShareholderEntity;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Shareholder {
 
     private Integer id;
 
-    private int displayId;
+    private Integer displayId;
 
     private String firstName;
 
