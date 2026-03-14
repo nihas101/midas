@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.Month;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -24,34 +25,54 @@ public class DefaultMonthlyTotalCalculator implements MonthlyTotalCalculator {
     // TODO: Wrap the return value
     @Override
     public Map<BookingType, MoneyAmount> monthlyTotal() {
-        final MoneyAmount initialBalance = bookings.initialBalance();
+        final MoneyAmount initialBalance = initialBalance();
         final MonthlyBookings monthBookings = bookings.bookingsInMonth(month);
-
-        // TODO: Why are we grouping by comment instead of by type here or something?
-        // Group by date and comment within the month
-        final Map<String, List<Booking>> groupedByEntry = monthBookings.bookings()
+        final Map<String, List<Booking>> groupedBookings = groupByDate(monthBookings);
+        final List<String> sortedDates = groupedBookings.keySet()
                 .stream()
-                .collect(Collectors.groupingBy(b -> b.getDate().toString() + "_" + (b.getComment() != null ? b.getComment() : "")));
+                .sorted()
+                .toList();
 
-        // Sort by date
-        final List<String> sortedEntryKeys = groupedByEntry.keySet().stream().sorted().toList();
+        return calculateMonthTotals(initialBalance, sortedDates, groupedBookings);
+    }
 
-        final Map<BookingType, MoneyAmount> monthTotals = new EnumMap<>(BookingType.class);
-        Arrays.stream(BookingType.values()).forEach(t -> monthTotals.put(t, MoneyAmount.ZERO));
+    private Map<BookingType, MoneyAmount> calculateMonthTotals(final MoneyAmount initialBalance, final List<String> sortedDates, final Map<String, List<Booking>> groupedBookings) {
+        final Map<BookingType, MoneyAmount> monthTotals = createBookingTypeToTotalMapping();
 
         MoneyAmount runningTotal = initialBalance;
-        for (String entryKey : sortedEntryKeys) {
-            List<Booking> entryBookings = groupedByEntry.get(entryKey);
+        for (String date : sortedDates) {
+            List<Booking> entryBookings = groupedBookings.get(date);
 
             MoneyAmount entryTotal = MoneyAmount.ZERO;
 
-            for (final Booking b : entryBookings) {
-                entryTotal = entryTotal.plus(b.getAmount());
-                monthTotals.put(b.getType(), monthTotals.get(b.getType()).plus(b.getAmount()));
+            for (final Booking booking : entryBookings) {
+                entryTotal = entryTotal.plus(booking.getAmount());
+                monthTotals.put(booking.getType(), monthTotals.get(booking.getType()).plus(booking.getAmount()));
             }
 
             runningTotal = runningTotal.plus(entryTotal);
         }
         return monthTotals;
+    }
+
+    private Map<BookingType, MoneyAmount> createBookingTypeToTotalMapping() {
+        final Map<BookingType, MoneyAmount> monthTotals = new EnumMap<>(BookingType.class);
+        Arrays.stream(BookingType.values()).forEach(t -> monthTotals.put(t, MoneyAmount.ZERO));
+        return monthTotals;
+    }
+
+    private MoneyAmount initialBalance() {
+        MoneyAmount initialBalance = bookings.initialBalance();
+        return initialBalance == null ? MoneyAmount.ZERO : initialBalance;
+    }
+
+    private Map<String, List<Booking>> groupByDate(final MonthlyBookings monthBookings) {
+        if (monthBookings == null || monthBookings.bookings() == null) {
+            return Collections.emptyMap();
+        }
+
+        return monthBookings.bookings()
+                .stream()
+                .collect(Collectors.groupingBy(b -> b.getDate().toString()));
     }
 }

@@ -9,7 +9,9 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.RouterLink;
 import de.nihas101.midas.config.MidasConfig;
+import de.nihas101.midas.ui.bookings.BookingsView;
 import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
+import de.nihas101.midas.ui.interest.InterestView;
 import de.nihas101.midas.ui.main.MainView;
 import de.nihas101.midas.ui.settings.SettingsView;
 import de.nihas101.midas.ui.shareholders.ShareholdersView;
@@ -46,10 +48,11 @@ public class MidasPage extends AppLayout {
 
         final RouterLink mainViewLink = new RouterLink(messageSource.getMessage("main.view", null, locale), MainView.class);
         final RouterLink shareholdersViewLink = new RouterLink(messageSource.getMessage("shareholders", null, locale), ShareholdersView.class);
-        final RouterLink bookingsViewLink = new RouterLink(messageSource.getMessage("bookings", null, locale), de.nihas101.midas.ui.bookings.BookingsView.class);
+        final RouterLink bookingsViewLink = new RouterLink(messageSource.getMessage("bookings", null, locale), BookingsView.class);
+        final RouterLink interestViewLink = new RouterLink(messageSource.getMessage("interest", null, locale), InterestView.class);
         final RouterLink settingsLink = new RouterLink(messageSource.getMessage("settings", null, locale), SettingsView.class);
 
-        final VerticalLayout drawerContent = new VerticalLayout(mainViewLink, shareholdersViewLink, bookingsViewLink, settingsLink);
+        final VerticalLayout drawerContent = new VerticalLayout(mainViewLink, shareholdersViewLink, bookingsViewLink, interestViewLink, settingsLink);
         addToDrawer(drawerContent);
     }
 

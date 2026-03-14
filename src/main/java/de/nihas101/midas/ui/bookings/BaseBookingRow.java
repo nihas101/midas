@@ -13,6 +13,7 @@ public record BaseBookingRow(
         MoneyAmount total,
         MoneyAmount balance
 ) implements BookingRow {
+
     @Override
     public MoneyAmount amount(final BookingType type) {
         return amounts.getOrDefault(type, MoneyAmount.ZERO);

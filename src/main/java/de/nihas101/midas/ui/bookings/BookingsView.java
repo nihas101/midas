@@ -222,7 +222,6 @@ public class BookingsView extends MidasPage {
 
                 rows.add(
                         new MonthlySummaryBookingRow(
-                                "",
                                 messageSource.getMessage("bookings.table.summary.monthly", null, locale),
                                 bookings,
                                 month

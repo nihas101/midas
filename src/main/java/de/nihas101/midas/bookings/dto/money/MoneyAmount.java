@@ -58,7 +58,7 @@ public class MoneyAmount {
 
     public String format(Locale locale) {
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(locale);
-        // Ensure consistent formatting regardless of locale defaults if needed, 
+        // Ensure consistent formatting regardless of locale defaults if needed,
         // but usually we want the locale's style.
         DecimalFormat formatter = new DecimalFormat("#,##0.00", symbols);
         return formatter.format(toBigDecimal());

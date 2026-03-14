@@ -75,6 +75,15 @@ class DefaultMonthlyTotalCalculatorTest {
         assertEquals(MoneyAmount.ofCents(600L), totals.get(BookingType.WITHDRAWAL));
     }
 
+    @Test
+    void monthlyTotal_null() {
+        final DefaultMonthlyTotalCalculator calculator = createCalculator(null);
+
+        Map<BookingType, MoneyAmount> totals = calculator.monthlyTotal();
+
+        assertEquals(MoneyAmount.ZERO, totals.get(BookingType.WITHDRAWAL));
+    }
+
     private static DefaultMonthlyTotalCalculator createCalculator(final MonthlyBookings monthlyBookings) {
         Bookings bookings = new Bookings() {
             @Override

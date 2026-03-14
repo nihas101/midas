@@ -3,7 +3,6 @@ package de.nihas101.midas.ui.bookings;
 import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.dto.money.MoneyAmount;
 import de.nihas101.midas.bookings.entity.BookingType;
-import de.nihas101.midas.bookings.monthlytotal.CumulativeMonthlyTotalCalculator;
 import de.nihas101.midas.bookings.monthlytotal.DefaultMonthlyTotalCalculator;
 import de.nihas101.midas.bookings.monthlytotal.MonthlyTotalCalculator;
 import lombok.RequiredArgsConstructor;
@@ -12,45 +11,33 @@ import java.time.Month;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public class MonthlySummaryBookingRow implements BookingRow { // TODO: Test
+public class MonthlySummaryBookingRow implements BookingRow {
 
     private final BaseBookingRow bookingRow;
 
     public MonthlySummaryBookingRow(
-            final String dateStr,
             final String comment,
             final Bookings bookings,
             final Month month
     ) {
         this(
-                dateStr,
                 comment,
-                bookings,
-                new DefaultMonthlyTotalCalculator(bookings, month),
-                month
+                new DefaultMonthlyTotalCalculator(bookings, month)
         );
     }
 
     public MonthlySummaryBookingRow(
-            final String dateStr,
             final String comment,
-            final Bookings bookings,
-            final MonthlyTotalCalculator monthlyTotalCalculator,
-            final Month month
+            final MonthlyTotalCalculator monthlyTotalCalculator
     ) {
         final Map<BookingType, MoneyAmount> monthTotals = monthlyTotalCalculator.monthlyTotal();
-        final MoneyAmount monthTotalSum = monthTotals.values().stream()
+        final MoneyAmount monthTotalSum = monthTotals.values()
+                .stream()
                 .reduce(MoneyAmount.ZERO, MoneyAmount::plus);
-
-        // Calculate running balance up to this month
-        final Map<BookingType, MoneyAmount> cumulativeTotals = new CumulativeMonthlyTotalCalculator(bookings, month).monthlyTotal();
-        final MoneyAmount totalSumUpToNow = cumulativeTotals.values().stream()
-                .reduce(MoneyAmount.ZERO, MoneyAmount::plus);
-        final MoneyAmount balance = bookings.initialBalance().plus(totalSumUpToNow);
 
         this.bookingRow = new BaseBookingRow(
                 "",
-                dateStr,
+                "",
                 comment,
                 monthTotals,
                 monthTotalSum,
