@@ -8,6 +8,7 @@ import de.nihas101.midas.bookings.entity.BookingType;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Month;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -21,10 +22,20 @@ public class BookingsToBookingRowConverter { // TODO: This class is very closely
 
     private final Bookings bookings;
     private final Month month;
+    private final MoneyAmount startingBalance;
+    private final DateTimeFormatter dateFormat;
+
+    public BookingsToBookingRowConverter(Bookings bookings, Month month, MoneyAmount startingBalance) {
+        this(
+                bookings,
+                month,
+                startingBalance,
+                DateTimeFormatter.ofPattern("dd.MM")
+        );
+    }
 
     // TODO: Wrap this list
     public List<BookingRow> bookingRows() {
-        final MoneyAmount initialBalance = bookings.initialBalance();
         final MonthlyBookings monthBookings = bookings.bookingsInMonth(month);
 
         // TODO: Why are we grouping by comment instead of by type here?
@@ -39,7 +50,7 @@ public class BookingsToBookingRowConverter { // TODO: This class is very closely
         final Map<BookingType, MoneyAmount> monthTotals = new EnumMap<>(BookingType.class);
         Arrays.stream(BookingType.values()).forEach(t -> monthTotals.put(t, MoneyAmount.ZERO));
 
-        MoneyAmount runningTotal = initialBalance;
+        MoneyAmount runningTotal = startingBalance;
         final List<BookingRow> bookingRows = new ArrayList<>();
         for (String entryKey : sortedEntryKeys) {
             List<Booking> entryBookings = groupedByEntry.get(entryKey);
@@ -57,11 +68,11 @@ public class BookingsToBookingRowConverter { // TODO: This class is very closely
             runningTotal = runningTotal.plus(entryTotal);
             final BookingRow bookingRow = new DefaultBookingRow( // TODO: Get rid of this dependency to the UI?
                     String.valueOf(first.getDisplayId()),
-                    first.getDate().toString(),
+                    first.getDate().format(dateFormat),
                     first.getComment(),
                     entryAmounts,
                     entryTotal,
-                    runningTotal
+                    MoneyAmount.ZERO
             );
             bookingRows.add(bookingRow);
         }

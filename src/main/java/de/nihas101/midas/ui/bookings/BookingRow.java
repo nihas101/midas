@@ -20,4 +20,8 @@ public interface BookingRow {
     MoneyAmount total();
 
     MoneyAmount balance();
+
+    default String partName() {
+        return "month-content"; // TODO: This is used to hide separators, think of a way to keep this knowledge, perhaps we can move create a class for this
+    }
 }

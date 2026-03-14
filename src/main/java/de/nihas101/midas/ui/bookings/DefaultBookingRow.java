@@ -65,4 +65,5 @@ public class DefaultBookingRow implements BookingRow {
     public MoneyAmount balance() {
         return bookingRow.balance();
     }
+
 }

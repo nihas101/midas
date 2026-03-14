@@ -12,15 +12,12 @@ public class OpeningBalanceRow implements BookingRow { // TODO: Test
 
     private final BaseBookingRow bookingRow;
 
-    public OpeningBalanceRow(
-            final String comment,
-            final Bookings bookings
-    ) {
+    public OpeningBalanceRow(final Bookings bookings) {
         this(
                 new BaseBookingRow(
                         "",
                         "01.01.",
-                        comment,
+                        "",
                         Map.of(BookingType.OPENING_BALANCE, bookings.initialBalance()),
                         MoneyAmount.ZERO,
                         bookings.initialBalance()
@@ -61,5 +58,10 @@ public class OpeningBalanceRow implements BookingRow { // TODO: Test
     @Override
     public MoneyAmount balance() {
         return bookingRow.balance();
+    }
+
+    @Override
+    public String partName() {
+        return "month-content";
     }
 }

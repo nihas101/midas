@@ -1,13 +1,18 @@
 package de.nihas101.midas.ui.bookings;
 
 import com.vaadin.flow.component.Unit;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.nihas101.midas.bookings.dto.Bookings;
+import de.nihas101.midas.bookings.dto.money.MoneyAmount;
 import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.bookings.service.BookingsService;
 import de.nihas101.midas.config.MidasConfig;
@@ -16,17 +21,18 @@ import de.nihas101.midas.shareholders.service.ShareholdersService;
 import de.nihas101.midas.ui.common.MidasPage;
 import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
 import de.nihas101.midas.userconfig.service.UserConfigService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.ZoneId;
-import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.IntStream;
 
+@Slf4j
 @Route("bookings")
 @PageTitle("Bookings")
 public class BookingsView extends MidasPage {
@@ -66,11 +72,14 @@ public class BookingsView extends MidasPage {
     private void setupHeader(final VerticalLayout content) {
         HorizontalLayout header = new HorizontalLayout();
         header.setWidthFull();
+        header.setAlignItems(FlexComponent.Alignment.END);
 
         setupShareholderPicker();
         setupYearPicker();
+        final HorizontalLayout actionRow = createActionRow();
 
-        header.add(shareholderPicker, yearPicker);
+        header.add(shareholderPicker, yearPicker, actionRow);
+        header.setFlexGrow(1, actionRow);
         content.add(header);
     }
 
@@ -96,13 +105,42 @@ public class BookingsView extends MidasPage {
         yearPicker.addValueChangeListener(e -> refreshGrid());
     }
 
+    private HorizontalLayout createActionRow() {
+        final Button addBookingButton = new Button(messageSource.getMessage("bookings.add-booking", null, locale));
+        addBookingButton.addClickListener(e -> {
+            new BookingFormDialog(
+                    shareholdersService,
+                    bookingsService,
+                    messageSource,
+                    locale,
+                    shareholderPicker.getValue(),
+                    booking -> refreshGrid()
+            ).open();
+        });
+
+        final HorizontalLayout actions = new HorizontalLayout();
+        actions.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
+        actions.add(addBookingButton);
+        actions.setWidthFull();
+
+        return actions;
+    }
+
+    // TODO: Add edit and delete buttons
     private void setupGrid(final VerticalLayout content) {
         grid = new Grid<>();
         grid.setSizeFull();
 
-        setupColumn(grid.addColumn(BookingRow::displayId), "bookings.table.id");
-        setupColumn(grid.addColumn(BookingRow::dateStr), "bookings.table.date");
-        setupColumn(grid.addColumn(BookingRow::comment), "bookings.table.comment");
+        grid.setPartNameGenerator(BookingRow::partName);
+
+        setupColumn(grid.addColumn(BookingRow::displayId), "bookings.table.id", ColumnTextAlign.START);
+        setupColumn(grid.addColumn(BookingRow::dateStr), "bookings.table.date", ColumnTextAlign.START);
+        setupColumn(grid.addColumn(BookingRow::comment), "bookings.table.comment", ColumnTextAlign.START);
+
+        final Grid.Column<BookingRow> totalColumn = grid.addColumn(r -> formatAmount(r.total()));
+        // TODO: booking-type-column is used to add separators on the left and right of a cell
+        totalColumn.setPartNameGenerator(r -> "booking-type-column"); // TODO: Think of a better name here, booking-type-column makes no sense here
+        setupColumn(totalColumn, "bookings.table.total", ColumnTextAlign.END);
 
         setupColumn(BookingType.WITHDRAWAL);
         setupColumn(BookingType.TAX_PREVIOUS_YEAR);
@@ -110,21 +148,44 @@ public class BookingsView extends MidasPage {
         setupColumn(BookingType.INTEREST);
         setupColumn(BookingType.COMPENSATION);
 
-        setupColumn(grid.addColumn(r1 -> r1.total().format(locale)), "bookings.table.total");
-        setupColumn(grid.addColumn(r -> r.balance().format(locale)), "bookings.table.balance");
+        final Grid.Column<BookingRow> balanceColumn = grid.addColumn(r -> formatAmount(r.balance()));
+        balanceColumn.setPartNameGenerator(r -> "balance-column"); // Header part for no vertical separators
+        setupColumn(balanceColumn, "bookings.table.balance", ColumnTextAlign.END);
 
         content.add(grid);
+
+        // Header parts for vertical separators
+        grid.getHeaderRows().getFirst().getCell(totalColumn).setPartName("booking-type-column");
+        grid.getHeaderRows().getFirst().getCell(balanceColumn).setPartName("balance-column");
+    }
+
+    private String formatAmount(final MoneyAmount amount) {
+        if (amount == null || amount.equals(MoneyAmount.ZERO)) {
+            return ""; // To display empty cells for empty amounts
+        }
+        return amount.format(locale);
     }
 
     private void setupColumn(final BookingType bookingType) {
-        setupColumn(grid.addColumn(r -> r.amount(bookingType).format(locale)), bookingType.getI18nKey());
+        final Grid.Column<BookingRow> column = grid.addColumn(r -> formatAmount(r.amount(bookingType)));
+        column.setPartNameGenerator(r -> "booking-type-column");
+        setupColumn(column, bookingType.getI18nKey(), ColumnTextAlign.END);
+        grid.getHeaderRows().getFirst().getCell(column).setPartName("booking-type-column");
     }
 
-    private void setupColumn(final Grid.Column<BookingRow> column, final String i18nKey) {
+    private void setupColumn(
+            final Grid.Column<BookingRow> column,
+            final String i18nKey,
+            final ColumnTextAlign columnTextAlign
+    ) {
+        final Span header = new Span(messageSource.getMessage(i18nKey, null, locale));
+        header.getElement().setAttribute("part", "header-cell-content"); // To allow common header styling
+
         column.setAutoWidth(true)
                 .setFrozen(true)
                 .setResizable(true)
-                .setHeader(messageSource.getMessage(i18nKey, null, locale));
+                .setTextAlign(columnTextAlign)
+                .setHeader(header);
     }
 
     private void refreshGrid() {
@@ -142,37 +203,40 @@ public class BookingsView extends MidasPage {
 
     private List<BookingRow> createRows(final Bookings bookings) {
         List<BookingRow> rows = new ArrayList<>();
-        rows.add(initialBalanceRow(bookings));
+        rows.add(new OpeningBalanceRow(bookings));
         rows.addAll(monthlySummaryRows(bookings));
         return rows;
     }
 
-    private OpeningBalanceRow initialBalanceRow(final Bookings bookings) {
-        return new OpeningBalanceRow(
-                messageSource.getMessage(BookingType.OPENING_BALANCE.getI18nKey(), null, locale),
-                bookings
-        );
-    }
-
     private List<BookingRow> monthlySummaryRows(final Bookings bookings) {
         final List<BookingRow> rows = new ArrayList<>();
+        MoneyAmount currentBalance = bookings.initialBalance();
+
         for (Month month : Month.values()) {
-            if (month.getValue() > LocalDate.now().getMonthValue() && yearPicker.getValue() >= LocalDate.now().getYear()) {
-                continue;
+            final List<BookingRow> bookingRows = new BookingsToBookingRowConverter(bookings, month, currentBalance).bookingRows();
+
+            if (!bookingRows.isEmpty()) {
+                rows.addAll(bookingRows);
+                // The last row of the month has the correct balance at the end of the month
+                currentBalance = bookingRows.getLast().balance();
+
+                rows.add(
+                        new MonthlySummaryBookingRow(
+                                "",
+                                messageSource.getMessage("bookings.table.summary.monthly", null, locale),
+                                bookings,
+                                month
+                        )
+                );
+                rows.add(
+                        new CumulativeSummaryBookingRow(
+                                "",
+                                messageSource.getMessage("bookings.table.summary.cumulative", null, locale),
+                                bookings,
+                                month
+                        )
+                );
             }
-            final List<BookingRow> bookingRows = new BookingsToBookingRowConverter(bookings, month).bookingRows();
-            if (bookingRows.isEmpty()) {
-                continue;
-            }
-            rows.addAll(bookingRows);
-            rows.add(
-                    new MonthlySummaryBookingRow(
-                            month.getDisplayName(TextStyle.FULL, locale),
-                            messageSource.getMessage("bookings.table.summary.monthly", null, locale),
-                            bookings,
-                            month
-                    )
-            );
         }
         return rows;
     }

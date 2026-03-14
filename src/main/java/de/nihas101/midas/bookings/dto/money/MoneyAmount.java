@@ -52,6 +52,10 @@ public class MoneyAmount {
         return new BigDecimal(cents).divide(MULTIPLIER, 4, RoundingMode.HALF_UP);
     }
 
+    public BigDecimal toBigDecimalForInput() {
+        return new BigDecimal(cents).divide(MULTIPLIER, 2, RoundingMode.HALF_UP);
+    }
+
     public String format(Locale locale) {
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(locale);
         // Ensure consistent formatting regardless of locale defaults if needed, 
