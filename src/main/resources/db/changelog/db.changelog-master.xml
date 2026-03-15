@@ -9,4 +9,6 @@
     <include file="db/changelog/001-create-user-config-table.xml"/>
     <include file="db/changelog/002-create-shareholders-table.xml"/>
     <include file="db/changelog/003-create-bookings-table.xml"/>
+    <include file="db/changelog/004-create-interest-rates-table.xml"/>
+    <include file="db/changelog/005-create-opening-balances-table.xml"/>
 </databaseChangeLog>

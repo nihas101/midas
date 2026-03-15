@@ -13,7 +13,7 @@ import java.util.List;
 class CachingBookingsTest {
 
     @Test
-    void initialBalanceIsCached() {
+    void openingBalanceIsCached() {
         List<Booking> bookings = List.of(
                 new Booking(
                         1,
@@ -36,8 +36,8 @@ class CachingBookingsTest {
         final MoneyAmount expectedInitialBalance = MoneyAmount.ofCents(100L);
         final CachingBookings cachingBookings = new CachingBookings(getBookings(expectedInitialBalance, bookings));
 
-        Assertions.assertEquals(expectedInitialBalance, cachingBookings.initialBalance());
-        Assertions.assertEquals(expectedInitialBalance, cachingBookings.initialBalance());
+        Assertions.assertEquals(expectedInitialBalance, cachingBookings.openingBalance());
+        Assertions.assertEquals(expectedInitialBalance, cachingBookings.openingBalance());
     }
 
     @Test
@@ -78,7 +78,7 @@ class CachingBookingsTest {
             private List<Booking> book = bookings;
 
             @Override
-            public MoneyAmount initialBalance() {
+            public MoneyAmount openingBalance() {
                 final MoneyAmount ret = init;
                 // Every call will return another value
                 init = init.plus(MoneyAmount.ofCents(100L));

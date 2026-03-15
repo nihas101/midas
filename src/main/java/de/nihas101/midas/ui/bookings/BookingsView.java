@@ -9,6 +9,7 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.nihas101.midas.bookings.dto.Bookings;
@@ -16,6 +17,8 @@ import de.nihas101.midas.bookings.dto.money.MoneyAmount;
 import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.bookings.service.BookingsService;
 import de.nihas101.midas.config.MidasConfig;
+import de.nihas101.midas.openingbalance.dto.OpeningBalance;
+import de.nihas101.midas.openingbalance.service.OpeningBalanceService;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersService;
 import de.nihas101.midas.ui.common.MidasPage;
@@ -24,8 +27,10 @@ import de.nihas101.midas.userconfig.service.UserConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.Year;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,15 +43,19 @@ public class BookingsView extends MidasPage {
 
     private final ShareholdersService shareholdersService;
     private final BookingsService bookingsService;
+    private final OpeningBalanceService openingBalanceService;
     private final MessageSource messageSource;
 
     private ComboBox<Shareholder> shareholderPicker;
     private ComboBox<Integer> yearPicker;
+    private BigDecimalField openingBalanceField;
+    private HorizontalLayout actionRow;
     private Grid<BookingRow> grid;
 
     public BookingsView(
             final ShareholdersService shareholdersService,
             final BookingsService bookingsService,
+            final OpeningBalanceService openingBalanceService,
             final MidasConfig config,
             final MessageSource messageSource,
             final UserConfigService userConfigService,
@@ -55,6 +64,7 @@ public class BookingsView extends MidasPage {
         super(config, userConfigService, messageSource, midasLocaleResolver);
         this.shareholdersService = shareholdersService;
         this.bookingsService = bookingsService;
+        this.openingBalanceService = openingBalanceService;
         this.messageSource = messageSource;
 
         VerticalLayout content = new VerticalLayout();
@@ -73,7 +83,8 @@ public class BookingsView extends MidasPage {
 
         setupShareholderPicker();
         setupYearPicker();
-        final HorizontalLayout actionRow = createActionRow();
+        actionRow = createActionRow();
+        actionRow.setVisible(false);
 
         header.add(shareholderPicker, yearPicker, actionRow);
         header.setFlexGrow(1, actionRow);
@@ -102,7 +113,16 @@ public class BookingsView extends MidasPage {
         yearPicker.addValueChangeListener(e -> refreshGrid());
     }
 
+    // TODO: Add element for editing saldo for this year
     private HorizontalLayout createActionRow() {
+        openingBalanceField = new BigDecimalField(messageSource.getMessage("bookings.type.opening-balance", null, getLocale()));
+        openingBalanceField.setSuffixComponent(new Span("€"));
+        openingBalanceField.addValueChangeListener(e -> {
+            if (e.isFromClient()) {
+                saveOpeningBalance();
+            }
+        });
+
         final Button addBookingButton = new Button(messageSource.getMessage("bookings.add-booking", null, getLocale()));
         addBookingButton.addClickListener(e -> {
             new BookingFormDialog(
@@ -117,10 +137,29 @@ public class BookingsView extends MidasPage {
 
         final HorizontalLayout actions = new HorizontalLayout();
         actions.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
-        actions.add(addBookingButton);
+        actions.setAlignItems(FlexComponent.Alignment.BASELINE);
+        actions.add(openingBalanceField, addBookingButton);
         actions.setWidthFull();
 
         return actions;
+    }
+
+    private void saveOpeningBalance() {
+        Shareholder shareholder = shareholderPicker.getValue();
+        Integer year = yearPicker.getValue();
+        if (shareholder == null || year == null) {
+            return;
+        }
+
+        BigDecimal amount = openingBalanceField.getValue();
+        final OpeningBalance openingBalance = openingBalanceService.openingBalance(shareholder.getId(), Year.of(year));
+        if (openingBalance == null) {
+            openingBalanceService.create(new OpeningBalance(null, shareholder.getId(), MoneyAmount.of(amount), Year.of(year)));
+        } else {
+            openingBalance.setOpeningBalance(MoneyAmount.of(amount));
+            openingBalanceService.update(openingBalance);
+        }
+        refreshGrid();
     }
 
     // TODO: Add edit and delete buttons
@@ -189,9 +228,20 @@ public class BookingsView extends MidasPage {
         Shareholder shareholder = shareholderPicker.getValue();
         Integer year = yearPicker.getValue();
 
-        if (shareholder == null || year == null) {
+        final boolean hasSelection = shareholder != null && year != null;
+        actionRow.setVisible(hasSelection);
+
+        if (!hasSelection) {
+            openingBalanceField.setValue(null);
             grid.setItems(new ArrayList<>());
             return;
+        }
+
+        OpeningBalance openingBalance = openingBalanceService.openingBalance(shareholder.getId(), Year.of(year));
+        if (openingBalance != null) {
+            openingBalanceField.setValue(openingBalance.getOpeningBalance().toBigDecimal());
+        } else {
+            openingBalanceField.setValue(BigDecimal.ZERO);
         }
 
         Bookings bookings = bookingsService.bookingsForShareholderAndYear(shareholder.getId(), year);
@@ -207,7 +257,7 @@ public class BookingsView extends MidasPage {
 
     private List<BookingRow> monthlySummaryRows(final Bookings bookings) {
         final List<BookingRow> rows = new ArrayList<>();
-        MoneyAmount currentBalance = bookings.initialBalance();
+        MoneyAmount currentBalance = bookings.openingBalance();
 
         for (Month month : Month.values()) {
             final List<BookingRow> bookingRows = new BookingsToBookingRowConverter(bookings, month, currentBalance).bookingRows();

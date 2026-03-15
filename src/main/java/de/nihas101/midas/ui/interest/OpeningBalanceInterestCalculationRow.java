@@ -1,7 +1,6 @@
 package de.nihas101.midas.ui.interest;
 
 import de.nihas101.midas.bookings.dto.Bookings;
-import de.nihas101.midas.bookings.dto.money.MoneyAmount;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Year;
@@ -21,8 +20,8 @@ public class OpeningBalanceInterestCalculationRow implements InterestCalculation
         this(
                 new BaseInterestCalculationRow(
                         "Vortrag per 01.01." + year.format(DateTimeFormatter.ofPattern("yyyy")),
-                        bookings.initialBalance(),
-                        bookings.initialBalance(),
+                        bookings.openingBalance(),
+                        bookings.openingBalance(),
                         0, // TODO: Calculate (or is this always 300)?
                         locale
                 )

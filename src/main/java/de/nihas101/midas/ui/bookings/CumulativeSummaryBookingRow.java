@@ -38,7 +38,7 @@ public class CumulativeSummaryBookingRow implements BookingRow {
         final Map<BookingType, MoneyAmount> cumulativeTotals = cumulativeTotalCalculator.monthlyTotal();
         final MoneyAmount totalSumOfAllBookings = cumulativeTotals.values().stream()
                 .reduce(MoneyAmount.ZERO, MoneyAmount::plus);
-        final MoneyAmount balance = bookings.initialBalance().plus(totalSumOfAllBookings);
+        final MoneyAmount balance = bookings.openingBalance().plus(totalSumOfAllBookings);
 
         this.bookingRow = new BaseBookingRow(
                 "",

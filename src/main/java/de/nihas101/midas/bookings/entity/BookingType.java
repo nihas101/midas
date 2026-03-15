@@ -12,8 +12,7 @@ public enum BookingType {
     TAX_PREVIOUS_YEAR(2, "bookings.type.tax-previous-year"),
     TAX_CREDIT(3, "bookings.type.tax-credit"),
     INTEREST(4, "bookings.type.interest"),
-    COMPENSATION(5, "bookings.type.compensation"),
-    OPENING_BALANCE(31, "bookings.type.opening-balance");
+    COMPENSATION(5, "bookings.type.compensation");
 
     private final int id;
     private final String i18nKey;

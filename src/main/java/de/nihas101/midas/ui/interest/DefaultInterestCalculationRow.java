@@ -5,7 +5,6 @@ import de.nihas101.midas.bookings.dto.money.MoneyAmount;
 import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.bookings.monthlytotal.CumulativeSumMonthlyTotalCalculator;
 import de.nihas101.midas.bookings.monthlytotal.MonthlySumTotalCalculator;
-import de.nihas101.midas.bookings.monthlytotal.MonthlyTotalCalculator;
 import lombok.RequiredArgsConstructor;
 
 import java.time.YearMonth;
@@ -47,7 +46,7 @@ public class DefaultInterestCalculationRow implements InterestCalculationRow {
         final Map<BookingType, MoneyAmount> cumulativeTotals = cumulativeSumMonthlyTotalCalculator.monthlyTotal();
         final MoneyAmount totalSumOfAllBookings = cumulativeTotals.values().stream()
                 .reduce(MoneyAmount.ZERO, MoneyAmount::plus);
-        final MoneyAmount balanceAtEndOfMonth = bookings.initialBalance().plus(totalSumOfAllBookings);
+        final MoneyAmount balanceAtEndOfMonth = bookings.openingBalance().plus(totalSumOfAllBookings);
 
         this.interestCalculationRow = new BaseInterestCalculationRow(
                 yearMonth.atEndOfMonth().format(DateTimeFormatter.ofPattern("dd. MMMM", locale)),

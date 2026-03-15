@@ -18,9 +18,9 @@ public class OpeningBalanceBookingRow implements BookingRow { // TODO: Test
                         "",
                         "01.01.",
                         "",
-                        Map.of(BookingType.OPENING_BALANCE, bookings.initialBalance()),
+                        java.util.Collections.emptyMap(),
                         MoneyAmount.ZERO,
-                        bookings.initialBalance()
+                        bookings.openingBalance()
                 )
         );
     }

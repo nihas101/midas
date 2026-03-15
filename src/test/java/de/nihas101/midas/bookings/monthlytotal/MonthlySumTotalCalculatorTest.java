@@ -35,14 +35,13 @@ class MonthlySumTotalCalculatorTest {
         assertEquals(MoneyAmount.ofCents(1500L), totals.get(BookingType.WITHDRAWAL));
         assertEquals(MoneyAmount.ofCents(200L), totals.get(BookingType.INTEREST));
         assertEquals(MoneyAmount.ZERO, totals.get(BookingType.TAX_PREVIOUS_YEAR));
-        assertEquals(MoneyAmount.ZERO, totals.get(BookingType.OPENING_BALANCE));
     }
 
     @Test
     void monthlyTotal_emptyMonthReturnsZeros() {
         Bookings mockBookings = new Bookings() {
             @Override
-            public MoneyAmount initialBalance() {
+            public MoneyAmount openingBalance() {
                 return MoneyAmount.ZERO;
             }
 
@@ -87,7 +86,7 @@ class MonthlySumTotalCalculatorTest {
     private static MonthlySumTotalCalculator createCalculator(final MonthlyBookings monthlyBookings) {
         Bookings bookings = new Bookings() {
             @Override
-            public MoneyAmount initialBalance() {
+            public MoneyAmount openingBalance() {
                 return MoneyAmount.ZERO;
             }
 

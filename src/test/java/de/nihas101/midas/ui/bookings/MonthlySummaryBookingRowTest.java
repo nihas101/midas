@@ -21,7 +21,6 @@ import java.util.stream.Stream;
 
 import static de.nihas101.midas.bookings.entity.BookingType.COMPENSATION;
 import static de.nihas101.midas.bookings.entity.BookingType.INTEREST;
-import static de.nihas101.midas.bookings.entity.BookingType.OPENING_BALANCE;
 import static de.nihas101.midas.bookings.entity.BookingType.TAX_CREDIT;
 import static de.nihas101.midas.bookings.entity.BookingType.TAX_PREVIOUS_YEAR;
 import static de.nihas101.midas.bookings.entity.BookingType.WITHDRAWAL;
@@ -161,8 +160,7 @@ class MonthlySummaryBookingRowTest {
                                 TAX_PREVIOUS_YEAR, MoneyAmount.ofCents(0L),
                                 TAX_CREDIT, MoneyAmount.ofCents(0L),
                                 INTEREST, MoneyAmount.ofCents(0L),
-                                COMPENSATION, MoneyAmount.ofCents(0L),
-                                OPENING_BALANCE, MoneyAmount.ofCents(0L)
+                                COMPENSATION, MoneyAmount.ofCents(0L)
                         )
                 ),
                 Arguments.of(
@@ -172,8 +170,7 @@ class MonthlySummaryBookingRowTest {
                                 TAX_PREVIOUS_YEAR, MoneyAmount.ofCents(0L),
                                 TAX_CREDIT, MoneyAmount.ofCents(0L),
                                 INTEREST, MoneyAmount.ofCents(0L),
-                                COMPENSATION, MoneyAmount.ofCents(0L),
-                                OPENING_BALANCE, MoneyAmount.ofCents(0L)
+                                COMPENSATION, MoneyAmount.ofCents(0L)
                         )
                 ),
                 Arguments.of(
@@ -193,8 +190,7 @@ class MonthlySummaryBookingRowTest {
                                 TAX_PREVIOUS_YEAR, MoneyAmount.ofCents(0L),
                                 TAX_CREDIT, MoneyAmount.ofCents(0L),
                                 INTEREST, MoneyAmount.ofCents(0L),
-                                COMPENSATION, MoneyAmount.ofCents(100L),
-                                OPENING_BALANCE, MoneyAmount.ofCents(0L)
+                                COMPENSATION, MoneyAmount.ofCents(100L)
                         )),
                 Arguments.of(
                         createBookings(null,
@@ -222,8 +218,7 @@ class MonthlySummaryBookingRowTest {
                                 TAX_PREVIOUS_YEAR, MoneyAmount.ofCents(0L),
                                 TAX_CREDIT, MoneyAmount.ofCents(0L),
                                 INTEREST, MoneyAmount.ofCents(0L),
-                                COMPENSATION, MoneyAmount.ofCents(110L),
-                                OPENING_BALANCE, MoneyAmount.ofCents(0L)
+                                COMPENSATION, MoneyAmount.ofCents(110L)
                         )),
                 Arguments.of(
                         createBookings(null,
@@ -251,8 +246,7 @@ class MonthlySummaryBookingRowTest {
                                 TAX_PREVIOUS_YEAR, MoneyAmount.ofCents(0L),
                                 TAX_CREDIT, MoneyAmount.ofCents(0L),
                                 INTEREST, MoneyAmount.ofCents(0L),
-                                COMPENSATION, MoneyAmount.ofCents(100L),
-                                OPENING_BALANCE, MoneyAmount.ofCents(0L)
+                                COMPENSATION, MoneyAmount.ofCents(100L)
                         )),
                 Arguments.of(
                         createBookings(MoneyAmount.ofCents(1000L),
@@ -280,8 +274,7 @@ class MonthlySummaryBookingRowTest {
                                 TAX_PREVIOUS_YEAR, MoneyAmount.ofCents(0L),
                                 TAX_CREDIT, MoneyAmount.ofCents(0L),
                                 INTEREST, MoneyAmount.ofCents(0L),
-                                COMPENSATION, MoneyAmount.ofCents(100L),
-                                OPENING_BALANCE, MoneyAmount.ofCents(0L)
+                                COMPENSATION, MoneyAmount.ofCents(100L)
                         ))
         );
     }
@@ -289,7 +282,7 @@ class MonthlySummaryBookingRowTest {
     private static Bookings createBookings(final MoneyAmount initialBalance, final List<Booking> bookingsInMonth) {
         return new Bookings() {
             @Override
-            public MoneyAmount initialBalance() {
+            public MoneyAmount openingBalance() {
                 return initialBalance;
             }
 

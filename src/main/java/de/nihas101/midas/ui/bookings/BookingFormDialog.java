@@ -72,7 +72,7 @@ public class BookingFormDialog extends Dialog {
                 .bind(Booking::getDate, Booking::setDate);
 
         ComboBox<BookingType> typePicker = new ComboBox<>(messageSource.getMessage("bookings.type", null, locale));
-        typePicker.setItems(Arrays.stream(BookingType.values()).filter(b -> BookingType.OPENING_BALANCE != b).toList());
+        typePicker.setItems(Arrays.asList(BookingType.values()));
         typePicker.setItemLabelGenerator(t -> messageSource.getMessage(t.getI18nKey(), null, locale) + " (" + t.getId() + ")");
         typePicker.setRequired(true);
         binder.forField(typePicker)

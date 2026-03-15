@@ -62,7 +62,7 @@ public class MonthlySumTotalCalculator implements MonthlyTotalCalculator {
     }
 
     private MoneyAmount initialBalance() {
-        MoneyAmount initialBalance = bookings.initialBalance();
+        MoneyAmount initialBalance = bookings.openingBalance();
         return initialBalance == null ? MoneyAmount.ZERO : initialBalance;
     }
 

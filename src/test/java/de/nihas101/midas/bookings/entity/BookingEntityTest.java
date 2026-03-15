@@ -57,7 +57,7 @@ class BookingEntityTest {
                                 2,
                                 3,
                                 LocalDate.now(),
-                                BookingType.OPENING_BALANCE,
+                                BookingType.COMPENSATION,
                                 MoneyAmount.ofCents(100L),
                                 "Test"
                         ),
@@ -67,7 +67,7 @@ class BookingEntityTest {
                                 2,
                                 new ShareholderEntity(3, null, null, null, null),
                                 LocalDate.now(),
-                                BookingType.OPENING_BALANCE,
+                                BookingType.COMPENSATION,
                                 MoneyAmount.ofCents(100L),
                                 "Test"
                         )

@@ -1,7 +1,7 @@
 package de.nihas101.midas.bookings.dto;
 
 import de.nihas101.midas.bookings.dto.money.MoneyAmount;
-import de.nihas101.midas.bookings.entity.BookingType;
+import de.nihas101.midas.openingbalance.dto.OpeningBalance;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Month;
@@ -10,19 +10,20 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DefaultBookings implements Bookings {
     private final List<Booking> bookings;
+    private final OpeningBalance openingBalance;
 
     @Override
-    public MoneyAmount initialBalance() {
-        return bookings.stream()
-                .filter(b -> b.getType() == BookingType.OPENING_BALANCE)
-                .map(Booking::getAmount)
-                .reduce(MoneyAmount.ZERO, MoneyAmount::plus);
+    public MoneyAmount openingBalance() {
+        if (openingBalance == null) {
+            return MoneyAmount.ZERO;
+        }
+        return openingBalance.getOpeningBalance(); // TODO: Return the opening balance instead!
     }
 
     @Override
     public MonthlyBookings bookingsInMonth(final Month month) {
         final List<Booking> monthlyBookings = bookings.stream()
-                .filter(b -> b.getType() != BookingType.OPENING_BALANCE && month.equals(b.getDate().getMonth()))
+                .filter(b -> month.equals(b.getDate().getMonth()))
                 .toList();
         return new MonthlyBookings(monthlyBookings);
     }

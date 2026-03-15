@@ -1,7 +1,6 @@
 package de.nihas101.midas.ui.interest;
 
 import com.vaadin.flow.component.Unit;
-import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
@@ -9,15 +8,17 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.dto.money.MoneyAmount;
 import de.nihas101.midas.bookings.service.BookingsService;
 import de.nihas101.midas.config.MidasConfig;
+import de.nihas101.midas.interest.dto.InterestRate;
+import de.nihas101.midas.interest.service.InterestRateService;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersService;
-import de.nihas101.midas.ui.bookings.BookingFormDialog;
 import de.nihas101.midas.ui.bookings.BookingRow;
 import de.nihas101.midas.ui.bookings.BookingsToBookingRowConverter;
 import de.nihas101.midas.ui.common.MidasPage;
@@ -26,6 +27,7 @@ import de.nihas101.midas.userconfig.service.UserConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
@@ -43,14 +45,18 @@ public class InterestView extends MidasPage {
     // TODO: Get rid of 'service' in these names, it adds nothing, maybe registry instead?
     private final ShareholdersService shareholdersService;
     private final BookingsService bookingsService;
+    private final InterestRateService interestRateService;
     private final MessageSource messageSource;
     private ComboBox<Shareholder> shareholderPicker;
     private ComboBox<Integer> yearPicker;
+    private BigDecimalField interestRateField;
+    private HorizontalLayout actionRow;
     private Grid<InterestCalculationRow> grid;
 
     public InterestView(
             final ShareholdersService shareholdersService,
             final BookingsService bookingsService,
+            final InterestRateService interestRateService,
             final MidasConfig config,
             final MessageSource messageSource,
             final UserConfigService userConfigService,
@@ -59,6 +65,7 @@ public class InterestView extends MidasPage {
         super(config, userConfigService, messageSource, midasLocaleResolver);
         this.shareholdersService = shareholdersService;
         this.bookingsService = bookingsService;
+        this.interestRateService = interestRateService;
         this.messageSource = messageSource;
 
         VerticalLayout content = new VerticalLayout();
@@ -78,7 +85,8 @@ public class InterestView extends MidasPage {
 
         setupShareholderPicker();
         setupYearPicker();
-        final HorizontalLayout actionRow = createActionRow();
+        actionRow = createActionRow();
+        actionRow.setVisible(false);
 
         header.add(shareholderPicker, yearPicker, actionRow);
         header.setFlexGrow(1, actionRow);
@@ -108,43 +116,68 @@ public class InterestView extends MidasPage {
     }
 
     private HorizontalLayout createActionRow() {
-        // TODO: Replace with a way to enter the interest rate (Zinssatz)
-        final Button addBookingButton = new Button(messageSource.getMessage("bookings.add-booking", null, getLocale()));
-        addBookingButton.addClickListener(e -> {
-            new BookingFormDialog(
-                    shareholdersService,
-                    bookingsService,
-                    messageSource,
-                    getLocale(),
-                    shareholderPicker.getValue(),
-                    booking -> refreshGrid()
-            ).open();
+        interestRateField = new BigDecimalField(messageSource.getMessage("interest.rate.label", null, getLocale()));
+        interestRateField.setSuffixComponent(new Span("%"));
+        interestRateField.addValueChangeListener(e -> {
+            if (e.isFromClient()) {
+                saveInterestRate();
+            }
         });
 
         final HorizontalLayout actions = new HorizontalLayout();
         actions.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
-        actions.add(addBookingButton);
+        actions.add(interestRateField);
         actions.setWidthFull();
 
         return actions;
     }
 
-    private void refreshGrid() {
-        Shareholder shareholder = shareholderPicker.getValue();
-        Integer year = yearPicker.getValue(); // TODO: Wrap in java Year?
-
+    private void saveInterestRate() {
+        final Shareholder shareholder = shareholderPicker.getValue();
+        final Integer year = yearPicker.getValue(); // TODO: Turn into year
+        final BigDecimal rate = interestRateField.getValue();
         if (shareholder == null || year == null) {
+            return;
+        }
+
+        final InterestRate interestRate = interestRateService.interestRate(shareholder.getId(), Year.of(year));
+        if (interestRate != null) {
+            interestRate.setInterestRate(rate); // TODO: This mutates the object! Do it differently
+            interestRateService.update(interestRate);
+        } else {
+            interestRateService.create(new InterestRate(null, shareholder.getId(), rate, Year.of(year)));
+        }
+        refreshGrid();
+    }
+
+    private void refreshGrid() {
+        final Shareholder shareholder = shareholderPicker.getValue();
+        final Integer year = yearPicker.getValue(); // TODO: Wrap in java Year immediately!
+
+        final boolean hasSelection = shareholder != null && year != null;
+        actionRow.setVisible(hasSelection);
+
+        if (!hasSelection) {
+            interestRateField.setValue(null);
             grid.setItems(new ArrayList<>());
             return;
         }
 
-        Bookings bookings = bookingsService.bookingsForShareholderAndYear(shareholder.getId(), year);
+        final InterestRate rate = interestRateService.interestRate(shareholder.getId(), Year.of(year));
+        // TODO: This mutates the object! Do it differently
+        if (rate != null) {
+            interestRateField.setValue(rate.getInterestRate());
+        } else {
+            interestRateField.setValue(BigDecimal.ZERO);
+        }
+
+        final Bookings bookings = bookingsService.bookingsForShareholderAndYear(shareholder.getId(), year);
         grid.setItems(createRows(year, bookings));
     }
 
     // TODO: This is currently just a copy from bookings view, this needs to be its own thing
     private List<InterestCalculationRow> createRows(final Integer year, final Bookings bookings) {
-        List<InterestCalculationRow> rows = new ArrayList<>();
+        final List<InterestCalculationRow> rows = new ArrayList<>();
         rows.add(new OpeningBalanceInterestCalculationRow(bookings, Year.of(year), getLocale())); // TODO: Rename this for booking view and use own class here
         rows.addAll(monthlySummaryRows(year, bookings));
         return rows;
@@ -153,7 +186,7 @@ public class InterestView extends MidasPage {
     // TODO: Decouple this from the bookings view classes
     private List<InterestCalculationRow> monthlySummaryRows(final Integer year, final Bookings bookings) {
         final List<InterestCalculationRow> rows = new ArrayList<>();
-        MoneyAmount currentBalance = bookings.initialBalance();
+        MoneyAmount currentBalance = bookings.openingBalance();
 
         for (Month month : Month.values()) {
             final List<BookingRow> bookingRows = new BookingsToBookingRowConverter(bookings, month, currentBalance).bookingRows();

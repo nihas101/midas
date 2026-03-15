@@ -6,6 +6,7 @@ import de.nihas101.midas.bookings.dto.money.MoneyAmount;
 import de.nihas101.midas.bookings.entity.BookingEntity;
 import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.bookings.repository.BookingsRepository;
+import de.nihas101.midas.openingbalance.repository.OpeningBalanceRepository;
 import de.nihas101.midas.shareholders.entity.ShareholderEntity;
 import de.nihas101.midas.shareholders.repository.ShareholdersRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,6 +41,9 @@ class BookingsServiceTest {
 
     @InjectMocks
     private BookingsService bookingsService;
+
+    @Mock
+    private OpeningBalanceRepository openingBalanceRepository;
 
     private ShareholderEntity shareholder;
 
@@ -76,7 +80,7 @@ class BookingsServiceTest {
 
         // Assert
         assertNotNull(result);
-        assertEquals(MoneyAmount.ZERO, result.initialBalance());
+        assertEquals(MoneyAmount.ZERO, result.openingBalance());
         assertEquals(1, result.bookingsInMonth(Month.MARCH).bookings().size());
     }
 
@@ -122,27 +126,32 @@ class BookingsServiceTest {
     @Test
     void update_success() {
         // Arrange
+        final LocalDate now = LocalDate.now();
+        final MoneyAmount amount = MoneyAmount.ofCents(200L);
         Booking dto = Booking.builder()
                 .id(10)
                 .shareholderId(1)
-                .date(LocalDate.now())
+                .date(now)
                 .type(BookingType.INTEREST)
-                .amount(MoneyAmount.ofCents(200L))
+                .amount(amount)
                 .build();
 
         when(shareholdersRepository.findById(1)).thenReturn(Optional.of(shareholder));
 
-        BookingEntity existing = new BookingEntity();
-        existing.setId(10);
-        when(bookingsRepository.findById(10)).thenReturn(Optional.of(existing));
+        BookingEntity expectedSave = new BookingEntity();
+        expectedSave.setId(10);
+        expectedSave.setShareholder(new ShareholderEntity(1, null, null, null, null));
+        expectedSave.setType(BookingType.INTEREST);
+        expectedSave.setDate(now);
+        expectedSave.setAmount(amount);
 
         // Act
         bookingsService.update(dto);
 
         // Assert
-        verify(bookingsRepository).save(existing);
-        assertEquals(BookingType.INTEREST, existing.getType());
-        assertEquals(MoneyAmount.ofCents(200L), existing.getAmount());
+        verify(bookingsRepository).save(expectedSave);
+        assertEquals(BookingType.INTEREST, expectedSave.getType());
+        assertEquals(amount, expectedSave.getAmount());
     }
 
     @Test

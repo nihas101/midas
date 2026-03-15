@@ -6,6 +6,8 @@ import de.nihas101.midas.bookings.dto.CachingBookings;
 import de.nihas101.midas.bookings.dto.DefaultBookings;
 import de.nihas101.midas.bookings.entity.BookingEntity;
 import de.nihas101.midas.bookings.repository.BookingsRepository;
+import de.nihas101.midas.openingbalance.dto.OpeningBalance;
+import de.nihas101.midas.openingbalance.repository.OpeningBalanceRepository;
 import de.nihas101.midas.shareholders.entity.ShareholderEntity;
 import de.nihas101.midas.shareholders.repository.ShareholdersRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,14 +16,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.Year;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class BookingsService implements BookingsWriter, BookingsReader {
 
+    // TODO Use the other services? instead of the raw repository
     private final BookingsRepository bookingsRepository;
     private final ShareholdersRepository shareholdersRepository;
+    private final OpeningBalanceRepository openingBalanceRepository;
 
     @Override
     public Bookings bookingsForShareholderAndYear(final Integer shareholderId, final Integer year) {
@@ -35,9 +40,15 @@ public class BookingsService implements BookingsWriter, BookingsReader {
                 .stream()
                 .map(Booking::fromEntity)
                 .toList();
+
+        final OpeningBalance openingBalance = openingBalanceRepository.findByShareholderAndDate(shareholder, Year.of(year).atDay(1))
+                .map(OpeningBalance::fromEntity)
+                .orElse(null);
+
         return new CachingBookings(
                 new DefaultBookings(
-                        bookings
+                        bookings,
+                        openingBalance
                 )
         );
     }
@@ -48,10 +59,7 @@ public class BookingsService implements BookingsWriter, BookingsReader {
         if (booking.getId() != null) {
             throw new IllegalArgumentException("BookingService#create with booking.getId() != null"); // TODO: i18n
         }
-        ShareholderEntity shareholder = shareholdersRepository.findById(booking.getShareholderId())
-                .orElseThrow(() -> new IllegalArgumentException("Shareholder not found")); // TODO: i18n
-        BookingEntity entity = BookingEntity.fromDto(booking, shareholder);
-        bookingsRepository.save(entity);
+        upsertEntity(booking);
     }
 
     @Transactional
@@ -60,20 +68,13 @@ public class BookingsService implements BookingsWriter, BookingsReader {
         if (booking.getId() == null) {
             throw new IllegalArgumentException("BookingService#udpate with booking.getId() == null"); // TODO: i18n
         }
-        final ShareholderEntity shareholder = shareholdersRepository.findById(booking.getShareholderId())
+
+        upsertEntity(booking);
+    }
+
+    private void upsertEntity(final Booking booking) {
+        ShareholderEntity shareholder = shareholdersRepository.findById(booking.getShareholderId())
                 .orElseThrow(() -> new IllegalArgumentException("Shareholder not found")); // TODO: i18n
-
-        final BookingEntity entity = booking.getId() != null ?
-                bookingsRepository.findById(booking.getId()).orElse(new BookingEntity()) :
-                new BookingEntity();
-
-        entity.setId(booking.getId());
-        entity.setShareholder(shareholder);
-        entity.setDate(booking.getDate());
-        entity.setType(booking.getType());
-        entity.setAmount(booking.getAmount());
-        entity.setComment(booking.getComment());
-
-        bookingsRepository.save(entity);
+        bookingsRepository.save(BookingEntity.fromDto(booking, shareholder));
     }
 }

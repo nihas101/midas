@@ -22,9 +22,9 @@ public class CachingBookings implements Bookings {
     }
 
     @Override
-    public MoneyAmount initialBalance() {
+    public MoneyAmount openingBalance() {
         if (initialBalance == null) {
-            initialBalance = delegate.initialBalance();
+            initialBalance = delegate.openingBalance();
         }
         return initialBalance;
     }
