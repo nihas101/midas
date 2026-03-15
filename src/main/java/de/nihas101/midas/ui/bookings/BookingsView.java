@@ -29,7 +29,6 @@ import java.time.Month;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.IntStream;
 
 @Slf4j
@@ -40,7 +39,6 @@ public class BookingsView extends MidasPage {
     private final ShareholdersService shareholdersService;
     private final BookingsService bookingsService;
     private final MessageSource messageSource;
-    private final Locale locale;
 
     private ComboBox<Shareholder> shareholderPicker;
     private ComboBox<Integer> yearPicker;
@@ -58,7 +56,6 @@ public class BookingsView extends MidasPage {
         this.shareholdersService = shareholdersService;
         this.bookingsService = bookingsService;
         this.messageSource = messageSource;
-        this.locale = midasLocaleResolver.resolve();
 
         VerticalLayout content = new VerticalLayout();
         content.setSizeFull();
@@ -84,7 +81,7 @@ public class BookingsView extends MidasPage {
     }
 
     private void setupShareholderPicker() {
-        shareholderPicker = new ComboBox<>(messageSource.getMessage("bookings.shareholder", null, locale));
+        shareholderPicker = new ComboBox<>(messageSource.getMessage("bookings.shareholder", null, getLocale()));
         shareholderPicker.setItems(shareholdersService.shareholders().toList());
         shareholderPicker.setItemLabelGenerator(s -> s.getFirstName() + " " + s.getLastName() + " (" + s.getDisplayId() + ")");
         shareholderPicker.setPlaceholder("Search by name or ID..."); // TODO: i18n
@@ -99,20 +96,20 @@ public class BookingsView extends MidasPage {
                 .map(i -> now.getYear() - i)
                 .boxed()
                 .toList();
-        yearPicker = new ComboBox<>(messageSource.getMessage("bookings.year", null, locale), selectableYears);
+        yearPicker = new ComboBox<>(messageSource.getMessage("bookings.year", null, getLocale()), selectableYears);
         yearPicker.setValue(LocalDate.now().getYear());
         yearPicker.setWidth(6, Unit.EM);
         yearPicker.addValueChangeListener(e -> refreshGrid());
     }
 
     private HorizontalLayout createActionRow() {
-        final Button addBookingButton = new Button(messageSource.getMessage("bookings.add-booking", null, locale));
+        final Button addBookingButton = new Button(messageSource.getMessage("bookings.add-booking", null, getLocale()));
         addBookingButton.addClickListener(e -> {
             new BookingFormDialog(
                     shareholdersService,
                     bookingsService,
                     messageSource,
-                    locale,
+                    getLocale(),
                     shareholderPicker.getValue(),
                     booking -> refreshGrid()
             ).open();
@@ -163,7 +160,7 @@ public class BookingsView extends MidasPage {
         if (amount == null || amount.equals(MoneyAmount.ZERO)) {
             return ""; // To display empty cells for empty amounts
         }
-        return amount.format(locale);
+        return amount.format(getLocale());
     }
 
     private void setupColumn(final BookingType bookingType) {
@@ -174,11 +171,11 @@ public class BookingsView extends MidasPage {
     }
 
     private void setupColumn(
-            final Grid.Column<BookingRow> column,
+            final Grid.Column<?> column,
             final String i18nKey,
             final ColumnTextAlign columnTextAlign
     ) {
-        final Span header = new Span(messageSource.getMessage(i18nKey, null, locale));
+        final Span header = new Span(messageSource.getMessage(i18nKey, null, getLocale()));
         header.getElement().setAttribute("part", "header-cell-content"); // To allow common header styling
 
         column.setAutoWidth(true)
@@ -203,7 +200,7 @@ public class BookingsView extends MidasPage {
 
     private List<BookingRow> createRows(final Bookings bookings) {
         List<BookingRow> rows = new ArrayList<>();
-        rows.add(new OpeningBalanceRow(bookings));
+        rows.add(new OpeningBalanceBookingRow(bookings));
         rows.addAll(monthlySummaryRows(bookings));
         return rows;
     }
@@ -222,7 +219,7 @@ public class BookingsView extends MidasPage {
 
                 rows.add(
                         new MonthlySummaryBookingRow(
-                                messageSource.getMessage("bookings.table.summary.monthly", null, locale),
+                                messageSource.getMessage("bookings.table.summary.monthly", null, getLocale()),
                                 bookings,
                                 month
                         )
@@ -230,7 +227,7 @@ public class BookingsView extends MidasPage {
                 rows.add(
                         new CumulativeSummaryBookingRow(
                                 "",
-                                messageSource.getMessage("bookings.table.summary.cumulative", null, locale),
+                                messageSource.getMessage("bookings.table.summary.cumulative", null, getLocale()),
                                 bookings,
                                 month
                         )

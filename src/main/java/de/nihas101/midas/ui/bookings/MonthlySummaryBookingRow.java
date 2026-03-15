@@ -3,7 +3,7 @@ package de.nihas101.midas.ui.bookings;
 import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.dto.money.MoneyAmount;
 import de.nihas101.midas.bookings.entity.BookingType;
-import de.nihas101.midas.bookings.monthlytotal.DefaultMonthlyTotalCalculator;
+import de.nihas101.midas.bookings.monthlytotal.MonthlySumTotalCalculator;
 import de.nihas101.midas.bookings.monthlytotal.MonthlyTotalCalculator;
 import lombok.RequiredArgsConstructor;
 
@@ -13,7 +13,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class MonthlySummaryBookingRow implements BookingRow {
 
-    private final BaseBookingRow bookingRow;
+    private final BookingRow bookingRow;
 
     public MonthlySummaryBookingRow(
             final String comment,
@@ -22,7 +22,7 @@ public class MonthlySummaryBookingRow implements BookingRow {
     ) {
         this(
                 comment,
-                new DefaultMonthlyTotalCalculator(bookings, month)
+                new MonthlySumTotalCalculator(bookings, month)
         );
     }
 

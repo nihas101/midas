@@ -12,10 +12,9 @@ import de.nihas101.midas.userconfig.service.UserConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 
-import java.util.Locale;
-
 // TODO: Add ability to set favicon
 // TODO: Add ability to set icon on main page
+// TODO: Redirect here for 404s
 @Slf4j
 @Route("main")
 @RouteAlias("")
@@ -34,8 +33,6 @@ public class MainView extends MidasPage {
                 messageSource,
                 midasLocaleResolver
         );
-
-        final Locale locale = midasLocaleResolver.resolve();
 
         final VerticalLayout contentLayout = new VerticalLayout();
         contentLayout.addClassName("main-view-content");

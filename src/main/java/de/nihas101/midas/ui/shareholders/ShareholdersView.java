@@ -12,8 +12,6 @@ import de.nihas101.midas.userconfig.service.UserConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 
-import java.util.Locale;
-
 @Slf4j
 @Route("shareholders")
 @PageTitle("Shareholders") // TODO: Is it possible to add translations for the page title?
@@ -33,8 +31,6 @@ public class ShareholdersView extends MidasPage {
                 midasLocaleResolver
         );
 
-        final Locale locale = midasLocaleResolver.resolve();
-
         final VerticalLayout contentLayout = new VerticalLayout();
         contentLayout.addClassName("shareholders-view-content");
         contentLayout.setSizeFull();
@@ -45,7 +41,7 @@ public class ShareholdersView extends MidasPage {
                         shareholdersService,
                         shareholdersService,
                         messageSource,
-                        locale
+                        getLocale()
                 )
         );
 

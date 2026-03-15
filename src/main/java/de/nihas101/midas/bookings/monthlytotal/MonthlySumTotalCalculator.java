@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
-public class DefaultMonthlyTotalCalculator implements MonthlyTotalCalculator {
+public class MonthlySumTotalCalculator implements MonthlyTotalCalculator {
 
     private final Bookings bookings;
     private final Month month;

@@ -8,11 +8,11 @@ import lombok.RequiredArgsConstructor;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public class OpeningBalanceRow implements BookingRow { // TODO: Test
+public class OpeningBalanceBookingRow implements BookingRow { // TODO: Test
 
-    private final BaseBookingRow bookingRow;
+    private final BookingRow bookingRow;
 
-    public OpeningBalanceRow(final Bookings bookings) {
+    public OpeningBalanceBookingRow(final Bookings bookings) {
         this(
                 new BaseBookingRow(
                         "",

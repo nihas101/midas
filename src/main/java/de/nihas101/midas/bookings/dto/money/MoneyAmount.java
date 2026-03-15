@@ -48,6 +48,10 @@ public class MoneyAmount {
         return new MoneyAmount(this.cents - other.cents);
     }
 
+    public MoneyAmount abs() { // TODO: Test
+        return MoneyAmount.ofCents(Math.abs(cents));
+    }
+
     public BigDecimal toBigDecimal() {
         return new BigDecimal(cents).divide(MULTIPLIER, 4, RoundingMode.HALF_UP);
     }
@@ -67,5 +71,9 @@ public class MoneyAmount {
     @Override
     public String toString() {
         return format(Locale.ENGLISH); // Default for internal logging/debugging
+    }
+
+    public boolean smallerThan(final MoneyAmount amount) { // TODO: Add tests
+        return getCents() < amount.getCents();
     }
 }

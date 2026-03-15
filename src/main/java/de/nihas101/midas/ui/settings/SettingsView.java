@@ -11,8 +11,6 @@ import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
 import de.nihas101.midas.userconfig.service.UserConfigService;
 import org.springframework.context.MessageSource;
 
-import java.util.Locale;
-
 // TODO: Add descriptions to the settings
 // TODO: Add property to hide settings
 @Route("settings")
@@ -38,8 +36,6 @@ public class SettingsView extends MidasPage {
         verticalLayout.setPadding(true);
         verticalLayout.setAlignItems(FlexComponent.Alignment.START);
 
-        final Locale locale = midasLocaleResolver.resolve();
-
         final ThemeToggleButton themeToggleButton = new ThemeToggleButton(
                 config,
                 userConfigService
@@ -47,7 +43,7 @@ public class SettingsView extends MidasPage {
 
         final LocaleSelect localeSelect = new LocaleSelect(
                 i18NProvider,
-                locale,
+                getLocale(),
                 config,
                 userConfigService
         );

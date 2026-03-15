@@ -13,7 +13,7 @@ import java.util.EnumMap;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public class CumulativeMonthlyTotalCalculator implements MonthlyTotalCalculator {
+public class CumulativeSumMonthlyTotalCalculator implements MonthlyTotalCalculator {
 
     private final Bookings bookings;
     private final Month month;

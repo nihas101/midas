@@ -9,7 +9,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class DefaultBookingRow implements BookingRow {
 
-    private final BaseBookingRow bookingRow;
+    private final BookingRow bookingRow;
 
     public DefaultBookingRow(
             final String displayId,

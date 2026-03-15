@@ -17,12 +17,16 @@ import de.nihas101.midas.ui.settings.SettingsView;
 import de.nihas101.midas.ui.shareholders.ShareholdersView;
 import de.nihas101.midas.userconfig.entity.UserConfig;
 import de.nihas101.midas.userconfig.service.UserConfigService;
+import lombok.Getter;
 import org.springframework.context.MessageSource;
 
 import java.util.Locale;
 import java.util.Optional;
 
+@Getter
 public class MidasPage extends AppLayout {
+
+    private final Locale locale;
 
     public MidasPage(
             final MidasConfig config,
@@ -32,7 +36,7 @@ public class MidasPage extends AppLayout {
     ) {
         final UserConfig userConfig = getUserConfig(userConfigService);
         applyTheme(userConfig.getTheme(), config.getTheme().getDefaultTheme());
-        final Locale locale = midasLocaleResolver.resolve();
+        locale = midasLocaleResolver.resolve();
 
         HorizontalLayout navbarContent = new HorizontalLayout();
         navbarContent.setWidthFull();
@@ -49,7 +53,7 @@ public class MidasPage extends AppLayout {
         final RouterLink mainViewLink = new RouterLink(messageSource.getMessage("main.view", null, locale), MainView.class);
         final RouterLink shareholdersViewLink = new RouterLink(messageSource.getMessage("shareholders", null, locale), ShareholdersView.class);
         final RouterLink bookingsViewLink = new RouterLink(messageSource.getMessage("bookings", null, locale), BookingsView.class);
-        final RouterLink interestViewLink = new RouterLink(messageSource.getMessage("interest", null, locale), InterestView.class);
+        final RouterLink interestViewLink = new RouterLink(messageSource.getMessage("interest-calculation", null, locale), InterestView.class);
         final RouterLink settingsLink = new RouterLink(messageSource.getMessage("settings", null, locale), SettingsView.class);
 
         final VerticalLayout drawerContent = new VerticalLayout(mainViewLink, shareholdersViewLink, bookingsViewLink, interestViewLink, settingsLink);
