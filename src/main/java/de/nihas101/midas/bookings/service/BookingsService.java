@@ -23,7 +23,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BookingsService implements BookingsWriter, BookingsReader {
 
-    // TODO Use the other services? instead of the raw repository
+    // TODO: Use the other services? instead of the raw repository
+    // TOOD: Get rid of the services in favour of wrappers that are applied here that handle the mappings?
     private final BookingsRepository bookingsRepository;
     private final ShareholdersRepository shareholdersRepository;
     private final OpeningBalanceRepository openingBalanceRepository;

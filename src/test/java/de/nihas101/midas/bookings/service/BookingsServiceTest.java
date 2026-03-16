@@ -138,17 +138,17 @@ class BookingsServiceTest {
 
         when(shareholdersRepository.findById(1)).thenReturn(Optional.of(shareholder));
 
-        BookingEntity expectedSave = new BookingEntity();
-        expectedSave.setId(10);
-        expectedSave.setShareholder(new ShareholderEntity(1, null, null, null, null));
-        expectedSave.setType(BookingType.INTEREST);
-        expectedSave.setDate(now);
-        expectedSave.setAmount(amount);
-
         // Act
         bookingsService.update(dto);
 
         // Assert
+        BookingEntity expectedSave = BookingEntity.builder()
+                .id(10)
+                .shareholder(new ShareholderEntity(1, null, null, null, null))
+                .type(BookingType.INTEREST)
+                .date(now)
+                .amount(amount)
+                .build();
         verify(bookingsRepository).save(expectedSave);
         assertEquals(BookingType.INTEREST, expectedSave.getType());
         assertEquals(amount, expectedSave.getAmount());

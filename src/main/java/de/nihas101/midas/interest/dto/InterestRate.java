@@ -18,7 +18,7 @@ public class InterestRate {
 
     private Integer id;
     private Integer shareholderId;
-    private BigDecimal interestRate; // TODO: The conversion is not quite right here yet. Investigate
+    private BigDecimal interestRate;
     private Year year;
 
     public static InterestRate fromEntity(InterestRateEntity interestRateEntity) {
@@ -29,7 +29,9 @@ public class InterestRate {
         return new InterestRate(
                 interestRateEntity.getId(),
                 interestRateEntity.getShareholder().getId(),
-                new BigDecimal(interestRateEntity.getRate()).divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP),
+                new BigDecimal(interestRateEntity.getRate())
+                        .setScale(2, RoundingMode.HALF_UP)
+                        .divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP),
                 Year.from(interestRateEntity.getDate())
         );
     }
