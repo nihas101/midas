@@ -1,12 +1,14 @@
 package de.nihas101.midas.ui.interest;
 
 import de.nihas101.midas.bookings.dto.Bookings;
-import de.nihas101.midas.bookings.dto.money.MoneyAmount;
 import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.bookings.monthlytotal.CumulativeSumMonthlyTotalCalculator;
 import de.nihas101.midas.bookings.monthlytotal.MonthlySumTotalCalculator;
+import de.nihas101.midas.interest.interestamount.Interest;
+import de.nihas101.midas.money.MoneyAmount;
 import lombok.RequiredArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -20,6 +22,7 @@ public class DefaultInterestCalculationRow implements InterestCalculationRow {
     public DefaultInterestCalculationRow(
             final Bookings bookings,
             final YearMonth yearMonth,
+            final BigDecimal interestRate,
             final Locale locale
     ) {
         this(
@@ -27,7 +30,7 @@ public class DefaultInterestCalculationRow implements InterestCalculationRow {
                 new MonthlySumTotalCalculator(bookings, yearMonth.getMonth()),
                 new CumulativeSumMonthlyTotalCalculator(bookings, yearMonth.getMonth()),
                 yearMonth,
-                locale
+                interestRate, locale
         );
     }
 
@@ -36,6 +39,7 @@ public class DefaultInterestCalculationRow implements InterestCalculationRow {
             final MonthlySumTotalCalculator monthlyTotalCalculator,
             final CumulativeSumMonthlyTotalCalculator cumulativeSumMonthlyTotalCalculator,
             final YearMonth yearMonth,
+            final BigDecimal interestRate,
             final Locale locale
     ) {
         final Map<BookingType, MoneyAmount> monthTotals = monthlyTotalCalculator.monthlyTotal();
@@ -52,7 +56,11 @@ public class DefaultInterestCalculationRow implements InterestCalculationRow {
                 yearMonth.atEndOfMonth().format(DateTimeFormatter.ofPattern("dd. MMMM", locale)),
                 monthTotalSum,
                 balanceAtEndOfMonth,
-                0, // TODO: Calculate
+                new Interest(
+                        balanceAtEndOfMonth,
+                        BigDecimal.valueOf(30L),
+                        interestRate
+                ).interestAmount(),
                 locale
         );
     }
@@ -63,12 +71,12 @@ public class DefaultInterestCalculationRow implements InterestCalculationRow {
     }
 
     @Override
-    public String totalTransactionAmountAsString() {
-        return interestCalculationRow.totalTransactionAmountAsString();
+    public Transaction totalTransaction() {
+        return interestCalculationRow.totalTransaction();
     }
 
     @Override
-    public String balanceAtEndOfMonth() {
+    public Transaction balanceAtEndOfMonth() {
         return interestCalculationRow.balanceAtEndOfMonth();
     }
 
@@ -78,7 +86,7 @@ public class DefaultInterestCalculationRow implements InterestCalculationRow {
     }
 
     @Override
-    public int interestAmount() {
+    public BigDecimal interestAmount() {
         return interestCalculationRow.interestAmount();
     }
 }

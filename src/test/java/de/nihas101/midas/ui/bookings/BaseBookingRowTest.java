@@ -1,7 +1,7 @@
 package de.nihas101.midas.ui.bookings;
 
-import de.nihas101.midas.bookings.dto.money.MoneyAmount;
 import de.nihas101.midas.bookings.entity.BookingType;
+import de.nihas101.midas.money.MoneyAmount;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;

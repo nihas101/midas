@@ -1,8 +1,8 @@
 package de.nihas101.midas.bookings.dto;
 
-import de.nihas101.midas.bookings.dto.money.MoneyAmount;
 import de.nihas101.midas.bookings.entity.BookingEntity;
 import de.nihas101.midas.bookings.entity.BookingType;
+import de.nihas101.midas.money.MoneyAmount;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -1,8 +1,9 @@
 package de.nihas101.midas.ui.interest;
 
-import de.nihas101.midas.bookings.dto.money.MoneyAmount;
+import de.nihas101.midas.money.MoneyAmount;
 import lombok.RequiredArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.Locale;
 
 @RequiredArgsConstructor
@@ -12,14 +13,14 @@ public class BaseInterestCalculationRow implements InterestCalculationRow {
     private final MoneyAmount monthlyTotalSum;
     private final MoneyAmount balanceAtEndOfMonth;
     private final int interestDaysCount;
-    private final int interestAmount;
+    private final BigDecimal interestAmount; // TODO: Use an appropriate class (MoneyAmount?)
     private final Locale locale;
 
     public BaseInterestCalculationRow(
             final String monthAsString,
             final MoneyAmount totalTransactionAmount,
             final MoneyAmount balanceAtEndOfMonth,
-            final int interestAmount, // TODO: Wrap in class
+            final BigDecimal interestAmount, // TODO: Use an appropriate class (MoneyAmount?)
             final Locale locale
     ) {
         this(
@@ -38,22 +39,13 @@ public class BaseInterestCalculationRow implements InterestCalculationRow {
     }
 
     @Override
-    public String totalTransactionAmountAsString() {
-        return toInterestCalculationAmountString(monthlyTotalSum);
+    public Transaction totalTransaction() {
+        return new Transaction(monthlyTotalSum); // TODO: Move into field
     }
 
     @Override
-    public String balanceAtEndOfMonth() {
-        return toInterestCalculationAmountString(balanceAtEndOfMonth);
-    }
-
-    // TODO: This would be better in a print class that we inject
-    private String toInterestCalculationAmountString(final MoneyAmount monthlyTotalSum) {
-        if (monthlyTotalSum.smallerThan(MoneyAmount.ZERO)) {
-            return monthlyTotalSum.abs().format(locale) + " H";
-        } else {
-            return monthlyTotalSum.format(locale) + " S";
-        }
+    public Transaction balanceAtEndOfMonth() {
+        return new Transaction(balanceAtEndOfMonth); // TODO: Move into field
     }
 
     @Override
@@ -62,7 +54,7 @@ public class BaseInterestCalculationRow implements InterestCalculationRow {
     }
 
     @Override
-    public int interestAmount() {
+    public BigDecimal interestAmount() {
         return interestAmount;
     }
 }

@@ -1,8 +1,10 @@
 package de.nihas101.midas.ui.interest;
 
 import de.nihas101.midas.bookings.dto.Bookings;
+import de.nihas101.midas.interest.interestamount.Interest;
 import lombok.RequiredArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -15,6 +17,7 @@ public class OpeningBalanceInterestCalculationRow implements InterestCalculation
     public OpeningBalanceInterestCalculationRow(
             final Bookings bookings,
             final Year year,
+            final BigDecimal interestRate,
             final Locale locale
     ) {
         this(
@@ -22,7 +25,11 @@ public class OpeningBalanceInterestCalculationRow implements InterestCalculation
                         "Vortrag per 01.01." + year.format(DateTimeFormatter.ofPattern("yyyy")),
                         bookings.openingBalance(),
                         bookings.openingBalance(),
-                        0, // TODO: Calculate (or is this always 300)?
+                        new Interest(
+                                bookings.openingBalance(),
+                                BigDecimal.valueOf(30L), // TODO: Make this passable from outside
+                                interestRate
+                        ).interestAmount(),
                         locale
                 )
         );
@@ -34,12 +41,12 @@ public class OpeningBalanceInterestCalculationRow implements InterestCalculation
     }
 
     @Override
-    public String totalTransactionAmountAsString() {
-        return "";
+    public Transaction totalTransaction() {
+        return null;
     }
 
     @Override
-    public String balanceAtEndOfMonth() {
+    public Transaction balanceAtEndOfMonth() {
         return interestCalculationRow.balanceAtEndOfMonth();
     }
 
@@ -49,7 +56,7 @@ public class OpeningBalanceInterestCalculationRow implements InterestCalculation
     }
 
     @Override
-    public int interestAmount() {
+    public BigDecimal interestAmount() {
         return interestCalculationRow.interestAmount();
     }
 }

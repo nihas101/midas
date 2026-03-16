@@ -1,4 +1,4 @@
-package de.nihas101.midas.bookings.dto.money;
+package de.nihas101.midas.money;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

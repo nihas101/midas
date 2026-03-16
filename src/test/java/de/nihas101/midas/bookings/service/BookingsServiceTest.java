@@ -2,10 +2,10 @@ package de.nihas101.midas.bookings.service;
 
 import de.nihas101.midas.bookings.dto.Booking;
 import de.nihas101.midas.bookings.dto.Bookings;
-import de.nihas101.midas.bookings.dto.money.MoneyAmount;
 import de.nihas101.midas.bookings.entity.BookingEntity;
 import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.bookings.repository.BookingsRepository;
+import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.openingbalance.repository.OpeningBalanceRepository;
 import de.nihas101.midas.shareholders.entity.ShareholderEntity;
 import de.nihas101.midas.shareholders.repository.ShareholdersRepository;

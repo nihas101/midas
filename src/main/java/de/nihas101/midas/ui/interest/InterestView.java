@@ -12,11 +12,11 @@ import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.nihas101.midas.bookings.dto.Bookings;
-import de.nihas101.midas.bookings.dto.money.MoneyAmount;
 import de.nihas101.midas.bookings.service.BookingsService;
 import de.nihas101.midas.config.MidasConfig;
 import de.nihas101.midas.interest.dto.InterestRate;
 import de.nihas101.midas.interest.service.InterestRateService;
+import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersService;
 import de.nihas101.midas.ui.bookings.BookingRow;
@@ -35,6 +35,7 @@ import java.time.YearMonth;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 @Slf4j
@@ -47,8 +48,8 @@ public class InterestView extends MidasPage {
     private final BookingsService bookingsService;
     private final InterestRateService interestRateService;
     private final MessageSource messageSource;
-    private ComboBox<Shareholder> shareholderPicker;
-    private ComboBox<Integer> yearPicker;
+    private ComboBox<Shareholder> shareholderPicker; // TODO: Store the selected shareholder somewhere so that we can use that in the same filter when switching views
+    private ComboBox<Integer> yearPicker; // TODO: Store the selected shareholder somewhere so that we can use that in the same filter when switching views
     private BigDecimalField interestRateField;
     private HorizontalLayout actionRow;
     private Grid<InterestCalculationRow> grid;
@@ -178,7 +179,14 @@ public class InterestView extends MidasPage {
     // TODO: This is currently just a copy from bookings view, this needs to be its own thing
     private List<InterestCalculationRow> createRows(final Integer year, final Bookings bookings) {
         final List<InterestCalculationRow> rows = new ArrayList<>();
-        rows.add(new OpeningBalanceInterestCalculationRow(bookings, Year.of(year), getLocale())); // TODO: Rename this for booking view and use own class here
+        rows.add(
+                new OpeningBalanceInterestCalculationRow(
+                        bookings,
+                        Year.of(year),
+                        interestRateField.getValue(),
+                        getLocale()
+                )
+        ); // TODO: Rename this for booking view and use own class here
         rows.addAll(monthlySummaryRows(year, bookings));
         return rows;
     }
@@ -200,6 +208,7 @@ public class InterestView extends MidasPage {
                         new DefaultInterestCalculationRow(
                                 bookings,
                                 YearMonth.of(year, month),
+                                interestRateField.getValue(),
                                 getLocale()
                         )
                 );
@@ -213,12 +222,28 @@ public class InterestView extends MidasPage {
         grid = new Grid<>();
         grid.setSizeFull();
 
+        // TODO: Null safety!
         setupColumn(grid.addColumn(InterestCalculationRow::monthAsString), "Monat", ColumnTextAlign.START);
         // TODO: These header wit S/H were displayed slightly different in the old program output, investigate how best to display that
         //       Probably involves a div or span
-        setupColumn(grid.addColumn(InterestCalculationRow::totalTransactionAmountAsString), "Bewegungen S/H", ColumnTextAlign.END); // TODO: i18n
-        setupColumn(grid.addColumn(InterestCalculationRow::balanceAtEndOfMonth), "Saldo S/H", ColumnTextAlign.END); // TODO: i18n
+        setupColumn(
+                grid.addColumn(i -> Optional.ofNullable(i)
+                        .map(InterestCalculationRow::totalTransaction)
+                        .map(Transaction::moneyAmount)
+                        .map(m -> m.format(getLocale()))
+                        .orElse("")
+                ), "Bewegungen", ColumnTextAlign.END); // TODO: i18n
+        setupColumn(
+                grid.addColumn(i -> Optional.ofNullable(i)
+                        .map(InterestCalculationRow::totalTransaction)
+                        .map(Transaction::type)
+                        .map(TransactionType::getValue)
+                        .orElse("")
+                ), "S/H", ColumnTextAlign.START); // TODO: i18n
+        setupColumn(grid.addColumn(i -> i.balanceAtEndOfMonth().moneyAmount().format(getLocale())), "Saldo", ColumnTextAlign.END); // TODO: i18n
+        setupColumn(grid.addColumn(i -> i.balanceAtEndOfMonth().type().getValue()), "S/H", ColumnTextAlign.START); // TODO: i18n
         setupColumn(grid.addColumn(InterestCalculationRow::interestDaysCount), "Zinstage", ColumnTextAlign.CENTER); // TODO: i18n
+        // TODO: Return a money amount here so we can format it
         setupColumn(grid.addColumn(InterestCalculationRow::interestAmount), "Zinszahl", ColumnTextAlign.CENTER); // TODO: i18n
 
         // TODO: Add Summe Zinszahl

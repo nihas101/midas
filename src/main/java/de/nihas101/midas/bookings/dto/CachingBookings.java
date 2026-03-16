@@ -1,6 +1,6 @@
 package de.nihas101.midas.bookings.dto;
 
-import de.nihas101.midas.bookings.dto.money.MoneyAmount;
+import de.nihas101.midas.money.MoneyAmount;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Month;

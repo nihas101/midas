@@ -1,6 +1,6 @@
 package de.nihas101.midas.openingbalance.dto;
 
-import de.nihas101.midas.bookings.dto.money.MoneyAmount;
+import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.openingbalance.entity.OpeningBalanceEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
