@@ -78,4 +78,10 @@ public class BookingsService implements BookingsWriter, BookingsReader {
                 .orElseThrow(() -> new IllegalArgumentException("Shareholder not found")); // TODO: i18n
         bookingsRepository.save(BookingEntity.fromDto(booking, shareholder));
     }
+
+    public void delete(final Booking booking) {
+        ShareholderEntity shareholder = shareholdersRepository.findById(booking.getShareholderId())
+                .orElseThrow(() -> new IllegalArgumentException("Shareholder not found")); // TODO: i18n
+        bookingsRepository.delete(BookingEntity.fromDto(booking, shareholder));
+    }
 }

@@ -117,7 +117,9 @@ public class InterestView extends MidasPage {
     }
 
     private HorizontalLayout createActionRow() {
+        // TODO: Extract this into its own class, so we always set the locale
         interestRateField = new BigDecimalField(messageSource.getMessage("interest.rate.label", null, getLocale()));
+        interestRateField.setLocale(getLocale());
         interestRateField.setSuffixComponent(new Span("%"));
         interestRateField.addValueChangeListener(e -> {
             if (e.isFromClient()) {

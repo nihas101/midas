@@ -1,5 +1,6 @@
 package de.nihas101.midas.ui.bookings;
 
+import de.nihas101.midas.bookings.dto.Booking;
 import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.bookings.monthlytotal.MonthlySumTotalCalculator;
@@ -8,6 +9,8 @@ import de.nihas101.midas.money.MoneyAmount;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Month;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -41,7 +44,8 @@ public class MonthlySummaryBookingRow implements BookingRow {
                 comment,
                 monthTotals,
                 monthTotalSum,
-                MoneyAmount.ZERO
+                MoneyAmount.ZERO,
+                Collections.emptyList()
         );
     }
 
@@ -78,6 +82,11 @@ public class MonthlySummaryBookingRow implements BookingRow {
     @Override
     public MoneyAmount balance() {
         return bookingRow.balance();
+    }
+
+    @Override
+    public List<Booking> bookings() {
+        return bookingRow.bookings();
     }
 
 }

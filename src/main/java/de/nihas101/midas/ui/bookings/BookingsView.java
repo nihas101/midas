@@ -3,6 +3,7 @@ package de.nihas101.midas.ui.bookings;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Span;
@@ -12,6 +13,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import de.nihas101.midas.bookings.dto.Booking;
 import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.bookings.service.BookingsService;
@@ -116,7 +118,8 @@ public class BookingsView extends MidasPage {
     // TODO: Add element for editing saldo for this year
     private HorizontalLayout createActionRow() {
         openingBalanceField = new BigDecimalField(messageSource.getMessage("bookings.type.opening-balance", null, getLocale()));
-        openingBalanceField.setSuffixComponent(new Span("€"));
+        openingBalanceField.setLocale(getLocale());
+        openingBalanceField.setSuffixComponent(new Span("€")); // TODO: Use currency from properties
         openingBalanceField.addValueChangeListener(e -> {
             if (e.isFromClient()) {
                 saveOpeningBalance();
@@ -188,11 +191,78 @@ public class BookingsView extends MidasPage {
         balanceColumn.setPartNameGenerator(r -> "balance-column"); // Header part for no vertical separators
         setupColumn(balanceColumn, "bookings.table.balance", ColumnTextAlign.END);
 
+        grid.addComponentColumn(row -> {
+            final VerticalLayout actionsContainer = new VerticalLayout();
+            actionsContainer.setPadding(false);
+            actionsContainer.setSpacing(false);
+
+            for (final Booking booking : row.bookings()) {
+                final HorizontalLayout actionRow = new HorizontalLayout();
+                actionRow.setPadding(false);
+                actionRow.setSpacing(true);
+
+                final Button editButton = createEditBookingButton(booking);
+                final Button deleteButton = createDeleteBookingButton(booking);
+
+                actionRow.add(editButton, deleteButton);
+                actionsContainer.add(actionRow);
+            }
+            return actionsContainer;
+        }).setHeader(messageSource.getMessage("shareholders.table.actions", null, getLocale())).setAutoWidth(true);
+
         content.add(grid);
 
         // Header parts for vertical separators
         grid.getHeaderRows().getFirst().getCell(totalColumn).setPartName("booking-type-column");
         grid.getHeaderRows().getFirst().getCell(balanceColumn).setPartName("balance-column");
+    }
+
+    private Button createEditBookingButton(final Booking booking) {
+        final Button editButton = new Button(messageSource.getMessage("global.edit", null, getLocale()));
+        editButton.addClickListener(e -> {
+            new BookingFormDialog(
+                    shareholdersService,
+                    bookingsService,
+                    messageSource,
+                    getLocale(),
+                    shareholderPicker.getValue(),
+                    booking,
+                    b -> refreshGrid()
+            ).open();
+        });
+        return editButton;
+    }
+
+    private Button createDeleteBookingButton(final Booking booking) {
+        final Button deleteButton = new Button(messageSource.getMessage("global.delete", null, getLocale()));
+        deleteButton.addThemeVariants(com.vaadin.flow.component.button.ButtonVariant.LUMO_ERROR);
+        deleteButton.addClickListener(e -> {
+            final ConfirmDialog dialog = createDeleteBookingDialog(booking);
+            dialog.open();
+        });
+        return deleteButton;
+    }
+
+    private ConfirmDialog createDeleteBookingDialog(final Booking booking) {
+        final ConfirmDialog dialog = new ConfirmDialog();
+        dialog.setHeader(messageSource.getMessage("bookings.table.delete.confirmation.title", null, getLocale()));
+
+        final String[] args = new String[]{
+                messageSource.getMessage(booking.getType().getI18nKey(), null, getLocale()),
+                booking.getDate().toString(),
+                booking.getAmount().format(getLocale())
+        };
+        dialog.setText(messageSource.getMessage("bookings.table.delete.confirmation.message", args, getLocale()));
+
+        dialog.setCancelable(true);
+        dialog.setCancelText(messageSource.getMessage("global.cancel", null, getLocale()));
+        dialog.setConfirmText(messageSource.getMessage("global.delete", null, getLocale()));
+        dialog.setConfirmButtonTheme("error primary");
+        dialog.addConfirmListener(event -> {
+            bookingsService.delete(booking);
+            refreshGrid();
+        });
+        return dialog;
     }
 
     private String formatAmount(final MoneyAmount amount) {
@@ -239,7 +309,7 @@ public class BookingsView extends MidasPage {
 
         OpeningBalance openingBalance = openingBalanceService.openingBalance(shareholder.getId(), Year.of(year));
         if (openingBalance != null) {
-            openingBalanceField.setValue(openingBalance.getOpeningBalance().toBigDecimal());
+            openingBalanceField.setValue(openingBalance.getOpeningBalance().toBigDecimalForInput());
         } else {
             openingBalanceField.setValue(BigDecimal.ZERO);
         }

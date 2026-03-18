@@ -42,10 +42,24 @@ public class BookingFormDialog extends Dialog {
             final Shareholder initialShareholder,
             final Consumer<Booking> onSave
     ) {
+        this(shareholdersReader, bookingsWriter, messageSource, locale, initialShareholder, null, onSave);
+    }
+
+    public BookingFormDialog(
+            final ShareholdersReader shareholdersReader,
+            final BookingsWriter bookingsWriter,
+            final MessageSource messageSource,
+            final Locale locale,
+            final Shareholder initialShareholder,
+            final Booking bookingToEdit,
+            final Consumer<Booking> onSave
+    ) {
         this.bookingsWriter = bookingsWriter;
         this.onSave = onSave;
 
-        setHeaderTitle(messageSource.getMessage("bookings.dialog.title.add", null, locale));
+        final boolean isEditMode = bookingToEdit != null;
+        final String titleKey = isEditMode ? "bookings.dialog.title.edit" : "bookings.dialog.title.add";
+        setHeaderTitle(messageSource.getMessage(titleKey, null, locale));
 
         FormLayout formLayout = new FormLayout();
 
@@ -64,8 +78,9 @@ public class BookingFormDialog extends Dialog {
                         (b, s) -> b.setShareholderId(s != null ? s.getId() : null)
                 );
 
-        // TODO: This shows mm/dd/yyyy, but this should be dd/mm/yyyy
+        // TODO: Extract into class, so we dont have to set the local everywhere
         DatePicker datePicker = new DatePicker(messageSource.getMessage("bookings.date", null, locale));
+        datePicker.setLocale(locale);
         datePicker.setRequired(true);
         binder.forField(datePicker)
                 .asRequired()
@@ -80,10 +95,12 @@ public class BookingFormDialog extends Dialog {
                 .bind(Booking::getType, Booking::setType);
 
         TextField commentField = new TextField(messageSource.getMessage("bookings.comment", null, locale));
-        binder.forField(commentField).bind(Booking::getComment, Booking::setComment);
+        binder.forField(commentField)
+                .bind(Booking::getComment, Booking::setComment);
 
-        // TODO: Need to set the right comma here
+        // TODO: Extract into class, so we dont have to set the local everywhere
         BigDecimalField amountField = new BigDecimalField(messageSource.getMessage("bookings.amount", null, locale));
+        amountField.setLocale(locale);
         amountField.setSuffixComponent(new Span("€")); // TODO: currency from config?
         binder.forField(amountField)
                 .asRequired()
@@ -97,6 +114,8 @@ public class BookingFormDialog extends Dialog {
         add(formLayout);
 
         addAnotherCheckbox = new Checkbox(messageSource.getMessage("bookings.add-another", null, locale));
+        addAnotherCheckbox.setVisible(!isEditMode);
+
         HorizontalLayout footer = new HorizontalLayout();
         footer.setWidthFull();
         footer.setFlexGrow(1, addAnotherCheckbox);
@@ -108,14 +127,17 @@ public class BookingFormDialog extends Dialog {
         footer.add(addAnotherCheckbox, saveButton, cancelButton);
         getFooter().add(footer);
 
-        // Set initial values
-        Booking booking = new Booking();
-        booking.setDate(LocalDate.now());
-        if (initialShareholder != null) {
-            booking.setShareholderId(initialShareholder.getId());
-            shareholderPicker.setValue(initialShareholder);
+        if (isEditMode) {
+            binder.setBean(bookingToEdit);
+        } else {
+            Booking booking = new Booking();
+            booking.setDate(LocalDate.now());
+            if (initialShareholder != null) {
+                booking.setShareholderId(initialShareholder.getId());
+                shareholderPicker.setValue(initialShareholder);
+            }
+            binder.setBean(booking);
         }
-        binder.setBean(booking);
     }
 
     private void save() {
@@ -125,10 +147,14 @@ public class BookingFormDialog extends Dialog {
 
         try {
             Booking booking = binder.getBean();
-            bookingsWriter.create(booking);
+            if (booking.getId() == null) {
+                bookingsWriter.create(booking);
+            } else {
+                bookingsWriter.update(booking);
+            }
             onSave.accept(booking);
 
-            if (addAnotherCheckbox.getValue()) {
+            if (addAnotherCheckbox.isVisible() && addAnotherCheckbox.getValue()) {
                 resetForm();
             } else {
                 close();
@@ -142,7 +168,7 @@ public class BookingFormDialog extends Dialog {
         Booking current = binder.getBean();
         Booking next = new Booking();
         next.setShareholderId(current.getShareholderId());
-        next.setDate(current.getDate()); // Keep same date for convenience when adding batches
+        next.setDate(current.getDate());
         binder.setBean(next);
     }
 }

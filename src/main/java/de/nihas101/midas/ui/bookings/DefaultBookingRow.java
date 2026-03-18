@@ -1,9 +1,11 @@
 package de.nihas101.midas.ui.bookings;
 
+import de.nihas101.midas.bookings.dto.Booking;
 import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.money.MoneyAmount;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -17,7 +19,8 @@ public class DefaultBookingRow implements BookingRow {
             final String comment,
             final Map<BookingType, MoneyAmount> amounts,
             final MoneyAmount total,
-            final MoneyAmount balance
+            final MoneyAmount balance,
+            final List<Booking> bookings
     ) {
         this(
                 new BaseBookingRow(
@@ -26,7 +29,8 @@ public class DefaultBookingRow implements BookingRow {
                         comment,
                         amounts,
                         total,
-                        balance
+                        balance,
+                        bookings
                 )
         );
     }
@@ -39,6 +43,11 @@ public class DefaultBookingRow implements BookingRow {
     @Override
     public String displayId() {
         return bookingRow.displayId();
+    }
+
+    @Override
+    public List<Booking> bookings() {
+        return bookingRow.bookings();
     }
 
     @Override

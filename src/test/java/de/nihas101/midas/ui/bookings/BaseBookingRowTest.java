@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,7 +26,8 @@ class BaseBookingRowTest {
                 "comment",
                 amounts,
                 MoneyAmount.ofCents(100L),
-                MoneyAmount.ofCents(1000L)
+                MoneyAmount.ofCents(1000L),
+                Collections.emptyList()
         );
         final MoneyAmount amount = bookingRow.amount(bookingType);
         Assertions.assertEquals(bookingType.getId(), amount.getCents());

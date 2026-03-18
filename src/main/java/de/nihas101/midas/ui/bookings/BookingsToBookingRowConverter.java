@@ -72,7 +72,8 @@ public class BookingsToBookingRowConverter { // TODO: This class is very closely
                     first.getComment(),
                     entryAmounts,
                     entryTotal,
-                    MoneyAmount.ZERO
+                    MoneyAmount.ZERO,
+                    entryBookings
             );
             bookingRows.add(bookingRow);
         }
