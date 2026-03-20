@@ -2,7 +2,6 @@ package de.nihas101.midas.bookings.service;
 
 import de.nihas101.midas.bookings.dto.Booking;
 import de.nihas101.midas.bookings.dto.Bookings;
-import de.nihas101.midas.bookings.dto.CachingBookings;
 import de.nihas101.midas.bookings.dto.DefaultBookings;
 import de.nihas101.midas.bookings.entity.BookingEntity;
 import de.nihas101.midas.bookings.repository.BookingsRepository;
@@ -46,11 +45,9 @@ public class BookingsService implements BookingsWriter, BookingsReader {
                 .map(OpeningBalance::fromEntity)
                 .orElse(null);
 
-        return new CachingBookings(
-                new DefaultBookings(
-                        bookings,
-                        openingBalance
-                )
+        return new DefaultBookings(
+                bookings,
+                openingBalance
         );
     }
 

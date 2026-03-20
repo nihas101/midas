@@ -80,7 +80,7 @@ class BookingsServiceTest {
 
         // Assert
         assertNotNull(result);
-        assertEquals(MoneyAmount.ZERO, result.openingBalance());
+        assertEquals(MoneyAmount.ZERO, result.openingBalance().getOpeningBalance());
         assertEquals(1, result.bookingsInMonth(Month.MARCH).bookings().size());
     }
 

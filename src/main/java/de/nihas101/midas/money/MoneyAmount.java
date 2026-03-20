@@ -23,6 +23,7 @@ public class MoneyAmount {
 
     private Long cents;
 
+    // TODO: Constructor?
     public static MoneyAmount of(BigDecimal amount) {
         if (amount == null) {
             return ZERO;
@@ -30,6 +31,7 @@ public class MoneyAmount {
         return new MoneyAmount(amount.multiply(MULTIPLIER).setScale(0, RoundingMode.HALF_UP).longValue());
     }
 
+    // TODO: Constructor?
     public static MoneyAmount ofCents(Long cents) {
         return new MoneyAmount(cents == null ? 0L : cents);
     }

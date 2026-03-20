@@ -196,7 +196,8 @@ public class InterestView extends MidasPage {
     // TODO: Decouple this from the bookings view classes
     private List<InterestCalculationRow> monthlySummaryRows(final Integer year, final Bookings bookings) {
         final List<InterestCalculationRow> rows = new ArrayList<>();
-        MoneyAmount currentBalance = bookings.openingBalance();
+        MoneyAmount currentBalance = bookings.openingBalance()
+                .getOpeningBalance();
 
         for (Month month : Month.values()) {
             final List<BookingRow> bookingRows = new BookingsToBookingRowConverter(bookings, month, currentBalance).bookingRows();

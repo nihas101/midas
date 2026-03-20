@@ -4,6 +4,7 @@ import de.nihas101.midas.bookings.dto.Booking;
 import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.dto.MonthlyBookings;
 import de.nihas101.midas.bookings.entity.BookingType;
+import de.nihas101.midas.bookings.monthlytotal.MonthlyTotalSum;
 import de.nihas101.midas.money.MoneyAmount;
 import lombok.RequiredArgsConstructor;
 
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
 
 // TODO: Test
 @RequiredArgsConstructor
-public class BookingsToBookingRowConverter { // TODO: This class is very closely related to MonthlyTotalCalculator, think on if and how to best share code
+public class BookingsToBookingRowConverter {
 
     private final Bookings bookings;
     private final Month month;
@@ -34,7 +35,7 @@ public class BookingsToBookingRowConverter { // TODO: This class is very closely
         );
     }
 
-    // TODO: Wrap this list
+    // TODO: Wrap this list and merge the logic here into that class
     public List<BookingRow> bookingRows() {
         final MonthlyBookings monthBookings = bookings.bookingsInMonth(month);
 
@@ -70,7 +71,7 @@ public class BookingsToBookingRowConverter { // TODO: This class is very closely
                     String.valueOf(first.getDisplayId()),
                     first.getDate().format(dateFormat),
                     first.getComment(),
-                    entryAmounts,
+                    new MonthlyTotalSum(entryAmounts),
                     entryTotal,
                     MoneyAmount.ZERO,
                     entryBookings

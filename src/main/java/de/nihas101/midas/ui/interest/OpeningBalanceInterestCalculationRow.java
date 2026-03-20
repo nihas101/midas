@@ -23,10 +23,10 @@ public class OpeningBalanceInterestCalculationRow implements InterestCalculation
         this(
                 new BaseInterestCalculationRow(
                         "Vortrag per 01.01." + year.format(DateTimeFormatter.ofPattern("yyyy")),
-                        bookings.openingBalance(),
-                        bookings.openingBalance(),
+                        bookings.openingBalance().getOpeningBalance(),
+                        bookings.openingBalance().getOpeningBalance(),
                         new Interest(
-                                bookings.openingBalance(),
+                                bookings.openingBalance().getOpeningBalance(),
                                 BigDecimal.valueOf(30L), // TODO: Make this passable from outside
                                 interestRate
                         ).interestAmount(),

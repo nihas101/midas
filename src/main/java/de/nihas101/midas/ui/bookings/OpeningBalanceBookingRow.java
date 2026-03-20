@@ -3,70 +3,53 @@ package de.nihas101.midas.ui.bookings;
 import de.nihas101.midas.bookings.dto.Booking;
 import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.entity.BookingType;
+import de.nihas101.midas.bookings.monthlytotal.MonthlyTotal;
+import de.nihas101.midas.bookings.monthlytotal.MonthlyTotalSum;
 import de.nihas101.midas.money.MoneyAmount;
-import lombok.RequiredArgsConstructor;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
-@RequiredArgsConstructor
-public class OpeningBalanceBookingRow implements BookingRow { // TODO: Test
-
-    private final BookingRow bookingRow;
+public record OpeningBalanceBookingRow(
+        MoneyAmount balance,
+        List<Booking> bookings
+) implements BookingRow { // TODO: Test
 
     public OpeningBalanceBookingRow(final Bookings bookings) {
         this(
-                new BaseBookingRow(
-                        "",
-                        "01.01.",
-                        "",
-                        Collections.emptyMap(),
-                        MoneyAmount.ZERO,
-                        bookings.openingBalance(),
-                        Collections.emptyList()
-                )
+                bookings.openingBalance().getOpeningBalance(),
+                Collections.emptyList()
         );
     }
 
     @Override
     public MoneyAmount amount(final BookingType type) {
-        return bookingRow.amount(type);
+        return MonthlyTotalSum.ZERO.monthlyTotal(type);
     }
 
     @Override
     public String displayId() {
-        return bookingRow.displayId();
+        return "";
     }
 
     @Override
     public String dateStr() {
-        return bookingRow.dateStr();
+        return "01.01.";
     }
 
     @Override
     public String comment() {
-        return bookingRow.comment();
+        return "";
     }
 
     @Override
-    public Map<BookingType, MoneyAmount> amounts() {
-        return bookingRow.amounts();
+    public MonthlyTotal amounts() {
+        return MonthlyTotalSum.ZERO;
     }
 
     @Override
     public MoneyAmount total() {
-        return bookingRow.total();
-    }
-
-    @Override
-    public MoneyAmount balance() {
-        return bookingRow.balance();
-    }
-
-    @Override
-    public List<Booking> bookings() {
-        return bookingRow.bookings();
+        return MoneyAmount.ZERO;
     }
 
     @Override

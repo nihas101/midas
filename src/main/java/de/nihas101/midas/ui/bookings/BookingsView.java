@@ -327,7 +327,8 @@ public class BookingsView extends MidasPage {
 
     private List<BookingRow> monthlySummaryRows(final Bookings bookings) {
         final List<BookingRow> rows = new ArrayList<>();
-        MoneyAmount currentBalance = bookings.openingBalance();
+        MoneyAmount currentBalance = bookings.openingBalance()
+                .getOpeningBalance();
 
         for (Month month : Month.values()) {
             final List<BookingRow> bookingRows = new BookingsToBookingRowConverter(bookings, month, currentBalance).bookingRows();

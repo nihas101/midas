@@ -20,6 +20,10 @@ public class OpeningBalance {
     private MoneyAmount openingBalance;
     private Year year;
 
+    public OpeningBalance(final MoneyAmount moneyAmount) {
+        this(null, null, moneyAmount != null ? moneyAmount : MoneyAmount.ZERO, Year.now());
+    }
+
     public static OpeningBalance fromEntity(OpeningBalanceEntity openingBalanceEntity) {
         if (openingBalanceEntity == null) {
             return null;

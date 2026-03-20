@@ -4,7 +4,9 @@ import de.nihas101.midas.bookings.dto.Booking;
 import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.dto.MonthlyBookings;
 import de.nihas101.midas.bookings.entity.BookingType;
+import de.nihas101.midas.bookings.monthlytotal.MonthlyTotalSum;
 import de.nihas101.midas.money.MoneyAmount;
+import de.nihas101.midas.openingbalance.dto.OpeningBalance;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -25,7 +27,7 @@ import static de.nihas101.midas.bookings.entity.BookingType.TAX_CREDIT;
 import static de.nihas101.midas.bookings.entity.BookingType.TAX_PREVIOUS_YEAR;
 import static de.nihas101.midas.bookings.entity.BookingType.WITHDRAWAL;
 
-class MonthlySummaryBookingRowTest {
+class MonthlyTotalSummaryBookingRowTest {
 
     @Test
     public void comment_null() {
@@ -148,7 +150,7 @@ class MonthlySummaryBookingRowTest {
                 Month.MARCH
         );
 
-        Assertions.assertEquals(expected, bookingRow.amounts());
+        Assertions.assertEquals(new MonthlyTotalSum(expected), bookingRow.amounts());
     }
 
     public static Stream<Arguments> amountsValues() {
@@ -282,8 +284,8 @@ class MonthlySummaryBookingRowTest {
     private static Bookings createBookings(final MoneyAmount initialBalance, final List<Booking> bookingsInMonth) {
         return new Bookings() {
             @Override
-            public MoneyAmount openingBalance() {
-                return initialBalance;
+            public OpeningBalance openingBalance() {
+                return new OpeningBalance(initialBalance);
             }
 
             @Override

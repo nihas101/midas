@@ -3,20 +3,24 @@ package de.nihas101.midas.ui.bookings;
 import de.nihas101.midas.bookings.dto.Booking;
 import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.entity.BookingType;
-import de.nihas101.midas.bookings.monthlytotal.CumulativeSumMonthlyTotalCalculator;
-import de.nihas101.midas.bookings.monthlytotal.MonthlyTotalCalculator;
+import de.nihas101.midas.bookings.monthlytotal.MonthlyCumulativeSum;
+import de.nihas101.midas.bookings.monthlytotal.MonthlyTotal;
 import de.nihas101.midas.money.MoneyAmount;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Month;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 @RequiredArgsConstructor
 public class CumulativeSummaryBookingRow implements BookingRow {
 
-    private final BookingRow bookingRow;
+    private final String dateStr;
+    private final String comment;
+    private final MonthlyCumulativeSum amounts;
+    private final MoneyAmount total;
+    private final MoneyAmount balance;
+    private final List<Booking> bookings;
 
     public CumulativeSummaryBookingRow(
             final String dateStr,
@@ -28,7 +32,7 @@ public class CumulativeSummaryBookingRow implements BookingRow {
                 dateStr,
                 comment,
                 bookings,
-                new CumulativeSumMonthlyTotalCalculator(bookings, month)
+                new MonthlyCumulativeSum(bookings, month)
         );
     }
 
@@ -36,62 +40,58 @@ public class CumulativeSummaryBookingRow implements BookingRow {
             final String dateStr,
             final String comment,
             final Bookings bookings,
-            final MonthlyTotalCalculator cumulativeTotalCalculator
+            final MonthlyCumulativeSum monthlyCumulativeSum
     ) {
-        final Map<BookingType, MoneyAmount> cumulativeTotals = cumulativeTotalCalculator.monthlyTotal();
-        final MoneyAmount totalSumOfAllBookings = cumulativeTotals.values().stream()
-                .reduce(MoneyAmount.ZERO, MoneyAmount::plus);
-        final MoneyAmount balance = bookings.openingBalance().plus(totalSumOfAllBookings);
-
-        this.bookingRow = new BaseBookingRow(
-                "",
+        this(
                 dateStr,
                 comment,
-                cumulativeTotals,
-                totalSumOfAllBookings,
-                balance,
+                monthlyCumulativeSum,
+                monthlyCumulativeSum.sum(), // TODO: Sum is calculated twice here. Think on how to avoid that
+                bookings.openingBalance()
+                        .getOpeningBalance()
+                        .plus(monthlyCumulativeSum.sum()),
                 Collections.emptyList()
         );
     }
 
     @Override
     public MoneyAmount amount(final BookingType type) {
-        return bookingRow.amount(type);
+        return amounts.monthlyTotal(type);
     }
 
     @Override
     public String displayId() {
-        return bookingRow.displayId();
+        return "";
     }
 
     @Override
     public String dateStr() {
-        return bookingRow.dateStr();
+        return dateStr;
     }
 
     @Override
     public String comment() {
-        return bookingRow.comment();
+        return comment;
     }
 
     @Override
-    public Map<BookingType, MoneyAmount> amounts() {
-        return bookingRow.amounts();
+    public MonthlyTotal amounts() {
+        return amounts;
     }
 
     @Override
     public MoneyAmount total() {
-        return bookingRow.total();
+        return total;
     }
 
     @Override
     public MoneyAmount balance() {
-        return bookingRow.balance();
+        return balance;
     }
 
     @Override
     public List<Booking> bookings() {
-        return bookingRow.bookings();
+        return bookings;
     }
 
     @Override

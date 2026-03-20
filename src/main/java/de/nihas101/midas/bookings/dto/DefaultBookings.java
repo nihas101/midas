@@ -13,11 +13,11 @@ public class DefaultBookings implements Bookings {
     private final OpeningBalance openingBalance;
 
     @Override
-    public MoneyAmount openingBalance() {
+    public OpeningBalance openingBalance() {
         if (openingBalance == null) {
-            return MoneyAmount.ZERO;
+            return new OpeningBalance(MoneyAmount.ZERO);
         }
-        return openingBalance.getOpeningBalance(); // TODO: Return the opening balance instead!
+        return openingBalance;
     }
 
     @Override

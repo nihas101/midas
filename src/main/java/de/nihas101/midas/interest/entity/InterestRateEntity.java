@@ -16,7 +16,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -46,9 +45,7 @@ public class InterestRateEntity {
                 interestRate.getId(),
                 shareholder,
                 interestRate.getYear().atDay(1),
-                // TODO: Extract this conversion (and the one in InterestRate into a common class for all decimal numbers)
-                // TODO: Then use it everywhere
-                interestRate.getInterestRate().multiply(BigDecimal.valueOf(100)).longValue()
+                interestRate.toEntity()
         );
     }
 }

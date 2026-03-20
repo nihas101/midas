@@ -1,12 +1,11 @@
 package de.nihas101.midas.bookings.dto;
 
-import de.nihas101.midas.money.MoneyAmount;
+import de.nihas101.midas.openingbalance.dto.OpeningBalance;
 
 import java.time.Month;
 
 public interface Bookings {
-    MoneyAmount openingBalance();
+    OpeningBalance openingBalance();
 
-    // TODO: Wrap this return in a class
     MonthlyBookings bookingsInMonth(final Month month);
 }

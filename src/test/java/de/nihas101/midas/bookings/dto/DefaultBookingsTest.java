@@ -24,13 +24,13 @@ class DefaultBookingsTest {
                 createBooking(BookingType.WITHDRAWAL, 2000L, Month.JANUARY)
         );
         DefaultBookings defaultBookings = new DefaultBookings(bookings, new OpeningBalance(1, 2, MoneyAmount.ofCents(1500L), Year.of(2026)));
-        assertEquals(MoneyAmount.ofCents(1500L), defaultBookings.openingBalance());
+        assertEquals(MoneyAmount.ofCents(1500L), defaultBookings.openingBalance().getOpeningBalance());
     }
 
     @Test
     void openingBalance_emptyReturnsZero() {
         DefaultBookings defaultBookings = new DefaultBookings(List.of(), null);
-        assertEquals(MoneyAmount.ZERO, defaultBookings.openingBalance());
+        assertEquals(MoneyAmount.ZERO, defaultBookings.openingBalance().getOpeningBalance());
     }
 
     @ParameterizedTest

@@ -3,20 +3,21 @@ package de.nihas101.midas.ui.bookings;
 import de.nihas101.midas.bookings.dto.Booking;
 import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.entity.BookingType;
-import de.nihas101.midas.bookings.monthlytotal.MonthlySumTotalCalculator;
-import de.nihas101.midas.bookings.monthlytotal.MonthlyTotalCalculator;
+import de.nihas101.midas.bookings.monthlytotal.MonthlyTotal;
+import de.nihas101.midas.bookings.monthlytotal.MonthlyTotalSum;
 import de.nihas101.midas.money.MoneyAmount;
-import lombok.RequiredArgsConstructor;
 
 import java.time.Month;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
-@RequiredArgsConstructor
-public class MonthlySummaryBookingRow implements BookingRow {
-
-    private final BookingRow bookingRow;
+public record MonthlySummaryBookingRow(
+        String comment,
+        MonthlyTotal amounts,
+        MoneyAmount total,
+        MoneyAmount balance,
+        List<Booking> bookings
+) implements BookingRow {
 
     public MonthlySummaryBookingRow(
             final String comment,
@@ -25,25 +26,19 @@ public class MonthlySummaryBookingRow implements BookingRow {
     ) {
         this(
                 comment,
-                new MonthlySumTotalCalculator(bookings, month)
+                new MonthlyTotalSum(bookings, month)
         );
     }
 
     public MonthlySummaryBookingRow(
             final String comment,
-            final MonthlyTotalCalculator monthlyTotalCalculator
+            final MonthlyTotalSum monthlyTotalSum
     ) {
-        final Map<BookingType, MoneyAmount> monthTotals = monthlyTotalCalculator.monthlyTotal();
-        final MoneyAmount monthTotalSum = monthTotals.values()
-                .stream()
-                .reduce(MoneyAmount.ZERO, MoneyAmount::plus);
 
-        this.bookingRow = new BaseBookingRow(
-                "",
-                "",
+        this(
                 comment,
-                monthTotals,
-                monthTotalSum,
+                monthlyTotalSum,
+                monthlyTotalSum.sum(),
                 MoneyAmount.ZERO,
                 Collections.emptyList()
         );
@@ -51,42 +46,17 @@ public class MonthlySummaryBookingRow implements BookingRow {
 
     @Override
     public MoneyAmount amount(final BookingType type) {
-        return bookingRow.amount(type);
+        return amounts.monthlyTotal(type);
     }
 
     @Override
     public String displayId() {
-        return bookingRow.displayId();
+        return "";
     }
 
     @Override
     public String dateStr() {
-        return bookingRow.dateStr();
-    }
-
-    @Override
-    public String comment() {
-        return bookingRow.comment();
-    }
-
-    @Override
-    public Map<BookingType, MoneyAmount> amounts() {
-        return bookingRow.amounts();
-    }
-
-    @Override
-    public MoneyAmount total() {
-        return bookingRow.total();
-    }
-
-    @Override
-    public MoneyAmount balance() {
-        return bookingRow.balance();
-    }
-
-    @Override
-    public List<Booking> bookings() {
-        return bookingRow.bookings();
+        return "";
     }
 
 }

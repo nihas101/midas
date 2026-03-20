@@ -16,6 +16,8 @@ import java.time.Year;
 @AllArgsConstructor
 public class InterestRate {
 
+    private static final BigDecimal MULTIPLIER = BigDecimal.valueOf(100);
+
     private Integer id;
     private Integer shareholderId;
     private BigDecimal interestRate;
@@ -29,10 +31,19 @@ public class InterestRate {
         return new InterestRate(
                 interestRateEntity.getId(),
                 interestRateEntity.getShareholder().getId(),
-                new BigDecimal(interestRateEntity.getRate())
-                        .setScale(2, RoundingMode.HALF_UP)
-                        .divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP),
+                scaleDownFromDatabase(interestRateEntity),
                 Year.from(interestRateEntity.getDate())
         );
+    }
+
+    private static BigDecimal scaleDownFromDatabase(final InterestRateEntity interestRateEntity) {
+        return new BigDecimal(interestRateEntity.getRate())
+                .setScale(2, RoundingMode.HALF_UP)
+                .divide(MULTIPLIER, RoundingMode.HALF_UP);
+    }
+
+    public Long toEntity() {
+        return interestRate.multiply(MULTIPLIER)
+                .longValue();
     }
 }
