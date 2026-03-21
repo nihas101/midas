@@ -31,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
@@ -50,7 +51,6 @@ import java.util.stream.IntStream;
 @PageTitle("Interest Calculation")
 public class InterestView extends MidasPage {
 
-    // TODO: Get rid of 'service' in these names, it adds nothing, maybe registry instead?
     private final ShareholdersService shareholdersService;
     private final BookingsService bookingsService;
     private final InterestRateService interestRateService;
@@ -185,7 +185,7 @@ public class InterestView extends MidasPage {
         interestCalculationGrid.setItems(createRows(year, bookings));
     }
 
-    // TODO: Introduce a class for this
+    // TODO: Introduce classes for all this logic
     private List<InterestCalculationRow> createRows(final Integer year, final Bookings bookings) {
         final List<InterestCalculationRow> rows = new ArrayList<>();
         rows.add(
@@ -223,7 +223,35 @@ public class InterestView extends MidasPage {
                 interests
         );
         rows.addAll(interestCalculationRows);
-        rows.addAll(summaryRows(Year.of(year), interests));
+
+        final BigDecimal interestSum = interests.entrySet()
+                .stream()
+                // The last month is excluded from the sum of interests
+                .filter(e -> !Month.DECEMBER.equals(e.getKey()))
+                .map(Map.Entry::getValue)
+                .map(Interest::interestAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                // TODO: Make this explicit (so that the 'Vortrag' is handled at one place)
+                .add(BigDecimal.valueOf(300L)); // We add 300 vor the 'Vortrag'
+        final BigDecimal divisor = BigDecimal.valueOf(72.00); // TODO: Actually calculate it
+        final MoneyAmount interest = MoneyAmount.of(
+                interestSum.setScale(4, RoundingMode.HALF_UP)
+                        .divide(divisor, RoundingMode.HALF_UP)
+        );
+        final MoneyAmount finalSum = monthlyBalances.get(Month.DECEMBER)
+                .plus(interest);
+
+        rows.addAll(
+                List.of(
+                        new ZinszahlSumRow(interestSum),
+                        new DivisorRow(divisor),
+                        new InterestRow(interest), // TODO: This should be persisted in the bookings
+                        new FinalSumRow(
+                                Year.of(year).atMonth(Month.DECEMBER).atEndOfMonth(),
+                                finalSum
+                        )
+                )
+        );
         return rows;
     }
 
@@ -261,62 +289,79 @@ public class InterestView extends MidasPage {
         return rows;
     }
 
-    // TODO: Move to own class
-    private List<InterestCalculationRow> summaryRows(
-            Year year,
-            Map<Month, Interest> interests
-    ) {
-        return List.of(
-                new ZinszahlSumRow(
-                        interests.values()
-                                .stream()
-                                .map(Interest::interestAmount)
-                                .reduce(BigDecimal.ZERO, BigDecimal::add)
-                ),
-                new DivisorRow(
-                        BigDecimal.valueOf(72.00) // TODO: Actually calculate it
-                ),
-                new ZinsenRow(
-                        MoneyAmount.ofCents(6472L) // TODO: Actually calculate it
-                ),
-                new FinalSumRow(
-                        year.atMonth(Month.DECEMBER).atEndOfMonth(),
-                        MoneyAmount.ofCents(203972L) // TODO: Actually calculate it
-                )
-        );
-    }
-
     // TODO: Hide zeros (check how the booking view does it)
     // TODO: Move to own class (same in bookings view)
     private void setupInterestGrid(final VerticalLayout content) {
         interestCalculationGrid = new Grid<>();
         interestCalculationGrid.setWidthFull();
 
-        // TODO: Null safety!
+        // TODO: Null safety! (Also create a wrapper for InterestCalculationRow that handles all the fallbacks and stuff in the lambdas here)
         setupColumn(interestCalculationGrid.addColumn(InterestCalculationRow::monthAsString), "Monat", ColumnTextAlign.START);
         // TODO: These header wit S/H were displayed slightly different in the old program output, investigate how best to display that
         //       Probably involves a div or span
         setupColumn(
-                interestCalculationGrid.addColumn(i -> Optional.ofNullable(i)
-                        .map(InterestCalculationRow::totalTransaction)
-                        .map(Transaction::moneyAmount)
-                        .map(m -> m.format(getLocale()))
-                        .orElse("")
+                interestCalculationGrid.addColumn(
+                        i -> Optional.ofNullable(i)
+                                .map(InterestCalculationRow::totalTransaction)
+                                .map(Transaction::moneyAmount)
+                                .map(m -> m.format(getLocale()))
+                                .orElse("")
                 ), "Bewegungen", ColumnTextAlign.END); // TODO: i18n
         setupColumn(
-                interestCalculationGrid.addColumn(i -> Optional.ofNullable(i)
-                        .map(InterestCalculationRow::totalTransaction)
+                interestCalculationGrid.addColumn(
+                        i -> Optional.ofNullable(i)
+                                .map(InterestCalculationRow::totalTransaction)
+                                .map(Transaction::type)
+                                .map(TransactionType::getValue)
+                                .orElse("")
+                ), "S/H", ColumnTextAlign.START); // TODO: i18n
+        setupColumn(interestCalculationGrid.addColumn(
+                i -> formatAmount(
+                        Optional.ofNullable(i)
+                                .map(InterestCalculationRow::balanceAtEndOfMonth)
+                                .map(Transaction::moneyAmount)
+                                .orElse(null)
+                )
+        ), "Saldo", ColumnTextAlign.END); // TODO: i18n
+        setupColumn(interestCalculationGrid.addColumn(
+                i -> Optional.ofNullable(i)
+                        .map(InterestCalculationRow::balanceAtEndOfMonth)
                         .map(Transaction::type)
                         .map(TransactionType::getValue)
                         .orElse("")
-                ), "S/H", ColumnTextAlign.START); // TODO: i18n
-        setupColumn(interestCalculationGrid.addColumn(i -> i.balanceAtEndOfMonth().moneyAmount().format(getLocale())), "Saldo", ColumnTextAlign.END); // TODO: i18n
-        setupColumn(interestCalculationGrid.addColumn(i -> i.balanceAtEndOfMonth().type().getValue()), "S/H", ColumnTextAlign.START); // TODO: i18n
-        setupColumn(interestCalculationGrid.addColumn(InterestCalculationRow::interestDaysCount), "Zinstage", ColumnTextAlign.CENTER); // TODO: i18n
+        ), "S/H", ColumnTextAlign.START); // TODO: i18n
+        setupColumn(interestCalculationGrid.addColumn(
+                i -> formatDays(
+                        Optional.ofNullable(i)
+                                .map(InterestCalculationRow::interestDaysCount)
+                                .orElse(null)
+                )
+        ), "Zinstage", ColumnTextAlign.CENTER); // TODO: i18n
         // TODO: We need to format the comma for the divisor in the summary only here -> Create a wrapper for this that handles this and only wrap the divisor
-        setupColumn(interestCalculationGrid.addColumn(InterestCalculationRow::interestAmount), "Zinszahl", ColumnTextAlign.CENTER); // TODO: i18n
+        setupColumn(interestCalculationGrid.addColumn(
+                i -> formatInterestAmounts(
+                        Optional.ofNullable(i)
+                                .map(InterestCalculationRow::interestAmount)
+                                .orElse(null)
+                )
+        ), "Zinszahl", ColumnTextAlign.CENTER); // TODO: i18n
 
         content.add(interestCalculationGrid);
+    }
+
+    private String formatInterestAmounts(final BigDecimal interestAmounts) {
+        // To display empty cells for empty amounts
+        return interestAmounts == null ? "" : interestAmounts.toString();
+    }
+
+    private String formatDays(final Integer days) {
+        // To display empty cells for empty amounts
+        return days == null ? "" : days.toString();
+    }
+
+    private String formatAmount(final MoneyAmount amount) {
+        // To display empty cells for empty amounts
+        return amount == null || amount.equals(MoneyAmount.ZERO) ? "" : amount.format(getLocale());
     }
 
     // TODO: Extract into common class for bookings view and this?

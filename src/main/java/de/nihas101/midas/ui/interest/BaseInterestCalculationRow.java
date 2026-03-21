@@ -46,7 +46,7 @@ public class BaseInterestCalculationRow implements InterestCalculationRow { // T
     }
 
     @Override
-    public int interestDaysCount() {
+    public Integer interestDaysCount() {
         return interestDaysCount;
     }
 

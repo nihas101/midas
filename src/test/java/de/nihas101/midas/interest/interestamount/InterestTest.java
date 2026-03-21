@@ -17,7 +17,7 @@ class InterestTest {
 
     @Test
     void dailyInterestRate_null() {
-        Assertions.assertEquals(createExpected(0), new Interest(
+        Assertions.assertEquals(createExpected(0, 4), new Interest(
                 (MoneyAmount) null,
                 null,
                 null
@@ -26,12 +26,12 @@ class InterestTest {
 
     @Test
     void dailyInterestRate() {
-        Assertions.assertEquals(createExpected(2.2222), interest.dailyInterestRate());
+        Assertions.assertEquals(createExpected(2.2222, 0), interest.dailyInterestRate());
     }
 
     @Test
     void interestAmount_null() {
-        Assertions.assertEquals(createExpected(0), new Interest(
+        Assertions.assertEquals(createExpected(0, 4), new Interest(
                 (MoneyAmount) null,
                 null,
                 null
@@ -40,7 +40,7 @@ class InterestTest {
 
     @Test
     void interestAmount_interestDaysNegative() {
-        Assertions.assertEquals(createExpected(0), new Interest(
+        Assertions.assertEquals(createExpected(0, 4), new Interest(
                 (MoneyAmount) null,
                 BigDecimal.valueOf(-1),
                 null
@@ -49,12 +49,12 @@ class InterestTest {
 
     @Test
     void interestAmount() {
-        Assertions.assertEquals(createExpected(1600), interest.interestAmount());
+        Assertions.assertEquals(createExpected(1600, 0), interest.interestAmount());
     }
 
     @Test
     void interestDivisor_null() {
-        Assertions.assertEquals(createExpected(360), new Interest(
+        Assertions.assertEquals(createExpected(360, 4), new Interest(
                 (MoneyAmount) null,
                 null,
                 null
@@ -63,7 +63,7 @@ class InterestTest {
 
     @Test
     void interestDivisor_interestRate0() {
-        Assertions.assertEquals(createExpected(360), new Interest(
+        Assertions.assertEquals(createExpected(360, 4), new Interest(
                 (MoneyAmount) null,
                 null,
                 BigDecimal.valueOf(0)
@@ -72,14 +72,14 @@ class InterestTest {
 
     @Test
     void interestDivisor() {
-        Assertions.assertEquals(createExpected(720), interest.interestDivisor().setScale(4, RoundingMode.HALF_UP));
+        Assertions.assertEquals(createExpected(720, 4), interest.interestDivisor().setScale(4, RoundingMode.HALF_UP));
     }
 
-    private BigDecimal createExpected(final double value) {
-        return BigDecimal.valueOf(value).setScale(4, RoundingMode.HALF_UP);
+    private BigDecimal createExpected(final double value, final int scale) {
+        return BigDecimal.valueOf(value).setScale(scale, RoundingMode.HALF_UP);
     }
 
-    private BigDecimal createExpected(final int value) {
-        return BigDecimal.valueOf(value).setScale(4, RoundingMode.HALF_UP);
+    private BigDecimal createExpected(final int value, final int scale) {
+        return BigDecimal.valueOf(value).setScale(scale, RoundingMode.HALF_UP);
     }
 }

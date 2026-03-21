@@ -2,12 +2,14 @@ package de.nihas101.midas.interest.interestamount;
 
 import de.nihas101.midas.money.MoneyAmount;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 // https://de.wikipedia.org/wiki/Zinszahlen
 // Using the 'kaufmaennische Zinsformel'
+@ToString
 @RequiredArgsConstructor
 public class Interest {
 
@@ -40,7 +42,8 @@ public class Interest {
         }
 
         return (capital.multiply(interestDays))
-                .divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP);
+                .divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP)
+                .setScale(0, RoundingMode.HALF_UP);
     }
 
     // aka 'Zinsteiler'

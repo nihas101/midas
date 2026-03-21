@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.Year;
 import java.time.format.DateTimeFormatter;
 
 @RequiredArgsConstructor
@@ -15,13 +14,13 @@ public class FinalSumRow implements InterestCalculationRow {
 
     @Override
     public String monthAsString() {
-        // TODO: Allow the use to define all these formats somewhere?
+        // TODO: Allow the user to define all these formats somewhere?
         return "Bestand per " + date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")); // TODO: i18n
     }
 
     @Override
     public Transaction totalTransaction() {
-        return new Transaction(MoneyAmount.ZERO);
+        return null;
     }
 
     @Override
@@ -30,12 +29,12 @@ public class FinalSumRow implements InterestCalculationRow {
     }
 
     @Override
-    public int interestDaysCount() {
-        return 0;
+    public Integer interestDaysCount() {
+        return null;
     }
 
     @Override
     public BigDecimal interestAmount() {
-        return BigDecimal.ZERO;
+        return null;
     }
 }

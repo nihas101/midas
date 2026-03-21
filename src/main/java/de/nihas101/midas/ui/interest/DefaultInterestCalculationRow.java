@@ -1,12 +1,12 @@
 package de.nihas101.midas.ui.interest;
 
-import de.nihas101.midas.bookings.monthlytotal.MonthlyCumulativeSum;
 import de.nihas101.midas.bookings.monthlytotal.MonthlyTotalSum;
 import de.nihas101.midas.interest.interestamount.Interest;
 import de.nihas101.midas.money.MoneyAmount;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -47,12 +47,12 @@ public class DefaultInterestCalculationRow implements InterestCalculationRow {
     }
 
     @Override
-    public int interestDaysCount() {
+    public Integer interestDaysCount() {
         return interestCalculationRow.interestDaysCount();
     }
 
     @Override
     public BigDecimal interestAmount() {
-        return interestCalculationRow.interestAmount();
+        return interestCalculationRow.interestAmount().setScale(0, RoundingMode.HALF_UP);
     }
 }

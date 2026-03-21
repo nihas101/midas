@@ -12,7 +12,7 @@ public interface InterestCalculationRow {
 
     Transaction balanceAtEndOfMonth();
 
-    int interestDaysCount();
+    Integer interestDaysCount();
 
     BigDecimal interestAmount(); // TODO: Is this the correct term?
 }

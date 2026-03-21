@@ -1,7 +1,6 @@
 package de.nihas101.midas.ui.interest;
 
 import de.nihas101.midas.money.MoneyAmount;
-import lombok.RequiredArgsConstructor;
 
 public record Transaction(MoneyAmount moneyAmount) {
 

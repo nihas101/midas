@@ -55,8 +55,8 @@ class InterestsTest {
     @Test
     void interest() {
         Assertions.assertEquals(
-                BigDecimal.valueOf(14.79).setScale(2, RoundingMode.HALF_UP),
-                interests.interest().setScale(2, RoundingMode.HALF_UP)
+                BigDecimal.valueOf(15).setScale(0, RoundingMode.HALF_UP),
+                interests.interest()
         );
     }
 

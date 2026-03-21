@@ -5,6 +5,7 @@ import de.nihas101.midas.interest.interestamount.Interest;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
 
@@ -48,12 +49,13 @@ public class OpeningBalanceInterestCalculationRow implements InterestCalculation
     }
 
     @Override
-    public int interestDaysCount() {
+    public Integer interestDaysCount() {
         return interestCalculationRow.interestDaysCount();
     }
 
     @Override
     public BigDecimal interestAmount() {
-        return interestCalculationRow.interestAmount();
+        // TODO: Extract the scaling etc into a wrapper to share the code where necessary
+        return interestCalculationRow.interestAmount().setScale(0, RoundingMode.HALF_UP);
     }
 }

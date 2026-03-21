@@ -6,31 +6,31 @@ import lombok.RequiredArgsConstructor;
 import java.math.BigDecimal;
 
 @RequiredArgsConstructor
-public class ZinsenRow implements InterestCalculationRow { // TODO: Rename into english
-    private final MoneyAmount zinsen;
+public class InterestRow implements InterestCalculationRow {
+    private final MoneyAmount interest;
 
     @Override
     public String monthAsString() {
-        return "Zinsen";
-    } // TODO: i18n
+        return "Zinsen"; // TODO: i18n
+    }
 
     @Override
     public Transaction totalTransaction() {
-        return new Transaction(MoneyAmount.ZERO);
+        return null;
     }
 
     @Override
     public Transaction balanceAtEndOfMonth() {
-        return new Transaction(zinsen);
+        return new Transaction(interest);
     }
 
     @Override
-    public int interestDaysCount() {
-        return 0;
+    public Integer interestDaysCount() {
+        return null;
     }
 
     @Override
     public BigDecimal interestAmount() {
-        return BigDecimal.ZERO;
+        return null;
     }
 }

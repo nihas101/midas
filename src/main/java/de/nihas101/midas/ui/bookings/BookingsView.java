@@ -314,14 +314,17 @@ public class BookingsView extends MidasPage {
             openingBalanceField.setValue(BigDecimal.ZERO);
         }
 
-        Bookings bookings = bookingsService.bookingsForShareholderAndYear(shareholder.getId(), year);
-        grid.setItems(createRows(bookings));
+        Bookings bookings = bookingsService.bookingsForShareholderAndYear(shareholder.getId(), year); // TODO: Pass in Year class!
+        grid.setItems(createRows(Year.of(year), bookings));
     }
 
-    private List<BookingRow> createRows(final Bookings bookings) {
+    private List<BookingRow> createRows(Year year, final Bookings bookings) {
         List<BookingRow> rows = new ArrayList<>();
         rows.add(new OpeningBalanceBookingRow(bookings));
         rows.addAll(monthlySummaryRows(bookings));
+        // TODO: Maybe we don't need to handle this in a special way, because interest should be updated automatically (and inserted)
+        // TODO: We need to make sure that when edit is clicked here we go to the interest calculation site
+        rows.add(new InterestBookingRow(year.atMonth(Month.DECEMBER).atEndOfMonth(), MoneyAmount.ofCents(6472L)));
         return rows;
     }
 

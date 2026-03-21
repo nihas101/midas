@@ -1,6 +1,5 @@
 package de.nihas101.midas.ui.interest;
 
-import de.nihas101.midas.money.MoneyAmount;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
@@ -17,17 +16,17 @@ public class DivisorRow implements InterestCalculationRow {
 
     @Override
     public Transaction totalTransaction() {
-        return new Transaction(MoneyAmount.ZERO);
+        return null;
     }
 
     @Override
     public Transaction balanceAtEndOfMonth() {
-        return new Transaction(MoneyAmount.ZERO);
+        return null;
     }
 
     @Override
-    public int interestDaysCount() {
-        return 0;
+    public Integer interestDaysCount() {
+        return null;
     }
 
     @Override
