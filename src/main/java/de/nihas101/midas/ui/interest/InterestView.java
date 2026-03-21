@@ -12,10 +12,10 @@ import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.nihas101.midas.bookings.dto.Bookings;
-import de.nihas101.midas.bookings.monthlytotal.MonthlyCumulativeSum;
 import de.nihas101.midas.bookings.monthlytotal.MonthlyTotalSum;
 import de.nihas101.midas.bookings.service.BookingsService;
 import de.nihas101.midas.config.MidasConfig;
+import de.nihas101.midas.interest.InterestCalculation;
 import de.nihas101.midas.interest.dto.InterestRate;
 import de.nihas101.midas.interest.interestamount.Interest;
 import de.nihas101.midas.interest.service.InterestRateService;
@@ -31,19 +31,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
 import java.time.YearMonth;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Slf4j
@@ -196,66 +192,28 @@ public class InterestView extends MidasPage {
                         interestRate
                 )
         );
-        // TODO: Extract all of these calculations into classes
-        final Map<Month, MonthlyTotalSum> monthlyTotalSums = Arrays.stream(Month.values())
-                .collect(Collectors.toMap(Function.identity(), month -> new MonthlyTotalSum(bookings, YearMonth.of(year, month).getMonth())));
-        final Map<Month, MonthlyCumulativeSum> monthlyCumulativeSums = Arrays.stream(Month.values())
-                .collect(Collectors.toMap(Function.identity(), month -> new MonthlyCumulativeSum(bookings, YearMonth.of(year, month).getMonth())));
-        final Map<Month, MoneyAmount> monthlyBookingSums = Arrays.stream(Month.values())
-                .collect(Collectors.toMap(Function.identity(), month -> {
-                    final MonthlyCumulativeSum monthlyCumulativeSum = monthlyCumulativeSums.get(month);
-                    return monthlyCumulativeSum.sum();
-                }));
-        final Map<Month, MoneyAmount> monthlyBalances = Arrays.stream(Month.values())
-                .collect(Collectors.toMap(Function.identity(), month -> bookings.openingBalance()
-                        .getOpeningBalance()
-                        .plus(monthlyBookingSums.get(month))));
-        final Map<Month, Interest> interests = Arrays.stream(Month.values()).collect(
-                Collectors.toMap(Function.identity(), month -> new Interest(
-                        monthlyBalances.get(month),
-                        BigDecimal.valueOf(30L),
-                        interestRate
-                )));
+
+        final InterestCalculation interestCalculation = new InterestCalculation(
+                bookings,
+                year,
+                interestRate
+        );
+
         final List<InterestCalculationRow> interestCalculationRows = interestRows(
                 year,
                 bookings,
-                monthlyTotalSums,
-                monthlyBalances,
-                interests
+                interestCalculation
         );
         rows.addAll(interestCalculationRows);
 
-        final BigDecimal interestSum = interests.entrySet()
-                .stream()
-                // The last month is excluded from the sum of interests
-                .filter(e -> !Month.DECEMBER.equals(e.getKey()))
-                .map(Map.Entry::getValue)
-                .map(Interest::interestAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add)
-                // TODO: Make this explicit (so that the 'Vortrag' is handled at one place)
-                .add(BigDecimal.valueOf(300L)); // We add 300 vor the 'Vortrag'
-
-        final BigDecimal daysInInterestYear = interests.values()
-                .stream()
-                .map(Interest::interestDays)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        final BigDecimal divisor = daysInInterestYear.divide(interestRate, RoundingMode.HALF_UP);
-
-        final MoneyAmount interest = MoneyAmount.of(
-                interestSum.setScale(4, RoundingMode.HALF_UP)
-                        .divide(divisor, RoundingMode.HALF_UP)
-        );
-        final MoneyAmount finalSum = monthlyBalances.get(Month.DECEMBER)
-                .plus(interest);
-
         rows.addAll(
                 List.of(
-                        new ZinszahlSumRow(interestSum),
-                        new DivisorRow(divisor),
-                        new InterestRow(interest), // TODO: This should be persisted in the bookings
+                        new ZinszahlSumRow(interestCalculation.interestSum()),
+                        new DivisorRow(interestCalculation.divisor()),
+                        new InterestRow(interestCalculation.interest()), // TODO: This should be persisted in the bookings
                         new FinalSumRow(
                                 Year.of(year).atMonth(Month.DECEMBER).atEndOfMonth(),
-                                finalSum
+                                interestCalculation.finalSum()
                         )
                 )
         );
@@ -266,11 +224,8 @@ public class InterestView extends MidasPage {
     private List<InterestCalculationRow> interestRows(
             final Integer year, // TODO: Use Year class!
             final Bookings bookings,
-            final Map<Month, MonthlyTotalSum> monthlyTotalSums,
-            final Map<Month, MoneyAmount> monthlyBalances,
-            final Map<Month, Interest> interests
+            final InterestCalculation interestCalculation
     ) {
-
         final List<InterestCalculationRow> rows = new ArrayList<>();
         MoneyAmount currentBalance = bookings.openingBalance().getOpeningBalance();
 
@@ -285,10 +240,10 @@ public class InterestView extends MidasPage {
                 rows.add(
                         new DefaultInterestCalculationRow(
                                 YearMonth.of(year, month),
-                                interests.get(month),
+                                interestCalculation.interests().get(month),
                                 getLocale(),
-                                monthlyBalances.get(month),
-                                monthlyTotalSums.get(month)
+                                interestCalculation.monthlyBalances().get(month),
+                                interestCalculation.monthlyTotalSums().get(month)
                         )
                 );
             }

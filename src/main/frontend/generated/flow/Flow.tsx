@@ -614,9 +614,9 @@ function Flow() {
                     router
                 );
             })
-            .then((result: unknown) => {
-                if (typeof result === 'function') {
-                    result();
+            .then((interestCalculation: unknown) => {
+                if (typeof interestCalculation === 'function') {
+                    interestCalculation();
                 }
             });
     }, [location]);
