@@ -9,6 +9,8 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.BigDecimalField;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.nihas101.midas.bookings.dto.Booking;
@@ -28,6 +30,7 @@ import de.nihas101.midas.ui.common.MidasPage;
 import de.nihas101.midas.ui.common.ShareholderPicker;
 import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
 import de.nihas101.midas.userconfig.service.UserConfigService;
+import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 
@@ -45,7 +48,7 @@ import java.util.stream.IntStream;
 @Slf4j
 @Route("interest-calculation")
 @PageTitle("Interest Calculation")
-public class InterestView extends MidasPage {
+public class InterestView extends MidasPage implements BeforeEnterObserver {
 
     private final ShareholdersService shareholdersService;
     private final BookingsService bookingsService;
@@ -79,6 +82,38 @@ public class InterestView extends MidasPage {
         setupInterestGrid(content);
 
         setContent(content);
+    }
+
+    // TODO: Also add these to local storage
+    @Override
+    public void beforeEnter(BeforeEnterEvent event) {
+        event.getLocation().getQueryParameters().getSingleParameter(QUERY_PARAM_SHAREHOLDER)
+                .ifPresent(shareholderId -> {
+                    try {
+                        if (StringUtils.isBlank(shareholderId)) {
+                            return;
+                        }
+                        final Shareholder shareholder = shareholdersService.shareholder(Integer.parseInt(shareholderId));
+                        if (shareholder == null) {
+                            log.warn("Unknown shareholderId: {}. Ignoring parameter.", shareholderId);
+                            return;
+                        }
+                        shareholderPicker.setValue(shareholder);
+                    } catch (NumberFormatException e) {
+                        log.warn("Unparsable shareholderId in query parameter: {}. Ignoring parameter.", shareholderId);
+                    }
+                });
+        event.getLocation().getQueryParameters().getSingleParameter(QUERY_PARAM_YEAR)
+                .ifPresent(year -> {
+                    if (StringUtils.isBlank(year)) {
+                        return;
+                    }
+                    try {
+                        yearPicker.setValue(Integer.parseInt(year));
+                    } catch (NumberFormatException e) {
+                        log.warn("Unparsable year in query parameter: {}. Ignoring parameter.", year);
+                    }
+                });
     }
 
     // TODO: All of this is straight from BookingsView, extract that code into its own class

@@ -1,5 +1,6 @@
 package de.nihas101.midas.ui.bookings;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
@@ -10,7 +11,10 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.BigDecimalField;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
 import de.nihas101.midas.bookings.dto.Booking;
 import de.nihas101.midas.bookings.dto.Bookings;
@@ -26,7 +30,9 @@ import de.nihas101.midas.ui.common.MidasPage;
 import de.nihas101.midas.ui.common.ShareholderPicker;
 import de.nihas101.midas.ui.common.YearPicker;
 import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
+import de.nihas101.midas.ui.interest.InterestView;
 import de.nihas101.midas.userconfig.service.UserConfigService;
+import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 
@@ -39,7 +45,7 @@ import java.util.List;
 @Slf4j
 @Route("bookings")
 @PageTitle("Bookings")
-public class BookingsView extends MidasPage {
+public class BookingsView extends MidasPage implements BeforeEnterObserver {
 
     private final ShareholdersService shareholdersService;
     private final BookingsService bookingsService;
@@ -76,6 +82,38 @@ public class BookingsView extends MidasPage {
         setContent(content);
     }
 
+    // TODO: Also add these to local storage
+    @Override
+    public void beforeEnter(BeforeEnterEvent event) {
+        event.getLocation().getQueryParameters().getSingleParameter(QUERY_PARAM_SHAREHOLDER)
+                .ifPresent(shareholderId -> {
+                    try {
+                        if (StringUtils.isBlank(shareholderId)) {
+                            return;
+                        }
+                        final Shareholder shareholder = shareholdersService.shareholder(Integer.parseInt(shareholderId));
+                        if (shareholder == null) {
+                            log.warn("Unknown shareholderId: {}. Ignoring parameter.", shareholderId);
+                            return;
+                        }
+                        shareholderPicker.setValue(shareholder);
+                    } catch (NumberFormatException e) {
+                        log.warn("Unparsable shareholderId in query parameter: {}. Ignoring parameter.", shareholderId);
+                    }
+                });
+        event.getLocation().getQueryParameters().getSingleParameter(QUERY_PARAM_YEAR)
+                .ifPresent(year -> {
+                    if (StringUtils.isBlank(year)) {
+                        return;
+                    }
+                    try {
+                        yearPicker.setValue(Integer.parseInt(year));
+                    } catch (NumberFormatException e) {
+                        log.warn("Unparsable year in query parameter: {}. Ignoring parameter.", year);
+                    }
+                });
+    }
+
     private void setupHeader(final VerticalLayout content) {
         HorizontalLayout header = new HorizontalLayout();
         header.setWidthFull();
@@ -84,11 +122,33 @@ public class BookingsView extends MidasPage {
         shareholderPicker = new ShareholderPicker(
                 messageSource.getMessage("bookings.shareholder", null, getLocale()),
                 shareholdersService,
-                e -> refreshGrid()
+                e -> {
+                    final Shareholder shareholder = e.getValue();
+
+                    QueryParameters queryParameters = UI.getCurrent().getActiveViewLocation().getQueryParameters();
+                    if (shareholder != null) {
+                        queryParameters = queryParameters.merging(QUERY_PARAM_SHAREHOLDER, String.valueOf(shareholder.getId()));
+                    } else {
+                        queryParameters = queryParameters.excluding(QUERY_PARAM_SHAREHOLDER);
+                    }
+                    UI.getCurrent().navigate(BookingsView.class, queryParameters);
+                    refreshGrid();
+                }
         );
         yearPicker = new YearPicker(
                 messageSource.getMessage("bookings.year", null, getLocale()),
-                e -> refreshGrid()
+                e -> {
+                    final Integer year = e.getValue();
+
+                    QueryParameters queryParameters = UI.getCurrent().getActiveViewLocation().getQueryParameters();
+                    if (year != null) {
+                        queryParameters = queryParameters.merging(QUERY_PARAM_YEAR, String.valueOf(String.valueOf(year)));
+                    } else {
+                        queryParameters = queryParameters.excluding(QUERY_PARAM_YEAR);
+                    }
+                    UI.getCurrent().navigate(BookingsView.class, queryParameters);
+                    refreshGrid();
+                }
         );
         actionRow = createActionRow();
         actionRow.setVisible(false);
@@ -110,16 +170,14 @@ public class BookingsView extends MidasPage {
         });
 
         final Button addBookingButton = new Button(messageSource.getMessage("bookings.add-booking", null, getLocale()));
-        addBookingButton.addClickListener(e -> {
-            new BookingFormDialog(
-                    shareholdersService,
-                    bookingsService,
-                    messageSource,
-                    getLocale(),
-                    shareholderPicker.getValue(),
-                    booking -> refreshGrid()
-            ).open();
-        });
+        addBookingButton.addClickListener(e -> new BookingFormDialog(
+                shareholdersService,
+                bookingsService,
+                messageSource,
+                getLocale(),
+                shareholderPicker.getValue(),
+                booking -> refreshGrid()
+        ).open());
 
         final HorizontalLayout actions = new HorizontalLayout();
         actions.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
@@ -148,7 +206,6 @@ public class BookingsView extends MidasPage {
         refreshGrid();
     }
 
-    // TODO: Add edit and delete buttons
     private void setupGrid(final VerticalLayout content) {
         grid = new Grid<>();
         grid.setSizeFull();
@@ -203,15 +260,20 @@ public class BookingsView extends MidasPage {
     private Button createEditBookingButton(final Booking booking) {
         final Button editButton = new Button(messageSource.getMessage("global.edit", null, getLocale()));
         editButton.addClickListener(e -> {
-            new BookingFormDialog(
-                    shareholdersService,
-                    bookingsService,
-                    messageSource,
-                    getLocale(),
-                    shareholderPicker.getValue(),
-                    booking,
-                    b -> refreshGrid()
-            ).open();
+            if (BookingType.INTEREST.equals(booking.getType())) {
+                final QueryParameters queryParameters = UI.getCurrent().getActiveViewLocation().getQueryParameters();
+                UI.getCurrent().navigate(InterestView.class, queryParameters);
+            } else {
+                new BookingFormDialog(
+                        shareholdersService,
+                        bookingsService,
+                        messageSource,
+                        getLocale(),
+                        shareholderPicker.getValue(),
+                        booking,
+                        b -> refreshGrid()
+                ).open();
+            }
         });
         return editButton;
     }

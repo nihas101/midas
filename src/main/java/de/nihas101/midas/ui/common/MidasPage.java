@@ -26,6 +26,9 @@ import java.util.Optional;
 @Getter
 public class MidasPage extends AppLayout {
 
+    public static final String QUERY_PARAM_SHAREHOLDER = "shareholder";
+    public static final String QUERY_PARAM_YEAR = "year";
+
     private final Locale locale;
 
     public MidasPage(

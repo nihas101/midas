@@ -28,7 +28,6 @@ public class YearPicker extends ComboBox<Integer> {
             final List<Integer> selectableYears,
             final ValueChangeListener<ComponentValueChangeEvent<ComboBox<Integer>, Integer>> changeListener
     ) {
-
         super(label, selectableYears);
         this.setValue(LocalDate.now().getYear());
         this.setWidth(6, Unit.EM);

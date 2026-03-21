@@ -16,6 +16,13 @@ public class ShareholdersService implements ShareholdersReader, ShareholdersWrit
     }
 
     @Override
+    public Shareholder shareholder(final int shareholderId) {
+        return repository.findById(shareholderId)
+                .map(Shareholder::fromEntity)
+                .orElse(null);
+    }
+
+    @Override
     public Shareholders shareholders() {
         return new Shareholders(
                 repository.findAll()
