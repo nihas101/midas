@@ -1,6 +1,7 @@
 package de.nihas101.midas.bookings.repository;
 
 import de.nihas101.midas.bookings.entity.BookingEntity;
+import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.shareholders.entity.ShareholderEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -15,5 +16,11 @@ public interface BookingsRepository extends JpaRepository<BookingEntity, Integer
             ShareholderEntity shareholder,
             LocalDate start,
             LocalDate end
+    );
+
+    BookingEntity findFirstByShareholderAndDateAndType(
+            ShareholderEntity shareholder,
+            LocalDate date,
+            BookingType type
     );
 }

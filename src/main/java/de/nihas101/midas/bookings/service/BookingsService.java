@@ -4,6 +4,7 @@ import de.nihas101.midas.bookings.dto.Booking;
 import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.dto.DefaultBookings;
 import de.nihas101.midas.bookings.entity.BookingEntity;
+import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.bookings.repository.BookingsRepository;
 import de.nihas101.midas.openingbalance.dto.OpeningBalance;
 import de.nihas101.midas.openingbalance.repository.OpeningBalanceRepository;
@@ -18,6 +19,8 @@ import java.time.Month;
 import java.time.Year;
 import java.util.List;
 
+// TODO: Wrap year here!
+// TODO: Break this service up into multiple ones -> One method per class?
 @Service
 @RequiredArgsConstructor
 public class BookingsService implements BookingsWriter, BookingsReader {
@@ -28,15 +31,60 @@ public class BookingsService implements BookingsWriter, BookingsReader {
     private final ShareholdersRepository shareholdersRepository;
     private final OpeningBalanceRepository openingBalanceRepository;
 
+    // TODO: Can be extracted into separate class
+    // -- INTEREST RELATED --
+    @Override
+    public Booking interestForShareholderAndYear(final Integer shareholderId, final Integer year) {
+        final ShareholderEntity shareholder = shareholdersRepository.findById(shareholderId)
+                .orElseThrow(() -> new IllegalArgumentException("Shareholder not found")); // TODO: i18n
+
+        final LocalDate endOfYear = endOfYear(year);
+
+        return Booking.fromEntity(
+                bookingsRepository.findFirstByShareholderAndDateAndType(
+                        shareholder,
+                        endOfYear,
+                        BookingType.INTEREST
+                )
+        );
+    }
+
+    @Override
+    public Bookings interestRelatedBookingsForShareholderAndYear(final Integer shareholderId, final Integer year) {
+        final ShareholderEntity shareholder = shareholdersRepository.findById(shareholderId)
+                .orElseThrow(() -> new IllegalArgumentException("Shareholder not found")); // TODO: i18n
+
+        final LocalDate startOfYear = LocalDate.of(year, Month.JANUARY, 1);
+        final LocalDate endOfYear = endOfYear(year);
+
+        final List<Booking> bookings = bookingsRepository.findByShareholderAndDateBetweenOrderByDateAsc(shareholder, startOfYear, endOfYear)
+                .stream()
+                // Exclude the interest, because that is what we will calculate
+                .filter(bookingEntity -> !BookingType.INTEREST.equals(bookingEntity.getType()))
+                .map(Booking::fromEntity)
+                .toList();
+
+        final OpeningBalance openingBalance = openingBalanceRepository.findByShareholderAndDate(shareholder, Year.of(year).atDay(1))
+                .map(OpeningBalance::fromEntity)
+                .orElse(null);
+
+        return new DefaultBookings(
+                bookings,
+                openingBalance
+        );
+    }
+
+    // TODO: Can be extracted into separate class
+    // -- BOOKING View related --
     @Override
     public Bookings bookingsForShareholderAndYear(final Integer shareholderId, final Integer year) {
         final ShareholderEntity shareholder = shareholdersRepository.findById(shareholderId)
                 .orElseThrow(() -> new IllegalArgumentException("Shareholder not found")); // TODO: i18n
 
-        final LocalDate start = LocalDate.of(year, Month.JANUARY, 1);
-        final LocalDate end = LocalDate.of(year, Month.DECEMBER, 31);
+        final LocalDate startOfYear = LocalDate.of(year, Month.JANUARY, 1);
+        final LocalDate endOfYear = endOfYear(year);
 
-        final List<Booking> bookings = bookingsRepository.findByShareholderAndDateBetweenOrderByDateAsc(shareholder, start, end)
+        final List<Booking> bookings = bookingsRepository.findByShareholderAndDateBetweenOrderByDateAsc(shareholder, startOfYear, endOfYear)
                 .stream()
                 .map(Booking::fromEntity)
                 .toList();
@@ -49,6 +97,10 @@ public class BookingsService implements BookingsWriter, BookingsReader {
                 bookings,
                 openingBalance
         );
+    }
+
+    private LocalDate endOfYear(final Integer year) {
+        return LocalDate.of(year, Month.DECEMBER, 31);
     }
 
     @Transactional

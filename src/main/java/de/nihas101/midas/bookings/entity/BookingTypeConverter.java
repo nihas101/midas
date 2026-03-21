@@ -7,12 +7,12 @@ import jakarta.persistence.Converter;
 public class BookingTypeConverter implements AttributeConverter<BookingType, Integer> {
 
     @Override
-    public Integer convertToDatabaseColumn(BookingType attribute) {
-        return attribute == null ? null : attribute.getId();
+    public Integer convertToDatabaseColumn(BookingType bookingType) {
+        return bookingType == null ? null : bookingType.getId();
     }
 
     @Override
-    public BookingType convertToEntityAttribute(Integer dbData) {
-        return dbData == null ? null : BookingType.fromId(dbData);
+    public BookingType convertToEntityAttribute(Integer bookingTypeId) {
+        return bookingTypeId == null ? null : BookingType.fromId(bookingTypeId);
     }
 }

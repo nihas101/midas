@@ -11,13 +11,13 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import de.nihas101.midas.bookings.dto.Booking;
 import de.nihas101.midas.bookings.dto.Bookings;
-import de.nihas101.midas.bookings.monthlytotal.MonthlyTotalSum;
+import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.bookings.service.BookingsService;
 import de.nihas101.midas.config.MidasConfig;
 import de.nihas101.midas.interest.InterestCalculation;
 import de.nihas101.midas.interest.dto.InterestRate;
-import de.nihas101.midas.interest.interestamount.Interest;
 import de.nihas101.midas.interest.service.InterestRateService;
 import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.shareholders.dto.Shareholder;
@@ -38,7 +38,6 @@ import java.time.YearMonth;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
@@ -126,7 +125,7 @@ public class InterestView extends MidasPage {
         interestRateField.setSuffixComponent(new Span("%"));
         interestRateField.addValueChangeListener(e -> {
             if (e.isFromClient()) {
-                saveInterestRate();
+                handleInterestRate();
             }
         });
 
@@ -138,22 +137,71 @@ public class InterestView extends MidasPage {
         return actions;
     }
 
-    private void saveInterestRate() {
+    private void handleInterestRate() {
         final Shareholder shareholder = shareholderPicker.getValue();
-        final Integer year = yearPicker.getValue(); // TODO: Turn into year
+        final Integer year = yearPicker.getValue(); // TODO: Wrap in Year
         final BigDecimal rate = interestRateField.getValue();
         if (shareholder == null || year == null) {
             return;
         }
 
-        final InterestRate interestRate = interestRateService.interestRate(shareholder.getId(), Year.of(year));
+        // TODO: Updating of these two fields should be handled in a transaction
+        final InterestRate interestRate = updateInterestRate(shareholder, year, rate);
+        final Bookings bookings = bookingsService.interestRelatedBookingsForShareholderAndYear(shareholder.getId(), year);
+        final InterestCalculation interestCalculation = new InterestCalculation(
+                bookings,
+                year,
+                interestRate
+        );
+        updateInterestBooking(shareholder, year, interestCalculation);
+
+        refreshGrid(
+                year,
+                bookings,
+                rate,
+                interestCalculation
+        );
+    }
+
+    private void updateInterestBooking(
+            final Shareholder shareholder,
+            final Integer year,
+            final InterestCalculation interestCalculation
+    ) {
+        final Booking booking = bookingsService.interestForShareholderAndYear(
+                shareholder.getId(),
+                year
+        );
+        if (booking != null) {
+            log.info("Updating interest booking: {}", booking); // TODO: remove
+            // TODO: This mutates the object! Handle this differently
+            booking.setAmount(interestCalculation.interest());
+            bookingsService.update(booking);
+        } else {
+            final Booking newBooking = new Booking(
+                    null,
+                    null,
+                    shareholder.getId(),
+                    Year.of(year).atMonth(Month.DECEMBER).atEndOfMonth(),
+                    BookingType.INTEREST,
+                    interestCalculation.interest(),
+                    null
+            );
+            log.info("Creating interest booking: {}", newBooking); // TODO: remove
+            bookingsService.create(newBooking);
+        }
+    }
+
+    private InterestRate updateInterestRate(final Shareholder shareholder, final Integer year, final BigDecimal rate) {
+        InterestRate interestRate = interestRateService.interestRate(shareholder.getId(), Year.of(year));
         if (interestRate != null) {
             interestRate.setInterestRate(rate); // TODO: This mutates the object! Do it differently
             interestRateService.update(interestRate);
         } else {
-            interestRateService.create(new InterestRate(null, shareholder.getId(), rate, Year.of(year)));
+            interestRate = new InterestRate(null, shareholder.getId(), rate, Year.of(year));
+            interestRateService.create(interestRate);
         }
-        refreshGrid();
+        return interestRate;
     }
 
     private void refreshGrid() {
@@ -169,34 +217,61 @@ public class InterestView extends MidasPage {
             return;
         }
 
-        final InterestRate rate = interestRateService.interestRate(shareholder.getId(), Year.of(year));
-        // TODO: This mutates the object! Do it differently
-        if (rate != null) {
-            interestRateField.setValue(rate.getInterestRate());
-        } else {
-            interestRateField.setValue(BigDecimal.ZERO);
-        }
+        final BigDecimal interestRate = interestRate(shareholder, Year.of(year)).getInterestRate();
+        interestRateField.setValue(interestRate);
 
-        final Bookings bookings = bookingsService.bookingsForShareholderAndYear(shareholder.getId(), year);
-        interestCalculationGrid.setItems(createRows(year, bookings));
+        final Bookings bookings = bookingsService.interestRelatedBookingsForShareholderAndYear(shareholder.getId(), year);
+        final InterestCalculation interestCalculation = new InterestCalculation(
+                bookings,
+                year,
+                interestRate
+        );
+        refreshGrid(
+                year,
+                bookings,
+                interestRate,
+                interestCalculation
+        );
+    }
+
+    private InterestRate interestRate(final Shareholder shareholder, final Year year) {
+        InterestRate rate = interestRateService.interestRate(shareholder.getId(), year);
+        if (rate == null) {
+            return new InterestRate(null, shareholder.getId(), BigDecimal.ZERO, year);
+        }
+        return rate;
+    }
+
+    private void refreshGrid(
+            final Integer year,
+            final Bookings bookings,
+            final BigDecimal interestRate,
+            final InterestCalculation interestCalculation
+    ) {
+        interestCalculationGrid.setItems(
+                createRows(
+                        year,
+                        bookings,
+                        interestRate,
+                        interestCalculation
+                )
+        );
     }
 
     // TODO: Introduce classes for all this logic
-    private List<InterestCalculationRow> createRows(final Integer year, final Bookings bookings) {
+    private List<InterestCalculationRow> createRows(
+            final Integer year,
+            final Bookings bookings,
+            final BigDecimal interestRate,
+            final InterestCalculation interestCalculation
+    ) {
         final List<InterestCalculationRow> rows = new ArrayList<>();
-        final BigDecimal interestRate = interestRateField.getValue();
         rows.add(
                 new OpeningBalanceInterestCalculationRow(
                         bookings,
                         Year.of(year),
                         interestRate
                 )
-        );
-
-        final InterestCalculation interestCalculation = new InterestCalculation(
-                bookings,
-                year,
-                interestRate
         );
 
         final List<InterestCalculationRow> interestCalculationRows = interestRows(
@@ -251,7 +326,6 @@ public class InterestView extends MidasPage {
         return rows;
     }
 
-    // TODO: Hide zeros (check how the booking view does it)
     // TODO: Move to own class (same in bookings view)
     private void setupInterestGrid(final VerticalLayout content) {
         interestCalculationGrid = new Grid<>();

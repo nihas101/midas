@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Getter
 @RequiredArgsConstructor
@@ -22,5 +23,14 @@ public enum BookingType {
                 .filter(t -> t.id == id)
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Unknown BookingType ID: " + id)); // TODO: i18n
+    }
+
+    public static List<BookingType> creatableByUser() {
+        return List.of(
+                BookingType.WITHDRAWAL,
+                BookingType.TAX_PREVIOUS_YEAR,
+                BookingType.TAX_CREDIT,
+                BookingType.COMPENSATION
+        );
     }
 }

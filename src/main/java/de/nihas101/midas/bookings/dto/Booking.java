@@ -19,7 +19,7 @@ public class Booking {
     private Integer displayId;
     private Integer shareholderId;
     private LocalDate date;
-    private BookingType type;
+    private BookingType type; // TODO Split this class per booking type?
     private MoneyAmount amount;
     private String comment;
 

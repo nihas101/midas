@@ -22,7 +22,6 @@ import de.nihas101.midas.shareholders.service.ShareholdersReader;
 import org.springframework.context.MessageSource;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.Locale;
 import java.util.function.Consumer;
 
@@ -87,7 +86,7 @@ public class BookingFormDialog extends Dialog {
                 .bind(Booking::getDate, Booking::setDate);
 
         ComboBox<BookingType> typePicker = new ComboBox<>(messageSource.getMessage("bookings.type", null, locale));
-        typePicker.setItems(Arrays.asList(BookingType.values()));
+        typePicker.setItems(BookingType.creatableByUser());
         typePicker.setItemLabelGenerator(t -> messageSource.getMessage(t.getI18nKey(), null, locale) + " (" + t.getId() + ")");
         typePicker.setRequired(true);
         binder.forField(typePicker)
