@@ -35,13 +35,21 @@ jobs:
       - name: Build with Maven
         run: mvn -B package --file pom.xml
 
+      - name: Package Release Assets
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          VERSION=${VERSION#v}
+          mkdir midas-distribution
+          cp target/midas.jar midas-distribution/
+          cp distribution/midas.bat midas-distribution/
+          cp distribution/midas.sh midas-distribution/
+          zip -r midas-$VERSION.zip midas-distribution/
+
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: |
-            target/midas.jar
-            distribution/midas.bat
-            distribution/midas.sh
+          files: midas-*.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
