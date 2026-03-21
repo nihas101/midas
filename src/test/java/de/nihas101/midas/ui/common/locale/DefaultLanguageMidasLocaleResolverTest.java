@@ -1,5 +1,6 @@
 package de.nihas101.midas.ui.common.locale;
 
+import de.nihas101.midas.config.DesktopConfig;
 import de.nihas101.midas.config.I18nConfig;
 import de.nihas101.midas.config.MidasConfig;
 import de.nihas101.midas.config.ThemeConfig;
@@ -42,42 +43,48 @@ class DefaultLanguageMidasLocaleResolverTest {
                         new MidasConfig(
                                 new ThemeConfig(),
                                 new UIConfig(),
-                                new I18nConfig()
+                                new I18nConfig(),
+                                new DesktopConfig()
                         ), Locale.ENGLISH
                 ),
                 Arguments.of(
                         new MidasConfig(
                                 new ThemeConfig(),
                                 new UIConfig(),
-                                new I18nConfig("", false)
+                                new I18nConfig("", false),
+                                new DesktopConfig()
                         ), null
                 ),
                 Arguments.of(
                         new MidasConfig(
                                 new ThemeConfig(),
                                 new UIConfig(),
-                                new I18nConfig("        ", false)
+                                new I18nConfig("        ", false),
+                                new DesktopConfig()
                         ), null
                 ),
                 Arguments.of(
                         new MidasConfig(
                                 new ThemeConfig(),
                                 new UIConfig(),
-                                new I18nConfig("notAValidLocale", false)
+                                new I18nConfig("notAValidLocale", false),
+                                new DesktopConfig()
                         ), null
                 ),
                 Arguments.of(
                         new MidasConfig(
                                 new ThemeConfig(),
                                 new UIConfig(),
-                                new I18nConfig("en", false)
+                                new I18nConfig("en", false),
+                                new DesktopConfig()
                         ), Locale.ENGLISH
                 ),
                 Arguments.of(
                         new MidasConfig(
                                 new ThemeConfig(),
                                 new UIConfig(),
-                                new I18nConfig("de", false)
+                                new I18nConfig("de", false),
+                                new DesktopConfig()
                         ), Locale.GERMAN
                 )
         );

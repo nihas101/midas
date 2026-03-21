@@ -15,12 +15,14 @@ public class MidasConfig {
     private ThemeConfig theme;
     private UIConfig ui;
     private I18nConfig i18n;
+    private DesktopConfig desktop;
 
     public MidasConfig() {
         this(
                 new ThemeConfig(),
                 new UIConfig(),
-                new I18nConfig()
+                new I18nConfig(),
+                new DesktopConfig()
         );
     }
 

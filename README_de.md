@@ -46,6 +46,8 @@ Die Anwendung kann über `application.properties` konfiguriert werden. Nachfolge
 *   `midas.theme.default-theme`: Legt das Standard-Theme für die Anwendung fest (z.B. `dark`).
 *   `midas.ui.hide-theme-toggle`: Wenn `true`, wird die Theme-Umschalttaste in der Benutzeroberfläche ausgeblendet.
 *   `midas.ui.hide-language-selector`: Wenn `true`, wird die Sprachauswahl in der Benutzeroberfläche ausgeblendet.
+*   `midas.desktop.auto-shutdown-enabled`: Wenn `true`, wird die Anwendung automatisch heruntergefahren, sobald keine Browserfenster (und Sessions) mehr aktiv sind (Standard: `true`).
+*   `midas.desktop.grace-period-seconds`: Die Zeitspanne (in Sekunden), die die Anwendung wartet, nachdem das letzte Browserfenster geschlossen wurde, bevor sie heruntergefahren wird (Standard: `60`).
 *   `server.port`: Der Port, auf dem die Anwendung ausgeführt wird (z.B. `8080`).
 *   `vaadin.launch-browser`: Wenn auf `true` gesetzt, öffnet sich automatisch ein Browserfenster zur Anwendungs-URL beim Start.
 *   `spring.datasource.url`: Die JDBC-URL für die SQLite-Datenbank (z.B. `jdbc:sqlite:midas.db`).
