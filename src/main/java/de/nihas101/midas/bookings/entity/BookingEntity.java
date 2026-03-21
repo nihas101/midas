@@ -47,6 +47,7 @@ public class BookingEntity {
     @Column(name = "type", nullable = false)
     private BookingType type;
 
+    @Builder.Default
     @Column(name = "amount", nullable = false)
     private MoneyAmount amount = MoneyAmount.ZERO;
 
