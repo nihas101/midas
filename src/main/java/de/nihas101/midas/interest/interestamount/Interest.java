@@ -54,4 +54,8 @@ public class Interest {
 
         return BigDecimal.valueOf(360).divide(interestRate, RoundingMode.HALF_UP);
     }
+
+    public BigDecimal interestDays() {
+        return interestDays;
+    }
 }

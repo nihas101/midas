@@ -188,11 +188,12 @@ public class InterestView extends MidasPage {
     // TODO: Introduce classes for all this logic
     private List<InterestCalculationRow> createRows(final Integer year, final Bookings bookings) {
         final List<InterestCalculationRow> rows = new ArrayList<>();
+        final BigDecimal interestRate = interestRateField.getValue();
         rows.add(
                 new OpeningBalanceInterestCalculationRow(
                         bookings,
                         Year.of(year),
-                        interestRateField.getValue()
+                        interestRate
                 )
         );
         // TODO: Extract all of these calculations into classes
@@ -213,7 +214,7 @@ public class InterestView extends MidasPage {
                 Collectors.toMap(Function.identity(), month -> new Interest(
                         monthlyBalances.get(month),
                         BigDecimal.valueOf(30L),
-                        interestRateField.getValue()
+                        interestRate
                 )));
         final List<InterestCalculationRow> interestCalculationRows = interestRows(
                 year,
@@ -233,7 +234,13 @@ public class InterestView extends MidasPage {
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
                 // TODO: Make this explicit (so that the 'Vortrag' is handled at one place)
                 .add(BigDecimal.valueOf(300L)); // We add 300 vor the 'Vortrag'
-        final BigDecimal divisor = BigDecimal.valueOf(72.00); // TODO: Actually calculate it
+
+        final BigDecimal daysInInterestYear = interests.values()
+                .stream()
+                .map(Interest::interestDays)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        final BigDecimal divisor = daysInInterestYear.divide(interestRate, RoundingMode.HALF_UP);
+
         final MoneyAmount interest = MoneyAmount.of(
                 interestSum.setScale(4, RoundingMode.HALF_UP)
                         .divide(divisor, RoundingMode.HALF_UP)
