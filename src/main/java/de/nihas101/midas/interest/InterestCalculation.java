@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+// TODO: Tests
 // TODO: These constructors are a mess, extract classes from that logic
 public record InterestCalculation(
         BigDecimal interestSum,
@@ -158,7 +159,7 @@ public record InterestCalculation(
     ) {
         this(
                 interestSum,
-                daysInInterestYear.divide(interestRate, RoundingMode.HALF_UP), // divisor
+                interestRate.compareTo(BigDecimal.ZERO) > 0 ? daysInInterestYear.divide(interestRate, RoundingMode.HALF_UP) : BigDecimal.ZERO, // divisor
                 monthlyTotalSums,
                 monthlyBalances,
                 interests
@@ -176,8 +177,9 @@ public record InterestCalculation(
                 interestSum,
                 divisor,
                 // interest
-                MoneyAmount.of(interestSum.setScale(4, RoundingMode.HALF_UP)
-                        .divide(divisor, RoundingMode.HALF_UP)),
+                divisor.compareTo(BigDecimal.ZERO) > 0
+                        ? MoneyAmount.of(interestSum.setScale(4, RoundingMode.HALF_UP).divide(divisor, RoundingMode.HALF_UP))
+                        : MoneyAmount.ZERO,
                 monthlyTotalSums,
                 monthlyBalances,
                 interests

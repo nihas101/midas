@@ -25,6 +25,7 @@ import de.nihas101.midas.shareholders.service.ShareholdersService;
 import de.nihas101.midas.ui.bookings.BookingRow;
 import de.nihas101.midas.ui.bookings.BookingsToBookingRowConverter;
 import de.nihas101.midas.ui.common.MidasPage;
+import de.nihas101.midas.ui.common.ShareholderPicker;
 import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
 import de.nihas101.midas.userconfig.service.UserConfigService;
 import lombok.extern.slf4j.Slf4j;
@@ -86,7 +87,11 @@ public class InterestView extends MidasPage {
         header.setWidthFull();
         header.setAlignItems(FlexComponent.Alignment.END);
 
-        setupShareholderPicker();
+        shareholderPicker = new ShareholderPicker(
+                messageSource.getMessage("bookings.shareholder", null, getLocale()),
+                shareholdersService.shareholders(),
+                e -> refreshGrid()
+        );
         setupYearPicker();
         actionRow = createActionRow();
         actionRow.setVisible(false);
@@ -94,15 +99,6 @@ public class InterestView extends MidasPage {
         header.add(shareholderPicker, yearPicker, actionRow);
         header.setFlexGrow(1, actionRow);
         content.add(header);
-    }
-
-    private void setupShareholderPicker() {
-        shareholderPicker = new ComboBox<>(messageSource.getMessage("bookings.shareholder", null, getLocale()));
-        shareholderPicker.setItems(shareholdersService.shareholders().toList());
-        shareholderPicker.setItemLabelGenerator(s -> s.getFirstName() + " " + s.getLastName() + " (" + s.getDisplayId() + ")");
-        shareholderPicker.setPlaceholder("Search by name or ID..."); // TODO: i18n
-        shareholderPicker.setClearButtonVisible(true);
-        shareholderPicker.addValueChangeListener(e -> refreshGrid());
     }
 
     private void setupYearPicker() {
@@ -121,6 +117,7 @@ public class InterestView extends MidasPage {
     private HorizontalLayout createActionRow() {
         // TODO: Extract this into its own class, so we always set the locale
         interestRateField = new BigDecimalField(messageSource.getMessage("interest.rate.label", null, getLocale()));
+        interestRateField.setMaxWidth("5em");
         interestRateField.setLocale(getLocale());
         interestRateField.setSuffixComponent(new Span("%"));
         interestRateField.addValueChangeListener(e -> {

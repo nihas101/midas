@@ -1,6 +1,5 @@
 package de.nihas101.midas.ui.bookings;
 
-import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
@@ -24,19 +23,18 @@ import de.nihas101.midas.openingbalance.service.OpeningBalanceService;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersService;
 import de.nihas101.midas.ui.common.MidasPage;
+import de.nihas101.midas.ui.common.ShareholderPicker;
+import de.nihas101.midas.ui.common.YearPicker;
 import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
 import de.nihas101.midas.userconfig.service.UserConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 
 @Slf4j
 @Route("bookings")
@@ -83,8 +81,15 @@ public class BookingsView extends MidasPage {
         header.setWidthFull();
         header.setAlignItems(FlexComponent.Alignment.END);
 
-        setupShareholderPicker();
-        setupYearPicker();
+        shareholderPicker = new ShareholderPicker(
+                messageSource.getMessage("bookings.shareholder", null, getLocale()),
+                shareholdersService,
+                e -> refreshGrid()
+        );
+        yearPicker = new YearPicker(
+                messageSource.getMessage("bookings.year", null, getLocale()),
+                e -> refreshGrid()
+        );
         actionRow = createActionRow();
         actionRow.setVisible(false);
 
@@ -93,31 +98,9 @@ public class BookingsView extends MidasPage {
         content.add(header);
     }
 
-    private void setupShareholderPicker() {
-        shareholderPicker = new ComboBox<>(messageSource.getMessage("bookings.shareholder", null, getLocale()));
-        shareholderPicker.setItems(shareholdersService.shareholders().toList());
-        shareholderPicker.setItemLabelGenerator(s -> s.getFirstName() + " " + s.getLastName() + " (" + s.getDisplayId() + ")");
-        shareholderPicker.setPlaceholder("Search by name or ID..."); // TODO: i18n
-        shareholderPicker.setClearButtonVisible(true);
-        shareholderPicker.addValueChangeListener(e -> refreshGrid());
-    }
-
-    private void setupYearPicker() {
-        LocalDate now = LocalDate.now(ZoneId.systemDefault());
-
-        List<Integer> selectableYears = IntStream.rangeClosed(0, 99)
-                .map(i -> now.getYear() - i)
-                .boxed()
-                .toList();
-        yearPicker = new ComboBox<>(messageSource.getMessage("bookings.year", null, getLocale()), selectableYears);
-        yearPicker.setValue(LocalDate.now().getYear());
-        yearPicker.setWidth(6, Unit.EM);
-        yearPicker.addValueChangeListener(e -> refreshGrid());
-    }
-
-    // TODO: Add element for editing saldo for this year
     private HorizontalLayout createActionRow() {
         openingBalanceField = new BigDecimalField(messageSource.getMessage("bookings.type.opening-balance", null, getLocale()));
+        openingBalanceField.setMaxWidth("9em");
         openingBalanceField.setLocale(getLocale());
         openingBalanceField.setSuffixComponent(new Span("€")); // TODO: Use currency from properties
         openingBalanceField.addValueChangeListener(e -> {
