@@ -20,6 +20,7 @@ import static java.awt.Desktop.*;
 @EnableConfigurationProperties
 public class MidasApplication implements AppShellConfigurator {
 
+    // TODO: Fix the issue with the cyclic CSS import!
     // TODO: Add build step for an executable
 
     // TODO: Think about splitting this project into multiple modules

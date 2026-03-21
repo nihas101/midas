@@ -1,4 +1,6 @@
 /* styles.css */
+@import url('./lumo/color.css');
+@import url('./lumo/typography.css');
 @import url('./lumo-dark.css');
 @import url('./lumo-light.css');
 
