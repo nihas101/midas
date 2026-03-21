@@ -3,11 +3,9 @@ package de.nihas101.midas.ui.interest;
 import de.nihas101.midas.money.MoneyAmount;
 import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
-public class Transaction {
+public record Transaction(MoneyAmount moneyAmount) {
 
-    private final MoneyAmount moneyAmount;
-
+    @Override
     public MoneyAmount moneyAmount() {
         return moneyAmount.abs();
     }

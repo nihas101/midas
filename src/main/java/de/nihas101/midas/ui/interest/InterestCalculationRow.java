@@ -15,5 +15,4 @@ public interface InterestCalculationRow {
     int interestDaysCount();
 
     BigDecimal interestAmount(); // TODO: Is this the correct term?
-
 }

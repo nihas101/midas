@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import java.math.BigDecimal;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 
 @RequiredArgsConstructor
 public class OpeningBalanceInterestCalculationRow implements InterestCalculationRow { // TODO: Test
@@ -17,20 +16,18 @@ public class OpeningBalanceInterestCalculationRow implements InterestCalculation
     public OpeningBalanceInterestCalculationRow(
             final Bookings bookings,
             final Year year,
-            final BigDecimal interestRate,
-            final Locale locale
+            final BigDecimal interestRate
     ) {
         this(
                 new BaseInterestCalculationRow(
-                        "Vortrag per 01.01." + year.format(DateTimeFormatter.ofPattern("yyyy")),
+                        "Vortrag per 01.01." + year.format(DateTimeFormatter.ofPattern("yyyy")), // TODO: i18n
                         bookings.openingBalance().getOpeningBalance(),
                         bookings.openingBalance().getOpeningBalance(),
                         new Interest(
                                 bookings.openingBalance().getOpeningBalance(),
                                 BigDecimal.valueOf(30L), // TODO: Make this passable from outside
                                 interestRate
-                        ).interestAmount(),
-                        locale
+                        ).interestAmount()
                 )
         );
     }

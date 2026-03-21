@@ -1,6 +1,5 @@
 package de.nihas101.midas.ui.interest;
 
-import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.monthlytotal.MonthlyCumulativeSum;
 import de.nihas101.midas.bookings.monthlytotal.MonthlyTotalSum;
 import de.nihas101.midas.interest.interestamount.Interest;
@@ -18,45 +17,17 @@ public class DefaultInterestCalculationRow implements InterestCalculationRow {
     private final InterestCalculationRow interestCalculationRow;
 
     public DefaultInterestCalculationRow(
-            final Bookings bookings,
             final YearMonth yearMonth,
-            final BigDecimal interestRate,
-            final Locale locale
+            final Interest interest,
+            final Locale locale,
+            final MoneyAmount balanceAtEndOfMonth,
+            final MonthlyTotalSum monthTotalSum
     ) {
-        this(
-                bookings,
-                new MonthlyTotalSum(bookings, yearMonth.getMonth()),
-                new MonthlyCumulativeSum(bookings, yearMonth.getMonth()),
-                yearMonth,
-                interestRate, locale
-        );
-    }
-
-    public DefaultInterestCalculationRow(
-            final Bookings bookings,
-            final MonthlyTotalSum monthlyTotalSum,
-            final MonthlyCumulativeSum monthlyCumulativeSum,
-            final YearMonth yearMonth,
-            final BigDecimal interestRate,
-            final Locale locale
-    ) {
-        final MoneyAmount monthTotalSum = monthlyTotalSum.sum();
-
-        final MoneyAmount totalSumOfAllBookings = monthlyCumulativeSum.sum();
-        final MoneyAmount balanceAtEndOfMonth = bookings.openingBalance()
-                .getOpeningBalance()
-                .plus(totalSumOfAllBookings);
-
         this.interestCalculationRow = new BaseInterestCalculationRow(
                 yearMonth.atEndOfMonth().format(DateTimeFormatter.ofPattern("dd. MMMM", locale)),
-                monthTotalSum,
+                monthTotalSum.sum(),
                 balanceAtEndOfMonth,
-                new Interest(
-                        balanceAtEndOfMonth,
-                        BigDecimal.valueOf(30L),
-                        interestRate
-                ).interestAmount(),
-                locale
+                interest.interestAmount()
         );
     }
 
