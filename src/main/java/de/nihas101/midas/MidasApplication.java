@@ -12,16 +12,14 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Properties;
 
-import static java.awt.Desktop.*;
+import static java.awt.Desktop.getDesktop;
+import static java.awt.Desktop.isDesktopSupported;
 
 @SpringBootApplication
 @Push
-@Theme("midas-theme")
+@Theme("midas-theme") // TODO: Update
 @EnableConfigurationProperties
 public class MidasApplication implements AppShellConfigurator {
-
-    // TODO: Fix the issue with the cyclic CSS import!
-    // TODO: Add build step for an executable
 
     // TODO: Think about splitting this project into multiple modules
     //       sqlite persistence module

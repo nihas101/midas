@@ -87,6 +87,7 @@
     </dependencyManagement>
 
     <build>
+        <finalName>midas</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
