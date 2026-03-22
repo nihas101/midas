@@ -1,7 +1,5 @@
 package de.nihas101.midas.ui.shareholders;
 
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.editor.Editor;
@@ -12,6 +10,10 @@ import com.vaadin.flow.data.binder.Binder;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersReader;
 import de.nihas101.midas.shareholders.service.ShareholdersWriter;
+import de.nihas101.midas.ui.common.CancelButton;
+import de.nihas101.midas.ui.common.DeleteButton;
+import de.nihas101.midas.ui.common.EditButton;
+import de.nihas101.midas.ui.common.SaveButton;
 import de.nihas101.midas.ui.main.Dependant;
 import org.springframework.context.MessageSource;
 
@@ -71,8 +73,8 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
             final Editor<Shareholder> editor
     ) {
         final HorizontalLayout actions = new HorizontalLayout();
-        final Button saveButton = new Button(messageSource.getMessage("global.save", null, locale), e -> editor.save());
-        final Button cancelButton = new Button(messageSource.getMessage("global.cancel", null, locale), e -> editor.cancel());
+        final SaveButton saveButton = new SaveButton(messageSource.getMessage("global.save", null, locale), e -> editor.save());
+        final CancelButton cancelButton = new CancelButton(messageSource.getMessage("global.cancel", null, locale), e -> editor.cancel());
         actions.add(saveButton, cancelButton);
 
         this.getColumns().getLast().setEditorComponent(actions);
@@ -92,18 +94,19 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
                             ? messageSource.getMessage("shareholder.add.button", null, locale)
                             : messageSource.getMessage("global.edit", null, locale);
 
-                    final Button editButton = new Button(editButtonText);
-                    editButton.addClickListener(e -> {
-                        if (editor.isOpen()) {
-                            editor.cancel();
-                        }
-                        editor.editItem(shareholder);
-                    });
+                    final EditButton editButton = new EditButton(
+                            editButtonText,
+                            e -> {
+                                if (editor.isOpen()) {
+                                    editor.cancel();
+                                }
+                                editor.editItem(shareholder);
+                            });
 
                     actions.add(editButton);
 
                     if (!isDummy) {
-                        final Button deleteButton = createDeleteShareholderButton(messageSource, locale, shareholder);
+                        final DeleteButton deleteButton = createDeleteShareholderButton(messageSource, locale, shareholder);
                         actions.add(deleteButton);
                     }
 
@@ -112,21 +115,25 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
                 .setAutoWidth(true);
     }
 
-    private Button createDeleteShareholderButton(
+    private DeleteButton createDeleteShareholderButton(
             final MessageSource messageSource,
             final Locale locale,
             final Shareholder shareholder
     ) {
-        final Button deleteButton = new Button(messageSource.getMessage("global.delete", null, locale));
-        deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
-        deleteButton.addClickListener(e -> {
-            final ConfirmDialog dialog = createDeleteShareholderDialog(messageSource, locale, shareholder);
-            dialog.open();
-        });
-        return deleteButton;
+        return new DeleteButton(
+                messageSource.getMessage("global.delete", null, locale),
+                e -> {
+                    final ConfirmDialog dialog = createDeleteShareholderDialog(messageSource, locale, shareholder);
+                    dialog.open();
+                }
+        );
     }
 
-    private ConfirmDialog createDeleteShareholderDialog(final MessageSource messageSource, final Locale locale, final Shareholder shareholder) {
+    private ConfirmDialog createDeleteShareholderDialog(
+            final MessageSource messageSource,
+            final Locale locale,
+            final Shareholder shareholder
+    ) {
         final ConfirmDialog dialog = new ConfirmDialog();
         dialog.setHeader(messageSource.getMessage("shareholders.table.delete.confirmation.title", null, locale));
 

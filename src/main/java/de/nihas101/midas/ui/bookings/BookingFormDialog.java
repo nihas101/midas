@@ -1,7 +1,5 @@
 package de.nihas101.midas.ui.bookings;
 
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
@@ -9,6 +7,7 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.TextField;
@@ -19,9 +18,12 @@ import de.nihas101.midas.bookings.service.BookingsWriter;
 import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersReader;
+import de.nihas101.midas.ui.common.CancelButton;
+import de.nihas101.midas.ui.common.SaveButton;
 import org.springframework.context.MessageSource;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
 
@@ -63,7 +65,7 @@ public class BookingFormDialog extends Dialog {
         FormLayout formLayout = new FormLayout();
 
         ComboBox<Shareholder> shareholderPicker = new ComboBox<>(messageSource.getMessage("bookings.shareholder", null, locale));
-        final java.util.List<Shareholder> shareholders = shareholdersReader.shareholders().toList();
+        final List<Shareholder> shareholders = shareholdersReader.shareholders().toList();
         shareholderPicker.setItems(shareholders);
         shareholderPicker.setItemLabelGenerator(s -> s.getFirstName() + " " + s.getLastName() + " (" + s.getDisplayId() + ")");
         shareholderPicker.setRequired(true);
@@ -113,18 +115,9 @@ public class BookingFormDialog extends Dialog {
         add(formLayout);
 
         addAnotherCheckbox = new Checkbox(messageSource.getMessage("bookings.add-another", null, locale));
-        addAnotherCheckbox.setVisible(!isEditMode);
-
-        HorizontalLayout footer = new HorizontalLayout();
-        footer.setWidthFull();
-        footer.setFlexGrow(1, addAnotherCheckbox);
-
-        Button saveButton = new Button(messageSource.getMessage("bookings.dialog.save", null, locale), e -> save());
-        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        Button cancelButton = new Button(messageSource.getMessage("bookings.dialog.cancel", null, locale), e -> close());
-
-        footer.add(addAnotherCheckbox, saveButton, cancelButton);
-        getFooter().add(footer);
+        final HorizontalLayout checkBoxLayout = setupCheckBoxes(isEditMode);
+        final HorizontalLayout buttonLayout = setupButtons(messageSource, locale);
+        setupFooter(checkBoxLayout, buttonLayout);
 
         if (isEditMode) {
             binder.setBean(bookingToEdit);
@@ -137,6 +130,31 @@ public class BookingFormDialog extends Dialog {
             }
             binder.setBean(booking);
         }
+    }
+
+    private HorizontalLayout setupButtons(final MessageSource messageSource, final Locale locale) {
+        SaveButton saveButton = new SaveButton(messageSource.getMessage("bookings.dialog.save", null, locale), e -> save());
+        CancelButton cancelButton = new CancelButton(messageSource.getMessage("bookings.dialog.cancel", null, locale), e -> close());
+        final HorizontalLayout buttonLayout = new HorizontalLayout();
+        buttonLayout.add(saveButton, cancelButton);
+        buttonLayout.setAlignItems(FlexComponent.Alignment.END);
+        return buttonLayout;
+    }
+
+    private void setupFooter(final HorizontalLayout checkBoxLayout, final HorizontalLayout buttonLayout) {
+        HorizontalLayout footer = new HorizontalLayout();
+        footer.setWidthFull();
+        footer.setFlexGrow(1, addAnotherCheckbox);
+        footer.add(checkBoxLayout, buttonLayout);
+        getFooter().add(footer);
+    }
+
+    private HorizontalLayout setupCheckBoxes(final boolean isEditMode) {
+        addAnotherCheckbox.setVisible(!isEditMode);
+        final HorizontalLayout checkBoxLayout = new HorizontalLayout();
+        checkBoxLayout.add(addAnotherCheckbox);
+        checkBoxLayout.setWidthFull();
+        return checkBoxLayout;
     }
 
     private void save() {

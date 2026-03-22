@@ -1,7 +1,6 @@
 package de.nihas101.midas.ui.bookings;
 
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
@@ -26,6 +25,8 @@ import de.nihas101.midas.openingbalance.dto.OpeningBalance;
 import de.nihas101.midas.openingbalance.service.OpeningBalanceService;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersService;
+import de.nihas101.midas.ui.common.DeleteButton;
+import de.nihas101.midas.ui.common.EditButton;
 import de.nihas101.midas.ui.common.MidasPage;
 import de.nihas101.midas.ui.common.ShareholderPicker;
 import de.nihas101.midas.ui.common.YearPicker;
@@ -41,6 +42,8 @@ import java.time.Month;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.vaadin.flow.component.button.ButtonVariant.LUMO_ERROR;
 
 @Slf4j
 @Route("bookings")
@@ -169,15 +172,20 @@ public class BookingsView extends MidasPage implements BeforeEnterObserver {
             }
         });
 
-        final Button addBookingButton = new Button(messageSource.getMessage("bookings.add-booking", null, getLocale()));
-        addBookingButton.addClickListener(e -> new BookingFormDialog(
-                shareholdersService,
-                bookingsService,
-                messageSource,
-                getLocale(),
-                shareholderPicker.getValue(),
-                booking -> refreshGrid()
-        ).open());
+        final EditButton addBookingButton = new EditButton(
+                messageSource.getMessage("bookings.add-booking", null, getLocale()),
+                e -> {
+                    final BookingFormDialog bookingFormDialog = new BookingFormDialog(
+                            shareholdersService,
+                            bookingsService,
+                            messageSource,
+                            getLocale(),
+                            shareholderPicker.getValue(),
+                            booking -> refreshGrid()
+                    );
+                    bookingFormDialog.open();
+                }
+        );
 
         final HorizontalLayout actions = new HorizontalLayout();
         actions.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
@@ -241,8 +249,8 @@ public class BookingsView extends MidasPage implements BeforeEnterObserver {
                 actionRow.setPadding(false);
                 actionRow.setSpacing(true);
 
-                final Button editButton = createEditBookingButton(booking);
-                final Button deleteButton = createDeleteBookingButton(booking);
+                final EditButton editButton = createEditBookingButton(booking);
+                final DeleteButton deleteButton = createDeleteBookingButton(booking);
 
                 actionRow.add(editButton, deleteButton);
                 actionsContainer.add(actionRow);
@@ -257,9 +265,9 @@ public class BookingsView extends MidasPage implements BeforeEnterObserver {
         grid.getHeaderRows().getFirst().getCell(balanceColumn).setPartName("balance-column");
     }
 
-    private Button createEditBookingButton(final Booking booking) {
-        final Button editButton = new Button(messageSource.getMessage("global.edit", null, getLocale()));
-        editButton.addClickListener(e -> {
+    private EditButton createEditBookingButton(final Booking booking) {
+        return new EditButton(
+                messageSource.getMessage("global.edit", null, getLocale()), e -> {
             if (BookingType.INTEREST.equals(booking.getType())) {
                 final QueryParameters queryParameters = UI.getCurrent().getActiveViewLocation().getQueryParameters();
                 UI.getCurrent().navigate(InterestView.class, queryParameters);
@@ -275,16 +283,16 @@ public class BookingsView extends MidasPage implements BeforeEnterObserver {
                 ).open();
             }
         });
-        return editButton;
     }
 
-    private Button createDeleteBookingButton(final Booking booking) {
-        final Button deleteButton = new Button(messageSource.getMessage("global.delete", null, getLocale()));
-        deleteButton.addThemeVariants(com.vaadin.flow.component.button.ButtonVariant.LUMO_ERROR);
-        deleteButton.addClickListener(e -> {
-            final ConfirmDialog dialog = createDeleteBookingDialog(booking);
-            dialog.open();
-        });
+    private DeleteButton createDeleteBookingButton(final Booking booking) {
+        final DeleteButton deleteButton = new DeleteButton(
+                messageSource.getMessage("global.delete", null, getLocale()),
+                e -> {
+                    final ConfirmDialog dialog = createDeleteBookingDialog(booking);
+                    dialog.open();
+                });
+        deleteButton.addThemeVariants(LUMO_ERROR);
         return deleteButton;
     }
 
