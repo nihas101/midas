@@ -61,11 +61,11 @@ class BookingEntityTest {
                                 MoneyAmount.ofCents(100L),
                                 "Test"
                         ),
-                        new ShareholderEntity(3, null, null, null, null),
+                        new ShareholderEntity(3, null, null, null),
                         new BookingEntity(
                                 1,
                                 2,
-                                new ShareholderEntity(3, null, null, null, null),
+                                new ShareholderEntity(3, null, null, null),
                                 LocalDate.now(),
                                 BookingType.COMPENSATION,
                                 MoneyAmount.ofCents(100L),

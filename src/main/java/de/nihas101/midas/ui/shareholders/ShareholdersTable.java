@@ -11,11 +11,11 @@ import com.vaadin.flow.data.binder.Binder;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersReader;
 import de.nihas101.midas.shareholders.service.ShareholdersWriter;
+import de.nihas101.midas.ui.common.AddButton;
 import de.nihas101.midas.ui.common.CancelButton;
 import de.nihas101.midas.ui.common.DeleteButton;
 import de.nihas101.midas.ui.common.EditButton;
 import de.nihas101.midas.ui.common.SaveButton;
-import de.nihas101.midas.ui.common.AddButton;
 import de.nihas101.midas.ui.main.Dependant;
 import org.springframework.context.MessageSource;
 

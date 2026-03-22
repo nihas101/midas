@@ -12,9 +12,12 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import de.nihas101.midas.config.MidasConfig;
+import de.nihas101.midas.ui.accountstatement.AccountStatementView;
+import de.nihas101.midas.ui.backup.BackupView;
 import de.nihas101.midas.ui.bookings.BookingsView;
-import de.nihas101.midas.ui.common.MidasPage;
+import de.nihas101.midas.ui.common.MidasView;
 import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
+import de.nihas101.midas.ui.export.ExportView;
 import de.nihas101.midas.ui.interest.InterestView;
 import de.nihas101.midas.ui.shareholders.ShareholdersView;
 import de.nihas101.midas.userconfig.service.UserConfigService;
@@ -28,7 +31,9 @@ import org.springframework.context.MessageSource;
 @Route("main")
 @RouteAlias("")
 @PageTitle("Main")
-public class MainView extends MidasPage {
+public class MainView extends MidasView {
+
+    public static final VaadinIcon icon = VaadinIcon.HOME;
 
     public MainView(
             final MidasConfig config,
@@ -49,7 +54,7 @@ public class MainView extends MidasPage {
 
         hubGrid.add(
                 createHubCard(
-                        VaadinIcon.USERS,
+                        ShareholdersView.icon(),
                         messageSource.getMessage("main.hub.shareholders.title", null, getLocale()),
                         messageSource.getMessage("main.hub.shareholders.description", null, getLocale()),
                         ShareholdersView.class
@@ -58,7 +63,7 @@ public class MainView extends MidasPage {
 
         hubGrid.add(
                 createHubCard(
-                        VaadinIcon.BOOK_DOLLAR,
+                        BookingsView.icon(),
                         messageSource.getMessage("main.hub.bookings.title", null, getLocale()),
                         messageSource.getMessage("main.hub.bookings.description", null, getLocale()),
                         BookingsView.class
@@ -67,10 +72,37 @@ public class MainView extends MidasPage {
 
         hubGrid.add(
                 createHubCard(
-                        VaadinIcon.BOOK_PERCENT,
+                        AccountStatementView.icon(),
+                        messageSource.getMessage("main.hub.bookings.title", null, getLocale()), // TODO: Update
+                        messageSource.getMessage("main.hub.bookings.description", null, getLocale()), // TODO: Update
+                        AccountStatementView.class
+                )
+        );
+
+        hubGrid.add(
+                createHubCard(
+                        InterestView.icon(),
                         messageSource.getMessage("main.hub.interest.title", null, getLocale()),
                         messageSource.getMessage("main.hub.interest.description", null, getLocale()),
                         InterestView.class
+                )
+        );
+
+        hubGrid.add(
+                createHubCard(
+                        ExportView.icon(),
+                        messageSource.getMessage("main.hub.export.title", null, getLocale()),
+                        messageSource.getMessage("main.hub.export.description", null, getLocale()),
+                        ExportView.class
+                )
+        );
+
+        hubGrid.add(
+                createHubCard(
+                        BackupView.icon(),
+                        messageSource.getMessage("main.hub.backup.title", null, getLocale()),
+                        messageSource.getMessage("main.hub.backup.description", null, getLocale()),
+                        BackupView.class
                 )
         );
 
@@ -83,7 +115,7 @@ public class MainView extends MidasPage {
     }
 
     private Div createHubCard(
-            final VaadinIcon vaadinIcon,
+            final Icon icon,
             final String title,
             final String description,
             final Class<? extends Component> navigationTarget
@@ -91,7 +123,6 @@ public class MainView extends MidasPage {
         final Div card = new Div();
         card.addClassName("hub-card");
 
-        final Icon icon = vaadinIcon.create();
         final H2 h2 = new H2(title);
         final Paragraph p = new Paragraph(description);
 
@@ -99,6 +130,10 @@ public class MainView extends MidasPage {
         card.addClickListener(e -> card.getUI().ifPresent(ui -> ui.navigate(navigationTarget)));
 
         return card;
+    }
+
+    public static Icon icon() {
+        return icon.create();
     }
 
 }

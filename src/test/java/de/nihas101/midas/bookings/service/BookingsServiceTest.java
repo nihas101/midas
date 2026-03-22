@@ -144,7 +144,7 @@ class BookingsServiceTest {
         // Assert
         BookingEntity expectedSave = BookingEntity.builder()
                 .id(10)
-                .shareholder(new ShareholderEntity(1, null, null, null, null))
+                .shareholder(new ShareholderEntity(1, null, null, null))
                 .type(BookingType.INTEREST)
                 .date(now)
                 .amount(amount)

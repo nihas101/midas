@@ -5,6 +5,8 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -26,7 +28,7 @@ import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersService;
 import de.nihas101.midas.ui.bookings.BookingRow;
 import de.nihas101.midas.ui.bookings.BookingsToBookingRowConverter;
-import de.nihas101.midas.ui.common.MidasPage;
+import de.nihas101.midas.ui.common.MidasView;
 import de.nihas101.midas.ui.common.ShareholderPicker;
 import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
 import de.nihas101.midas.userconfig.service.UserConfigService;
@@ -48,7 +50,9 @@ import java.util.stream.IntStream;
 @Slf4j
 @Route("interest-calculation")
 @PageTitle("Interest Calculation")
-public class InterestView extends MidasPage implements BeforeEnterObserver {
+public class InterestView extends MidasView implements BeforeEnterObserver {
+
+    public static final VaadinIcon icon = VaadinIcon.BOOK_PERCENT;
 
     private final ShareholdersService shareholdersService;
     private final BookingsService bookingsService;
@@ -448,4 +452,7 @@ public class InterestView extends MidasPage implements BeforeEnterObserver {
                 .setHeader(header);
     }
 
+    public static Icon icon() {
+        return icon.create();
+    }
 }

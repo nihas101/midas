@@ -6,6 +6,8 @@ import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -28,7 +30,7 @@ import de.nihas101.midas.shareholders.service.ShareholdersService;
 import de.nihas101.midas.ui.common.AddButton;
 import de.nihas101.midas.ui.common.DeleteButton;
 import de.nihas101.midas.ui.common.EditButton;
-import de.nihas101.midas.ui.common.MidasPage;
+import de.nihas101.midas.ui.common.MidasView;
 import de.nihas101.midas.ui.common.ShareholderPicker;
 import de.nihas101.midas.ui.common.YearPicker;
 import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
@@ -49,7 +51,9 @@ import static com.vaadin.flow.component.button.ButtonVariant.LUMO_ERROR;
 @Slf4j
 @Route("bookings")
 @PageTitle("Bookings")
-public class BookingsView extends MidasPage implements BeforeEnterObserver {
+public class BookingsView extends MidasView implements BeforeEnterObserver {
+
+    public static final VaadinIcon icon = VaadinIcon.BOOK_DOLLAR;
 
     private final ShareholdersService shareholdersService;
     private final BookingsService bookingsService;
@@ -415,6 +419,10 @@ public class BookingsView extends MidasPage implements BeforeEnterObserver {
             }
         }
         return rows;
+    }
+
+    public static Icon icon() {
+        return icon.create();
     }
 
 }

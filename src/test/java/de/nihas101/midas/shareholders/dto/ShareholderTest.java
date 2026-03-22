@@ -14,7 +14,6 @@ class ShareholderTest {
         entity.setDisplayId(100);
         entity.setFirstName("Max");
         entity.setLastName("Mustermann");
-        entity.setExternalId(500);
 
         Shareholder dto = Shareholder.fromEntity(entity);
 
@@ -22,7 +21,6 @@ class ShareholderTest {
         assertEquals(100, dto.getDisplayId());
         assertEquals("Max", dto.getFirstName());
         assertEquals("Mustermann", dto.getLastName());
-        assertEquals(500, dto.getExternalId());
     }
 
     @Test

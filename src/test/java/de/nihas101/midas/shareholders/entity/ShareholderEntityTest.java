@@ -25,15 +25,13 @@ class ShareholderEntityTest {
                                 1,
                                 2,
                                 "firstName",
-                                "lastName",
-                                3
+                                "lastName"
                         ),
                         new ShareholderEntity(
                                 1,
                                 2,
                                 "firstName",
-                                "lastName",
-                                3
+                                "lastName"
                         )
                 )
         );

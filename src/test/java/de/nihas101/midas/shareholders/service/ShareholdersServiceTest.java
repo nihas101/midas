@@ -30,7 +30,7 @@ class ShareholdersServiceTest {
 
     @Test
     void shareholders() {
-        ShareholderEntity entity = new ShareholderEntity(1, 100, "Max", "Mustermann", 500);
+        ShareholderEntity entity = new ShareholderEntity(1, 100, "Max", "Mustermann");
         when(repository.findAll()).thenReturn(List.of(entity));
 
         Shareholders result = service.shareholders();
@@ -44,7 +44,7 @@ class ShareholdersServiceTest {
 
     @Test
     void create_success() {
-        Shareholder dto = new Shareholder(null, 0, "Max", "Mustermann", 500);
+        Shareholder dto = new Shareholder(null, 0, "Max", "Mustermann");
 
         service.create(dto);
 
@@ -62,13 +62,13 @@ class ShareholdersServiceTest {
 
     @Test
     void create_withIdFails() {
-        Shareholder dto = new Shareholder(1, 0, "Max", "Mustermann", 500);
+        Shareholder dto = new Shareholder(1, 0, "Max", "Mustermann");
         assertThrows(IllegalArgumentException.class, () -> service.create(dto));
     }
 
     @Test
     void update_success() {
-        Shareholder dto = new Shareholder(1, 100, "Max", "Mustermann", 500);
+        Shareholder dto = new Shareholder(1, 100, "Max", "Mustermann");
 
         service.update(dto);
 
@@ -86,13 +86,13 @@ class ShareholdersServiceTest {
 
     @Test
     void update_withoutIdFails() {
-        Shareholder dto = new Shareholder(null, 0, "Max", "Mustermann", 500);
+        Shareholder dto = new Shareholder(null, 0, "Max", "Mustermann");
         assertThrows(IllegalArgumentException.class, () -> service.update(dto));
     }
 
     @Test
     void delete() {
-        Shareholder dto = new Shareholder(1, 100, "Max", "Mustermann", 500);
+        Shareholder dto = new Shareholder(1, 100, "Max", "Mustermann");
 
         service.delete(dto);
 

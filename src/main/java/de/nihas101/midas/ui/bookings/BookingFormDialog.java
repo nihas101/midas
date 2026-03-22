@@ -27,9 +27,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
 
+import static de.nihas101.midas.ui.common.DatePickerI18nProvider.datePickerI18n;
+
 public class BookingFormDialog extends Dialog {
 
     private final BookingsWriter bookingsWriter;
+    private final MessageSource messageSource;
+    private final Locale locale;
     private final Consumer<Booking> onSave;
 
     private final Binder<Booking> binder = new Binder<>(Booking.class);
@@ -56,6 +60,8 @@ public class BookingFormDialog extends Dialog {
             final Consumer<Booking> onSave
     ) {
         this.bookingsWriter = bookingsWriter;
+        this.messageSource = messageSource;
+        this.locale = locale;
         this.onSave = onSave;
 
         final boolean isEditMode = bookingToEdit != null;
@@ -82,6 +88,7 @@ public class BookingFormDialog extends Dialog {
         // TODO: Extract into class, so we dont have to set the local everywhere
         DatePicker datePicker = new DatePicker(messageSource.getMessage("bookings.date", null, locale));
         datePicker.setLocale(locale);
+        datePicker.setI18n(datePickerI18n(messageSource, locale));
         datePicker.setRequired(true);
         binder.forField(datePicker)
                 .asRequired()
