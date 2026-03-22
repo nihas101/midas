@@ -34,9 +34,6 @@ public class ShareholderEntity {
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Column(name = "external_id")
-    private Integer externalId;
-
     public static ShareholderEntity fromDto(final Shareholder shareholder) {
         if (shareholder == null) {
             return null;
@@ -46,8 +43,7 @@ public class ShareholderEntity {
                 shareholder.getId(),
                 shareholder.getDisplayId(),
                 shareholder.getFirstName(),
-                shareholder.getLastName(),
-                shareholder.getExternalId()
+                shareholder.getLastName()
         );
     }
 }

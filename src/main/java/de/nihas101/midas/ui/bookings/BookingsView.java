@@ -25,6 +25,7 @@ import de.nihas101.midas.openingbalance.dto.OpeningBalance;
 import de.nihas101.midas.openingbalance.service.OpeningBalanceService;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersService;
+import de.nihas101.midas.ui.common.AddButton;
 import de.nihas101.midas.ui.common.DeleteButton;
 import de.nihas101.midas.ui.common.EditButton;
 import de.nihas101.midas.ui.common.MidasPage;
@@ -172,8 +173,10 @@ public class BookingsView extends MidasPage implements BeforeEnterObserver {
             }
         });
 
-        final EditButton addBookingButton = new EditButton(
-                messageSource.getMessage("bookings.add-booking", null, getLocale()),
+        final String addBookingMessage = messageSource.getMessage("bookings.add-booking", null, getLocale());
+        final AddButton addBookingButton = new AddButton(
+                addBookingMessage,
+                addBookingMessage,
                 e -> {
                     final BookingFormDialog bookingFormDialog = new BookingFormDialog(
                             shareholdersService,

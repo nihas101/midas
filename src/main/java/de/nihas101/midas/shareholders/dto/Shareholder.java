@@ -18,15 +18,12 @@ public class Shareholder {
 
     private String lastName;
 
-    private Integer externalId;
-
     public static Shareholder fromEntity(ShareholderEntity entity) {
         return new Shareholder(
                 entity.getId(),
                 entity.getDisplayId() != null ? entity.getDisplayId() : entity.getId(),
                 entity.getFirstName(),
-                entity.getLastName(),
-                entity.getExternalId()
+                entity.getLastName()
         );
     }
 }

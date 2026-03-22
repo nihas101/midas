@@ -18,7 +18,6 @@
             <column name="last_name" type="STRING">
                 <constraints nullable="false"/>
             </column>
-            <column name="external_id" type="INTEGER"/>
         </createTable>
         <!-- Trigger to automatically sync display_id with id on insert -->
         <sql dbms="sqlite">

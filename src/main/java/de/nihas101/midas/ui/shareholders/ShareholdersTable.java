@@ -1,5 +1,6 @@
 package de.nihas101.midas.ui.shareholders;
 
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.editor.Editor;
@@ -14,6 +15,7 @@ import de.nihas101.midas.ui.common.CancelButton;
 import de.nihas101.midas.ui.common.DeleteButton;
 import de.nihas101.midas.ui.common.EditButton;
 import de.nihas101.midas.ui.common.SaveButton;
+import de.nihas101.midas.ui.common.AddButton;
 import de.nihas101.midas.ui.main.Dependant;
 import org.springframework.context.MessageSource;
 
@@ -41,10 +43,9 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
         editor.setBinder(binder);
         editor.setBuffered(true);
 
-        setupDisplayIdColumn(messageSource, locale);
+        setupDisplayIdColumn(messageSource, locale, binder);
         setupFirstNameField(messageSource, locale, binder);
         setupLastNameField(messageSource, locale, binder);
-        setupExternalIdField(messageSource, locale, binder);
 
         setupActionsColumn(messageSource, locale, editor);
         setupEditorActions(messageSource, locale, editor);
@@ -90,20 +91,31 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
 
                     final HorizontalLayout actions = new HorizontalLayout();
 
-                    final String editButtonText = isDummy
-                            ? messageSource.getMessage("shareholder.add.button", null, locale)
-                            : messageSource.getMessage("global.edit", null, locale);
+                    Button button;
+                    if (isDummy) {
+                        final String addButtonText = messageSource.getMessage("shareholder.add.button", null, locale);
+                        button = new AddButton(
+                                addButtonText,
+                                addButtonText,
+                                e -> {
+                                    if (editor.isOpen()) {
+                                        editor.cancel();
+                                    }
+                                    editor.editItem(shareholder);
+                                });
+                    } else {
+                        final String editButtonText = messageSource.getMessage("global.edit", null, locale);
+                        button = new EditButton(
+                                editButtonText,
+                                e -> {
+                                    if (editor.isOpen()) {
+                                        editor.cancel();
+                                    }
+                                    editor.editItem(shareholder);
+                                });
+                    }
 
-                    final EditButton editButton = new EditButton(
-                            editButtonText,
-                            e -> {
-                                if (editor.isOpen()) {
-                                    editor.cancel();
-                                }
-                                editor.editItem(shareholder);
-                            });
-
-                    actions.add(editButton);
+                    actions.add(button);
 
                     if (!isDummy) {
                         final DeleteButton deleteButton = createDeleteShareholderButton(messageSource, locale, shareholder);
@@ -155,25 +167,6 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
         return dialog;
     }
 
-    private void setupExternalIdField(
-            final MessageSource messageSource,
-            final Locale locale,
-            final Binder<Shareholder> binder
-    ) {
-        final IntegerField externalIdField = new IntegerField();
-        externalIdField.setWidthFull();
-
-        binder.forField(externalIdField)
-                .bind(Shareholder::getExternalId, Shareholder::setExternalId);
-
-        this.addColumn(Shareholder::getExternalId)
-                .setHeader(messageSource.getMessage("shareholders.table.external_id", null, locale))
-                .setKey("externalId")
-                .setAutoWidth(true);
-
-        this.getColumnByKey("externalId").setEditorComponent(externalIdField);
-    }
-
     private void setupLastNameField(
             final MessageSource messageSource,
             final Locale locale,
@@ -213,11 +206,23 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
         this.getColumnByKey("firstName").setEditorComponent(firstNameField);
     }
 
-    private void setupDisplayIdColumn(final MessageSource messageSource, final Locale locale) {
+    private void setupDisplayIdColumn(
+            final MessageSource messageSource,
+            final Locale locale,
+            final Binder<Shareholder> binder
+    ) {
+        final IntegerField displayIdField = new IntegerField();
+        displayIdField.setWidthFull();
+
         this.addColumn(shareholder -> shareholder.getId() == null ? "" : String.valueOf(shareholder.getDisplayId()))
                 .setHeader(messageSource.getMessage("shareholders.table.display_id", null, locale))
                 .setKey("displayId")
                 .setAutoWidth(true);
+
+        binder.forField(displayIdField)
+                .bind(Shareholder::getDisplayId, Shareholder::setDisplayId);
+
+        this.getColumnByKey("displayId").setEditorComponent(displayIdField);
     }
 
     @Override

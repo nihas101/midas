@@ -35,3 +35,55 @@ vaadin-grid::part(booking-type-column),
 vaadin-grid::part(balance-column) {
   border-left: 1px solid var(--lumo-contrast-10pct);
 }
+
+/* Hub Page Styles */
+.hub-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lumo-space-xl);
+  padding: var(--lumo-space-xl);
+  justify-content: center;
+}
+
+.hub-card {
+  background-color: var(--lumo-base-color);
+  border: 1px solid var(--lumo-contrast-10pct);
+  border-radius: var(--lumo-border-radius-l);
+  padding: var(--lumo-space-xl);
+  width: 280px;
+  min-height: 200px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: var(--lumo-box-shadow-s);
+}
+
+.hub-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--lumo-box-shadow-l);
+  border-color: var(--lumo-primary-color-50pct);
+}
+
+.hub-card vaadin-icon {
+  width: 48px;
+  height: 48px;
+  color: var(--lumo-primary-color);
+  margin-bottom: var(--lumo-space-l);
+}
+
+.hub-card h2 {
+  margin: 0;
+  font-size: var(--lumo-font-size-l);
+  color: var(--lumo-primary-text-color);
+}
+
+.hub-card p {
+  margin: var(--lumo-space-m) 0 0 0;
+  font-size: var(--lumo-font-size-s);
+  color: var(--lumo-secondary-text-color);
+}
