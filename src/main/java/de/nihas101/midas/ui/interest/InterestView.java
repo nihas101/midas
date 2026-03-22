@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
+// TODO: Align the display of the table more like in the printed sheet
 @Slf4j
 @Route("interest-calculation")
 @PageTitle("Interest Calculation")

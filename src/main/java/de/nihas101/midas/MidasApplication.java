@@ -16,7 +16,7 @@ import java.util.Properties;
 @Slf4j
 @Push
 @Theme("midas-theme") // TODO: Update
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "de.nihas101.midas")
 @EnableConfigurationProperties
 public class MidasApplication implements AppShellConfigurator {
 
