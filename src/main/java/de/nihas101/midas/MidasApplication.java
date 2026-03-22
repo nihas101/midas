@@ -3,21 +3,20 @@ package de.nihas101.midas;
 import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.theme.Theme;
+import de.nihas101.midas.browser.WebPage;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.util.Properties;
 
-import static java.awt.Desktop.getDesktop;
-import static java.awt.Desktop.isDesktopSupported;
-
-@SpringBootApplication
+@Slf4j
 @Push
 @Theme("midas-theme") // TODO: Update
+@SpringBootApplication
 @EnableConfigurationProperties
 public class MidasApplication implements AppShellConfigurator {
 
@@ -40,7 +39,7 @@ public class MidasApplication implements AppShellConfigurator {
         } catch (Exception e) {
             if (isPortInUse(e)) {
                 // Another instance is likely running, defer to it
-                openBrowser(args);
+                openBrowser(args); // TODO: Also need to check if launchBrowser is enabled before trying this
             } else {
                 throw e;
             }
@@ -61,12 +60,10 @@ public class MidasApplication implements AppShellConfigurator {
         String port = resolvePort(args);
         String url = "http://localhost:" + port;
         System.out.println("Port " + port + " is already in use. Opening browser at " + url);
-        if (isDesktopSupported()) {
-            try {
-                getDesktop().browse(new URI(url));
-            } catch (Exception e) {
-                System.err.println("Failed to open browser: " + e.getMessage());
-            }
+        try {
+            new WebPage(url).open();
+        } catch (Exception e) {
+            log.error("Failed to open browser: {}", e.getMessage());
         }
     }
 

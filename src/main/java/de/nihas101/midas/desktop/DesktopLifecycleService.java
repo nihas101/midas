@@ -1,14 +1,17 @@
 package de.nihas101.midas.desktop;
 
+import de.nihas101.midas.browser.WebPage;
 import de.nihas101.midas.config.DesktopConfig;
 import de.nihas101.midas.config.MidasConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -32,9 +35,26 @@ public class DesktopLifecycleService {
 
     @EventListener(ApplicationReadyEvent.class)
     public void onApplicationReady() {
+        if (config.isLaunchBrowser()) {
+            launchBrowser();
+        }
+
         if (config.isAutoShutdownEnabled()) {
             log.info("Auto-shutdown is enabled with a grace period of {} seconds.", config.getGracePeriodSeconds());
             checkAndScheduleShutdown();
+        }
+    }
+
+    private void launchBrowser() {
+        if (context instanceof ServletWebServerApplicationContext webServerContext) {
+            int port = webServerContext.getWebServer().getPort();
+            String url = "http://localhost:" + port;
+            log.info("Launching browser at {}", url);
+            try {
+                new WebPage(url).open();
+            } catch (IOException e) {
+                log.error("Failed to launch browser", e);
+            }
         }
     }
 
