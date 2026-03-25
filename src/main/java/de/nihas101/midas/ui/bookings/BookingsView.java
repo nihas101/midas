@@ -48,6 +48,7 @@ import java.util.List;
 
 import static com.vaadin.flow.component.button.ButtonVariant.LUMO_ERROR;
 
+// TODO If we add bookings, edit bookings, delete bookings or edit the saldo, we should trigger an interest-calculation as well
 @Slf4j
 @Route("bookings")
 @PageTitle("Bookings")

@@ -2,6 +2,9 @@ package de.nihas101.midas.ui.accountstatement;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.grid.ColumnTextAlign;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -16,7 +19,6 @@ import de.nihas101.midas.bookings.service.BookingsService;
 import de.nihas101.midas.config.MidasConfig;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersService;
-import de.nihas101.midas.ui.bookings.BookingsView;
 import de.nihas101.midas.ui.common.MidasView;
 import de.nihas101.midas.ui.common.ShareholderPicker;
 import de.nihas101.midas.ui.common.YearPicker;
@@ -38,6 +40,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
     private final MessageSource messageSource;
     private ComboBox<Shareholder> shareholderPicker;
     private ComboBox<Integer> yearPicker;
+    private Grid<AccountStatementRow> grid;
 
     public AccountStatementView(
             final ShareholdersService shareholdersService,
@@ -56,7 +59,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         content.setSizeFull();
 
         setupHeader(content);
-        //setupGrid(content);
+        setupGrid(content);
 
         setContent(content);
     }
@@ -110,7 +113,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                     } else {
                         queryParameters = queryParameters.excluding(QUERY_PARAM_SHAREHOLDER);
                     }
-                    UI.getCurrent().navigate(BookingsView.class, queryParameters);
+                    UI.getCurrent().navigate(AccountStatementView.class, queryParameters);
                     //refreshGrid();
                 }
         );
@@ -125,13 +128,45 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                     } else {
                         queryParameters = queryParameters.excluding(QUERY_PARAM_YEAR);
                     }
-                    UI.getCurrent().navigate(BookingsView.class, queryParameters);
+                    UI.getCurrent().navigate(AccountStatementView.class, queryParameters);
                     //refreshGrid();
                 }
         );
 
         header.add(shareholderPicker, yearPicker);
         content.add(header);
+    }
+
+    private void setupGrid(final VerticalLayout content) {
+        grid = new Grid<>();
+        grid.setSizeFull();
+
+        setupColumn(grid.addColumn(AccountStatementRow::displayId), "account-statements.table.id", ColumnTextAlign.START);
+        setupColumn(grid.addColumn(AccountStatementRow::dateStr), "account-statements.table.date", ColumnTextAlign.START);
+        setupColumn(grid.addColumn(AccountStatementRow::bookingType), "account-statements.table.type", ColumnTextAlign.START);
+        setupColumn(grid.addColumn(AccountStatementRow::debit), "account-statements.table.debit", ColumnTextAlign.END);
+        setupColumn(grid.addColumn(AccountStatementRow::credit), "account-statements.table.credit", ColumnTextAlign.END);
+        setupColumn(grid.addColumn(AccountStatementRow::balance), "account-statements.table.balance", ColumnTextAlign.END);
+
+        content.add(grid);
+
+        // TODO: Add Endstand row
+    }
+
+    // TODO: Extract this into a common class between all views
+    private void setupColumn(
+            final Grid.Column<?> column,
+            final String i18nKey,
+            final ColumnTextAlign columnTextAlign
+    ) {
+        final Span header = new Span(messageSource.getMessage(i18nKey, null, getLocale()));
+        header.getElement().setAttribute("part", "header-cell-content"); // To allow common header styling
+
+        column.setAutoWidth(true)
+                .setFrozen(true)
+                .setResizable(true)
+                .setTextAlign(columnTextAlign)
+                .setHeader(header);
     }
 
     public static Icon icon() {

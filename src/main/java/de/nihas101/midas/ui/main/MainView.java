@@ -73,8 +73,8 @@ public class MainView extends MidasView {
         hubGrid.add(
                 createHubCard(
                         AccountStatementView.icon(),
-                        messageSource.getMessage("main.hub.bookings.title", null, getLocale()), // TODO: Update
-                        messageSource.getMessage("main.hub.bookings.description", null, getLocale()), // TODO: Update
+                        messageSource.getMessage("main.hub.account-statements.title", null, getLocale()),
+                        messageSource.getMessage("main.hub.account-statements.description", null, getLocale()),
                         AccountStatementView.class
                 )
         );

@@ -16,7 +16,6 @@ import de.nihas101.midas.bookings.service.BookingsService;
 import de.nihas101.midas.config.MidasConfig;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersService;
-import de.nihas101.midas.ui.bookings.BookingsView;
 import de.nihas101.midas.ui.common.MidasView;
 import de.nihas101.midas.ui.common.ShareholderPicker;
 import de.nihas101.midas.ui.common.YearPicker;
@@ -109,7 +108,7 @@ public class BackupView extends MidasView implements BeforeEnterObserver { // TO
                     } else {
                         queryParameters = queryParameters.excluding(QUERY_PARAM_SHAREHOLDER);
                     }
-                    UI.getCurrent().navigate(BookingsView.class, queryParameters);
+                    UI.getCurrent().navigate(BackupView.class, queryParameters);
                     //refreshGrid();
                 }
         );
@@ -124,7 +123,7 @@ public class BackupView extends MidasView implements BeforeEnterObserver { // TO
                     } else {
                         queryParameters = queryParameters.excluding(QUERY_PARAM_YEAR);
                     }
-                    UI.getCurrent().navigate(BookingsView.class, queryParameters);
+                    UI.getCurrent().navigate(BackupView.class, queryParameters);
                     //refreshGrid();
                 }
         );
