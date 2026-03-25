@@ -26,11 +26,7 @@ public enum BookingType {
     }
 
     public static List<BookingType> creatableByUser() {
-        return List.of(
-                BookingType.WITHDRAWAL,
-                BookingType.TAX_PREVIOUS_YEAR,
-                BookingType.TAX_CREDIT,
-                BookingType.COMPENSATION
-        );
+        return Arrays.stream(BookingType.values())
+                .toList();
     }
 }
