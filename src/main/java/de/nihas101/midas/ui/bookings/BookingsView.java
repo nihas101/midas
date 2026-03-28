@@ -24,7 +24,7 @@ import de.nihas101.midas.bookings.entity.Source;
 import de.nihas101.midas.bookings.service.BookingsReader;
 import de.nihas101.midas.bookings.service.BookingsService;
 import de.nihas101.midas.bookings.service.BookingsWriter;
-import de.nihas101.midas.bookings.service.InterestUpdatingBookingsService;
+import de.nihas101.midas.interest.service.InterestUpdatingBookingsService;
 import de.nihas101.midas.config.MidasConfig;
 import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.openingbalance.dto.OpeningBalance;

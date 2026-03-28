@@ -20,6 +20,8 @@ import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.bookings.entity.Source;
 import de.nihas101.midas.bookings.service.BookingsService;
+import de.nihas101.midas.interest.service.InterestBookingsReader;
+import de.nihas101.midas.interest.service.InterestBookingsService;
 import de.nihas101.midas.config.MidasConfig;
 import de.nihas101.midas.interest.InterestCalculation;
 import de.nihas101.midas.interest.dto.InterestRate;
@@ -57,7 +59,8 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
     public static final VaadinIcon icon = VaadinIcon.BOOK_PERCENT;
 
     private final ShareholdersService shareholdersService;
-    private final BookingsService bookingsService;
+    private final BookingsService bookingsWriter;
+    private final InterestBookingsReader interestBookingsReader;
     private final InterestRateService interestRateService;
     private final MessageSource messageSource;
     private ComboBox<Shareholder> shareholderPicker; // TODO: Store the selected shareholder somewhere so that we can use that in the same filter when switching views
@@ -69,6 +72,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
     public InterestView(
             final ShareholdersService shareholdersService,
             final BookingsService bookingsService,
+            final InterestBookingsService interestBookingsReader,
             final InterestRateService interestRateService,
             final MidasConfig config,
             final MessageSource messageSource,
@@ -77,7 +81,8 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
     ) {
         super(config, userConfigService, messageSource, midasLocaleResolver);
         this.shareholdersService = shareholdersService;
-        this.bookingsService = bookingsService;
+        this.bookingsWriter = bookingsService;
+        this.interestBookingsReader = interestBookingsReader;
         this.interestRateService = interestRateService;
         this.messageSource = messageSource;
 
@@ -186,7 +191,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
         final Year year = Year.of(yearValue);
         // TODO: Updating of these two fields should be handled in a transaction
         final InterestRate interestRate = updateInterestRate(shareholder, yearValue, rate);
-        final Bookings bookings = bookingsService.interestRelatedBookingsForShareholderAndYear(shareholder.getId(), year);
+        final Bookings bookings = interestBookingsReader.interestRelatedBookingsForShareholderAndYear(shareholder.getId(), year);
         final InterestCalculation interestCalculation = new InterestCalculation(
                 bookings,
                 year,
@@ -207,16 +212,15 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
             final Year year,
             final InterestCalculation interestCalculation
     ) {
-        final Booking booking = bookingsService.systemGeneratedInterestForShareholderAndYear(
+        final Booking booking = interestBookingsReader.systemGeneratedInterestForShareholderAndYear(
                 shareholder.getId(),
                 year
         );
         // TODO: Extract this logic into the service. On interest update -> trigger
         if (booking != null) {
-            log.info("Updating interest booking: {}", booking); // TODO: remove
             // TODO: This mutates the object! Handle this differently
             booking.setAmount(interestCalculation.interest());
-            bookingsService.update(booking);
+            bookingsWriter.update(booking);
         } else {
             final Booking newBooking = new Booking(
                     null,
@@ -228,8 +232,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
                     messageSource.getMessage("bookings.type.interest", null, getLocale()),
                     Source.SYSTEM
             );
-            log.info("Creating interest booking: {}", newBooking); // TODO: remove
-            bookingsService.create(newBooking);
+            bookingsWriter.create(newBooking);
         }
     }
 
@@ -262,7 +265,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
         final BigDecimal interestRate = interestRate(shareholder, year).getInterestRate();
         interestRateField.setValue(interestRate);
 
-        final Bookings bookings = bookingsService.interestRelatedBookingsForShareholderAndYear(shareholder.getId(), year);
+        final Bookings bookings = interestBookingsReader.interestRelatedBookingsForShareholderAndYear(shareholder.getId(), year);
         final InterestCalculation interestCalculation = new InterestCalculation(
                 bookings,
                 year,

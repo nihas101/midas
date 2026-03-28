@@ -1,9 +1,10 @@
-package de.nihas101.midas.bookings.service;
+package de.nihas101.midas.interest.service;
 
 import de.nihas101.midas.bookings.dto.Booking;
 import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.bookings.entity.Source;
+import de.nihas101.midas.bookings.service.BookingsWriter;
 import de.nihas101.midas.interest.InterestCalculation;
 import de.nihas101.midas.interest.dto.InterestRate;
 import de.nihas101.midas.interest.repository.InterestRateRepository;
@@ -24,7 +25,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class InterestUpdatingBookingsService implements BookingsWriter { // TODO: Tests
 
-    private final BookingsReader bookingsReader;
+    private final InterestBookingsReader bookingsReader;
     private final BookingsWriter delegate;
     private final ShareholdersRepository shareholdersRepository;
     private final InterestRateRepository interestRateRepository;
@@ -68,7 +69,6 @@ public class InterestUpdatingBookingsService implements BookingsWriter { // TODO
         final Booking interestBooking = bookingsReader.systemGeneratedInterestForShareholderAndYear(shareholder.getId(), year);
         // TODO: This logic is duplicated in multiple places, extract into class to keep in-sync
         if (interestBooking != null) {
-            log.info("Updating interest booking: {}", interestBooking); // TODO: remove
             // TODO: This mutates the object! Handle this differently
             interestBooking.setAmount(interestCalculation.interest());
             delegate.update(interestBooking);
@@ -83,7 +83,6 @@ public class InterestUpdatingBookingsService implements BookingsWriter { // TODO
                     messageSource.getMessage("bookings.type.interest", null, localeResolver.resolve()),
                     Source.SYSTEM
             );
-            log.info("Creating interest booking: {}", newBooking); // TODO: remove
             delegate.create(newBooking);
         }
     }

@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 @RequiredArgsConstructor
-public class ZinszahlSumRow implements InterestCalculationRow {
+public class ZinszahlSumRow implements InterestCalculationRow { // TODO: English!
     private final BigDecimal sumOfZinsZahl; // TODO: Use english
 
     @Override

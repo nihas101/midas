@@ -21,7 +21,6 @@ import java.time.Month;
 import java.time.Year;
 import java.util.List;
 
-// TODO: Break this service up into multiple ones -> One method per class?
 @Service
 @RequiredArgsConstructor
 public class BookingsService implements BookingsWriter, BookingsReader {
@@ -30,56 +29,10 @@ public class BookingsService implements BookingsWriter, BookingsReader {
     private final ShareholdersRepository shareholdersRepository;
     private final OpeningBalanceRepository openingBalanceRepository;
 
-    // TODO: Can be extracted into separate class
-    // -- INTEREST RELATED --
-    @Override
-    public Booking systemGeneratedInterestForShareholderAndYear(final Integer shareholderId, final Year year) {
-        final ShareholderEntity shareholder = shareholdersRepository.findById(shareholderId)
-                .orElseThrow(() -> new IllegalArgumentException("Shareholder not found"));
-
-        final LocalDate endOfYear = year.atMonth(Month.DECEMBER).atDay(31);
-
-        return Booking.fromEntity(
-                bookingsRepository.findFirstByShareholderAndDateAndTypeAndSource(
-                        shareholder,
-                        endOfYear,
-                        BookingType.INTEREST,
-                        Source.SYSTEM
-                )
-        );
-    }
-
-    @Override
-    public Bookings interestRelatedBookingsForShareholderAndYear(final Integer shareholderId, final Year year) {
-        final ShareholderEntity shareholder = shareholdersRepository.findById(shareholderId)
-                .orElseThrow(() -> new IllegalArgumentException("Shareholder not found"));
-
-        final LocalDate startOfYear = year.atMonth(Month.JANUARY).atDay(1);
-        final LocalDate endOfYear = year.atMonth(Month.DECEMBER).atDay(31);
-
-        final List<Booking> bookings = bookingsRepository.findByShareholderAndDateBetweenOrderByDateAsc(shareholder, startOfYear, endOfYear)
-                .stream()
-                // Exclude the interest, because that is what we will calculate
-                .filter(bookingEntity -> !BookingType.INTEREST.equals(bookingEntity.getType()))
-                .map(Booking::fromEntity)
-                .toList();
-
-        final OpeningBalance openingBalance = openingBalanceRepository.findByShareholderAndDate(shareholder, year.atDay(1))
-                .map(OpeningBalance::fromEntity)
-                .orElse(null);
-
-        return new DefaultBookings(
-                bookings,
-                openingBalance
-        );
-    }
-
-    // TODO: Can be extracted into separate class
-    // -- BOOKING View related --
     @Override
     public Bookings bookingsForShareholderAndYear(final Integer shareholderId, final Year year) {
         final ShareholderEntity shareholder = shareholdersRepository.findById(shareholderId)
-                .orElseThrow(() -> new IllegalArgumentException("Shareholder not found")); // TODO: i18n
+                .orElseThrow(() -> new IllegalArgumentException("Shareholder not found"));
 
         final LocalDate startOfYear = year.atMonth(Month.JANUARY).atDay(1);
         final LocalDate endOfYear = year.atMonth(Month.DECEMBER).atEndOfMonth();
