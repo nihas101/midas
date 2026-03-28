@@ -6,6 +6,8 @@ import de.nihas101.midas.money.MoneyAmount;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 
+import java.time.LocalDate;
+import java.time.Month;
 import java.time.Year;
 import java.util.Locale;
 
@@ -31,8 +33,8 @@ public final class DefaultAccountStatement implements AccountStatement {
     }
 
     @Override
-    public Year year() {
-        return year;
+    public LocalDate date() {
+        return year.atMonth(Month.DECEMBER).atEndOfMonth();
     }
 
     @Override

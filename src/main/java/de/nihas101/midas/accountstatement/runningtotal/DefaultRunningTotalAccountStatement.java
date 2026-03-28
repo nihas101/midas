@@ -5,7 +5,7 @@ import de.nihas101.midas.money.MoneyAmount;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 
-import java.time.Year;
+import java.time.LocalDate;
 import java.util.Locale;
 
 @RequiredArgsConstructor
@@ -20,8 +20,8 @@ public class DefaultRunningTotalAccountStatement implements RunningTotalAccountS
     }
 
     @Override
-    public Year year() {
-        return statement.year();
+    public LocalDate date() {
+        return statement.date();
     }
 
     @Override

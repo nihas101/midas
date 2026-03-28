@@ -5,8 +5,6 @@ import de.nihas101.midas.money.MoneyAmount;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 
-import java.time.LocalDate;
-import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
@@ -22,8 +20,7 @@ public class RunningTotalAccountStatementRow implements AccountStatementRow {
 
     @Override
     public String dateStr() {
-        final LocalDate date = accountStatement.year().atMonth(Month.DECEMBER).atEndOfMonth();
-        return date.format(DateTimeFormatter.ofPattern("dd.MM")); // TODO: Make this configurable
+        return accountStatement.date().format(DateTimeFormatter.ofPattern("dd.MM")); // TODO: Make this configurable
     }
 
     @Override

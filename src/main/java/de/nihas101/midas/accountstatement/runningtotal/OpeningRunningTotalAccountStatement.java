@@ -5,7 +5,8 @@ import de.nihas101.midas.openingbalance.dto.OpeningBalance;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 
-import java.time.Year;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.Locale;
 
 @RequiredArgsConstructor
@@ -24,8 +25,8 @@ public class OpeningRunningTotalAccountStatement implements RunningTotalAccountS
     }
 
     @Override
-    public Year year() {
-        return openingBalance.getYear();
+    public LocalDate date() {
+        return openingBalance.getYear().atMonth(Month.JANUARY).atDay(1);
     }
 
     @Override

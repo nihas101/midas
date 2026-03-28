@@ -47,7 +47,8 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
     private final MessageSource messageSource;
     private ComboBox<Shareholder> shareholderPicker;
     private ComboBox<Integer> yearPicker;
-    private Grid<AccountStatementRow> grid;
+    private Grid<AccountStatementRow> accountStatementGrid;
+    private Grid<AccountStatementRow> closingStatementGrid;
 
     public AccountStatementView(
             final ShareholdersService shareholdersService,
@@ -66,7 +67,8 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         content.setSizeFull();
 
         setupHeader(content);
-        setupGrid(content);
+        setupAccountStatementGrid(content);
+        setupClosingStatementGrid(content);
 
         setContent(content);
     }
@@ -121,7 +123,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                         queryParameters = queryParameters.excluding(QUERY_PARAM_SHAREHOLDER);
                     }
                     UI.getCurrent().navigate(AccountStatementView.class, queryParameters);
-                    refreshGrid();
+                    refreshContent();
                 }
         );
         yearPicker = new YearPicker(
@@ -136,7 +138,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                         queryParameters = queryParameters.excluding(QUERY_PARAM_YEAR);
                     }
                     UI.getCurrent().navigate(AccountStatementView.class, queryParameters);
-                    refreshGrid();
+                    refreshContent();
                 }
         );
 
@@ -144,31 +146,32 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         content.add(header);
     }
 
-    private void setupGrid(final VerticalLayout content) {
-        grid = new Grid<>();
-        grid.setSizeFull();
+    private void setupAccountStatementGrid(final VerticalLayout content) {
+        accountStatementGrid = new Grid<>();
+        accountStatementGrid.setWidthFull();
+        accountStatementGrid.setAllRowsVisible(true);
 
-        setupColumn(grid.addColumn(AccountStatementRow::displayId), "account-statements.table.id", ColumnTextAlign.START);
-        setupColumn(grid.addColumn(AccountStatementRow::dateStr), "account-statements.table.date", ColumnTextAlign.START);
+        setupColumn(accountStatementGrid.addColumn(AccountStatementRow::displayId), "account-statements.table.id", ColumnTextAlign.START);
+        setupColumn(accountStatementGrid.addColumn(AccountStatementRow::dateStr), "account-statements.table.date", ColumnTextAlign.START);
         setupColumn(
-                grid.addColumn(asr -> asr.label(messageSource, getLocale())),
+                accountStatementGrid.addColumn(asr -> asr.label(messageSource, getLocale())),
                 "account-statements.table.type",
                 ColumnTextAlign.START
         );
-        setupColumn(grid.addColumn(
+        setupColumn(accountStatementGrid.addColumn(
                 accountStatementRow -> Optional.of(accountStatementRow)
                         .map(AccountStatementRow::debit)
                         .map(m -> m.format(getLocale()))
                         .orElse("")
         ), "account-statements.table.debit", ColumnTextAlign.END);
-        setupColumn(grid.addColumn(
+        setupColumn(accountStatementGrid.addColumn(
                 accountStatementRow -> Optional.of(accountStatementRow)
                         .map(AccountStatementRow::credit)
                         .map(m -> m.format(getLocale()))
                         .orElse("")
         ), "account-statements.table.credit", ColumnTextAlign.END);
         setupColumn(
-                grid.addColumn(
+                accountStatementGrid.addColumn(
                         accountStatementRow -> Optional.of(accountStatementRow)
                                 .map(AccountStatementRow::balance)
                                 .map(m -> m.format(getLocale()))
@@ -177,9 +180,26 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                 ColumnTextAlign.END
         );
 
-        content.add(grid);
+        content.add(accountStatementGrid);
+    }
 
-        // TODO: Add Endstand row
+    private void setupClosingStatementGrid(final VerticalLayout content) {
+        closingStatementGrid = new Grid<>();
+        closingStatementGrid.setWidthFull();
+        closingStatementGrid.setAllRowsVisible(true);
+        final Grid.Column<AccountStatementRow> dateColumn = closingStatementGrid.addColumn(AccountStatementRow::dateStr);
+        dateColumn.setWidth("75%");
+        dateColumn.setTextAlign(ColumnTextAlign.END);
+        final Grid.Column<AccountStatementRow> closingAmountColumn = closingStatementGrid.addColumn(
+                accountStatementRow -> Optional.of(accountStatementRow)
+                        .map(AccountStatementRow::balance)
+                        .map(amount -> amount.format(getLocale()))
+                        .orElse("")
+        );
+        closingAmountColumn.setWidth("25%");
+        closingAmountColumn.setTextAlign(ColumnTextAlign.END);
+
+        content.add(closingStatementGrid);
     }
 
     // TODO: Extract this into a common class between all views
@@ -198,18 +218,20 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                 .setHeader(header);
     }
 
-    private void refreshGrid() {
+    private void refreshContent() {
         Shareholder shareholder = shareholderPicker.getValue();
         Integer yearValue = yearPicker.getValue();
 
         final boolean hasSelection = shareholder != null && yearValue != null;
         if (!hasSelection) {
-            grid.setItems(new ArrayList<>());
+            accountStatementGrid.setItems(new ArrayList<>());
+            closingStatementGrid.setItems(new ArrayList<>());
             return;
         }
 
-        final RunningTotalAccountStatements defaultAccountStatements = accountStatementService.runningTotalAccountStatements(shareholder, Year.of(yearValue));
-        grid.setItems(createRows(defaultAccountStatements));
+        final RunningTotalAccountStatements accountStatements = accountStatementService.runningTotalAccountStatements(shareholder, Year.of(yearValue));
+        accountStatementGrid.setItems(createRows(accountStatements));
+        closingStatementGrid.setItems(createRow(accountStatements));
     }
 
     private List<AccountStatementRow> createRows(final RunningTotalAccountStatements accountStatements) {
@@ -217,6 +239,10 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                 .stream()
                 .map(RunningTotalAccountStatementRow::new)
                 .collect(Collectors.toList());
+    }
+
+    private AccountStatementRow createRow(final RunningTotalAccountStatements accountStatements) {
+        return new ClosingAccountStatementRow(accountStatements);
     }
 
     public static Icon icon() {
