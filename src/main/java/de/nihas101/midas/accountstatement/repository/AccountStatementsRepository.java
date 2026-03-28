@@ -20,7 +20,7 @@ public interface AccountStatementsRepository extends JpaRepository<BookingEntity
                     "GROUP BY type",
             nativeQuery = true
     )
-    List<AccountStatementEntity> findSummaryByType(
+    List<AccountStatementEntity> accountStatements(
             @Param("shareholderId") Integer shareholderId,
             @Param("start") LocalDate start,
             @Param("end") LocalDate end

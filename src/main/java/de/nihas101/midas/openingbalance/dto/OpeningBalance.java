@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.Year;
 
-@Data
+@Data // TODO: Replace with interface?
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

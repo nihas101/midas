@@ -1,6 +1,6 @@
 package de.nihas101.midas.ui.accountstatement;
 
-import de.nihas101.midas.accountstatement.dto.AccountStatement;
+import de.nihas101.midas.accountstatement.runningtotal.RunningTotalAccountStatement;
 import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.money.MoneyAmount;
 import lombok.RequiredArgsConstructor;
@@ -10,9 +10,9 @@ import java.time.Month;
 import java.time.format.DateTimeFormatter;
 
 @RequiredArgsConstructor
-public class DefaultAccountStatementRow implements AccountStatementRow {
+public class RunningTotalAccountStatementRow implements AccountStatementRow {
 
-    private final AccountStatement accountStatement;
+    private final RunningTotalAccountStatement accountStatement;
 
     @Override
     public Integer displayId() {
@@ -44,6 +44,6 @@ public class DefaultAccountStatementRow implements AccountStatementRow {
 
     @Override
     public MoneyAmount balance() {
-        return MoneyAmount.ZERO; // TODO
+        return accountStatement.currentBalance();
     }
 }

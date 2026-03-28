@@ -15,10 +15,8 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
-import de.nihas101.midas.accountstatement.dto.AccountStatement;
-import de.nihas101.midas.accountstatement.dto.AccountStatements;
+import de.nihas101.midas.accountstatement.runningtotal.RunningTotalAccountStatements;
 import de.nihas101.midas.accountstatement.service.AccountStatementService;
-import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.config.MidasConfig;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersService;
@@ -33,10 +31,9 @@ import org.springframework.context.MessageSource;
 
 import java.time.Year;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Route("account-statements")
@@ -209,21 +206,15 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
             return;
         }
 
-        final AccountStatements accountStatements = accountStatementService.accountStatement(shareholder, Year.of(yearValue));
-        grid.setItems(createRows(accountStatements));
+        final RunningTotalAccountStatements defaultAccountStatements = accountStatementService.runningTotalAccountStatements(shareholder, Year.of(yearValue));
+        grid.setItems(createRows(defaultAccountStatements));
     }
 
-    private List<AccountStatementRow> createRows(final AccountStatements accountStatements) {
-        List<AccountStatementRow> rows = new ArrayList<>();
-
-        for (BookingType bookingType : Arrays.stream(BookingType.values()).sorted(Comparator.comparingInt(BookingType::getSortKey)).toList()) {
-            final AccountStatement accountStatement = accountStatements.forType(bookingType);
-            if (accountStatement != null) {
-                rows.add(new DefaultAccountStatementRow(accountStatement));
-            }
-        }
-
-        return rows;
+    private List<AccountStatementRow> createRows(final RunningTotalAccountStatements accountStatements) {
+        return accountStatements.runningTotalAccountStatements()
+                .stream()
+                .map(RunningTotalAccountStatementRow::new)
+                .collect(Collectors.toList());
     }
 
     public static Icon icon() {
