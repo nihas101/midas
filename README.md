@@ -19,7 +19,7 @@ To run Midas, you can use the standalone JAR or the launcher scripts provided in
 
 ### Prerequisites
 
-- **Java 21 or newer** must be installed on your system.
+- **Java 21 or newer** must be installed on your system. [Temurin](https://adoptium.net/temurin/releases) comes recommended.
 
 ### Standalone Execution
 

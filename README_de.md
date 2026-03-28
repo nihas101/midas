@@ -21,7 +21,7 @@ verwenden.
 
 ### Voraussetzungen
 
-- **Java 21 oder neuer** muss auf Ihrem System installiert sein.
+- **Java 21 oder neuer** muss auf Ihrem System installiert sein. [Temurin](https://adoptium.net/temurin/releases) wird empfohlen.
 
 ### Eigenständige Ausführung
 
