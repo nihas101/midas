@@ -49,7 +49,7 @@ public enum BookingType {
         return Arrays.stream(values())
                 .filter(t -> t.id == id)
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Unknown BookingType ID: " + id)); // TODO: i18n
+                .orElseThrow(() -> new IllegalArgumentException("Unknown BookingType ID: " + id));
     }
 
     public static List<BookingType> creatableByUser() {

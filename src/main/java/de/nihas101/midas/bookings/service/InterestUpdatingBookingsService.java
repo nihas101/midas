@@ -51,8 +51,8 @@ public class InterestUpdatingBookingsService implements BookingsWriter { // TODO
 
     private void updateInterest(final Booking booking) {
         final ShareholderEntity shareholder = shareholdersRepository.getReferenceById(booking.getShareholderId());
-        final int year = booking.getDate().getYear();
-        final Optional<InterestRate> interestRate = interestRateRepository.findByShareholderAndDate(shareholder, Year.of(year).atDay(1))
+        final Year year = Year.of(booking.getDate().getYear());
+        final Optional<InterestRate> interestRate = interestRateRepository.findByShareholderAndDate(shareholder, year.atMonth(Month.JANUARY).atDay(1))
                 .map(InterestRate::fromEntity);
         if (interestRate.isEmpty()) {
             return;
@@ -77,7 +77,7 @@ public class InterestUpdatingBookingsService implements BookingsWriter { // TODO
                     null,
                     null,
                     shareholder.getId(),
-                    Year.of(year).atMonth(Month.DECEMBER).atEndOfMonth(),
+                    year.atMonth(Month.DECEMBER).atEndOfMonth(),
                     BookingType.INTEREST,
                     interestCalculation.interest(),
                     messageSource.getMessage("bookings.type.interest", null, localeResolver.resolve()),

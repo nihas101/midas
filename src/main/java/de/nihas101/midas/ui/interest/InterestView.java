@@ -177,14 +177,15 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
 
     private void handleInterestRate() {
         final Shareholder shareholder = shareholderPicker.getValue();
-        final Integer year = yearPicker.getValue(); // TODO: Wrap in Year
+        final Integer yearValue = yearPicker.getValue();
         final BigDecimal rate = interestRateField.getValue();
-        if (shareholder == null || year == null) {
+        if (shareholder == null || yearValue == null) {
             return;
         }
 
+        final Year year = Year.of(yearValue);
         // TODO: Updating of these two fields should be handled in a transaction
-        final InterestRate interestRate = updateInterestRate(shareholder, year, rate);
+        final InterestRate interestRate = updateInterestRate(shareholder, yearValue, rate);
         final Bookings bookings = bookingsService.interestRelatedBookingsForShareholderAndYear(shareholder.getId(), year);
         final InterestCalculation interestCalculation = new InterestCalculation(
                 bookings,
@@ -194,7 +195,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
         updateInterestBooking(shareholder, year, interestCalculation);
 
         refreshGrid(
-                year,
+                yearValue,
                 bookings,
                 rate,
                 interestCalculation
@@ -203,7 +204,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
 
     private void updateInterestBooking(
             final Shareholder shareholder,
-            final Integer year,
+            final Year year,
             final InterestCalculation interestCalculation
     ) {
         final Booking booking = bookingsService.systemGeneratedInterestForShareholderAndYear(
@@ -221,7 +222,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
                     null,
                     null,
                     shareholder.getId(),
-                    Year.of(year).atMonth(Month.DECEMBER).atEndOfMonth(),
+                    year.atMonth(Month.DECEMBER).atEndOfMonth(),
                     BookingType.INTEREST,
                     interestCalculation.interest(),
                     messageSource.getMessage("bookings.type.interest", null, getLocale()),
@@ -246,9 +247,9 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
 
     private void refreshGrid() {
         final Shareholder shareholder = shareholderPicker.getValue();
-        final Integer year = yearPicker.getValue(); // TODO: Wrap in java Year immediately!
+        final Integer yearValue = yearPicker.getValue();
 
-        final boolean hasSelection = shareholder != null && year != null;
+        final boolean hasSelection = shareholder != null && yearValue != null;
         actionRow.setVisible(hasSelection);
 
         if (!hasSelection) {
@@ -257,7 +258,8 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
             return;
         }
 
-        final BigDecimal interestRate = interestRate(shareholder, Year.of(year)).getInterestRate();
+        final Year year = Year.of(yearValue);
+        final BigDecimal interestRate = interestRate(shareholder, year).getInterestRate();
         interestRateField.setValue(interestRate);
 
         final Bookings bookings = bookingsService.interestRelatedBookingsForShareholderAndYear(shareholder.getId(), year);
@@ -267,7 +269,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
                 interestRate
         );
         refreshGrid(
-                year,
+                yearValue,
                 bookings,
                 interestRate,
                 interestCalculation

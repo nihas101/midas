@@ -52,7 +52,6 @@ import java.util.List;
 
 import static com.vaadin.flow.component.button.ButtonVariant.LUMO_ERROR;
 
-// TODO If we add bookings, edit bookings, delete bookings or edit the saldo, we should trigger an interest-calculation as well
 @Slf4j
 @Route("bookings")
 @PageTitle("Bookings")
@@ -366,9 +365,9 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
 
     private void refreshGrid() {
         Shareholder shareholder = shareholderPicker.getValue();
-        Integer year = yearPicker.getValue();
+        Integer yearValue = yearPicker.getValue();
 
-        final boolean hasSelection = shareholder != null && year != null;
+        final boolean hasSelection = shareholder != null && yearValue != null;
         actionRow.setVisible(hasSelection);
 
         if (!hasSelection) {
@@ -377,14 +376,15 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
             return;
         }
 
-        OpeningBalance openingBalance = openingBalanceService.openingBalance(shareholder.getId(), Year.of(year));
+        final Year year = Year.of(yearValue);
+        OpeningBalance openingBalance = openingBalanceService.openingBalance(shareholder.getId(), year);
         if (openingBalance != null) {
             openingBalanceField.setValue(openingBalance.getOpeningBalance().toBigDecimalForInput());
         } else {
             openingBalanceField.setValue(BigDecimal.ZERO);
         }
 
-        Bookings bookings = bookingsReader.bookingsForShareholderAndYear(shareholder.getId(), year); // TODO: Pass in Year class!
+        Bookings bookings = bookingsReader.bookingsForShareholderAndYear(shareholder.getId(), year);
         grid.setItems(createRows(bookings));
     }
 

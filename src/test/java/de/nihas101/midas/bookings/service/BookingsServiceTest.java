@@ -20,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.Year;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,14 +58,14 @@ class BookingsServiceTest {
     @Test
     void bookingsForShareholderAndYear_success() {
         // Arrange
-        int year = 2026;
+        Year year = Year.of(2026);
         when(shareholdersRepository.findById(1)).thenReturn(Optional.of(shareholder));
 
         BookingEntity entity = new BookingEntity(
                 10,
                 null,
                 shareholder,
-                LocalDate.of(year, Month.MARCH, 11),
+                year.atMonth(Month.MARCH).atDay(11),
                 BookingType.WITHDRAWAL,
                 MoneyAmount.ofCents(1000L),
                 null,
@@ -73,8 +74,8 @@ class BookingsServiceTest {
 
         when(bookingsRepository.findByShareholderAndDateBetweenOrderByDateAsc(
                 eq(shareholder),
-                eq(LocalDate.of(year, Month.JANUARY, 1)),
-                eq(LocalDate.of(year, Month.DECEMBER, 31)))
+                eq(year.atMonth(Month.JANUARY).atDay(1)),
+                eq(year.atMonth(Month.DECEMBER).atDay(31)))
         ).thenReturn(List.of(entity));
 
         // Act
@@ -89,7 +90,7 @@ class BookingsServiceTest {
     @Test
     void bookingsForShareholderAndYear_shareholderNotFound() {
         when(shareholdersRepository.findById(1)).thenReturn(Optional.empty());
-        assertThrows(IllegalArgumentException.class, () -> bookingsService.bookingsForShareholderAndYear(1, 2026));
+        assertThrows(IllegalArgumentException.class, () -> bookingsService.bookingsForShareholderAndYear(1, Year.of(2026)));
     }
 
     @Test

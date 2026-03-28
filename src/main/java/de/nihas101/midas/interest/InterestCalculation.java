@@ -10,7 +10,7 @@ import de.nihas101.midas.money.MoneyAmount;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Month;
-import java.time.YearMonth;
+import java.time.Year;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Function;
@@ -30,7 +30,7 @@ public record InterestCalculation(
 
     public InterestCalculation(
             final Bookings bookings,
-            final Integer year, // TODO: Wrap in year
+            final Year year,
             final InterestRate interestRate
     ) {
         this(
@@ -42,20 +42,20 @@ public record InterestCalculation(
 
     public InterestCalculation(
             final Bookings bookings,
-            final Integer year, // TODO: Wrap in year
+            final Year year,
             final BigDecimal interestRate
     ) {
         this(
                 bookings,
                 year,
                 interestRate,
-                getMonthlyBalances(bookings, getMonthlyBookingSums(getMonthlyCumulativeSums(year, bookings)))
+                getMonthlyBalances(bookings, getMonthlyBookingSums(getMonthlyCumulativeSums(bookings)))
         );
     }
 
     public InterestCalculation(
             final Bookings bookings,
-            final Integer year, // TODO: Wrap in year
+            final Year year,
             final BigDecimal interestRate,
             final Map<Month, MoneyAmount> monthlyBalances
     ) {
@@ -88,14 +88,14 @@ public record InterestCalculation(
                 }));
     }
 
-    private static Map<Month, MonthlyCumulativeSum> getMonthlyCumulativeSums(final Integer year, final Bookings bookings) {
+    private static Map<Month, MonthlyCumulativeSum> getMonthlyCumulativeSums(final Bookings bookings) {
         return Arrays.stream(Month.values())
-                .collect(Collectors.toMap(Function.identity(), month -> new MonthlyCumulativeSum(bookings, YearMonth.of(year, month).getMonth())));
+                .collect(Collectors.toMap(Function.identity(), month -> new MonthlyCumulativeSum(bookings, month)));
     }
 
     public InterestCalculation(
             final Bookings bookings,
-            final Integer year, // TODO: Wrap in year
+            final Year year,
             final BigDecimal interestRate,
             final Map<Month, MoneyAmount> monthlyBalances,
             final Map<Month, Interest> interests
@@ -116,34 +116,7 @@ public record InterestCalculation(
                         .reduce(BigDecimal.ZERO, BigDecimal::add),
                 interestRate,
                 Arrays.stream(Month.values())
-                        .collect(Collectors.toMap(Function.identity(), month -> new MonthlyTotalSum(bookings, YearMonth.of(year, month).getMonth()))),
-                monthlyBalances,
-                interests
-        );
-    }
-
-    public InterestCalculation(
-            final BigDecimal interestRate,
-            final Map<Month, MonthlyTotalSum> monthlyTotalSums,
-            final Map<Month, MoneyAmount> monthlyBalances,
-            final Map<Month, Interest> interests
-    ) {
-        this(
-                interests.entrySet()
-                        .stream()
-                        // The last month is excluded from the sum of interests
-                        .filter(e -> !Month.DECEMBER.equals(e.getKey()))
-                        .map(Map.Entry::getValue)
-                        .map(Interest::interestAmount)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add)
-                        // TODO: Make this explicit (so that the 'Vortrag' is handled at one place)
-                        .add(BigDecimal.valueOf(300L)), // We add 300 vor the 'Vortrag',
-                interests.values()
-                        .stream()
-                        .map(Interest::interestDays)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add),
-                interestRate,
-                monthlyTotalSums,
+                        .collect(Collectors.toMap(Function.identity(), month -> new MonthlyTotalSum(bookings, year.atMonth(month).getMonth()))),
                 monthlyBalances,
                 interests
         );

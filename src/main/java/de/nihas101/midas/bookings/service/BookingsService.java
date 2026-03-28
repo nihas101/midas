@@ -21,14 +21,11 @@ import java.time.Month;
 import java.time.Year;
 import java.util.List;
 
-// TODO: Wrap year here!
 // TODO: Break this service up into multiple ones -> One method per class?
 @Service
 @RequiredArgsConstructor
 public class BookingsService implements BookingsWriter, BookingsReader {
 
-    // TODO: Use the other services? instead of the raw repository
-    // TOOD: Get rid of the services in favour of wrappers that are applied here that handle the mappings?
     private final BookingsRepository bookingsRepository;
     private final ShareholdersRepository shareholdersRepository;
     private final OpeningBalanceRepository openingBalanceRepository;
@@ -36,11 +33,11 @@ public class BookingsService implements BookingsWriter, BookingsReader {
     // TODO: Can be extracted into separate class
     // -- INTEREST RELATED --
     @Override
-    public Booking systemGeneratedInterestForShareholderAndYear(final Integer shareholderId, final Integer year) {
+    public Booking systemGeneratedInterestForShareholderAndYear(final Integer shareholderId, final Year year) {
         final ShareholderEntity shareholder = shareholdersRepository.findById(shareholderId)
-                .orElseThrow(() -> new IllegalArgumentException("Shareholder not found")); // TODO: i18n
+                .orElseThrow(() -> new IllegalArgumentException("Shareholder not found"));
 
-        final LocalDate endOfYear = endOfYear(year);
+        final LocalDate endOfYear = year.atMonth(Month.DECEMBER).atDay(31);
 
         return Booking.fromEntity(
                 bookingsRepository.findFirstByShareholderAndDateAndTypeAndSource(
@@ -53,12 +50,12 @@ public class BookingsService implements BookingsWriter, BookingsReader {
     }
 
     @Override
-    public Bookings interestRelatedBookingsForShareholderAndYear(final Integer shareholderId, final Integer year) {
+    public Bookings interestRelatedBookingsForShareholderAndYear(final Integer shareholderId, final Year year) {
         final ShareholderEntity shareholder = shareholdersRepository.findById(shareholderId)
-                .orElseThrow(() -> new IllegalArgumentException("Shareholder not found")); // TODO: i18n
+                .orElseThrow(() -> new IllegalArgumentException("Shareholder not found"));
 
-        final LocalDate startOfYear = LocalDate.of(year, Month.JANUARY, 1);
-        final LocalDate endOfYear = endOfYear(year);
+        final LocalDate startOfYear = year.atMonth(Month.JANUARY).atDay(1);
+        final LocalDate endOfYear = year.atMonth(Month.DECEMBER).atDay(31);
 
         final List<Booking> bookings = bookingsRepository.findByShareholderAndDateBetweenOrderByDateAsc(shareholder, startOfYear, endOfYear)
                 .stream()
@@ -67,7 +64,7 @@ public class BookingsService implements BookingsWriter, BookingsReader {
                 .map(Booking::fromEntity)
                 .toList();
 
-        final OpeningBalance openingBalance = openingBalanceRepository.findByShareholderAndDate(shareholder, Year.of(year).atDay(1))
+        final OpeningBalance openingBalance = openingBalanceRepository.findByShareholderAndDate(shareholder, year.atDay(1))
                 .map(OpeningBalance::fromEntity)
                 .orElse(null);
 
@@ -80,19 +77,19 @@ public class BookingsService implements BookingsWriter, BookingsReader {
     // TODO: Can be extracted into separate class
     // -- BOOKING View related --
     @Override
-    public Bookings bookingsForShareholderAndYear(final Integer shareholderId, final Integer year) {
+    public Bookings bookingsForShareholderAndYear(final Integer shareholderId, final Year year) {
         final ShareholderEntity shareholder = shareholdersRepository.findById(shareholderId)
                 .orElseThrow(() -> new IllegalArgumentException("Shareholder not found")); // TODO: i18n
 
-        final LocalDate startOfYear = LocalDate.of(year, Month.JANUARY, 1);
-        final LocalDate endOfYear = endOfYear(year);
+        final LocalDate startOfYear = year.atMonth(Month.JANUARY).atDay(1);
+        final LocalDate endOfYear = year.atMonth(Month.DECEMBER).atEndOfMonth();
 
         final List<Booking> bookings = bookingsRepository.findByShareholderAndDateBetweenOrderByDateAsc(shareholder, startOfYear, endOfYear)
                 .stream()
                 .map(Booking::fromEntity)
                 .toList();
 
-        final OpeningBalance openingBalance = openingBalanceRepository.findByShareholderAndDate(shareholder, Year.of(year).atDay(1))
+        final OpeningBalance openingBalance = openingBalanceRepository.findByShareholderAndDate(shareholder, year.atMonth(Month.JANUARY).atDay(1))
                 .map(OpeningBalance::fromEntity)
                 .orElse(null);
 
@@ -121,15 +118,11 @@ public class BookingsService implements BookingsWriter, BookingsReader {
                 )).isPresent();
     }
 
-    private LocalDate endOfYear(final Integer year) {
-        return LocalDate.of(year, Month.DECEMBER, 31);
-    }
-
     @Transactional
     @Override
     public void create(final Booking booking) {
         if (booking.getId() != null) { // TODO: Move this into a wrapper, so this always happens first
-            throw new IllegalArgumentException("BookingService#create with booking.getId() != null"); // TODO: i18n
+            throw new IllegalArgumentException("BookingService#create with booking.getId() != null");
         }
         upsertEntity(booking);
     }
@@ -138,7 +131,7 @@ public class BookingsService implements BookingsWriter, BookingsReader {
     @Override
     public void update(final Booking booking) {
         if (booking.getId() == null) {
-            throw new IllegalArgumentException("BookingService#udpate with booking.getId() == null"); // TODO: i18n
+            throw new IllegalArgumentException("BookingService#udpate with booking.getId() == null");
         }
 
         upsertEntity(booking);
@@ -146,13 +139,13 @@ public class BookingsService implements BookingsWriter, BookingsReader {
 
     private void upsertEntity(final Booking booking) {
         ShareholderEntity shareholder = shareholdersRepository.findById(booking.getShareholderId())
-                .orElseThrow(() -> new IllegalArgumentException("Shareholder not found")); // TODO: i18n
+                .orElseThrow(() -> new IllegalArgumentException("Shareholder not found"));
         bookingsRepository.save(BookingEntity.fromDto(booking, shareholder));
     }
 
     public void delete(final Booking booking) {
         ShareholderEntity shareholder = shareholdersRepository.findById(booking.getShareholderId())
-                .orElseThrow(() -> new IllegalArgumentException("Shareholder not found")); // TODO: i18n
+                .orElseThrow(() -> new IllegalArgumentException("Shareholder not found"));
         bookingsRepository.delete(BookingEntity.fromDto(booking, shareholder));
     }
 }
