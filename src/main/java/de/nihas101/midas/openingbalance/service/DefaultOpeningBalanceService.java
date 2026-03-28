@@ -12,12 +12,12 @@ import java.time.Year;
 
 @Service
 @RequiredArgsConstructor
-public class OpeningBalanceService { // TODO: Add reading and writing interface
-    // TODO: Add @Transactional on services?
+public class DefaultOpeningBalanceService implements OpeningBalanceService { // TODO: Add reading and writing interface
 
     private final OpeningBalanceRepository openingBalanceRepository;
     private final ShareholdersRepository shareholdersRepository;
 
+    @Override
     public OpeningBalance openingBalance(Integer shareholderId, Year year) {
         ShareholderEntity shareholder = shareholdersRepository.findById(shareholderId)
                 .orElseThrow(() -> new IllegalArgumentException("Shareholder not found"));
@@ -27,6 +27,7 @@ public class OpeningBalanceService { // TODO: Add reading and writing interface
                 .orElse(null);
     }
 
+    @Override
     public void create(final OpeningBalance openingBalance) {
         if (openingBalance.getId() != null) {
             throw new IllegalArgumentException("OpeningBalanceService#create with openingBalance.getId() != null"); // TODO: i18n
@@ -35,6 +36,7 @@ public class OpeningBalanceService { // TODO: Add reading and writing interface
         upsertEntity(openingBalance);
     }
 
+    @Override
     public void update(final OpeningBalance openingBalance) {
         if (openingBalance.getId() == null) {
             throw new IllegalArgumentException("OpeningBalanceService#update with openingBalance.getId() == null"); // TODO: i18n

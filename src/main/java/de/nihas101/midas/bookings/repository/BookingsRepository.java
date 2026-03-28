@@ -21,7 +21,7 @@ public interface BookingsRepository extends JpaRepository<BookingEntity, Integer
 
     BookingEntity findFirstByShareholderAndDateAndTypeAndSource(
             final ShareholderEntity shareholder,
-            final LocalDate endOfYear,
+            final LocalDate date,
             final BookingType bookingType,
             final Source source
     );
@@ -32,5 +32,11 @@ public interface BookingsRepository extends JpaRepository<BookingEntity, Integer
             final BookingType bookingType,
             final String comment,
             final Integer id
+    );
+
+    void deleteByShareholderAndDateAndSource(
+            final ShareholderEntity shareholder,
+            final LocalDate date,
+            final Source source
     );
 }

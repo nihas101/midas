@@ -26,6 +26,7 @@ import de.nihas101.midas.bookings.service.BookingsService;
 import de.nihas101.midas.bookings.service.BookingsWriter;
 import de.nihas101.midas.config.MidasConfig;
 import de.nihas101.midas.interest.service.InterestUpdatingBookingsService;
+import de.nihas101.midas.interest.service.InterestUpdatingOpeningBalanceService;
 import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.openingbalance.dto.OpeningBalance;
 import de.nihas101.midas.openingbalance.service.OpeningBalanceService;
@@ -47,6 +48,7 @@ import org.springframework.context.MessageSource;
 import java.math.BigDecimal;
 import java.time.Month;
 import java.time.Year;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,7 +77,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
             final ShareholdersService shareholdersService,
             final BookingsService bookingsReader,
             final InterestUpdatingBookingsService bookingsWriter,
-            final OpeningBalanceService openingBalanceService,
+            final InterestUpdatingOpeningBalanceService openingBalanceService,
             final MidasConfig config,
             final MessageSource messageSource,
             final UserConfigService userConfigService,
@@ -318,7 +320,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
 
         final String[] args = new String[]{
                 messageSource.getMessage(booking.getType().getI18nKey(), null, getLocale()),
-                booking.getDate().toString(),
+                booking.getDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")), // TODO: Make format configurable
                 booking.getAmount().format(getLocale())
         };
         dialog.setText(messageSource.getMessage("bookings.table.delete.confirmation.message", args, getLocale()));

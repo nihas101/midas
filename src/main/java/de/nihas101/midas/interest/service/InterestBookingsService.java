@@ -7,8 +7,10 @@ import de.nihas101.midas.bookings.entity.BookingEntity;
 import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.bookings.entity.Source;
 import de.nihas101.midas.bookings.repository.BookingsRepository;
+import de.nihas101.midas.bookings.service.BookingsService;
 import de.nihas101.midas.openingbalance.dto.OpeningBalance;
 import de.nihas101.midas.openingbalance.repository.OpeningBalanceRepository;
+import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.entity.ShareholderEntity;
 import de.nihas101.midas.shareholders.repository.ShareholdersRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,22 +24,20 @@ import java.util.function.Predicate;
 
 @Service
 @RequiredArgsConstructor
-public class InterestBookingsService implements InterestBookingsReader {
+public class InterestBookingsService implements InterestBookingsWriter, InterestBookingsReader {
 
+    private final BookingsService bookingsService;
     private final BookingsRepository bookingsRepository;
     private final ShareholdersRepository shareholdersRepository;
     private final OpeningBalanceRepository openingBalanceRepository;
 
     @Override
-    public Booking systemGeneratedInterestForShareholderAndYear(final Integer shareholderId, final Year year) {
-        final ShareholderEntity shareholder = shareholdersRepository.findById(shareholderId)
-                .orElseThrow(() -> new IllegalArgumentException("Shareholder not found"));
-
+    public Booking systemGeneratedInterestForShareholderAndYear(final Shareholder shareholder, final Year year) {
         final LocalDate endOfYear = year.atMonth(Month.DECEMBER).atDay(31);
 
         return Booking.fromEntity(
                 bookingsRepository.findFirstByShareholderAndDateAndTypeAndSource(
-                        shareholder,
+                        ShareholderEntity.fromDto(shareholder),
                         endOfYear,
                         BookingType.INTEREST,
                         Source.SYSTEM
@@ -72,5 +72,24 @@ public class InterestBookingsService implements InterestBookingsReader {
     private Predicate<BookingEntity> bookingsAddedByUser() {
         return bookingEntity -> !BookingType.INTEREST.equals(bookingEntity.getType())
                 || !(Source.SYSTEM == bookingEntity.getSource());
+    }
+
+    @Override
+    public void create(final Booking booking) {
+        bookingsService.create(booking);
+    }
+
+    @Override
+    public void update(final Booking booking) {
+        bookingsService.update(booking);
+    }
+
+    @Override
+    public void deleteInterestBooking(final Shareholder shareholder, final Year year) {
+        bookingsRepository.deleteByShareholderAndDateAndSource(
+                ShareholderEntity.fromDto(shareholder),
+                year.atMonth(Month.DECEMBER).atEndOfMonth(),
+                Source.SYSTEM
+        );
     }
 }

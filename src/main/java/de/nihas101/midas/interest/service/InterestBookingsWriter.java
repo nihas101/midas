@@ -1,9 +1,12 @@
-package de.nihas101.midas.bookings.service;
+package de.nihas101.midas.interest.service;
 
 import de.nihas101.midas.bookings.dto.Booking;
+import de.nihas101.midas.shareholders.dto.Shareholder;
 import org.springframework.transaction.annotation.Transactional;
 
-public interface BookingsWriter {
+import java.time.Year;
+
+public interface InterestBookingsWriter {
     @Transactional
     void create(final Booking booking);
 
@@ -11,5 +14,5 @@ public interface BookingsWriter {
     void update(final Booking booking);
 
     @Transactional
-    void delete(final Booking booking);
+    void deleteInterestBooking(final Shareholder shareholder, final Year year);
 }
