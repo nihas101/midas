@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class DefaultRunningTotalAccountStatements implements RunningTotalAccountStatements {
+public class DefaultRunningTotalAccountStatements implements RunningTotalAccountStatements { // TODO: Test
 
     // TODO: Don't expose this
     private final List<RunningTotalAccountStatement> runningTotalAccountStatements;
@@ -21,11 +21,14 @@ public class DefaultRunningTotalAccountStatements implements RunningTotalAccount
             final List<BookingType> typeOrder
     ) {
         final OpeningBalance openingBalance = accountStatements.openingBalance();
+        this.runningTotalAccountStatements = new ArrayList<>();
+        if (openingBalance == null) {
+            return;
+        }
+
         final List<AccountStatement> statements = typeOrder.stream()
                 .map(accountStatements::forType)
                 .toList();
-
-        final List<RunningTotalAccountStatement> runningTotalAccountStatements = new ArrayList<>();
 
         MoneyAmount currentBalance = openingBalance.getOpeningBalance();
         runningTotalAccountStatements.add(new OpeningRunningTotalAccountStatement(openingBalance));
@@ -39,7 +42,6 @@ public class DefaultRunningTotalAccountStatements implements RunningTotalAccount
             );
         }
 
-        this.runningTotalAccountStatements = runningTotalAccountStatements;
     }
 
     @Override

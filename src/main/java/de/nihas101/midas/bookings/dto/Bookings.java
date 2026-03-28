@@ -8,4 +8,6 @@ public interface Bookings {
     OpeningBalance openingBalance();
 
     MonthlyBookings bookingsInMonth(final Month month);
+
+    boolean isEmpty();
 }

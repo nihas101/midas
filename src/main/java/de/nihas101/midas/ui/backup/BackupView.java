@@ -98,6 +98,7 @@ public class BackupView extends MidasView implements BeforeEnterObserver { // TO
 
         shareholderPicker = new ShareholderPicker(
                 messageSource.getMessage("bookings.shareholder", null, getLocale()),
+                messageSource.getMessage("shareholder-picker.placeholder", null, getLocale()),
                 shareholdersService,
                 e -> {
                     final Shareholder shareholder = e.getValue();

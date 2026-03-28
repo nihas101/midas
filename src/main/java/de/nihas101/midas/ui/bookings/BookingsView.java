@@ -50,6 +50,7 @@ import java.time.Month;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static com.vaadin.flow.component.button.ButtonVariant.LUMO_ERROR;
@@ -138,6 +139,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
 
         shareholderPicker = new ShareholderPicker(
                 messageSource.getMessage("bookings.shareholder", null, getLocale()),
+                messageSource.getMessage("shareholder-picker.placeholder", null, getLocale()),
                 shareholdersService,
                 e -> {
                     final Shareholder shareholder = e.getValue();
@@ -234,7 +236,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
     private void setupGrid(final VerticalLayout content) {
         grid = new Grid<>();
         grid.setSizeFull();
-
+        grid.setEmptyStateText(messageSource.getMessage("bookings.table.empty-state-text", null, getLocale()));
         grid.setPartNameGenerator(BookingRow::partName);
 
         setupColumn(grid.addColumn(BookingRow::displayId), "bookings.table.id", ColumnTextAlign.START);
@@ -387,6 +389,10 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         }
 
         Bookings bookings = bookingsReader.bookingsForShareholderAndYear(shareholder.getId(), year);
+        if (bookings.isEmpty()) {
+            grid.setItems(Collections.emptyList());
+            return;
+        }
         grid.setItems(createRows(bookings));
     }
 

@@ -307,6 +307,11 @@ class MonthlyTotalSummaryBookingRowTest {
             public MonthlyBookings bookingsInMonth(final Month month) {
                 return new MonthlyBookings(bookingsInMonth);
             }
+
+            @Override
+            public boolean isEmpty() {
+                return false;
+            }
         };
     }
 

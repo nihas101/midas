@@ -21,7 +21,7 @@ public class OpeningRunningTotalAccountStatement implements RunningTotalAccountS
 
     @Override
     public Integer id() {
-        return 0; // TODO: Openingbalance needs an id!
+        return null;
     }
 
     @Override

@@ -49,6 +49,7 @@ import java.time.Year;
 import java.time.YearMonth;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
@@ -139,7 +140,8 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
         shareholderPicker = new ShareholderPicker(
                 messageSource.getMessage("bookings.shareholder", null, getLocale()),
                 shareholdersService.shareholders(),
-                e -> recalculateInterestForDisplay()
+                e -> recalculateInterestForDisplay(),
+                messageSource.getMessage("shareholder-picker.placeholder", null, getLocale())
         );
         setupYearPicker();
         headerActionRow = createActionRow();
@@ -295,6 +297,10 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
         updateInterestAutomaticallyToggle.setValue(booking != null);
 
         final Bookings bookings = bookingsReader.interestRelatedBookingsForShareholderAndYear(shareholder.getId(), year);
+        if (bookings.isEmpty()) {
+            interestCalculationGrid.setItems(Collections.emptyList());
+            return;
+        }
         final InterestCalculation interestCalculation = new InterestCalculation(
                 bookings,
                 year,
@@ -308,6 +314,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
                         interestCalculation
                 )
         );
+
     }
 
     private InterestRate interestRate(final Shareholder shareholder, final Year year) {
@@ -389,6 +396,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
     // TODO: Move to own class (same in bookings view)
     private void setupInterestGrid(final VerticalLayout content) {
         interestCalculationGrid = new Grid<>();
+        interestCalculationGrid.setEmptyStateText(messageSource.getMessage("bookings.table.empty-state-text", null, getLocale()));
         interestCalculationGrid.setWidthFull();
 
         // TODO: Null safety! (Also create a wrapper for InterestCalculationRow that handles all the fallbacks and stuff in the lambdas here)

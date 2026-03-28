@@ -50,6 +50,11 @@ class TotalSumCalculatorTestTotal {
             public MonthlyBookings bookingsInMonth(Month m) {
                 return new MonthlyBookings(List.of());
             }
+
+            @Override
+            public boolean isEmpty() {
+                return true;
+            }
         };
 
         MonthlyTotalSum.MonthlySumTotalCalculator calculator = new MonthlyTotalSum.MonthlySumTotalCalculator(mockBookings, Month.JANUARY);
@@ -85,7 +90,7 @@ class TotalSumCalculatorTestTotal {
     }
 
     private static MonthlyTotalSum.MonthlySumTotalCalculator createCalculator(final MonthlyBookings monthlyBookings) {
-        Bookings bookings = new Bookings() {
+        final Bookings bookings = new Bookings() {
             @Override
             public OpeningBalance openingBalance() {
                 return new OpeningBalance(MoneyAmount.ZERO);
@@ -94,6 +99,11 @@ class TotalSumCalculatorTestTotal {
             @Override
             public MonthlyBookings bookingsInMonth(Month m) {
                 return m == Month.MARCH ? monthlyBookings : new MonthlyBookings(List.of());
+            }
+
+            @Override
+            public boolean isEmpty() {
+                return false;
             }
         };
 

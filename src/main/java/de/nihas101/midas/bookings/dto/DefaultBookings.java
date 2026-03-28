@@ -27,4 +27,9 @@ public class DefaultBookings implements Bookings {
                 .toList();
         return new MonthlyBookings(monthlyBookings);
     }
+
+    @Override
+    public boolean isEmpty() {
+        return bookings.isEmpty() && openingBalance == null;
+    }
 }

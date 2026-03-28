@@ -112,6 +112,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
 
         shareholderPicker = new ShareholderPicker(
                 messageSource.getMessage("bookings.shareholder", null, getLocale()),
+                messageSource.getMessage("shareholder-picker.placeholder", null, getLocale()),
                 shareholdersService,
                 e -> {
                     final Shareholder shareholder = e.getValue();
@@ -148,6 +149,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
 
     private void setupAccountStatementGrid(final VerticalLayout content) {
         accountStatementGrid = new Grid<>();
+        accountStatementGrid.setEmptyStateText(messageSource.getMessage("bookings.table.empty-state-text", null, getLocale()));
         accountStatementGrid.setWidthFull();
         accountStatementGrid.setAllRowsVisible(true);
 
