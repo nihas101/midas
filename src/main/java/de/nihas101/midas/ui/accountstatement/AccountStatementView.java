@@ -31,6 +31,7 @@ import org.springframework.context.MessageSource;
 
 import java.time.Year;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -232,6 +233,12 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         }
 
         final RunningTotalAccountStatements accountStatements = accountStatementService.runningTotalAccountStatements(shareholder, Year.of(yearValue));
+        if (accountStatements.isEmpty()) {
+            accountStatementGrid.setItems(Collections.emptyList());
+            closingStatementGrid.setItems(Collections.emptyList());
+            return;
+        }
+
         accountStatementGrid.setItems(createRows(accountStatements));
         closingStatementGrid.setItems(createRow(accountStatements));
     }

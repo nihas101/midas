@@ -4,4 +4,6 @@ import java.util.List;
 
 public interface RunningTotalAccountStatements {
     List<RunningTotalAccountStatement> runningTotalAccountStatements();
+
+    boolean isEmpty();
 }

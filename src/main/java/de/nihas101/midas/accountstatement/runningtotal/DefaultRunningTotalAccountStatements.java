@@ -48,4 +48,9 @@ public class DefaultRunningTotalAccountStatements implements RunningTotalAccount
     public List<RunningTotalAccountStatement> runningTotalAccountStatements() {
         return runningTotalAccountStatements;
     }
+
+    @Override
+    public boolean isEmpty() {
+        return runningTotalAccountStatements == null || runningTotalAccountStatements.isEmpty();
+    }
 }
