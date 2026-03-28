@@ -54,10 +54,16 @@ public class BookingEntity {
     @Column(name = "comment")
     private String comment;
 
-    // TODO: Make it so we can mark bookings as system generated
+    @Builder.Default
+    @Column(name = "source", nullable = false)
+    private Source source = Source.USER;
+
     // TODO: Make it so the interest calculation only updates the system generated interest
 
-    public static BookingEntity fromDto(final Booking booking, final ShareholderEntity shareholder) {
+    public static BookingEntity fromDto(
+            final Booking booking,
+            final ShareholderEntity shareholder
+    ) {
         if (booking == null) {
             return null;
         }
@@ -69,7 +75,8 @@ public class BookingEntity {
                 booking.getDate(),
                 booking.getType(),
                 booking.getAmount(),
-                booking.getComment()
+                booking.getComment(),
+                booking.getSource()
         );
     }
 }

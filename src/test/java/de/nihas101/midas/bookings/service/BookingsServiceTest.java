@@ -4,6 +4,7 @@ import de.nihas101.midas.bookings.dto.Booking;
 import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.entity.BookingEntity;
 import de.nihas101.midas.bookings.entity.BookingType;
+import de.nihas101.midas.bookings.entity.Source;
 import de.nihas101.midas.bookings.repository.BookingsRepository;
 import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.openingbalance.repository.OpeningBalanceRepository;
@@ -66,7 +67,8 @@ class BookingsServiceTest {
                 LocalDate.of(year, Month.MARCH, 11),
                 BookingType.WITHDRAWAL,
                 MoneyAmount.ofCents(1000L),
-                null
+                null,
+                Source.USER
         );
 
         when(bookingsRepository.findByShareholderAndDateBetweenOrderByDateAsc(
@@ -134,6 +136,7 @@ class BookingsServiceTest {
                 .date(now)
                 .type(BookingType.INTEREST)
                 .amount(amount)
+                .source(Source.USER)
                 .build();
 
         when(shareholdersRepository.findById(1)).thenReturn(Optional.of(shareholder));
@@ -148,6 +151,7 @@ class BookingsServiceTest {
                 .type(BookingType.INTEREST)
                 .date(now)
                 .amount(amount)
+                .source(Source.USER)
                 .build();
         verify(bookingsRepository).save(expectedSave);
         assertEquals(BookingType.INTEREST, expectedSave.getType());

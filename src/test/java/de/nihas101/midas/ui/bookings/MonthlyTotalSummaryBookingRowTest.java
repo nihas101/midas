@@ -4,6 +4,7 @@ import de.nihas101.midas.bookings.dto.Booking;
 import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.dto.MonthlyBookings;
 import de.nihas101.midas.bookings.entity.BookingType;
+import de.nihas101.midas.bookings.entity.Source;
 import de.nihas101.midas.bookings.monthlytotal.MonthlyTotalSum;
 import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.openingbalance.dto.OpeningBalance;
@@ -78,7 +79,8 @@ class MonthlyTotalSummaryBookingRowTest {
                                         LocalDate.of(2026, 3, 14),
                                         COMPENSATION,
                                         MoneyAmount.ofCents(100L),
-                                        "comment"
+                                        "comment",
+                                        Source.USER
                                 )
                         )), MoneyAmount.ofCents(100L)),
                 Arguments.of(createBookings(null,
@@ -89,7 +91,8 @@ class MonthlyTotalSummaryBookingRowTest {
                                         LocalDate.of(2026, 3, 14),
                                         COMPENSATION,
                                         MoneyAmount.ofCents(100L),
-                                        "comment"
+                                        "comment",
+                                        Source.USER
                                 ),
                                 new Booking(2,
                                         2,
@@ -97,7 +100,8 @@ class MonthlyTotalSummaryBookingRowTest {
                                         LocalDate.of(2026, 3, 14),
                                         COMPENSATION,
                                         MoneyAmount.ofCents(10L),
-                                        "comment"
+                                        "comment",
+                                        Source.USER
                                 )
                         )), MoneyAmount.ofCents(110L)),
                 Arguments.of(createBookings(null,
@@ -108,7 +112,8 @@ class MonthlyTotalSummaryBookingRowTest {
                                         LocalDate.of(2026, 3, 14),
                                         COMPENSATION,
                                         MoneyAmount.ofCents(100L),
-                                        "comment"
+                                        "comment",
+                                        Source.USER
                                 ),
                                 new Booking(2,
                                         2,
@@ -116,7 +121,8 @@ class MonthlyTotalSummaryBookingRowTest {
                                         LocalDate.of(2026, 3, 15),
                                         WITHDRAWAL,
                                         MoneyAmount.ofCents(-10L),
-                                        "comment"
+                                        "comment",
+                                        Source.USER
                                 )
                         )), MoneyAmount.ofCents(90L)),
                 Arguments.of(createBookings(MoneyAmount.ofCents(1000L),
@@ -127,7 +133,8 @@ class MonthlyTotalSummaryBookingRowTest {
                                         LocalDate.of(2026, 3, 14),
                                         COMPENSATION,
                                         MoneyAmount.ofCents(100L),
-                                        "comment"
+                                        "comment",
+                                        Source.USER
                                 ),
                                 new Booking(2,
                                         2,
@@ -135,7 +142,8 @@ class MonthlyTotalSummaryBookingRowTest {
                                         LocalDate.of(2026, 3, 15),
                                         WITHDRAWAL,
                                         MoneyAmount.ofCents(-10L),
-                                        "comment"
+                                        "comment",
+                                        Source.USER
                                 )
                         )), MoneyAmount.ofCents(90L))
         );
@@ -184,7 +192,8 @@ class MonthlyTotalSummaryBookingRowTest {
                                                 LocalDate.of(2026, 3, 14),
                                                 COMPENSATION,
                                                 MoneyAmount.ofCents(100L),
-                                                "comment"
+                                                "comment",
+                                                Source.USER
                                         )
                                 )),
                         Map.of(
@@ -203,7 +212,8 @@ class MonthlyTotalSummaryBookingRowTest {
                                                 LocalDate.of(2026, 3, 14),
                                                 COMPENSATION,
                                                 MoneyAmount.ofCents(100L),
-                                                "comment"
+                                                "comment",
+                                                Source.USER
                                         ),
                                         new Booking(2,
                                                 2,
@@ -211,7 +221,8 @@ class MonthlyTotalSummaryBookingRowTest {
                                                 LocalDate.of(2026, 3, 14),
                                                 COMPENSATION,
                                                 MoneyAmount.ofCents(10L),
-                                                "comment"
+                                                "comment",
+                                                Source.USER
                                         )
                                 )
                         ),
@@ -231,7 +242,8 @@ class MonthlyTotalSummaryBookingRowTest {
                                                 LocalDate.of(2026, 3, 14),
                                                 COMPENSATION,
                                                 MoneyAmount.ofCents(100L),
-                                                "comment"
+                                                "comment",
+                                                Source.USER
                                         ),
                                         new Booking(2,
                                                 2,
@@ -239,7 +251,8 @@ class MonthlyTotalSummaryBookingRowTest {
                                                 LocalDate.of(2026, 3, 15),
                                                 WITHDRAWAL,
                                                 MoneyAmount.ofCents(-10L),
-                                                "comment"
+                                                "comment",
+                                                Source.USER
                                         )
                                 )
                         ),
@@ -259,7 +272,8 @@ class MonthlyTotalSummaryBookingRowTest {
                                                 LocalDate.of(2026, 3, 14),
                                                 COMPENSATION,
                                                 MoneyAmount.ofCents(100L),
-                                                "comment"
+                                                "comment",
+                                                Source.USER
                                         ),
                                         new Booking(2,
                                                 2,
@@ -267,7 +281,8 @@ class MonthlyTotalSummaryBookingRowTest {
                                                 LocalDate.of(2026, 3, 15),
                                                 WITHDRAWAL,
                                                 MoneyAmount.ofCents(-10L),
-                                                "comment"
+                                                "comment",
+                                                Source.USER
                                         )
                                 )
                         ),

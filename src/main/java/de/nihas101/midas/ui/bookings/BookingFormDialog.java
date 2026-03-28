@@ -14,6 +14,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import de.nihas101.midas.bookings.dto.Booking;
 import de.nihas101.midas.bookings.entity.BookingType;
+import de.nihas101.midas.bookings.entity.Source;
 import de.nihas101.midas.bookings.service.BookingsWriter;
 import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.shareholders.dto.Shareholder;
@@ -131,6 +132,7 @@ public class BookingFormDialog extends Dialog {
         } else {
             Booking booking = new Booking();
             booking.setDate(LocalDate.now());
+            booking.setSource(Source.USER);
             if (initialShareholder != null) {
                 booking.setShareholderId(initialShareholder.getId());
                 shareholderPicker.setValue(initialShareholder);

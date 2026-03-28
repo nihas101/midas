@@ -2,6 +2,7 @@ package de.nihas101.midas.bookings.dto;
 
 import de.nihas101.midas.bookings.entity.BookingEntity;
 import de.nihas101.midas.bookings.entity.BookingType;
+import de.nihas101.midas.bookings.entity.Source;
 import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.shareholders.entity.ShareholderEntity;
 import org.junit.jupiter.api.Assertions;
@@ -33,7 +34,8 @@ class BookingTest {
                                 null,
                                 null,
                                 MoneyAmount.ZERO,
-                                null
+                                null,
+                                Source.USER
                         )
                 ),
                 Arguments.of(
@@ -44,7 +46,8 @@ class BookingTest {
                                 LocalDate.now(),
                                 BookingType.COMPENSATION,
                                 MoneyAmount.ofCents(100L),
-                                "Test"
+                                "Test",
+                                Source.USER
                         ),
                         new Booking(
                                 1,
@@ -53,7 +56,8 @@ class BookingTest {
                                 LocalDate.now(),
                                 BookingType.COMPENSATION,
                                 MoneyAmount.ofCents(100L),
-                                "Test"
+                                "Test",
+                                Source.USER
                         )
                 )
         );

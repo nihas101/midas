@@ -5,6 +5,7 @@ import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.dto.DefaultBookings;
 import de.nihas101.midas.bookings.entity.BookingEntity;
 import de.nihas101.midas.bookings.entity.BookingType;
+import de.nihas101.midas.bookings.entity.Source;
 import de.nihas101.midas.bookings.repository.BookingsRepository;
 import de.nihas101.midas.openingbalance.dto.OpeningBalance;
 import de.nihas101.midas.openingbalance.repository.OpeningBalanceRepository;
@@ -41,10 +42,11 @@ public class BookingsService implements BookingsWriter, BookingsReader {
         final LocalDate endOfYear = endOfYear(year);
 
         return Booking.fromEntity(
-                bookingsRepository.findFirstByShareholderAndDateAndType(
+                bookingsRepository.findFirstByShareholderAndDateAndTypeAndSource(
                         shareholder,
                         endOfYear,
-                        BookingType.INTEREST
+                        BookingType.INTEREST,
+                        Source.SYSTEM
                 )
         );
     }

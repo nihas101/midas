@@ -24,6 +24,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="comment" type="TEXT"/>
+            <column name="source" type="TEXT"/>
         </createTable>
 
         <sql dbms="sqlite">

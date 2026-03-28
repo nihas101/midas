@@ -20,6 +20,7 @@ import com.vaadin.flow.router.Route;
 import de.nihas101.midas.bookings.dto.Booking;
 import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.entity.BookingType;
+import de.nihas101.midas.bookings.entity.Source;
 import de.nihas101.midas.bookings.service.BookingsService;
 import de.nihas101.midas.config.MidasConfig;
 import de.nihas101.midas.money.MoneyAmount;
@@ -276,7 +277,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
     private EditButton createEditBookingButton(final Booking booking) {
         return new EditButton(
                 messageSource.getMessage("global.edit", null, getLocale()), e -> {
-            if (BookingType.INTEREST.equals(booking.getType())) {
+            if (BookingType.INTEREST.equals(booking.getType()) && Source.SYSTEM == booking.getSource()) {
                 final QueryParameters queryParameters = UI.getCurrent().getActiveViewLocation().getQueryParameters();
                 UI.getCurrent().navigate(InterestView.class, queryParameters);
             } else {
@@ -376,16 +377,13 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         }
 
         Bookings bookings = bookingsService.bookingsForShareholderAndYear(shareholder.getId(), year); // TODO: Pass in Year class!
-        grid.setItems(createRows(Year.of(year), bookings));
+        grid.setItems(createRows(bookings));
     }
 
-    private List<BookingRow> createRows(Year year, final Bookings bookings) {
+    private List<BookingRow> createRows(final Bookings bookings) {
         List<BookingRow> rows = new ArrayList<>();
         rows.add(new OpeningBalanceBookingRow(bookings));
         rows.addAll(monthlySummaryRows(bookings));
-        // TODO: Maybe we don't need to handle this in a special way, because interest should be updated automatically (and inserted)
-        // TODO: We need to make sure that when edit is clicked here we go to the interest calculation site
-        rows.add(new InterestBookingRow(year.atMonth(Month.DECEMBER).atEndOfMonth(), MoneyAmount.ofCents(6472L)));
         return rows;
     }
 

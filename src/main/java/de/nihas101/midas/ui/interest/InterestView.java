@@ -18,6 +18,7 @@ import com.vaadin.flow.router.Route;
 import de.nihas101.midas.bookings.dto.Booking;
 import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.entity.BookingType;
+import de.nihas101.midas.bookings.entity.Source;
 import de.nihas101.midas.bookings.service.BookingsService;
 import de.nihas101.midas.config.MidasConfig;
 import de.nihas101.midas.interest.InterestCalculation;
@@ -222,7 +223,8 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
                     Year.of(year).atMonth(Month.DECEMBER).atEndOfMonth(),
                     BookingType.INTEREST,
                     interestCalculation.interest(),
-                    null
+                    messageSource.getMessage("bookings.type.interest", null, getLocale()),
+                    Source.SYSTEM
             );
             log.info("Creating interest booking: {}", newBooking); // TODO: remove
             bookingsService.create(newBooking);

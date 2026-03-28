@@ -33,6 +33,7 @@ class BookingEntityTest {
                                 null,
                                 null,
                                 null,
+                                null,
                                 null
                         )
 
@@ -44,6 +45,7 @@ class BookingEntityTest {
                                 null,
                                 null,
                                 new ShareholderEntity(),
+                                null,
                                 null,
                                 null,
                                 null,
@@ -59,7 +61,8 @@ class BookingEntityTest {
                                 LocalDate.now(),
                                 BookingType.COMPENSATION,
                                 MoneyAmount.ofCents(100L),
-                                "Test"
+                                "Test",
+                                Source.USER
                         ),
                         new ShareholderEntity(3, null, null, null),
                         new BookingEntity(
@@ -69,7 +72,8 @@ class BookingEntityTest {
                                 LocalDate.now(),
                                 BookingType.COMPENSATION,
                                 MoneyAmount.ofCents(100L),
-                                "Test"
+                                "Test",
+                                Source.USER
                         )
                 )
         );

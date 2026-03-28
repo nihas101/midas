@@ -39,11 +39,9 @@ public class BookingsToBookingRowConverter {
     public List<BookingRow> bookingRows() {
         final MonthlyBookings monthBookings = bookings.bookingsInMonth(month);
 
-        // TODO: Why are we grouping by comment instead of by type here?
-        // Group by date and comment within the month
         final Map<String, List<Booking>> groupedByEntry = monthBookings.bookings()
                 .stream()
-                .collect(Collectors.groupingBy(b -> b.getDate().toString() + "_" + (b.getComment() != null ? b.getComment() : "")));
+                .collect(Collectors.groupingBy(b -> b.getDate().toString()));
 
         // Sort by date
         final List<String> sortedEntryKeys = groupedByEntry.keySet().stream().sorted().toList();

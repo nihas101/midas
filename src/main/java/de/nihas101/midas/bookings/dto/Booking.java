@@ -2,6 +2,7 @@ package de.nihas101.midas.bookings.dto;
 
 import de.nihas101.midas.bookings.entity.BookingEntity;
 import de.nihas101.midas.bookings.entity.BookingType;
+import de.nihas101.midas.bookings.entity.Source;
 import de.nihas101.midas.money.MoneyAmount;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,6 +23,7 @@ public class Booking {
     private BookingType type; // TODO Split this class per booking type?
     private MoneyAmount amount;
     private String comment;
+    private Source source;
 
     public static Booking fromEntity(BookingEntity entity) {
         if (entity == null) {
@@ -36,6 +38,7 @@ public class Booking {
                 .type(entity.getType())
                 .amount(entity.getAmount())
                 .comment(entity.getComment())
+                .source(entity.getSource())
                 .build();
     }
 }
