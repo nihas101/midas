@@ -151,13 +151,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         setupColumn(grid.addColumn(AccountStatementRow::displayId), "account-statements.table.id", ColumnTextAlign.START);
         setupColumn(grid.addColumn(AccountStatementRow::dateStr), "account-statements.table.date", ColumnTextAlign.START);
         setupColumn(
-                grid.addColumn(
-                        asr -> messageSource.getMessage(
-                                asr.bookingType().getAccountStatementI18nKey(),
-                                null,
-                                getLocale()
-                        )
-                ),
+                grid.addColumn(asr -> asr.label(messageSource, getLocale())),
                 "account-statements.table.type",
                 ColumnTextAlign.START
         );
@@ -173,7 +167,15 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                         .map(m -> m.format(getLocale()))
                         .orElse("")
         ), "account-statements.table.credit", ColumnTextAlign.END);
-        setupColumn(grid.addColumn(AccountStatementRow::balance), "account-statements.table.balance", ColumnTextAlign.END);
+        setupColumn(
+                grid.addColumn(
+                        accountStatementRow -> Optional.of(accountStatementRow)
+                                .map(AccountStatementRow::balance)
+                                .map(m -> m.format(getLocale()))
+                                .orElse("")
+                ), "account-statements.table.balance",
+                ColumnTextAlign.END
+        );
 
         content.add(grid);
 

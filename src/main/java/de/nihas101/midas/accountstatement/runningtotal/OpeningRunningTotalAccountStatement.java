@@ -1,7 +1,7 @@
 package de.nihas101.midas.accountstatement.runningtotal;
 
-import de.nihas101.midas.accountstatement.dto.AccountStatement;
 import de.nihas101.midas.money.MoneyAmount;
+import de.nihas101.midas.openingbalance.dto.OpeningBalance;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 
@@ -9,33 +9,32 @@ import java.time.Year;
 import java.util.Locale;
 
 @RequiredArgsConstructor
-public class DefaultRunningTotalAccountStatement implements RunningTotalAccountStatement {
+public class OpeningRunningTotalAccountStatement implements RunningTotalAccountStatement {
 
-    private final AccountStatement statement;
-    private final MoneyAmount currentBalance;
+    private final OpeningBalance openingBalance;
+
+    @Override
+    public MoneyAmount currentBalance() {
+        return openingBalance.getOpeningBalance();
+    }
 
     @Override
     public Integer id() {
-        return statement.id();
+        return 0; // TODO: Openingbalance needs an id!
     }
 
     @Override
     public Year year() {
-        return statement.year();
+        return openingBalance.getYear();
     }
 
     @Override
     public String label(final MessageSource messageSource, final Locale locale) {
-        return statement.label(messageSource, locale);
+        return "Saldovortrag"; // TODO: i18n
     }
 
     @Override
     public MoneyAmount amount() {
-        return statement.amount();
-    }
-
-    @Override
-    public MoneyAmount currentBalance() {
-        return currentBalance;
+        return openingBalance.getOpeningBalance();
     }
 }

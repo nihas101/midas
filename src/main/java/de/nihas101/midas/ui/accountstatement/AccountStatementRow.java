@@ -1,14 +1,16 @@
 package de.nihas101.midas.ui.accountstatement;
 
-import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.money.MoneyAmount;
+import org.springframework.context.MessageSource;
+
+import java.util.Locale;
 
 public interface AccountStatementRow {
     Integer displayId();
 
     String dateStr();
 
-    BookingType bookingType();
+    String label(final MessageSource messageSource, final Locale locale);
 
     MoneyAmount debit();
 

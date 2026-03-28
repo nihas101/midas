@@ -328,7 +328,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
 
     private String formatAmount(final MoneyAmount amount) {
         if (amount == null || amount.equals(MoneyAmount.ZERO)) {
-            return ""; // To display empty cells for empty amounts
+            return ""; // To display empty cells for zero amounts
         }
         return amount.format(getLocale());
     }

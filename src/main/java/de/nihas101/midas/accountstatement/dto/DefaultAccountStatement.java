@@ -4,8 +4,10 @@ import de.nihas101.midas.accountstatement.repository.AccountStatementEntity;
 import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.money.MoneyAmount;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
 
 import java.time.Year;
+import java.util.Locale;
 
 @RequiredArgsConstructor
 public final class DefaultAccountStatement implements AccountStatement {
@@ -34,8 +36,8 @@ public final class DefaultAccountStatement implements AccountStatement {
     }
 
     @Override
-    public BookingType type() {
-        return type;
+    public String label(final MessageSource messageSource, final Locale locale) {
+        return messageSource.getMessage(type.getAccountStatementI18nKey(), null, locale);
     }
 
     @Override

@@ -54,6 +54,9 @@ public class BookingEntity {
     @Column(name = "comment")
     private String comment;
 
+    // TODO: Make it so we can mark bookings as system generated
+    // TODO: Make it so the interest calculation only updates the system generated interest
+
     public static BookingEntity fromDto(final Booking booking, final ShareholderEntity shareholder) {
         if (booking == null) {
             return null;

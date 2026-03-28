@@ -1,13 +1,14 @@
 package de.nihas101.midas.ui.accountstatement;
 
 import de.nihas101.midas.accountstatement.runningtotal.RunningTotalAccountStatement;
-import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.money.MoneyAmount;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
 
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 @RequiredArgsConstructor
 public class RunningTotalAccountStatementRow implements AccountStatementRow {
@@ -26,8 +27,8 @@ public class RunningTotalAccountStatementRow implements AccountStatementRow {
     }
 
     @Override
-    public BookingType bookingType() {
-        return accountStatement.type();
+    public String label(final MessageSource messageSource, final Locale locale) {
+        return accountStatement.label(messageSource, locale);
     }
 
     @Override

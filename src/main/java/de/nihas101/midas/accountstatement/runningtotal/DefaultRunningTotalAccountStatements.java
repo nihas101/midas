@@ -28,7 +28,7 @@ public class DefaultRunningTotalAccountStatements implements RunningTotalAccount
         final List<RunningTotalAccountStatement> runningTotalAccountStatements = new ArrayList<>();
 
         MoneyAmount currentBalance = openingBalance.getOpeningBalance();
-        // TODO: Add opening balance
+        runningTotalAccountStatements.add(new OpeningRunningTotalAccountStatement(openingBalance));
         for (final AccountStatement statement : statements) {
             currentBalance = currentBalance.plus(statement.amount());
             runningTotalAccountStatements.add(
@@ -38,7 +38,6 @@ public class DefaultRunningTotalAccountStatements implements RunningTotalAccount
                     )
             );
         }
-        // TODO: Add closing balance
 
         this.runningTotalAccountStatements = runningTotalAccountStatements;
     }
