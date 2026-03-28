@@ -70,7 +70,6 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
     private ComboBox<Integer> yearPicker; // TODO: Store the selected shareholder somewhere so that we can use that in the same filter when switching views
     private BigDecimalField interestRateField;
     private HorizontalLayout headerActionRow;
-    private HorizontalLayout footerActionRow;
     private Grid<InterestCalculationRow> interestCalculationGrid;
     private Checkbox updateInterestAutomaticallyToggle;
 
@@ -95,7 +94,6 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
 
         setupHeader(content);
         setupInterestGrid(content);
-        setupFooter(content);
 
         setContent(content);
     }
@@ -166,6 +164,21 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
     }
 
     private HorizontalLayout createActionRow() {
+        updateInterestAutomaticallyToggle = new Checkbox(
+                messageSource.getMessage("interest.update.automatically.toggle.label", null, getLocale()),
+                false,
+                (HasValue.ValueChangeListener<AbstractField.ComponentValueChangeEvent<Checkbox, Boolean>>) event -> {
+                    if (!event.isFromClient()) {
+                        return;
+                    }
+
+                    if (Boolean.TRUE.equals(event.getValue())) {
+                        recalculateInterest();
+                    } else {
+                        bookingsWriter.deleteInterestBooking(shareholderPicker.getValue(), Year.of(yearPicker.getValue()));
+                    }
+                });
+
         // TODO: Extract this into its own class, so we always set the locale
         interestRateField = new BigDecimalField(messageSource.getMessage("interest.rate.label", null, getLocale()));
         interestRateField.setMaxWidth("5em");
@@ -179,7 +192,8 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
 
         final HorizontalLayout actions = new HorizontalLayout();
         actions.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
-        actions.add(interestRateField);
+        actions.setAlignItems(FlexComponent.Alignment.BASELINE);
+        actions.add(updateInterestAutomaticallyToggle, interestRateField);
         actions.setWidthFull();
 
         return actions;
@@ -265,7 +279,6 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
 
         final boolean hasSelection = shareholder != null && yearValue != null;
         headerActionRow.setVisible(hasSelection);
-        footerActionRow.setVisible(hasSelection);
 
         if (!hasSelection) {
             interestRateField.setValue(null);
@@ -453,7 +466,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
             final String headerName,
             final ColumnTextAlign columnTextAlign
     ) {
-        final Span header = new Span(headerName); // TODO: i18n
+        final Span header = new Span(headerName);
         header.getElement().setAttribute("part", "header-cell-content"); // To allow common header styling
 
         column.setAutoWidth(true)
@@ -461,32 +474,6 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
                 .setResizable(true)
                 .setTextAlign(columnTextAlign)
                 .setHeader(header);
-    }
-
-    private void setupFooter(final VerticalLayout content) {
-        footerActionRow = new HorizontalLayout();
-        footerActionRow.setWidthFull();
-        footerActionRow.setAlignItems(FlexComponent.Alignment.END);
-        footerActionRow.setVisible(false);
-
-        updateInterestAutomaticallyToggle = new Checkbox(
-                messageSource.getMessage("interest.update.automatically.toggle.label", null, getLocale()),
-                false,
-                (HasValue.ValueChangeListener<AbstractField.ComponentValueChangeEvent<Checkbox, Boolean>>) event -> {
-                    if (!event.isFromClient()) {
-                        return;
-                    }
-
-                    if (Boolean.TRUE.equals(event.getValue())) {
-                        recalculateInterest();
-                    } else {
-                        bookingsWriter.deleteInterestBooking(shareholderPicker.getValue(), Year.of(yearPicker.getValue()));
-                    }
-                });
-
-        footerActionRow.add(updateInterestAutomaticallyToggle);
-
-        content.add(footerActionRow);
     }
 
     public static Icon icon() {
