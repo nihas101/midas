@@ -4,15 +4,12 @@ import de.nihas101.midas.bookings.dto.Booking;
 import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.dto.DefaultBookings;
 import de.nihas101.midas.bookings.entity.BookingEntity;
-import de.nihas101.midas.bookings.entity.BookingType;
-import de.nihas101.midas.bookings.entity.Source;
 import de.nihas101.midas.bookings.repository.BookingsRepository;
 import de.nihas101.midas.openingbalance.dto.OpeningBalance;
 import de.nihas101.midas.openingbalance.repository.OpeningBalanceRepository;
 import de.nihas101.midas.shareholders.entity.ShareholderEntity;
 import de.nihas101.midas.shareholders.repository.ShareholdersRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,21 +51,17 @@ public class BookingsService implements BookingsWriter, BookingsReader {
 
     @Override
     public boolean exists(final Booking booking) {
-        return shareholdersRepository.findById(booking.getShareholderId())
-                .filter(shareholder -> bookingsRepository.exists(
-                        Example.of(
-                                new BookingEntity(
-                                        null,
-                                        null,
-                                        shareholder,
-                                        booking.getDate(),
-                                        booking.getType(),
-                                        null,
-                                        booking.getComment(),
-                                        null
-                                )
-                        )
-                )).isPresent();
+        final ShareholderEntity shareholderEntity = shareholdersRepository.findById(booking.getShareholderId()).orElse(null);
+        if (shareholderEntity == null) {
+            return false;
+        }
+        return bookingsRepository.existsByShareholderAndDateAndTypeAndCommentAndIdNot(
+                shareholderEntity,
+                booking.getDate(),
+                booking.getType(),
+                booking.getComment(),
+                booking.getId()
+        );
     }
 
     @Transactional

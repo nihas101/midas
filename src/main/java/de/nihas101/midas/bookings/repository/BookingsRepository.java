@@ -20,9 +20,17 @@ public interface BookingsRepository extends JpaRepository<BookingEntity, Integer
     );
 
     BookingEntity findFirstByShareholderAndDateAndTypeAndSource(
-            ShareholderEntity shareholder,
-            LocalDate endOfYear,
-            BookingType bookingType,
-            Source source
+            final ShareholderEntity shareholder,
+            final LocalDate endOfYear,
+            final BookingType bookingType,
+            final Source source
+    );
+
+    boolean existsByShareholderAndDateAndTypeAndCommentAndIdNot(
+            final ShareholderEntity shareholder,
+            final LocalDate date,
+            final BookingType bookingType,
+            final String comment,
+            final Integer id
     );
 }

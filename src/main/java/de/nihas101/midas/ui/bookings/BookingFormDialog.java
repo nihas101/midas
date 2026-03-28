@@ -150,6 +150,9 @@ public class BookingFormDialog extends Dialog {
 
         if (isEditMode) {
             binder.setBean(bookingToEdit);
+            binder.withValidator((b, context) -> bookingsReader.exists(b)
+                    ? ValidationResult.error(messageSource.getMessage("bookings.identity.error", null, locale))
+                    : ValidationResult.ok());
         } else {
             Booking booking = new Booking();
             booking.setDate(LocalDate.now());
@@ -159,10 +162,10 @@ public class BookingFormDialog extends Dialog {
                 shareholderPicker.setValue(initialShareholder);
             }
             binder.setBean(booking);
+            binder.withValidator((b, context) -> bookingsReader.exists(b)
+                    ? ValidationResult.error(messageSource.getMessage("bookings.identity.error", null, locale))
+                    : ValidationResult.ok());
         }
-        binder.withValidator((b, context) -> bookingsReader.exists(b)
-                ? ValidationResult.error(messageSource.getMessage("bookings.identity.error", null, locale))
-                : ValidationResult.ok());
     }
 
     private HorizontalLayout setupButtons(final MessageSource messageSource, final Locale locale) {
