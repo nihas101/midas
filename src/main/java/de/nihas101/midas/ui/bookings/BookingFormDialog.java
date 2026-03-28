@@ -33,8 +33,6 @@ import static de.nihas101.midas.ui.common.DatePickerI18nProvider.datePickerI18n;
 public class BookingFormDialog extends Dialog {
 
     private final BookingsWriter bookingsWriter;
-    private final MessageSource messageSource;
-    private final Locale locale;
     private final Consumer<Booking> onSave;
 
     private final Binder<Booking> binder = new Binder<>(Booking.class);
@@ -48,7 +46,15 @@ public class BookingFormDialog extends Dialog {
             final Shareholder initialShareholder,
             final Consumer<Booking> onSave
     ) {
-        this(shareholdersReader, bookingsWriter, messageSource, locale, initialShareholder, null, onSave);
+        this(
+                shareholdersReader,
+                bookingsWriter,
+                messageSource,
+                locale,
+                initialShareholder,
+                null,
+                onSave
+        );
     }
 
     public BookingFormDialog(
@@ -61,8 +67,6 @@ public class BookingFormDialog extends Dialog {
             final Consumer<Booking> onSave
     ) {
         this.bookingsWriter = bookingsWriter;
-        this.messageSource = messageSource;
-        this.locale = locale;
         this.onSave = onSave;
 
         final boolean isEditMode = bookingToEdit != null;

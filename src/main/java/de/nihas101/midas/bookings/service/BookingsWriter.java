@@ -9,4 +9,6 @@ public interface BookingsWriter {
 
     @Transactional
     void update(Booking booking);
+
+    void delete(Booking booking);
 }

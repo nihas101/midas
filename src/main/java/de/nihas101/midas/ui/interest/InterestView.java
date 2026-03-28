@@ -206,10 +206,11 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
             final Integer year,
             final InterestCalculation interestCalculation
     ) {
-        final Booking booking = bookingsService.interestForShareholderAndYear(
+        final Booking booking = bookingsService.systemGeneratedInterestForShareholderAndYear(
                 shareholder.getId(),
                 year
         );
+        // TODO: Extract this logic into the service. On interest update -> trigger
         if (booking != null) {
             log.info("Updating interest booking: {}", booking); // TODO: remove
             // TODO: This mutates the object! Handle this differently

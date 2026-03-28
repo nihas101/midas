@@ -35,7 +35,7 @@ public class BookingsService implements BookingsWriter, BookingsReader {
     // TODO: Can be extracted into separate class
     // -- INTEREST RELATED --
     @Override
-    public Booking interestForShareholderAndYear(final Integer shareholderId, final Integer year) {
+    public Booking systemGeneratedInterestForShareholderAndYear(final Integer shareholderId, final Integer year) {
         final ShareholderEntity shareholder = shareholdersRepository.findById(shareholderId)
                 .orElseThrow(() -> new IllegalArgumentException("Shareholder not found")); // TODO: i18n
 
@@ -108,7 +108,7 @@ public class BookingsService implements BookingsWriter, BookingsReader {
     @Transactional
     @Override
     public void create(final Booking booking) {
-        if (booking.getId() != null) {
+        if (booking.getId() != null) { // TODO: Move this into a wrapper, so this always happens first
             throw new IllegalArgumentException("BookingService#create with booking.getId() != null"); // TODO: i18n
         }
         upsertEntity(booking);

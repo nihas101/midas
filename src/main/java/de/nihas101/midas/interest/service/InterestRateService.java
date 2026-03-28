@@ -8,14 +8,12 @@ import de.nihas101.midas.shareholders.repository.ShareholdersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.Year;
 
 @Service
 @RequiredArgsConstructor
 public class InterestRateService {
 
-    private static final BigDecimal MULTIPLIER = new BigDecimal("10000"); // TODO: Is this right? Also use it (but in the entity or dto)
     private final InterestRateRepository interestRateRepository;
     private final ShareholdersRepository shareholdersRepository;
 

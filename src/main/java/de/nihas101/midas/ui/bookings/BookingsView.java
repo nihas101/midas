@@ -21,7 +21,10 @@ import de.nihas101.midas.bookings.dto.Booking;
 import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.bookings.entity.Source;
+import de.nihas101.midas.bookings.service.BookingsReader;
 import de.nihas101.midas.bookings.service.BookingsService;
+import de.nihas101.midas.bookings.service.BookingsWriter;
+import de.nihas101.midas.bookings.service.InterestUpdatingBookingsService;
 import de.nihas101.midas.config.MidasConfig;
 import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.openingbalance.dto.OpeningBalance;
@@ -58,7 +61,8 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
     public static final VaadinIcon icon = VaadinIcon.BOOK_DOLLAR;
 
     private final ShareholdersService shareholdersService;
-    private final BookingsService bookingsService;
+    private final BookingsReader bookingsReader;
+    private final BookingsWriter bookingsWriter;
     private final OpeningBalanceService openingBalanceService;
     private final MessageSource messageSource;
 
@@ -70,7 +74,8 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
 
     public BookingsView(
             final ShareholdersService shareholdersService,
-            final BookingsService bookingsService,
+            final BookingsService bookingsReader,
+            final InterestUpdatingBookingsService bookingsWriter,
             final OpeningBalanceService openingBalanceService,
             final MidasConfig config,
             final MessageSource messageSource,
@@ -79,7 +84,8 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
     ) {
         super(config, userConfigService, messageSource, midasLocaleResolver);
         this.shareholdersService = shareholdersService;
-        this.bookingsService = bookingsService;
+        this.bookingsReader = bookingsReader;
+        this.bookingsWriter = bookingsWriter;
         this.openingBalanceService = openingBalanceService;
         this.messageSource = messageSource;
 
@@ -186,7 +192,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                 e -> {
                     final BookingFormDialog bookingFormDialog = new BookingFormDialog(
                             shareholdersService,
-                            bookingsService,
+                            bookingsWriter,
                             messageSource,
                             getLocale(),
                             shareholderPicker.getValue(),
@@ -283,7 +289,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
             } else {
                 new BookingFormDialog(
                         shareholdersService,
-                        bookingsService,
+                        bookingsWriter,
                         messageSource,
                         getLocale(),
                         shareholderPicker.getValue(),
@@ -321,7 +327,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         dialog.setConfirmText(messageSource.getMessage("global.delete", null, getLocale()));
         dialog.setConfirmButtonTheme("error primary");
         dialog.addConfirmListener(event -> {
-            bookingsService.delete(booking);
+            bookingsWriter.delete(booking);
             refreshGrid();
         });
         return dialog;
@@ -376,7 +382,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
             openingBalanceField.setValue(BigDecimal.ZERO);
         }
 
-        Bookings bookings = bookingsService.bookingsForShareholderAndYear(shareholder.getId(), year); // TODO: Pass in Year class!
+        Bookings bookings = bookingsReader.bookingsForShareholderAndYear(shareholder.getId(), year); // TODO: Pass in Year class!
         grid.setItems(createRows(bookings));
     }
 
