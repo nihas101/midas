@@ -15,7 +15,10 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
-import de.nihas101.midas.bookings.service.BookingsService;
+import de.nihas101.midas.accountstatement.dto.AccountStatement;
+import de.nihas101.midas.accountstatement.dto.AccountStatements;
+import de.nihas101.midas.accountstatement.service.AccountStatementService;
+import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.config.MidasConfig;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersService;
@@ -28,6 +31,13 @@ import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 
+import java.time.Year;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+
 @Slf4j
 @Route("account-statements")
 @PageTitle("Account Statements")
@@ -36,7 +46,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
     public static final VaadinIcon icon = VaadinIcon.WALLET;
 
     private final ShareholdersService shareholdersService;
-    private final BookingsService bookingsService;
+    private final AccountStatementService accountStatementService;
     private final MessageSource messageSource;
     private ComboBox<Shareholder> shareholderPicker;
     private ComboBox<Integer> yearPicker;
@@ -44,7 +54,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
 
     public AccountStatementView(
             final ShareholdersService shareholdersService,
-            final BookingsService bookingsService,
+            final AccountStatementService accountStatementService,
             final MidasConfig config,
             final MessageSource messageSource,
             final UserConfigService userConfigService,
@@ -52,7 +62,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
     ) {
         super(config, userConfigService, messageSource, midasLocaleResolver);
         this.shareholdersService = shareholdersService;
-        this.bookingsService = bookingsService;
+        this.accountStatementService = accountStatementService;
         this.messageSource = messageSource;
 
         VerticalLayout content = new VerticalLayout();
@@ -114,7 +124,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                         queryParameters = queryParameters.excluding(QUERY_PARAM_SHAREHOLDER);
                     }
                     UI.getCurrent().navigate(AccountStatementView.class, queryParameters);
-                    //refreshGrid();
+                    refreshGrid();
                 }
         );
         yearPicker = new YearPicker(
@@ -129,7 +139,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                         queryParameters = queryParameters.excluding(QUERY_PARAM_YEAR);
                     }
                     UI.getCurrent().navigate(AccountStatementView.class, queryParameters);
-                    //refreshGrid();
+                    refreshGrid();
                 }
         );
 
@@ -143,9 +153,29 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
 
         setupColumn(grid.addColumn(AccountStatementRow::displayId), "account-statements.table.id", ColumnTextAlign.START);
         setupColumn(grid.addColumn(AccountStatementRow::dateStr), "account-statements.table.date", ColumnTextAlign.START);
-        setupColumn(grid.addColumn(AccountStatementRow::bookingType), "account-statements.table.type", ColumnTextAlign.START);
-        setupColumn(grid.addColumn(AccountStatementRow::debit), "account-statements.table.debit", ColumnTextAlign.END);
-        setupColumn(grid.addColumn(AccountStatementRow::credit), "account-statements.table.credit", ColumnTextAlign.END);
+        setupColumn(
+                grid.addColumn(
+                        asr -> messageSource.getMessage(
+                                asr.bookingType().getAccountStatementI18nKey(),
+                                null,
+                                getLocale()
+                        )
+                ),
+                "account-statements.table.type",
+                ColumnTextAlign.START
+        );
+        setupColumn(grid.addColumn(
+                accountStatementRow -> Optional.of(accountStatementRow)
+                        .map(AccountStatementRow::debit)
+                        .map(m -> m.format(getLocale()))
+                        .orElse("")
+        ), "account-statements.table.debit", ColumnTextAlign.END);
+        setupColumn(grid.addColumn(
+                accountStatementRow -> Optional.of(accountStatementRow)
+                        .map(AccountStatementRow::credit)
+                        .map(m -> m.format(getLocale()))
+                        .orElse("")
+        ), "account-statements.table.credit", ColumnTextAlign.END);
         setupColumn(grid.addColumn(AccountStatementRow::balance), "account-statements.table.balance", ColumnTextAlign.END);
 
         content.add(grid);
@@ -167,6 +197,33 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                 .setResizable(true)
                 .setTextAlign(columnTextAlign)
                 .setHeader(header);
+    }
+
+    private void refreshGrid() {
+        Shareholder shareholder = shareholderPicker.getValue();
+        Integer yearValue = yearPicker.getValue();
+
+        final boolean hasSelection = shareholder != null && yearValue != null;
+        if (!hasSelection) {
+            grid.setItems(new ArrayList<>());
+            return;
+        }
+
+        final AccountStatements accountStatements = accountStatementService.accountStatement(shareholder, Year.of(yearValue));
+        grid.setItems(createRows(accountStatements));
+    }
+
+    private List<AccountStatementRow> createRows(final AccountStatements accountStatements) {
+        List<AccountStatementRow> rows = new ArrayList<>();
+
+        for (BookingType bookingType : Arrays.stream(BookingType.values()).sorted(Comparator.comparingInt(BookingType::getSortKey)).toList()) {
+            final AccountStatement accountStatement = accountStatements.forType(bookingType);
+            if (accountStatement != null) {
+                rows.add(new DefaultAccountStatementRow(accountStatement));
+            }
+        }
+
+        return rows;
     }
 
     public static Icon icon() {
