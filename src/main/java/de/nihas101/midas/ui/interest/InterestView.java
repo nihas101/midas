@@ -325,7 +325,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
                 List.of(
                         new ZinszahlSumRow(interestCalculation.interestSum()),
                         new DivisorRow(interestCalculation.divisor()),
-                        new InterestRow(interestCalculation.interest()), // TODO: This should be persisted in the bookings
+                        new InterestRow(interestCalculation.interest()),
                         new FinalSumRow(
                                 Year.of(year).atMonth(Month.DECEMBER).atEndOfMonth(),
                                 interestCalculation.finalSum()

@@ -192,6 +192,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                 e -> {
                     final BookingFormDialog bookingFormDialog = new BookingFormDialog(
                             shareholdersService,
+                            bookingsReader,
                             bookingsWriter,
                             messageSource,
                             getLocale(),
@@ -289,6 +290,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
             } else {
                 new BookingFormDialog(
                         shareholdersService,
+                        bookingsReader,
                         bookingsWriter,
                         messageSource,
                         getLocale(),

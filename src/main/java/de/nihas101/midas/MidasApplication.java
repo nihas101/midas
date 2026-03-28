@@ -27,8 +27,6 @@ public class MidasApplication implements AppShellConfigurator {
     //       frontend (+ project that combines them all)
 
     public static void main(String[] args) {
-        // TODO: Test this on windows to see if it works
-        // TODO: Shut down application when no connection to a client is left
         // TODO: Add tooltips everywhere
         // TODO: Try importing dbf files
         // TODO: Add support for imports via some kind of (xml?) file that defines the inputs and mappings

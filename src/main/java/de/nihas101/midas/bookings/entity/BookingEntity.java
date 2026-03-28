@@ -58,8 +58,6 @@ public class BookingEntity {
     @Column(name = "source", nullable = false)
     private Source source = Source.USER;
 
-    // TODO: Make it so the interest calculation only updates the system generated interest
-
     public static BookingEntity fromDto(
             final Booking booking,
             final ShareholderEntity shareholder

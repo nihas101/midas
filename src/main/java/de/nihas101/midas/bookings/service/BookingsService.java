@@ -12,6 +12,7 @@ import de.nihas101.midas.openingbalance.repository.OpeningBalanceRepository;
 import de.nihas101.midas.shareholders.entity.ShareholderEntity;
 import de.nihas101.midas.shareholders.repository.ShareholdersRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -99,6 +100,25 @@ public class BookingsService implements BookingsWriter, BookingsReader {
                 bookings,
                 openingBalance
         );
+    }
+
+    @Override
+    public boolean exists(final Booking booking) {
+        return shareholdersRepository.findById(booking.getShareholderId())
+                .filter(shareholder -> bookingsRepository.exists(
+                        Example.of(
+                                new BookingEntity(
+                                        null,
+                                        null,
+                                        shareholder,
+                                        booking.getDate(),
+                                        booking.getType(),
+                                        null,
+                                        booking.getComment(),
+                                        null
+                                )
+                        )
+                )).isPresent();
     }
 
     private LocalDate endOfYear(final Integer year) {

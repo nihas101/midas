@@ -18,7 +18,6 @@ public class DefaultAccountStatements implements AccountStatements {
     private final Year year;
     private final OpeningBalance openingBalance;
 
-    // TODO: Turn into constructor
     public static DefaultAccountStatements fromEntity(
             final List<AccountStatementEntity> accountStatementEntities,
             final Year year,

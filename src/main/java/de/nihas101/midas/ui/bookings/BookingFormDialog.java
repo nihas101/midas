@@ -12,17 +12,23 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.BinderValidationStatus;
+import com.vaadin.flow.data.binder.ValidationResult;
+import com.vaadin.flow.data.binder.Validator;
 import de.nihas101.midas.bookings.dto.Booking;
 import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.bookings.entity.Source;
+import de.nihas101.midas.bookings.service.BookingsReader;
 import de.nihas101.midas.bookings.service.BookingsWriter;
 import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersReader;
 import de.nihas101.midas.ui.common.CancelButton;
 import de.nihas101.midas.ui.common.SaveButton;
+import io.micrometer.common.util.StringUtils;
 import org.springframework.context.MessageSource;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
@@ -30,6 +36,7 @@ import java.util.function.Consumer;
 
 import static de.nihas101.midas.ui.common.DatePickerI18nProvider.datePickerI18n;
 
+// TODO: Separate into edit and create variants
 public class BookingFormDialog extends Dialog {
 
     private final BookingsWriter bookingsWriter;
@@ -37,9 +44,12 @@ public class BookingFormDialog extends Dialog {
 
     private final Binder<Booking> binder = new Binder<>(Booking.class);
     private final Checkbox addAnotherCheckbox;
+    private final MessageSource messageSource;
+    private final Locale locale;
 
     public BookingFormDialog(
             final ShareholdersReader shareholdersReader,
+            final BookingsReader bookingsReader,
             final BookingsWriter bookingsWriter,
             final MessageSource messageSource,
             final Locale locale,
@@ -48,6 +58,7 @@ public class BookingFormDialog extends Dialog {
     ) {
         this(
                 shareholdersReader,
+                bookingsReader,
                 bookingsWriter,
                 messageSource,
                 locale,
@@ -59,6 +70,7 @@ public class BookingFormDialog extends Dialog {
 
     public BookingFormDialog(
             final ShareholdersReader shareholdersReader,
+            final BookingsReader bookingsReader,
             final BookingsWriter bookingsWriter,
             final MessageSource messageSource,
             final Locale locale,
@@ -67,6 +79,8 @@ public class BookingFormDialog extends Dialog {
             final Consumer<Booking> onSave
     ) {
         this.bookingsWriter = bookingsWriter;
+        this.messageSource = messageSource;
+        this.locale = locale;
         this.onSave = onSave;
 
         final boolean isEditMode = bookingToEdit != null;
@@ -117,6 +131,9 @@ public class BookingFormDialog extends Dialog {
         amountField.setSuffixComponent(new Span("€")); // TODO: currency from config?
         binder.forField(amountField)
                 .asRequired()
+                .withValidator((Validator<BigDecimal>) (value, context) -> value.longValue() != 0L
+                        ? ValidationResult.ok()
+                        : ValidationResult.error(messageSource.getMessage("bookings.amount.error", null, locale)))
                 .withConverter(
                         MoneyAmount::of,
                         m -> m != null ? m.toBigDecimalForInput() : null
@@ -143,10 +160,13 @@ public class BookingFormDialog extends Dialog {
             }
             binder.setBean(booking);
         }
+        binder.withValidator((b, context) -> bookingsReader.exists(b)
+                ? ValidationResult.error(messageSource.getMessage("bookings.identity.error", null, locale))
+                : ValidationResult.ok());
     }
 
     private HorizontalLayout setupButtons(final MessageSource messageSource, final Locale locale) {
-        SaveButton saveButton = new SaveButton(messageSource.getMessage("bookings.dialog.save", null, locale), e -> save());
+        final SaveButton saveButton = new SaveButton(messageSource.getMessage("bookings.dialog.save", null, locale), e -> save());
         CancelButton cancelButton = new CancelButton(messageSource.getMessage("bookings.dialog.cancel", null, locale), e -> close());
         final HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.add(saveButton, cancelButton);
@@ -171,7 +191,14 @@ public class BookingFormDialog extends Dialog {
     }
 
     private void save() {
-        if (!binder.validate().isOk()) {
+        final BinderValidationStatus<Booking> validationStatus = binder.validate();
+        if (!validationStatus.isOk()) {
+            validationStatus.getValidationErrors()
+                    .stream()
+                    .map(ValidationResult::getErrorMessage)
+                    .filter(StringUtils::isNotBlank)
+                    .findFirst()
+                    .ifPresent(Notification::show);
             return;
         }
 
@@ -190,7 +217,7 @@ public class BookingFormDialog extends Dialog {
                 close();
             }
         } catch (Exception e) {
-            Notification.show("Error saving booking: " + e.getMessage()); // TODO: i18n
+            Notification.show(messageSource.getMessage("bookings.save.error", new Object[]{e.getMessage()}, locale));
         }
     }
 

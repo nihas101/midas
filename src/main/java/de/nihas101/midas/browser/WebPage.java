@@ -2,7 +2,7 @@ package de.nihas101.midas.browser;
 
 import java.io.IOException;
 
-public class WebPage { // TODO: Clean up this class
+public class WebPage {
 
     private final String url;
 

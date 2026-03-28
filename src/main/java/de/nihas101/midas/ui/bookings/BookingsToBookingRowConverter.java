@@ -41,7 +41,7 @@ public class BookingsToBookingRowConverter {
 
         final Map<String, List<Booking>> groupedByEntry = monthBookings.bookings()
                 .stream()
-                .collect(Collectors.groupingBy(b -> b.getDate().toString()));
+                .collect(Collectors.groupingBy(b -> b.getDate().toString() + "_" + (b.getComment() != null ? b.getComment() : "")));
 
         // Sort by date
         final List<String> sortedEntryKeys = groupedByEntry.keySet().stream().sorted().toList();

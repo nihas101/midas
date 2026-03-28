@@ -9,4 +9,6 @@ public interface BookingsReader {
     Bookings interestRelatedBookingsForShareholderAndYear(final Integer shareholderId, final Integer year);
 
     Bookings bookingsForShareholderAndYear(Integer shareholderId, Integer year);
+
+    boolean exists(Booking booking);
 }
