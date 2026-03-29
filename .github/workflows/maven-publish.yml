@@ -42,8 +42,6 @@ jobs:
           VERSION=${VERSION#v}
           mkdir midas-distribution
           cp target/midas.jar midas-distribution/
-          cp distribution/midas.bat midas-distribution/
-          cp distribution/midas.sh midas-distribution/
           zip -r midas-$VERSION.zip midas-distribution/
 
       - name: Upload Release Assets
