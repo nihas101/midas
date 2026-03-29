@@ -40,6 +40,6 @@ public class LocaleSelect extends Select<Locale> {
     }
 
     private boolean isVisible(final MidasConfig config) {
-        return !config.getUi().isHideLanguageSelector() || config.getI18n().isForceDefaultLanguage();
+        return !config.getUi().isHideLanguageSelector() && !config.getI18n().isForceDefaultLanguage();
     }
 }

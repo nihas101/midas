@@ -7,7 +7,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class UIConfig {
     private boolean hideThemeToggle;
-    boolean hideLanguageSelector;
+    private boolean hideLanguageSelector;
 
     public UIConfig() {
         this(false, false);
