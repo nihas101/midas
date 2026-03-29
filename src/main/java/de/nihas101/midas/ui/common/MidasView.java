@@ -50,7 +50,7 @@ public class MidasView extends AppLayout {
         navbarContent.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
         navbarContent.setAlignItems(FlexComponent.Alignment.CENTER);
 
-        final H1 title = new H1(messageSource.getMessage("application.tile", null, locale));
+        final H1 title = new H1(config.getTitle());
         title.getStyle().set("margin-left", "var(--lumo-space-m)");
 
         final Navbar navbar = new Navbar();
