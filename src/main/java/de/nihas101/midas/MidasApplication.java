@@ -20,6 +20,10 @@ import java.util.Properties;
 @EnableConfigurationProperties
 public class MidasApplication implements AppShellConfigurator {
 
+    // TODO: Create a private repository that defines mappings specific to the client
+    //       i.e. rename midas -> GSHB
+    //       Set everything necessary in the application properties etc.
+
     // TODO: Think about splitting this project into multiple modules
     //       sqlite persistence module
     //       persistance interface module

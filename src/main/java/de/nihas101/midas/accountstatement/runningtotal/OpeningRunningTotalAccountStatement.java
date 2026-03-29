@@ -2,13 +2,17 @@ package de.nihas101.midas.accountstatement.runningtotal;
 
 import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.openingbalance.dto.OpeningBalance;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import org.springframework.context.MessageSource;
 
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Locale;
 
+@ToString
+@EqualsAndHashCode
 @RequiredArgsConstructor
 public class OpeningRunningTotalAccountStatement implements RunningTotalAccountStatement {
 

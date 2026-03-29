@@ -5,13 +5,17 @@ import de.nihas101.midas.accountstatement.dto.AccountStatements;
 import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.openingbalance.dto.OpeningBalance;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@ToString
+@EqualsAndHashCode
 @RequiredArgsConstructor
-public class DefaultRunningTotalAccountStatements implements RunningTotalAccountStatements { // TODO: Test
+public class DefaultRunningTotalAccountStatements implements RunningTotalAccountStatements {
 
     // TODO: Don't expose this
     private final List<RunningTotalAccountStatement> runningTotalAccountStatements;
@@ -41,7 +45,6 @@ public class DefaultRunningTotalAccountStatements implements RunningTotalAccount
                     )
             );
         }
-
     }
 
     @Override

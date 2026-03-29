@@ -44,12 +44,11 @@ public class AccountStatementService {
                 .map(OpeningBalance::fromEntity)
                 .orElse(null);
 
-        return DefaultAccountStatements.fromEntity(accountStatementEntities, year, openingBalance);
+        return new DefaultAccountStatements(accountStatementEntities, year, openingBalance);
     }
 
     public RunningTotalAccountStatements runningTotalAccountStatements(final Shareholder shareholder, final Year year) {
         final AccountStatements accountStatements = this.accountStatements(shareholder, year);
-
         return new DefaultRunningTotalAccountStatements(
                 accountStatements,
                 TYPE_ORDER
