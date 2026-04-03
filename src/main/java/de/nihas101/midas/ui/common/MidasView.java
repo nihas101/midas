@@ -68,6 +68,7 @@ public class MidasView extends AppLayout {
                 createMenuLink(SettingsView.icon(), messageSource.getMessage("settings", null, locale), SettingsView.class)
         );
         addToDrawer(drawerContent);
+        setDrawerOpened(false);
     }
 
     private RouterLink createMenuLink(
