@@ -13,6 +13,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import de.nihas101.midas.config.MidasConfig;
 import de.nihas101.midas.ui.accountstatement.AccountStatementView;
+import de.nihas101.midas.ui.backup.BackupView;
 import de.nihas101.midas.ui.bookings.BookingsView;
 import de.nihas101.midas.ui.common.MidasView;
 import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
@@ -97,7 +98,6 @@ public class MainView extends MidasView {
         );
         */
 
-        /*
         hubGrid.add(
                 createHubCard(
                         BackupView.icon(),
@@ -106,7 +106,6 @@ public class MainView extends MidasView {
                         BackupView.class
                 )
         );
-        */
 
         final VerticalLayout contentLayout = new VerticalLayout(hubGrid);
         contentLayout.setSizeFull();

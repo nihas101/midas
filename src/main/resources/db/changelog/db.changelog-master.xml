@@ -11,4 +11,5 @@
     <include file="db/changelog/003-create-bookings-table.xml"/>
     <include file="db/changelog/004-create-interest-rates-table.xml"/>
     <include file="db/changelog/005-create-opening-balances-table.xml"/>
+    <include file="db/changelog/006-create-backup-status-table.xml"/>
 </databaseChangeLog>
