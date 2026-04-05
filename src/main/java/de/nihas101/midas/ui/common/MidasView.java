@@ -51,7 +51,7 @@ public class MidasView extends AppLayout {
         navbarContent.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
         navbarContent.setAlignItems(FlexComponent.Alignment.CENTER);
 
-        final H1 title = new H1(config.getTitle());
+        final H1 title = new H1(config.getTitle()); // TODO: Also set the menu point as subtitle (or put a h2 element into the content like with the backup)
         title.getStyle().set("margin-left", "var(--lumo-space-m)");
 
         final Navbar navbar = new Navbar();
