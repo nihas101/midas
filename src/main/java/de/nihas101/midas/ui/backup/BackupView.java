@@ -11,7 +11,8 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.server.streams.DownloadHandler;
+import com.vaadin.flow.server.streams.DownloadResponse;
 import de.nihas101.midas.backup.service.BackupFileNameProvider;
 import de.nihas101.midas.backup.service.BackupService;
 import de.nihas101.midas.backup.service.BackupStatusService;
@@ -27,7 +28,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 
 @Slf4j
-@Route(value = "backup", layout = MidasView.class)
+@Route("backup")
 @PageTitle("Backup")
 public class BackupView extends MidasView {
 
@@ -104,11 +105,15 @@ public class BackupView extends MidasView {
             final byte[] backupData = backupService.createBackup();
             final String fileName = fileNameProvider.getBackupFileName();
 
-            // TODO: Replace with something not marked for removal
-            final StreamResource resource = new StreamResource(fileName, () -> new ByteArrayInputStream(backupData));
-
-            // TODO: Replace with something not marked for removal
-            final Anchor downloadAnchor = new Anchor(resource, "");
+            final Anchor downloadAnchor = new Anchor(
+                    DownloadHandler.fromInputStream(e -> new DownloadResponse(
+                            new ByteArrayInputStream(backupData),
+                            fileName,
+                            "application/zip",
+                            backupData.length
+                    )),
+                    ""
+            );
             downloadAnchor.getElement().setAttribute("download", true);
             downloadAnchor.getElement().getStyle().set("display", "none");
             content.add(downloadAnchor);

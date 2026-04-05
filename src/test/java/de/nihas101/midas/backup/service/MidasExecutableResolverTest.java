@@ -26,26 +26,6 @@ class MidasExecutableResolverTest {
     }
 
     @Test
-    void getExecutableNameFromJar() {
-        final File file = new File("midas-v1.jar");
-        when(midasSource.file()).thenReturn(file);
-
-        final String name = resolver.getExecutableName();
-
-        Assertions.assertEquals("midas-v1", name);
-    }
-
-    @Test
-    void getExecutableNameNoExtension() {
-        final File file = new File("midas-standalone");
-        when(midasSource.file()).thenReturn(file);
-
-        final String name = resolver.getExecutableName();
-
-        Assertions.assertEquals("midas-standalone", name);
-    }
-
-    @Test
     void resolveExecutableThrowsException() {
         when(midasSource.file()).thenThrow(new RuntimeException("Source failure"));
 

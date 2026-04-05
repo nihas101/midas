@@ -5,6 +5,7 @@ import de.nihas101.midas.backup.service.snapshot.JarSnapshot;
 import de.nihas101.midas.backup.service.snapshot.MidasSnapshot;
 import de.nihas101.midas.backup.service.snapshot.SqliteDatabaseLocation;
 import de.nihas101.midas.backup.service.snapshot.SqliteSnapshot;
+import de.nihas101.midas.backup.service.snapshot.ZipArchive;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
-import java.util.Set;
 import java.util.zip.ZipOutputStream;
 
 @Slf4j
@@ -43,31 +43,31 @@ public class BackupService { // TODO: Extract interface
         try (
                 final ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 final ZipOutputStream zos = new ZipOutputStream(baos);
-                final MidasSnapshot midasSnapshot = midasSnapshot(zos)
+                final ZipArchive zipArchive = new ZipArchive(baos, zos);
+                final MidasSnapshot midasSnapshot = midasSnapshot(zipArchive)
         ) {
             midasSnapshot.create();
-            zos.finish();
-            final byte[] byteArray = baos.toByteArray();
+            final byte[] byteArray = zipArchive.byteArray();
             backupStatusWriter.updateLastSuccessAt(LocalDateTime.now());
             return byteArray;
         }
     }
 
-    private MidasSnapshot midasSnapshot(final ZipOutputStream zos) {
+    private MidasSnapshot midasSnapshot(final ZipArchive zipArchive) {
         final SqliteDatabaseLocation databaseLocation = new SqliteDatabaseLocation(datasourceUrl);
-        // TODO: Don't pass in the raw ZipOutputStream here, but instead wrap it
         return new MidasSnapshot(
-                Set.of(
-                        new SqliteSnapshot(
-                                jdbcTemplate,
-                                zos,
-                                databaseLocation
-                        ),
-                        new ApplicationPropertiesSnapshot(
-                                zos,
-                                databaseLocation
-                        ),
-                        new JarSnapshot(zos, executableResolver)
+                new SqliteSnapshot(
+                        jdbcTemplate,
+                        zipArchive,
+                        databaseLocation
+                ),
+                new ApplicationPropertiesSnapshot(
+                        zipArchive,
+                        databaseLocation
+                ),
+                new JarSnapshot(
+                        zipArchive,
+                        executableResolver
                 )
         );
     }
