@@ -1,136 +1,131 @@
 package de.nihas101.midas.ui.backup;
 
-import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.router.BeforeEnterEvent;
-import com.vaadin.flow.router.BeforeEnterObserver;
+import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
-import de.nihas101.midas.bookings.service.BookingsService;
+import com.vaadin.flow.server.streams.DownloadHandler;
+import com.vaadin.flow.server.streams.DownloadResponse;
+import de.nihas101.midas.backup.service.BackupFileNameProvider;
+import de.nihas101.midas.backup.service.BackupService;
+import de.nihas101.midas.backup.service.BackupStatusService;
 import de.nihas101.midas.config.MidasConfig;
-import de.nihas101.midas.shareholders.dto.Shareholder;
-import de.nihas101.midas.shareholders.service.ShareholdersService;
 import de.nihas101.midas.ui.common.MidasView;
-import de.nihas101.midas.ui.common.ShareholderPicker;
-import de.nihas101.midas.ui.common.YearPicker;
 import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
 import de.nihas101.midas.userconfig.service.UserConfigService;
-import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
+
+import java.io.ByteArrayInputStream;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 
 @Slf4j
 @Route("backup")
 @PageTitle("Backup")
-public class BackupView extends MidasView implements BeforeEnterObserver { // TODO
+public class BackupView extends MidasView {
+
     public static final VaadinIcon icon = VaadinIcon.DATABASE;
 
-    private final ShareholdersService shareholdersService;
-    private final BookingsService bookingsService;
+    private final BackupService backupService;
+    private final BackupStatusService backupStatusService;
+    private final BackupFileNameProvider fileNameProvider;
     private final MessageSource messageSource;
-    private ComboBox<Shareholder> shareholderPicker;
-    private ComboBox<Integer> yearPicker;
+
+    private final Span lastBackupLabel;
+    private final Button backupButton;
+    private final ProgressBar progressBar;
+    private final Span statusText;
+    private final VerticalLayout content;
 
     public BackupView(
-            final ShareholdersService shareholdersService,
-            final BookingsService bookingsService,
-            final MidasConfig config,
-            final MessageSource messageSource,
+            final MidasConfig midasConfig,
             final UserConfigService userConfigService,
-            final MidasLocaleResolver midasLocaleResolver
+            final MidasLocaleResolver midasLocaleResolver,
+            final BackupService backupService,
+            final BackupStatusService backupStatusService,
+            final BackupFileNameProvider fileNameProvider,
+            final MessageSource messageSource
     ) {
-        super(config, userConfigService, messageSource, midasLocaleResolver);
-        this.shareholdersService = shareholdersService;
-        this.bookingsService = bookingsService;
+        super(
+                midasConfig,
+                userConfigService,
+                messageSource,
+                midasLocaleResolver
+        );
+        this.backupService = backupService;
+        this.backupStatusService = backupStatusService;
+        this.fileNameProvider = fileNameProvider;
         this.messageSource = messageSource;
 
-        VerticalLayout content = new VerticalLayout();
-        content.setSizeFull();
+        content = new VerticalLayout();
 
-        setupHeader(content);
-        //setupGrid(content);
+        content.setSizeFull();
+        content.setPadding(true);
+        content.setSpacing(true);
+
+        content.add(new H2(messageSource.getMessage("backup", null, getLocale())));
+
+        lastBackupLabel = new Span();
+        updateLastBackupLabel();
+        content.add(lastBackupLabel);
+
+        progressBar = new ProgressBar();
+        progressBar.setIndeterminate(true);
+        progressBar.setVisible(false);
+        content.add(progressBar);
+
+        statusText = new Span();
+        statusText.setVisible(false);
+        content.add(statusText);
+
+        backupButton = new Button(messageSource.getMessage("backup.create", null, getLocale()), VaadinIcon.DOWNLOAD.create());
+        backupButton.addClickListener(e -> runBackup());
+        content.add(backupButton);
 
         setContent(content);
     }
 
-    // TODO: Also add these to local storage
-    @Override
-    public void beforeEnter(BeforeEnterEvent event) {
-        event.getLocation().getQueryParameters().getSingleParameter(QUERY_PARAM_SHAREHOLDER)
-                .ifPresent(shareholderId -> {
-                    try {
-                        if (StringUtils.isBlank(shareholderId)) {
-                            return;
-                        }
-                        final Shareholder shareholder = shareholdersService.shareholder(Integer.parseInt(shareholderId));
-                        if (shareholder == null) {
-                            log.warn("Unknown shareholderId: {}. Ignoring parameter.", shareholderId);
-                            return;
-                        }
-                        shareholderPicker.setValue(shareholder);
-                    } catch (NumberFormatException e) {
-                        log.warn("Unparsable shareholderId in query parameter: {}. Ignoring parameter.", shareholderId);
-                    }
-                });
-        event.getLocation().getQueryParameters().getSingleParameter(QUERY_PARAM_YEAR)
-                .ifPresent(year -> {
-                    if (StringUtils.isBlank(year)) {
-                        return;
-                    }
-                    try {
-                        yearPicker.setValue(Integer.parseInt(year));
-                    } catch (NumberFormatException e) {
-                        log.warn("Unparsable year in query parameter: {}. Ignoring parameter.", year);
-                    }
-                });
+    private void updateLastBackupLabel() {
+        String lastBackup = backupStatusService.getLastSuccessAt()
+                .map(dt -> dt.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withLocale(getLocale())))
+                .orElse(messageSource.getMessage("backup.never", null, getLocale()));
+        lastBackupLabel.setText(messageSource.getMessage("backup.last-success", new Object[]{lastBackup}, getLocale()));
     }
 
-    private void setupHeader(final VerticalLayout content) {
-        HorizontalLayout header = new HorizontalLayout();
-        header.setWidthFull();
-        header.setAlignItems(FlexComponent.Alignment.END);
+    private void runBackup() {
+        try {
+            final byte[] backupData = backupService.createBackup();
+            final String fileName = fileNameProvider.getBackupFileName();
 
-        shareholderPicker = new ShareholderPicker(
-                messageSource.getMessage("bookings.shareholder", null, getLocale()),
-                messageSource.getMessage("shareholder-picker.placeholder", null, getLocale()),
-                shareholdersService,
-                e -> {
-                    final Shareholder shareholder = e.getValue();
+            final Anchor downloadAnchor = new Anchor(
+                    DownloadHandler.fromInputStream(e -> new DownloadResponse(
+                            new ByteArrayInputStream(backupData),
+                            fileName,
+                            "application/zip",
+                            backupData.length
+                    )),
+                    ""
+            );
+            downloadAnchor.getElement().setAttribute("download", true);
+            downloadAnchor.getElement().getStyle().set("display", "none");
+            content.add(downloadAnchor);
 
-                    QueryParameters queryParameters = UI.getCurrent().getActiveViewLocation().getQueryParameters();
-                    if (shareholder != null) {
-                        queryParameters = queryParameters.merging(QUERY_PARAM_SHAREHOLDER, String.valueOf(shareholder.getId()));
-                    } else {
-                        queryParameters = queryParameters.excluding(QUERY_PARAM_SHAREHOLDER);
-                    }
-                    UI.getCurrent().navigate(BackupView.class, queryParameters);
-                    //refreshGrid();
-                }
-        );
-        yearPicker = new YearPicker(
-                messageSource.getMessage("bookings.year", null, getLocale()),
-                e -> {
-                    final Integer year = e.getValue();
+            downloadAnchor.getElement().executeJs("this.click();");
 
-                    QueryParameters queryParameters = UI.getCurrent().getActiveViewLocation().getQueryParameters();
-                    if (year != null) {
-                        queryParameters = queryParameters.merging(QUERY_PARAM_YEAR, String.valueOf(String.valueOf(year)));
-                    } else {
-                        queryParameters = queryParameters.excluding(QUERY_PARAM_YEAR);
-                    }
-                    UI.getCurrent().navigate(BackupView.class, queryParameters);
-                    //refreshGrid();
-                }
-        );
-
-        header.add(shareholderPicker, yearPicker);
-        content.add(header);
+            updateLastBackupLabel();
+            Notification.show(messageSource.getMessage("backup.success", null, getLocale()));
+        } catch (Exception e) {
+            log.error("Backup failed", e);
+            Notification.show(messageSource.getMessage("backup.error", new Object[]{e.getMessage()}, getLocale()), 5000, Notification.Position.MIDDLE);
+        }
     }
 
     public static Icon icon() {

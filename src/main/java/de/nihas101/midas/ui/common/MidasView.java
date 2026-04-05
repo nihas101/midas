@@ -13,6 +13,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.RouterLink;
 import de.nihas101.midas.config.MidasConfig;
 import de.nihas101.midas.ui.accountstatement.AccountStatementView;
+import de.nihas101.midas.ui.backup.BackupView;
 import de.nihas101.midas.ui.bookings.BookingsView;
 import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
 import de.nihas101.midas.ui.interest.InterestView;
@@ -64,7 +65,7 @@ public class MidasView extends AppLayout {
                 createMenuLink(AccountStatementView.icon(), messageSource.getMessage("account-statements", null, locale), AccountStatementView.class),
                 createMenuLink(InterestView.icon(), messageSource.getMessage("interest-calculation", null, locale), InterestView.class),
                 //createMenuLink(ExportView.icon(), messageSource.getMessage("export", null, locale), ExportView.class),
-                //createMenuLink(BackupView.icon(), messageSource.getMessage("backup", null, locale), BackupView.class),
+                createMenuLink(BackupView.icon(), messageSource.getMessage("backup", null, locale), BackupView.class),
                 createMenuLink(SettingsView.icon(), messageSource.getMessage("settings", null, locale), SettingsView.class)
         );
         addToDrawer(drawerContent);
