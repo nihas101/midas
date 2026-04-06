@@ -4,6 +4,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -66,6 +67,8 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
 
         VerticalLayout content = new VerticalLayout();
         content.setSizeFull();
+
+        content.add(new H2(messageSource.getMessage("account-statements", null, getLocale())));
 
         setupHeader(content);
         setupAccountStatementGrid(content);
