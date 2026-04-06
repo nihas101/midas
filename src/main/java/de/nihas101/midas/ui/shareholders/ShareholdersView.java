@@ -1,5 +1,6 @@
 package de.nihas101.midas.ui.shareholders;
 
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -35,12 +36,15 @@ public class ShareholdersView extends MidasView {
                 midasLocaleResolver
         );
 
-        final VerticalLayout contentLayout = new VerticalLayout();
-        contentLayout.addClassName("shareholders-view-content");
-        contentLayout.setSizeFull();
-        contentLayout.setAlignItems(FlexComponent.Alignment.START);
-        contentLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.START);
-        contentLayout.add(
+        final VerticalLayout content = new VerticalLayout();
+        content.addClassName("shareholders-view-content");
+        content.setSizeFull();
+        content.setAlignItems(FlexComponent.Alignment.START);
+        content.setJustifyContentMode(FlexComponent.JustifyContentMode.START);
+
+        content.add(new H2(messageSource.getMessage("shareholders", null, getLocale())));
+
+        content.add(
                 new ShareholdersTable(
                         shareholdersService,
                         shareholdersService,
@@ -49,7 +53,7 @@ public class ShareholdersView extends MidasView {
                 )
         );
 
-        setContent(contentLayout);
+        setContent(content);
     }
 
     public static Icon icon() {

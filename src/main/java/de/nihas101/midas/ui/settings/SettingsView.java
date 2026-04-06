@@ -1,5 +1,6 @@
 package de.nihas101.midas.ui.settings;
 
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -34,11 +35,12 @@ public class SettingsView extends MidasView {
                 messageSource,
                 midasLocaleResolver
         );
-        final VerticalLayout verticalLayout = new VerticalLayout();
+        final VerticalLayout content = new VerticalLayout();
+        content.setSpacing(true);
+        content.setPadding(true);
+        content.setAlignItems(FlexComponent.Alignment.START);
 
-        verticalLayout.setSpacing(true);
-        verticalLayout.setPadding(true);
-        verticalLayout.setAlignItems(FlexComponent.Alignment.START);
+        content.add(new H2(messageSource.getMessage("settings", null, getLocale())));
 
         final ThemeToggleButton themeToggleButton = new ThemeToggleButton(
                 config,
@@ -52,8 +54,8 @@ public class SettingsView extends MidasView {
                 userConfigService
         );
 
-        verticalLayout.add(themeToggleButton, localeSelect);
-        setContent(verticalLayout);
+        content.add(themeToggleButton, localeSelect);
+        setContent(content);
     }
 
     public static Icon icon() {

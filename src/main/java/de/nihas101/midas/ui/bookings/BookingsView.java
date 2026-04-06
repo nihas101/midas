@@ -5,6 +5,7 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -93,6 +94,8 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
 
         VerticalLayout content = new VerticalLayout();
         content.setSizeFull();
+
+        content.add(new H2(messageSource.getMessage("bookings", null, getLocale())));
 
         setupHeader(content);
         setupGrid(content);
