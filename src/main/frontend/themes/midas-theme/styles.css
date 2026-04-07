@@ -22,9 +22,18 @@ vaadin-grid::part(month-content) {
   border-bottom: none !important;
 }
 
-vaadin-grid::part(month-separator) {
+vaadin-grid::part(single-separator) {
   border-top: none !important;
   border-bottom: 1px solid var(--lumo-contrast-10pct) !important;
+}
+
+vaadin-grid::part(double-separator) {
+  border-top: none !important;
+  border-bottom: 3px double var(--lumo-contrast-10pct) !important;
+}
+
+vaadin-grid::part(header-cell) {
+  border-bottom: 3px double var(--lumo-contrast-10pct);
 }
 
 vaadin-grid::part(total-column) {

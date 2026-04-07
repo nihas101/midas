@@ -5,6 +5,7 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
@@ -241,6 +242,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         grid.setSizeFull();
         grid.setEmptyStateText(messageSource.getMessage("bookings.table.empty-state-text", null, getLocale()));
         grid.setPartNameGenerator(BookingRow::partName);
+        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
 
         setupColumn(grid.addColumn(BookingRow::displayId), "bookings.table.id", ColumnTextAlign.START);
         setupColumn(grid.addColumn(BookingRow::dateStr), "bookings.table.date", ColumnTextAlign.START);

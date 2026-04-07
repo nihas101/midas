@@ -17,4 +17,8 @@ public interface AccountStatementRow {
     MoneyAmount credit();
 
     MoneyAmount balance();
+
+    default String partName() {
+        return "month-content";
+    }
 }

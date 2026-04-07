@@ -96,6 +96,6 @@ public class CumulativeSummaryBookingRow implements BookingRow {
 
     @Override
     public String partName() {
-        return "month-separator"; // TODO: This is used to add top and bottom separators
+        return "single-separator";
     }
 }

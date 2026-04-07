@@ -4,6 +4,8 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
@@ -156,6 +158,8 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         accountStatementGrid.setEmptyStateText(messageSource.getMessage("bookings.table.empty-state-text", null, getLocale()));
         accountStatementGrid.setWidthFull();
         accountStatementGrid.setAllRowsVisible(true);
+        accountStatementGrid.setPartNameGenerator(AccountStatementRow::partName);
+        accountStatementGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
 
         setupColumn(accountStatementGrid.addColumn(AccountStatementRow::displayId), "account-statements.table.id", ColumnTextAlign.START);
         setupColumn(accountStatementGrid.addColumn(AccountStatementRow::dateStr), "account-statements.table.date", ColumnTextAlign.START);
@@ -164,35 +168,50 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                 "account-statements.table.type",
                 ColumnTextAlign.START
         );
-        setupColumn(accountStatementGrid.addColumn(
+        final Grid.Column<AccountStatementRow> debitColumn = accountStatementGrid.addColumn(
                 accountStatementRow -> Optional.of(accountStatementRow)
                         .map(AccountStatementRow::debit)
                         .map(m -> m.format(getLocale()))
                         .orElse("")
-        ), "account-statements.table.debit", ColumnTextAlign.END);
-        setupColumn(accountStatementGrid.addColumn(
+        );
+        debitColumn.setPartNameGenerator(r -> "booking-type-column"); // TODO: Think of a better name for this part
+        setupColumn(debitColumn, "account-statements.table.debit", ColumnTextAlign.END);
+
+        final Grid.Column<AccountStatementRow> creditColumn = accountStatementGrid.addColumn(
                 accountStatementRow -> Optional.of(accountStatementRow)
                         .map(AccountStatementRow::credit)
                         .map(m -> m.format(getLocale()))
                         .orElse("")
-        ), "account-statements.table.credit", ColumnTextAlign.END);
-        setupColumn(
-                accountStatementGrid.addColumn(
-                        accountStatementRow -> Optional.of(accountStatementRow)
-                                .map(AccountStatementRow::balance)
-                                .map(m -> m.format(getLocale()))
-                                .orElse("")
-                ), "account-statements.table.balance",
-                ColumnTextAlign.END
         );
+        creditColumn.setPartNameGenerator(r -> "booking-type-column"); // TODO: Think of a better name for this part
+        setupColumn(creditColumn, "account-statements.table.credit", ColumnTextAlign.END);
+
+        final Grid.Column<AccountStatementRow> balanceColumn = accountStatementGrid.addColumn(
+                accountStatementRow -> Optional.of(accountStatementRow)
+                        .map(AccountStatementRow::balance)
+                        .map(m -> m.format(getLocale()))
+                        .orElse("")
+        );
+        balanceColumn.setPartNameGenerator(r -> "booking-type-column"); // TODO: Think of a better name for this part
+        setupColumn(balanceColumn, "account-statements.table.balance", ColumnTextAlign.END);
 
         content.add(accountStatementGrid);
+
+        // Header parts for vertical separators
+        final HeaderRow headerRow = accountStatementGrid.getHeaderRows().getFirst();
+        headerRow.getCell(debitColumn).setPartName("booking-type-column");
+        headerRow.getCell(creditColumn).setPartName("booking-type-column");
+        headerRow.getCell(balanceColumn).setPartName("booking-type-column");
     }
 
     private void setupClosingStatementGrid(final VerticalLayout content) {
+        content.setSpacing(false);
         closingStatementGrid = new Grid<>();
         closingStatementGrid.setWidthFull();
         closingStatementGrid.setAllRowsVisible(true);
+        closingStatementGrid.setPartNameGenerator(AccountStatementRow::partName);
+        closingStatementGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+
         final Grid.Column<AccountStatementRow> dateColumn = closingStatementGrid.addColumn(AccountStatementRow::dateStr);
         dateColumn.setWidth("75%");
         dateColumn.setTextAlign(ColumnTextAlign.END);

@@ -58,4 +58,9 @@ public class ClosingAccountStatementRow implements AccountStatementRow {
     public MoneyAmount balance() {
         return closingBalance;
     }
+
+    @Override
+    public String partName() {
+        return "double-separator";
+    }
 }
