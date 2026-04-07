@@ -413,6 +413,16 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         MoneyAmount currentBalance = bookings.openingBalance()
                 .getOpeningBalance();
 
+        // TODO: Just just a stream with a filter here, separate out the final month and treat it separately
+        //  i.e. just pass in the separator it should use, or make this behavior a wrapper that overrides the part method
+        final List<Month> monthsWithBookings = new ArrayList<>();
+        for (Month month : Month.values()) {
+            // TODO: Only calculate bookingsInMonth once and pass it to the BookingsToBookingRowConverter
+            if (!bookings.bookingsInMonth(month).bookings().isEmpty()) {
+                monthsWithBookings.add(month);
+            }
+        }
+
         for (Month month : Month.values()) {
             final List<BookingRow> bookingRows = new BookingsToBookingRowConverter(bookings, month, currentBalance).bookingRows();
 
@@ -428,12 +438,16 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                                 month
                         )
                 );
+
+                // TODO: This is not good, see comment above on how to handle this smarter
+                final String partName = month.equals(monthsWithBookings.getLast()) ? "double-separator" : "single-separator";
                 rows.add(
                         new CumulativeSummaryBookingRow(
                                 "",
                                 messageSource.getMessage("bookings.table.summary.cumulative", null, getLocale()),
                                 bookings,
-                                month
+                                month,
+                                partName
                         )
                 );
             }

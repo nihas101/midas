@@ -21,15 +21,17 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BookingsToBookingRowConverter {
 
-    private final Bookings bookings;
-    private final Month month;
+    private final MonthlyBookings monthBookings;
     private final MoneyAmount startingBalance;
     private final DateTimeFormatter dateFormat;
 
-    public BookingsToBookingRowConverter(Bookings bookings, Month month, MoneyAmount startingBalance) {
+    public BookingsToBookingRowConverter(
+            final Bookings bookings,
+            final Month month,
+            final MoneyAmount startingBalance
+    ) {
         this(
-                bookings,
-                month,
+                bookings.bookingsInMonth(month),
                 startingBalance,
                 DateTimeFormatter.ofPattern("dd.MM")
         );
@@ -37,8 +39,6 @@ public class BookingsToBookingRowConverter {
 
     // TODO: Wrap this list and merge the logic here into that class
     public List<BookingRow> bookingRows() {
-        final MonthlyBookings monthBookings = bookings.bookingsInMonth(month);
-
         final Map<String, List<Booking>> groupedByEntry = monthBookings.bookings()
                 .stream()
                 .collect(Collectors.groupingBy(b -> b.getDate().toString() + "_" + (b.getComment() != null ? b.getComment() : "")));
