@@ -52,8 +52,10 @@ import java.time.Month;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static com.vaadin.flow.component.button.ButtonVariant.LUMO_ERROR;
 
@@ -410,49 +412,65 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
 
     private List<BookingRow> monthlySummaryRows(final Bookings bookings) {
         final List<BookingRow> rows = new ArrayList<>();
-        MoneyAmount currentBalance = bookings.openingBalance()
-                .getOpeningBalance();
+        final AtomicReference<MoneyAmount> currentBalance = new AtomicReference<>(
+                bookings.openingBalance()
+                        .getOpeningBalance()
+        );
 
-        // TODO: Just just a stream with a filter here, separate out the final month and treat it separately
-        //  i.e. just pass in the separator it should use, or make this behavior a wrapper that overrides the part method
-        final List<Month> monthsWithBookings = new ArrayList<>();
-        for (Month month : Month.values()) {
-            // TODO: Only calculate bookingsInMonth once and pass it to the BookingsToBookingRowConverter
-            if (!bookings.bookingsInMonth(month).bookings().isEmpty()) {
-                monthsWithBookings.add(month);
-            }
-        }
+        final List<Month> months = Arrays.stream(Month.values())
+                // TODO: Only calculate bookingsInMonth once and pass it to the BookingsToBookingRowConverter
+                .filter(m -> !bookings.bookingsInMonth(m).bookings().isEmpty())
+                .toList();
+        months.stream()
+                .limit(months.size() - 1)
+                .forEach(month -> {
+                    final CumulativeSummaryBookingRow summaryBookingRow = generateBookingRows(
+                            bookings,
+                            month,
+                            currentBalance.get(),
+                            rows,
+                            "single-separator"
+                    );
+                    currentBalance.set(summaryBookingRow.balance());
+                });
 
-        for (Month month : Month.values()) {
-            final List<BookingRow> bookingRows = new BookingsToBookingRowConverter(bookings, month, currentBalance).bookingRows();
+        generateBookingRows(bookings, months.getLast(), currentBalance.get(), rows, "double-separator");
 
-            if (!bookingRows.isEmpty()) {
-                rows.addAll(bookingRows);
-                // The last row of the month has the correct balance at the end of the month
-                currentBalance = bookingRows.getLast().balance();
-
-                rows.add(
-                        new MonthlySummaryBookingRow(
-                                messageSource.getMessage("bookings.table.summary.monthly", null, getLocale()),
-                                bookings,
-                                month
-                        )
-                );
-
-                // TODO: This is not good, see comment above on how to handle this smarter
-                final String partName = month.equals(monthsWithBookings.getLast()) ? "double-separator" : "single-separator";
-                rows.add(
-                        new CumulativeSummaryBookingRow(
-                                "",
-                                messageSource.getMessage("bookings.table.summary.cumulative", null, getLocale()),
-                                bookings,
-                                month,
-                                partName
-                        )
-                );
-            }
-        }
         return rows;
+    }
+
+    private CumulativeSummaryBookingRow generateBookingRows(
+            final Bookings bookings,
+            final Month month,
+            final MoneyAmount curr,
+            final List<BookingRow> rows,
+            final String partName
+    ) {
+        final CumulativeSummaryBookingRow cumulativeSummaryBookingRow = new CumulativeSummaryBookingRow(
+                "",
+                messageSource.getMessage("bookings.table.summary.cumulative", null, getLocale()),
+                bookings,
+                month,
+                partName
+        );
+
+        new SummarizingBookingsToBookingRowConverter(
+                new DefaultBookingsToBookingRowConverter(
+                        bookings,
+                        month,
+                        curr,
+                        rows::add
+                ),
+                new MonthlySummaryBookingRow(
+                        messageSource.getMessage("bookings.table.summary.monthly", null, getLocale()),
+                        bookings,
+                        month
+                ),
+                cumulativeSummaryBookingRow,
+                rows::add
+        ).generate();
+
+        return cumulativeSummaryBookingRow;
     }
 
     public static Icon icon() {

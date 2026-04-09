@@ -34,7 +34,7 @@ import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersService;
 import de.nihas101.midas.ui.bookings.BookingRow;
-import de.nihas101.midas.ui.bookings.BookingsToBookingRowConverter;
+import de.nihas101.midas.ui.bookings.DefaultBookingsToBookingRowConverter;
 import de.nihas101.midas.ui.common.MidasView;
 import de.nihas101.midas.ui.common.ShareholderPicker;
 import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
@@ -246,7 +246,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
                 shareholder,
                 year
         );
-        // TODO: Extract this logic into the service. On interest update -> trigger
+        // TODO: Move this logic into the service. On interest update -> trigger
         if (booking != null) {
             // TODO: This mutates the object! Handle this differently
             booking.setAmount(interestCalculation.interest());
@@ -376,8 +376,15 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
 
         for (Month month : Month.values()) {
             // TODO: This should not depend on the booking row
-            final List<BookingRow> bookingRows = new BookingsToBookingRowConverter(bookings, month, currentBalance).bookingRows();
+            final List<BookingRow> bookingRows = new ArrayList<>();
+            new DefaultBookingsToBookingRowConverter(
+                    bookings,
+                    month,
+                    currentBalance,
+                    bookingRows::add
+            ).generate();
 
+            // TODO: Filter out the empty rows beforehand
             if (!bookingRows.isEmpty()) {
                 // The last row of the month has the correct balance at the end of the month
                 currentBalance = bookingRows.getLast().balance();
