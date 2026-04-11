@@ -17,6 +17,7 @@ import de.nihas101.midas.ui.backup.BackupView;
 import de.nihas101.midas.ui.bookings.BookingsView;
 import de.nihas101.midas.ui.common.MidasView;
 import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
+import de.nihas101.midas.ui.export.ExportView;
 import de.nihas101.midas.ui.interest.InterestView;
 import de.nihas101.midas.ui.shareholders.ShareholdersView;
 import de.nihas101.midas.userconfig.service.UserConfigService;
@@ -87,7 +88,6 @@ public class MainView extends MidasView {
                 )
         );
 
-        /*
         hubGrid.add(
                 createHubCard(
                         ExportView.icon(),
@@ -96,7 +96,6 @@ public class MainView extends MidasView {
                         ExportView.class
                 )
         );
-        */
 
         hubGrid.add(
                 createHubCard(
