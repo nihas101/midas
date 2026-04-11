@@ -36,6 +36,7 @@ public class AccountStatementService {
     public AccountStatements accountStatements(
             final Shareholder shareholder,
             final Year year,
+            // TODO: Inject the message source and locale (via a class similar to MidasLocaleResolver) rather than passing it in like this
             final MessageSource messageSource,
             final Locale locale
     ) {

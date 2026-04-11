@@ -3,6 +3,7 @@ package de.nihas101.midas.ui.shareholders;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
@@ -37,6 +38,7 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
         this.shareholdersReader = shareholdersReader;
         this.shareholdersWriter = shareholdersWriter;
         this.setColumns(); // Clear auto-generated columns to manually add them with editors
+        this.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.LUMO_COMPACT);
 
         final Binder<Shareholder> binder = new Binder<>(Shareholder.class);
         final Editor<Shareholder> editor = this.getEditor();

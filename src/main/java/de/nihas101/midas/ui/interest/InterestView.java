@@ -464,10 +464,9 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
         interestCalculationGrid.setEmptyStateText(messageSource.getMessage("bookings.table.empty-state-text", null, getLocale()));
         interestCalculationGrid.setWidthFull();
         interestCalculationGrid.setPartNameGenerator(InterestCalculationRow::partName);
-        interestCalculationGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.LUMO_NO_ROW_BORDERS);
+        interestCalculationGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.LUMO_NO_ROW_BORDERS, GridVariant.LUMO_COMPACT);
 
-        // TODO: Null safety! (Also create a wrapper for InterestCalculationRow that handles all the fallbacks and stuff in the lambdas here)
-        setupColumn(interestCalculationGrid.addColumn(i -> i.label()), "interest.table.month", ColumnTextAlign.START);
+        setupColumn(interestCalculationGrid.addColumn(InterestCalculationRow::label), "interest.table.month", ColumnTextAlign.START);
         // TODO: These header wit S/H were displayed slightly different in the old program output, investigate how best to display that
         //       Probably involves a div or span
         setupColumn(

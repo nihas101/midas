@@ -159,7 +159,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         accountStatementGrid.setWidthFull();
         accountStatementGrid.setAllRowsVisible(true);
         accountStatementGrid.setPartNameGenerator(AccountStatementRow::partName);
-        accountStatementGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+        accountStatementGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.LUMO_COMPACT);
 
         setupColumn(accountStatementGrid.addColumn(AccountStatementRow::displayId), "account-statements.table.id", ColumnTextAlign.START);
         setupColumn(accountStatementGrid.addColumn(AccountStatementRow::dateStr), "account-statements.table.date", ColumnTextAlign.START);
@@ -210,7 +210,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         closingStatementGrid.setWidthFull();
         closingStatementGrid.setAllRowsVisible(true);
         closingStatementGrid.setPartNameGenerator(AccountStatementRow::partName);
-        closingStatementGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+        closingStatementGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.LUMO_COMPACT);
 
         final Grid.Column<AccountStatementRow> labelColumn = closingStatementGrid.addColumn(AccountStatementRow::label);
         labelColumn.setWidth("75%");

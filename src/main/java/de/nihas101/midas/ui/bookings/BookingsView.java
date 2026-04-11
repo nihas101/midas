@@ -244,7 +244,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         grid.setSizeFull();
         grid.setEmptyStateText(messageSource.getMessage("bookings.table.empty-state-text", null, getLocale()));
         grid.setPartNameGenerator(BookingRow::partName);
-        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.LUMO_COMPACT);
 
         setupColumn(grid.addColumn(BookingRow::displayId), "bookings.table.id", ColumnTextAlign.START);
         setupColumn(grid.addColumn(BookingRow::dateStr), "bookings.table.date", ColumnTextAlign.START);
