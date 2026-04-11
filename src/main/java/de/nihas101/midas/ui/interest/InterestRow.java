@@ -33,4 +33,9 @@ public class InterestRow implements InterestCalculationRow {
     public BigDecimal interestAmount() {
         return null;
     }
+
+    @Override
+    public String partName() {
+        return "single-separator";
+    }
 }

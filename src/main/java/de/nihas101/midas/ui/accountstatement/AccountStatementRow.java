@@ -19,6 +19,6 @@ public interface AccountStatementRow {
     MoneyAmount balance();
 
     default String partName() {
-        return "month-content";
+        return "no-separator-column";
     }
 }

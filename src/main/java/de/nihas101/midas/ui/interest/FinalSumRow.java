@@ -37,4 +37,9 @@ public class FinalSumRow implements InterestCalculationRow {
     public BigDecimal interestAmount() {
         return null;
     }
+
+    @Override
+    public String partName() {
+        return "double-separator";
+    }
 }

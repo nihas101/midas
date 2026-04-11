@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
@@ -54,7 +53,6 @@ public class DefaultBookingsToBookingRowConverter implements BookingsToBookingRo
         Arrays.stream(BookingType.values()).forEach(t -> monthTotals.put(t, MoneyAmount.ZERO));
 
         MoneyAmount runningTotal = startingBalance;
-        final List<BookingRow> bookingRows = new ArrayList<>();
         for (String entryKey : sortedEntryKeys) {
             List<Booking> entryBookings = groupedByEntry.get(entryKey);
             Booking first = entryBookings.getFirst();

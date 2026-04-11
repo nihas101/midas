@@ -17,7 +17,7 @@
   height: 2em;
 }
 
-vaadin-grid::part(month-content) {
+vaadin-grid::part(no-separator-column) {
   border-top: none !important;
   border-bottom: none !important;
 }

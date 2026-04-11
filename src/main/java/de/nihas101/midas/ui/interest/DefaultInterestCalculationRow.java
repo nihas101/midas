@@ -15,19 +15,24 @@ import java.util.Locale;
 public class DefaultInterestCalculationRow implements InterestCalculationRow {
 
     private final InterestCalculationRow interestCalculationRow;
+    private final String partName;
 
     public DefaultInterestCalculationRow(
             final YearMonth yearMonth,
             final Interest interest,
             final Locale locale,
             final MoneyAmount balanceAtEndOfMonth,
-            final MonthlyTotalSum monthTotalSum
+            final MonthlyTotalSum monthTotalSum,
+            final String partName
     ) {
-        this.interestCalculationRow = new BaseInterestCalculationRow(
-                yearMonth.atEndOfMonth().format(DateTimeFormatter.ofPattern("dd. MMMM", locale)),
-                monthTotalSum.sum(),
-                balanceAtEndOfMonth,
-                interest.interestAmount()
+        this(
+                new BaseInterestCalculationRow(
+                        yearMonth.atEndOfMonth().format(DateTimeFormatter.ofPattern("dd. MMMM", locale)),
+                        monthTotalSum.sum(),
+                        balanceAtEndOfMonth,
+                        interest.interestAmount()
+                ),
+                partName
         );
     }
 
@@ -54,5 +59,10 @@ public class DefaultInterestCalculationRow implements InterestCalculationRow {
     @Override
     public BigDecimal interestAmount() {
         return interestCalculationRow.interestAmount().setScale(0, RoundingMode.HALF_UP);
+    }
+
+    @Override
+    public String partName() {
+        return partName;
     }
 }

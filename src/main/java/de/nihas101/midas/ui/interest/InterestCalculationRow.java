@@ -14,5 +14,9 @@ public interface InterestCalculationRow {
 
     Integer interestDaysCount();
 
-    BigDecimal interestAmount(); // TODO: Is this the correct term?
+    BigDecimal interestAmount();
+
+    default String partName() {
+        return "no-separator-column";
+    }
 }
