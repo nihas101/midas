@@ -1,7 +1,7 @@
 package de.nihas101.midas.accountstatement.runningtotal;
 
-import de.nihas101.midas.accountstatement.dto.AccountStatement;
 import de.nihas101.midas.accountstatement.dto.AccountStatements;
+import de.nihas101.midas.accountstatement.dto.LabeledAccountStatement;
 import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.openingbalance.dto.OpeningBalance;
@@ -22,7 +22,8 @@ public class DefaultRunningTotalAccountStatements implements RunningTotalAccount
 
     public DefaultRunningTotalAccountStatements(
             final AccountStatements accountStatements,
-            final List<BookingType> typeOrder
+            final List<BookingType> typeOrder,
+            final OpeningRunningTotalAccountStatement openingRunningTotalAccountStatement
     ) {
         final OpeningBalance openingBalance = accountStatements.openingBalance();
         this.runningTotalAccountStatements = new ArrayList<>();
@@ -30,13 +31,13 @@ public class DefaultRunningTotalAccountStatements implements RunningTotalAccount
             return;
         }
 
-        final List<AccountStatement> statements = typeOrder.stream()
+        runningTotalAccountStatements.add(openingRunningTotalAccountStatement);
+        final List<LabeledAccountStatement> statements = typeOrder.stream()
                 .map(accountStatements::forType)
                 .toList();
 
         MoneyAmount currentBalance = openingBalance.getOpeningBalance();
-        runningTotalAccountStatements.add(new OpeningRunningTotalAccountStatement(openingBalance));
-        for (final AccountStatement statement : statements) {
+        for (final LabeledAccountStatement statement : statements) {
             currentBalance = currentBalance.plus(statement.amount());
             runningTotalAccountStatements.add(
                     new DefaultRunningTotalAccountStatement(

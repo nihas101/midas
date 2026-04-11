@@ -17,21 +17,30 @@
   height: 2em;
 }
 
-vaadin-grid::part(month-content) {
+vaadin-grid::part(no-separator-column) {
   border-top: none !important;
   border-bottom: none !important;
 }
 
-vaadin-grid::part(month-separator) {
+vaadin-grid::part(single-separator) {
   border-top: none !important;
   border-bottom: 1px solid var(--lumo-contrast-10pct) !important;
+}
+
+vaadin-grid::part(double-separator) {
+  border-top: none !important;
+  border-bottom: 3px double var(--lumo-contrast-10pct) !important;
+}
+
+vaadin-grid::part(header-cell) {
+  border-bottom: 3px double var(--lumo-contrast-10pct);
 }
 
 vaadin-grid::part(total-column) {
   border-right: 1px solid var(--lumo-contrast-10pct);
 }
 
-vaadin-grid::part(booking-type-column),
+vaadin-grid::part(separator-column),
 vaadin-grid::part(balance-column) {
   border-left: 1px solid var(--lumo-contrast-10pct);
 }

@@ -17,13 +17,18 @@ import java.util.Optional;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor
-public final class DefaultAccountStatement implements AccountStatement {
+public final class DefaultAccountStatement implements LabeledAccountStatement {
     private final Integer id;
     private final Year year;
     private final BookingType type;
     private final MoneyAmount amount;
+    private final String label;
 
-    public DefaultAccountStatement(final AccountStatementEntity accountStatementEntity) {
+    public DefaultAccountStatement(
+            final AccountStatementEntity accountStatementEntity,
+            final MessageSource messageSource,
+            final Locale locale
+    ) {
         this(
                 accountStatementEntity != null ? accountStatementEntity.getId() : null,
                 Optional.ofNullable(accountStatementEntity)
@@ -32,7 +37,28 @@ public final class DefaultAccountStatement implements AccountStatement {
                         .map(Year::of)
                         .orElse(null),
                 accountStatementEntity != null ? accountStatementEntity.getType() : null,
-                accountStatementEntity != null ? accountStatementEntity.getAmount() : null
+                accountStatementEntity != null ? accountStatementEntity.getAmount() : null,
+                messageSource,
+                locale
+        );
+    }
+
+    public DefaultAccountStatement(
+            final Integer id,
+            final Year year,
+            final BookingType type,
+            final MoneyAmount amount,
+            final MessageSource messageSource,
+            final Locale locale
+    ) {
+        this(
+                id,
+                year,
+                type,
+                amount,
+                type != null && messageSource != null
+                        ? messageSource.getMessage(type.getAccountStatementI18nKey(), null, locale)
+                        : null
         );
     }
 
@@ -47,11 +73,8 @@ public final class DefaultAccountStatement implements AccountStatement {
     }
 
     @Override
-    public String label(final MessageSource messageSource, final Locale locale) {
-        if (messageSource == null || locale == null) {
-            return null;
-        }
-        return messageSource.getMessage(type.getAccountStatementI18nKey(), null, locale);
+    public String label() {
+        return label;
     }
 
     @Override

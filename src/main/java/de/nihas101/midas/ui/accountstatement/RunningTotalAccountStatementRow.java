@@ -3,10 +3,8 @@ package de.nihas101.midas.ui.accountstatement;
 import de.nihas101.midas.accountstatement.runningtotal.RunningTotalAccountStatement;
 import de.nihas101.midas.money.MoneyAmount;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.MessageSource;
 
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 
 @RequiredArgsConstructor
 public class RunningTotalAccountStatementRow implements AccountStatementRow {
@@ -24,8 +22,8 @@ public class RunningTotalAccountStatementRow implements AccountStatementRow {
     }
 
     @Override
-    public String label(final MessageSource messageSource, final Locale locale) {
-        return accountStatement.label(messageSource, locale);
+    public String label() {
+        return accountStatement.label();
     }
 
     @Override

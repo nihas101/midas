@@ -1,6 +1,6 @@
 package de.nihas101.midas.accountstatement.runningtotal;
 
-import de.nihas101.midas.accountstatement.dto.AccountStatement;
+import de.nihas101.midas.accountstatement.dto.LabeledAccountStatement;
 import de.nihas101.midas.accountstatement.dto.DefaultAccountStatement;
 import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.money.MoneyAmount;
@@ -9,10 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.context.MessageSource;
 
 import java.time.Year;
-import java.util.Locale;
 import java.util.stream.Stream;
 
 import static org.mockito.Mockito.mock;
@@ -30,13 +28,13 @@ class DefaultRunningTotalAccountStatementTest {
         Assertions.assertNull(runningTotal.currentBalance());
         Assertions.assertNull(runningTotal.amount());
         Assertions.assertNull(runningTotal.date());
-        Assertions.assertNull(runningTotal.label(null, null));
+        Assertions.assertNull(runningTotal.label());
     }
 
     @ParameterizedTest
     @MethodSource("delegationArguments")
     void delegationTests(
-            final AccountStatement statement,
+            final LabeledAccountStatement statement,
             final MoneyAmount currentBalance
     ) {
         final DefaultRunningTotalAccountStatement runningTotal = new DefaultRunningTotalAccountStatement(statement, currentBalance);
@@ -50,15 +48,36 @@ class DefaultRunningTotalAccountStatementTest {
     public static Stream<Arguments> delegationArguments() {
         return Stream.of(
                 Arguments.of(
-                        new DefaultAccountStatement(1, TEST_YEAR, BookingType.WITHDRAWAL, MoneyAmount.ofCents(100L)),
+                        new DefaultAccountStatement(
+                                1,
+                                TEST_YEAR,
+                                BookingType.WITHDRAWAL,
+                                MoneyAmount.ofCents(100L),
+                                null,
+                                null
+                        ),
                         MoneyAmount.ofCents(500L)
                 ),
                 Arguments.of(
-                        new DefaultAccountStatement(null, TEST_YEAR, BookingType.INTEREST, MoneyAmount.ZERO),
+                        new DefaultAccountStatement(
+                                null,
+                                TEST_YEAR,
+                                BookingType.INTEREST,
+                                MoneyAmount.ZERO,
+                                null,
+                                null
+                        ),
                         MoneyAmount.ofCents(-100L)
                 ),
                 Arguments.of(
-                        new DefaultAccountStatement(99, TEST_YEAR, BookingType.COMPENSATION, MoneyAmount.ofCents(100000L)),
+                        new DefaultAccountStatement(
+                                99,
+                                TEST_YEAR,
+                                BookingType.COMPENSATION,
+                                MoneyAmount.ofCents(100000L),
+                                null,
+                                null
+                        ),
                         MoneyAmount.ZERO
                 )
         );
@@ -66,15 +85,13 @@ class DefaultRunningTotalAccountStatementTest {
 
     @Test
     void labelDelegation() {
-        final AccountStatement statement = mock(AccountStatement.class);
-        final MessageSource messageSource = mock(MessageSource.class);
-        final Locale locale = Locale.GERMAN;
+        final LabeledAccountStatement statement = mock(LabeledAccountStatement.class);
         final String expectedLabel = "Test Label";
 
-        when(statement.label(messageSource, locale)).thenReturn(expectedLabel);
+        when(statement.label()).thenReturn(expectedLabel);
 
         final DefaultRunningTotalAccountStatement runningTotal = new DefaultRunningTotalAccountStatement(statement, TEST_BALANCE);
 
-        Assertions.assertEquals(expectedLabel, runningTotal.label(messageSource, locale));
+        Assertions.assertEquals(expectedLabel, runningTotal.label());
     }
 }

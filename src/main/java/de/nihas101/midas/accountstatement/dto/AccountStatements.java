@@ -6,5 +6,5 @@ import de.nihas101.midas.openingbalance.dto.OpeningBalance;
 public interface AccountStatements {
     OpeningBalance openingBalance();
 
-    AccountStatement forType(BookingType bookingType);
+    LabeledAccountStatement forType(BookingType bookingType);
 }

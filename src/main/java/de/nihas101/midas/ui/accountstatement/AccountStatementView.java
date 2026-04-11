@@ -4,6 +4,8 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
@@ -156,46 +158,63 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         accountStatementGrid.setEmptyStateText(messageSource.getMessage("bookings.table.empty-state-text", null, getLocale()));
         accountStatementGrid.setWidthFull();
         accountStatementGrid.setAllRowsVisible(true);
+        accountStatementGrid.setPartNameGenerator(AccountStatementRow::partName);
+        accountStatementGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.LUMO_COMPACT);
 
         setupColumn(accountStatementGrid.addColumn(AccountStatementRow::displayId), "account-statements.table.id", ColumnTextAlign.START);
         setupColumn(accountStatementGrid.addColumn(AccountStatementRow::dateStr), "account-statements.table.date", ColumnTextAlign.START);
         setupColumn(
-                accountStatementGrid.addColumn(asr -> asr.label(messageSource, getLocale())),
+                accountStatementGrid.addColumn(AccountStatementRow::label),
                 "account-statements.table.type",
                 ColumnTextAlign.START
         );
-        setupColumn(accountStatementGrid.addColumn(
+        final Grid.Column<AccountStatementRow> debitColumn = accountStatementGrid.addColumn(
                 accountStatementRow -> Optional.of(accountStatementRow)
                         .map(AccountStatementRow::debit)
                         .map(m -> m.format(getLocale()))
                         .orElse("")
-        ), "account-statements.table.debit", ColumnTextAlign.END);
-        setupColumn(accountStatementGrid.addColumn(
+        );
+        debitColumn.setPartNameGenerator(r -> "separator-column");
+        setupColumn(debitColumn, "account-statements.table.debit", ColumnTextAlign.END);
+
+        final Grid.Column<AccountStatementRow> creditColumn = accountStatementGrid.addColumn(
                 accountStatementRow -> Optional.of(accountStatementRow)
                         .map(AccountStatementRow::credit)
                         .map(m -> m.format(getLocale()))
                         .orElse("")
-        ), "account-statements.table.credit", ColumnTextAlign.END);
-        setupColumn(
-                accountStatementGrid.addColumn(
-                        accountStatementRow -> Optional.of(accountStatementRow)
-                                .map(AccountStatementRow::balance)
-                                .map(m -> m.format(getLocale()))
-                                .orElse("")
-                ), "account-statements.table.balance",
-                ColumnTextAlign.END
         );
+        creditColumn.setPartNameGenerator(r -> "separator-column");
+        setupColumn(creditColumn, "account-statements.table.credit", ColumnTextAlign.END);
+
+        final Grid.Column<AccountStatementRow> balanceColumn = accountStatementGrid.addColumn(
+                accountStatementRow -> Optional.of(accountStatementRow)
+                        .map(AccountStatementRow::balance)
+                        .map(m -> m.format(getLocale()))
+                        .orElse("")
+        );
+        balanceColumn.setPartNameGenerator(r -> "separator-column");
+        setupColumn(balanceColumn, "account-statements.table.balance", ColumnTextAlign.END);
 
         content.add(accountStatementGrid);
+
+        // Header parts for vertical separators
+        final HeaderRow headerRow = accountStatementGrid.getHeaderRows().getFirst();
+        headerRow.getCell(debitColumn).setPartName("separator-column");
+        headerRow.getCell(creditColumn).setPartName("separator-column");
+        headerRow.getCell(balanceColumn).setPartName("separator-column");
     }
 
     private void setupClosingStatementGrid(final VerticalLayout content) {
+        content.setSpacing(false);
         closingStatementGrid = new Grid<>();
         closingStatementGrid.setWidthFull();
         closingStatementGrid.setAllRowsVisible(true);
-        final Grid.Column<AccountStatementRow> dateColumn = closingStatementGrid.addColumn(AccountStatementRow::dateStr);
-        dateColumn.setWidth("75%");
-        dateColumn.setTextAlign(ColumnTextAlign.END);
+        closingStatementGrid.setPartNameGenerator(AccountStatementRow::partName);
+        closingStatementGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.LUMO_COMPACT);
+
+        final Grid.Column<AccountStatementRow> labelColumn = closingStatementGrid.addColumn(AccountStatementRow::label);
+        labelColumn.setWidth("75%");
+        labelColumn.setTextAlign(ColumnTextAlign.END);
         final Grid.Column<AccountStatementRow> closingAmountColumn = closingStatementGrid.addColumn(
                 accountStatementRow -> Optional.of(accountStatementRow)
                         .map(AccountStatementRow::balance)
@@ -235,7 +254,12 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
             return;
         }
 
-        final RunningTotalAccountStatements accountStatements = accountStatementService.runningTotalAccountStatements(shareholder, Year.of(yearValue));
+        final RunningTotalAccountStatements accountStatements = accountStatementService.runningTotalAccountStatements(
+                shareholder,
+                Year.of(yearValue),
+                messageSource,
+                getLocale()
+        );
         if (accountStatements.isEmpty()) {
             accountStatementGrid.setItems(Collections.emptyList());
             closingStatementGrid.setItems(Collections.emptyList());
@@ -254,7 +278,11 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
     }
 
     private AccountStatementRow createRow(final RunningTotalAccountStatements accountStatements) {
-        return new ClosingAccountStatementRow(accountStatements);
+        return new ClosingAccountStatementRow(
+                accountStatements,
+                messageSource,
+                getLocale()
+        );
     }
 
     public static Icon icon() {

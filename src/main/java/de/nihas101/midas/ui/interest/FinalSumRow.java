@@ -2,20 +2,38 @@ package de.nihas101.midas.ui.interest;
 
 import de.nihas101.midas.money.MoneyAmount;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 @RequiredArgsConstructor
 public class FinalSumRow implements InterestCalculationRow {
-    private final LocalDate date;
     private final MoneyAmount sum;
+    private final String label;
+
+    public FinalSumRow(
+            final LocalDate date,
+            final MoneyAmount sum,
+            final MessageSource messageSource,
+            final Locale locale
+    ) {
+        this(
+                sum,
+                messageSource.getMessage(
+                        "interest.summary.final-sum",
+                        // TODO: Allow the user to define all these formats somewhere?
+                        new Object[]{date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))},
+                        locale
+                )
+        );
+    }
 
     @Override
-    public String monthAsString() {
-        // TODO: Allow the user to define all these formats somewhere?
-        return "Bestand per " + date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")); // TODO: i18n
+    public String label() {
+        return label;
     }
 
     @Override
@@ -36,5 +54,10 @@ public class FinalSumRow implements InterestCalculationRow {
     @Override
     public BigDecimal interestAmount() {
         return null;
+    }
+
+    @Override
+    public String partName() {
+        return "double-separator";
     }
 }

@@ -52,8 +52,4 @@ public record OpeningBalanceBookingRow(
         return MoneyAmount.ZERO;
     }
 
-    @Override
-    public String partName() {
-        return "month-content";
-    }
 }

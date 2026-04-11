@@ -21,18 +21,21 @@ public class CumulativeSummaryBookingRow implements BookingRow {
     private final MoneyAmount total;
     private final MoneyAmount balance;
     private final List<Booking> bookings;
+    private final String partName;
 
     public CumulativeSummaryBookingRow(
             final String dateStr,
             final String comment,
             final Bookings bookings,
-            final Month month
+            final Month month,
+            final String partName
     ) {
         this(
                 dateStr,
                 comment,
                 bookings,
-                new MonthlyCumulativeSum(bookings, month)
+                new MonthlyCumulativeSum(bookings, month),
+                partName
         );
     }
 
@@ -40,7 +43,8 @@ public class CumulativeSummaryBookingRow implements BookingRow {
             final String dateStr,
             final String comment,
             final Bookings bookings,
-            final MonthlyCumulativeSum monthlyCumulativeSum
+            final MonthlyCumulativeSum monthlyCumulativeSum,
+            final String partName
     ) {
         this(
                 dateStr,
@@ -50,7 +54,8 @@ public class CumulativeSummaryBookingRow implements BookingRow {
                 bookings.openingBalance()
                         .getOpeningBalance()
                         .plus(monthlyCumulativeSum.sum()),
-                Collections.emptyList()
+                Collections.emptyList(),
+                partName
         );
     }
 
@@ -96,6 +101,6 @@ public class CumulativeSummaryBookingRow implements BookingRow {
 
     @Override
     public String partName() {
-        return "month-separator"; // TODO: This is used to add top and bottom separators
+        return partName;
     }
 }

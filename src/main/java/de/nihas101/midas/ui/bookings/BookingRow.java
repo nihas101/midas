@@ -26,6 +26,6 @@ public interface BookingRow {
     List<Booking> bookings();
 
     default String partName() {
-        return "month-content"; // TODO: This is used to hide separators, think of a way to keep this knowledge, perhaps we can move create a class for this
+        return "no-separator-column";
     }
 }

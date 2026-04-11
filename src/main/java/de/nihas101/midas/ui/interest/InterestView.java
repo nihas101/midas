@@ -7,6 +7,7 @@ import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
@@ -34,7 +35,7 @@ import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersService;
 import de.nihas101.midas.ui.bookings.BookingRow;
-import de.nihas101.midas.ui.bookings.BookingsToBookingRowConverter;
+import de.nihas101.midas.ui.bookings.DefaultBookingsToBookingRowConverter;
 import de.nihas101.midas.ui.common.MidasView;
 import de.nihas101.midas.ui.common.ShareholderPicker;
 import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
@@ -47,12 +48,13 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
-import java.time.YearMonth;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 
 // TODO: Align the display of the table more like in the printed sheet
@@ -229,7 +231,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
 
         interestCalculationGrid.setItems(
                 createRows(
-                        yearValue,
+                        year,
                         bookings,
                         rate,
                         interestCalculation
@@ -246,7 +248,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
                 shareholder,
                 year
         );
-        // TODO: Extract this logic into the service. On interest update -> trigger
+        // TODO: Move this logic into the service. On interest update -> trigger
         if (booking != null) {
             // TODO: This mutates the object! Handle this differently
             booking.setAmount(interestCalculation.interest());
@@ -311,7 +313,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
         );
         interestCalculationGrid.setItems(
                 createRows(
-                        yearValue,
+                        year,
                         bookings,
                         interestRate,
                         interestCalculation
@@ -330,7 +332,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
 
     // TODO: Introduce classes for all this logic
     private List<InterestCalculationRow> createRows(
-            final Integer year,
+            final Year year,
             final Bookings bookings,
             final BigDecimal interestRate,
             final InterestCalculation interestCalculation
@@ -339,8 +341,10 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
         rows.add(
                 new OpeningBalanceInterestCalculationRow(
                         bookings,
-                        Year.of(year),
-                        interestRate
+                        year,
+                        interestRate,
+                        messageSource,
+                        getLocale()
                 )
         );
 
@@ -353,47 +357,105 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
 
         rows.addAll(
                 List.of(
-                        new ZinszahlSumRow(interestCalculation.interestSum()),
-                        new DivisorRow(interestCalculation.divisor()),
-                        new InterestRow(interestCalculation.interest()),
+                        new InterestSumRow(
+                                interestCalculation.interestSum(),
+                                messageSource,
+                                getLocale()
+                        ),
+                        new DivisorRow(
+                                interestCalculation.divisor(),
+                                messageSource,
+                                getLocale()
+                        ),
+                        new InterestRow(
+                                interestCalculation.interest(),
+                                messageSource,
+                                getLocale()
+                        ),
                         new FinalSumRow(
-                                Year.of(year).atMonth(Month.DECEMBER).atEndOfMonth(),
-                                interestCalculation.finalSum()
+                                year.atMonth(Month.DECEMBER).atEndOfMonth(),
+                                interestCalculation.finalSum(),
+                                messageSource,
+                                getLocale()
                         )
                 )
         );
         return rows;
     }
 
-    // TODO: Decouple this from the bookings view classes
     private List<InterestCalculationRow> interestRows(
-            final Integer year, // TODO: Use Year class!
+            final Year year,
             final Bookings bookings,
             final InterestCalculation interestCalculation
     ) {
         final List<InterestCalculationRow> rows = new ArrayList<>();
-        MoneyAmount currentBalance = bookings.openingBalance().getOpeningBalance();
+        final AtomicReference<MoneyAmount> currentBalance = new AtomicReference<>(
+                bookings.openingBalance()
+                        .getOpeningBalance()
+        );
 
-        for (Month month : Month.values()) {
-            // TODO: This should not depend on the booking row
-            final List<BookingRow> bookingRows = new BookingsToBookingRowConverter(bookings, month, currentBalance).bookingRows();
+        final List<Month> months = Arrays.stream(Month.values())
+                .filter(month -> !bookings.bookingsInMonth(month)
+                        .bookings()
+                        .isEmpty())
+                .toList();
 
-            if (!bookingRows.isEmpty()) {
-                // The last row of the month has the correct balance at the end of the month
-                currentBalance = bookingRows.getLast().balance();
-
-                rows.add(
-                        new DefaultInterestCalculationRow(
-                                YearMonth.of(year, month),
-                                interestCalculation.interests().get(month),
-                                getLocale(),
-                                interestCalculation.monthlyBalances().get(month),
-                                interestCalculation.monthlyTotalSums().get(month)
+        months.stream()
+                .limit(months.size() - 1)
+                .forEach(month -> generateInterestRow(
+                                year,
+                                bookings,
+                                interestCalculation,
+                                month,
+                                currentBalance,
+                                rows,
+                                "no-separator-column"
                         )
                 );
-            }
-        }
+
+        generateInterestRow(
+                year,
+                bookings,
+                interestCalculation,
+                months.getLast(),
+                currentBalance,
+                rows,
+                "single-separator"
+        );
         return rows;
+    }
+
+    private void generateInterestRow(
+            final Year year,
+            final Bookings bookings,
+            final InterestCalculation interestCalculation,
+            final Month month,
+            final AtomicReference<MoneyAmount> currentBalance,
+            final List<InterestCalculationRow> rows,
+            final String partName
+    ) {
+        final List<BookingRow> bookingRows = new ArrayList<>();
+        // TODO: This should not depend on the booking row
+        new DefaultBookingsToBookingRowConverter(
+                bookings,
+                month,
+                currentBalance.get(),
+                bookingRows::add
+        ).generate();
+        // TODO: Create it's own class for this instead of piggybacking off of the DefaultBookingsToBookingRowConverter
+        if (!bookingRows.isEmpty()) {
+            currentBalance.set(bookingRows.getLast().balance());
+            rows.add(
+                    new DefaultInterestCalculationRow(
+                            year.atMonth(month),
+                            interestCalculation.interests().get(month),
+                            getLocale(),
+                            interestCalculation.monthlyBalances().get(month),
+                            interestCalculation.monthlyTotalSums().get(month),
+                            partName
+                    )
+            );
+        }
     }
 
     // TODO: Move to own class (same in bookings view)
@@ -401,9 +463,10 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
         interestCalculationGrid = new Grid<>();
         interestCalculationGrid.setEmptyStateText(messageSource.getMessage("bookings.table.empty-state-text", null, getLocale()));
         interestCalculationGrid.setWidthFull();
+        interestCalculationGrid.setPartNameGenerator(InterestCalculationRow::partName);
+        interestCalculationGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.LUMO_NO_ROW_BORDERS, GridVariant.LUMO_COMPACT);
 
-        // TODO: Null safety! (Also create a wrapper for InterestCalculationRow that handles all the fallbacks and stuff in the lambdas here)
-        setupColumn(interestCalculationGrid.addColumn(InterestCalculationRow::monthAsString), "Monat", ColumnTextAlign.START);
+        setupColumn(interestCalculationGrid.addColumn(InterestCalculationRow::label), "interest.table.month", ColumnTextAlign.START);
         // TODO: These header wit S/H were displayed slightly different in the old program output, investigate how best to display that
         //       Probably involves a div or span
         setupColumn(
@@ -413,7 +476,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
                                 .map(Transaction::moneyAmount)
                                 .map(m -> m.format(getLocale()))
                                 .orElse("")
-                ), "Bewegungen", ColumnTextAlign.END); // TODO: i18n
+                ), "interest.table.transactions", ColumnTextAlign.END);
         setupColumn(
                 interestCalculationGrid.addColumn(
                         i -> Optional.ofNullable(i)
@@ -421,7 +484,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
                                 .map(Transaction::type)
                                 .map(TransactionType::getValue)
                                 .orElse("")
-                ), "S/H", ColumnTextAlign.START); // TODO: i18n
+                ), "interest.table.sh", ColumnTextAlign.START);
         setupColumn(interestCalculationGrid.addColumn(
                 i -> formatAmount(
                         Optional.ofNullable(i)
@@ -429,21 +492,21 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
                                 .map(Transaction::moneyAmount)
                                 .orElse(null)
                 )
-        ), "Saldo", ColumnTextAlign.END); // TODO: i18n
+        ), "interest.table.balance", ColumnTextAlign.END);
         setupColumn(interestCalculationGrid.addColumn(
                 i -> Optional.ofNullable(i)
                         .map(InterestCalculationRow::balanceAtEndOfMonth)
                         .map(Transaction::type)
                         .map(TransactionType::getValue)
                         .orElse("")
-        ), "S/H", ColumnTextAlign.START); // TODO: i18n
+        ), "interest.table.sh", ColumnTextAlign.START);
         setupColumn(interestCalculationGrid.addColumn(
                 i -> formatDays(
                         Optional.ofNullable(i)
                                 .map(InterestCalculationRow::interestDaysCount)
                                 .orElse(null)
                 )
-        ), "Zinstage", ColumnTextAlign.CENTER); // TODO: i18n
+        ), "interest.table.days", ColumnTextAlign.CENTER);
         // TODO: We need to format the comma for the divisor in the summary only here -> Create a wrapper for this that handles this and only wrap the divisor
         setupColumn(interestCalculationGrid.addColumn(
                 i -> formatInterestAmounts(
@@ -451,7 +514,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
                                 .map(InterestCalculationRow::interestAmount)
                                 .orElse(null)
                 )
-        ), "Zinszahl", ColumnTextAlign.CENTER); // TODO: i18n
+        ), "interest.table.interest-amount", ColumnTextAlign.CENTER);
 
         content.add(interestCalculationGrid);
     }
@@ -474,10 +537,10 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
     // TODO: Extract into common class for bookings view and this?
     private void setupColumn(
             final Grid.Column<?> column,
-            final String headerName,
+            final String i18nKey,
             final ColumnTextAlign columnTextAlign
     ) {
-        final Span header = new Span(headerName);
+        final Span header = new Span(messageSource.getMessage(i18nKey, null, getLocale()));
         header.getElement().setAttribute("part", "header-cell-content"); // To allow common header styling
 
         column.setAutoWidth(true)

@@ -31,7 +31,7 @@ public class BaseInterestCalculationRow implements InterestCalculationRow { // T
     }
 
     @Override
-    public String monthAsString() {
+    public String label() {
         return monthAsString;
     }
 

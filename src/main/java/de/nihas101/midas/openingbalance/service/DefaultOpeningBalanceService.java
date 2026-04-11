@@ -30,7 +30,7 @@ public class DefaultOpeningBalanceService implements OpeningBalanceService { // 
     @Override
     public void create(final OpeningBalance openingBalance) {
         if (openingBalance.getId() != null) {
-            throw new IllegalArgumentException("OpeningBalanceService#create with openingBalance.getId() != null"); // TODO: i18n
+            throw new IllegalArgumentException("OpeningBalanceService#create with openingBalance.getId() != null");
         }
 
         upsertEntity(openingBalance);
@@ -39,7 +39,7 @@ public class DefaultOpeningBalanceService implements OpeningBalanceService { // 
     @Override
     public void update(final OpeningBalance openingBalance) {
         if (openingBalance.getId() == null) {
-            throw new IllegalArgumentException("OpeningBalanceService#update with openingBalance.getId() == null"); // TODO: i18n
+            throw new IllegalArgumentException("OpeningBalanceService#update with openingBalance.getId() == null");
         }
 
         upsertEntity(openingBalance);
