@@ -251,8 +251,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         setupColumn(grid.addColumn(BookingRow::comment), "bookings.table.comment", ColumnTextAlign.START);
 
         final Grid.Column<BookingRow> totalColumn = grid.addColumn(r -> formatAmount(r.total()));
-        // TODO: booking-type-column is used to add separators on the left and right of a cell
-        totalColumn.setPartNameGenerator(r -> "booking-type-column"); // TODO: Think of a better name here, booking-type-column makes no sense here
+        totalColumn.setPartNameGenerator(r -> "separator-column");
         setupColumn(totalColumn, "bookings.table.total", ColumnTextAlign.END);
 
         setupColumn(BookingType.WITHDRAWAL);
@@ -287,7 +286,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         content.add(grid);
 
         // Header parts for vertical separators
-        grid.getHeaderRows().getFirst().getCell(totalColumn).setPartName("booking-type-column");
+        grid.getHeaderRows().getFirst().getCell(totalColumn).setPartName("separator-column");
         grid.getHeaderRows().getFirst().getCell(balanceColumn).setPartName("balance-column");
     }
 
@@ -354,9 +353,9 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
 
     private void setupColumn(final BookingType bookingType) {
         final Grid.Column<BookingRow> column = grid.addColumn(r -> formatAmount(r.amount(bookingType)));
-        column.setPartNameGenerator(r -> "booking-type-column");
+        column.setPartNameGenerator(r -> "separator-column");
         setupColumn(column, bookingType.getI18nKey(), ColumnTextAlign.END);
-        grid.getHeaderRows().getFirst().getCell(column).setPartName("booking-type-column");
+        grid.getHeaderRows().getFirst().getCell(column).setPartName("separator-column");
     }
 
     private void setupColumn(

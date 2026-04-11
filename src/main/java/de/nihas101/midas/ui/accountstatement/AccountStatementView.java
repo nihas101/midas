@@ -174,7 +174,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                         .map(m -> m.format(getLocale()))
                         .orElse("")
         );
-        debitColumn.setPartNameGenerator(r -> "booking-type-column"); // TODO: Think of a better name for this part
+        debitColumn.setPartNameGenerator(r -> "separator-column");
         setupColumn(debitColumn, "account-statements.table.debit", ColumnTextAlign.END);
 
         final Grid.Column<AccountStatementRow> creditColumn = accountStatementGrid.addColumn(
@@ -183,7 +183,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                         .map(m -> m.format(getLocale()))
                         .orElse("")
         );
-        creditColumn.setPartNameGenerator(r -> "booking-type-column"); // TODO: Think of a better name for this part
+        creditColumn.setPartNameGenerator(r -> "separator-column");
         setupColumn(creditColumn, "account-statements.table.credit", ColumnTextAlign.END);
 
         final Grid.Column<AccountStatementRow> balanceColumn = accountStatementGrid.addColumn(
@@ -192,16 +192,16 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                         .map(m -> m.format(getLocale()))
                         .orElse("")
         );
-        balanceColumn.setPartNameGenerator(r -> "booking-type-column"); // TODO: Think of a better name for this part
+        balanceColumn.setPartNameGenerator(r -> "separator-column");
         setupColumn(balanceColumn, "account-statements.table.balance", ColumnTextAlign.END);
 
         content.add(accountStatementGrid);
 
         // Header parts for vertical separators
         final HeaderRow headerRow = accountStatementGrid.getHeaderRows().getFirst();
-        headerRow.getCell(debitColumn).setPartName("booking-type-column");
-        headerRow.getCell(creditColumn).setPartName("booking-type-column");
-        headerRow.getCell(balanceColumn).setPartName("booking-type-column");
+        headerRow.getCell(debitColumn).setPartName("separator-column");
+        headerRow.getCell(creditColumn).setPartName("separator-column");
+        headerRow.getCell(balanceColumn).setPartName("separator-column");
     }
 
     private void setupClosingStatementGrid(final VerticalLayout content) {

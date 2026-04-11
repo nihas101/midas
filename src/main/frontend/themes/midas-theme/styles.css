@@ -40,7 +40,7 @@ vaadin-grid::part(total-column) {
   border-right: 1px solid var(--lumo-contrast-10pct);
 }
 
-vaadin-grid::part(booking-type-column),
+vaadin-grid::part(separator-column),
 vaadin-grid::part(balance-column) {
   border-left: 1px solid var(--lumo-contrast-10pct);
 }
