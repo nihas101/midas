@@ -164,7 +164,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         setupColumn(accountStatementGrid.addColumn(AccountStatementRow::displayId), "account-statements.table.id", ColumnTextAlign.START);
         setupColumn(accountStatementGrid.addColumn(AccountStatementRow::dateStr), "account-statements.table.date", ColumnTextAlign.START);
         setupColumn(
-                accountStatementGrid.addColumn(asr -> asr.label(messageSource, getLocale())),
+                accountStatementGrid.addColumn(AccountStatementRow::label),
                 "account-statements.table.type",
                 ColumnTextAlign.START
         );
@@ -212,9 +212,9 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         closingStatementGrid.setPartNameGenerator(AccountStatementRow::partName);
         closingStatementGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
 
-        final Grid.Column<AccountStatementRow> dateColumn = closingStatementGrid.addColumn(AccountStatementRow::dateStr);
-        dateColumn.setWidth("75%");
-        dateColumn.setTextAlign(ColumnTextAlign.END);
+        final Grid.Column<AccountStatementRow> labelColumn = closingStatementGrid.addColumn(AccountStatementRow::label);
+        labelColumn.setWidth("75%");
+        labelColumn.setTextAlign(ColumnTextAlign.END);
         final Grid.Column<AccountStatementRow> closingAmountColumn = closingStatementGrid.addColumn(
                 accountStatementRow -> Optional.of(accountStatementRow)
                         .map(AccountStatementRow::balance)
@@ -254,7 +254,12 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
             return;
         }
 
-        final RunningTotalAccountStatements accountStatements = accountStatementService.runningTotalAccountStatements(shareholder, Year.of(yearValue));
+        final RunningTotalAccountStatements accountStatements = accountStatementService.runningTotalAccountStatements(
+                shareholder,
+                Year.of(yearValue),
+                messageSource,
+                getLocale()
+        );
         if (accountStatements.isEmpty()) {
             accountStatementGrid.setItems(Collections.emptyList());
             closingStatementGrid.setItems(Collections.emptyList());
@@ -273,7 +278,11 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
     }
 
     private AccountStatementRow createRow(final RunningTotalAccountStatements accountStatements) {
-        return new ClosingAccountStatementRow(accountStatements);
+        return new ClosingAccountStatementRow(
+                accountStatements,
+                messageSource,
+                getLocale()
+        );
     }
 
     public static Icon icon() {

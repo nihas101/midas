@@ -26,16 +26,11 @@ class DefaultAccountStatementsTest {
 
     @Test
     void nullTests() {
-        final AccountStatements accountStatement = new DefaultAccountStatements(null, (Year) null, null);
-        Assertions.assertNotNull(accountStatement.forType(BookingType.WITHDRAWAL));
-        Assertions.assertNull(accountStatement.openingBalance());
-    }
-
-    @Test
-    void fromEntity() {
         final AccountStatements accountStatement = new DefaultAccountStatements(
                 null,
                 (Year) null,
+                null,
+                null,
                 null
         );
         Assertions.assertNotNull(accountStatement.forType(BookingType.WITHDRAWAL));
@@ -48,7 +43,9 @@ class DefaultAccountStatementsTest {
         final AccountStatements accountStatement = new DefaultAccountStatements(
                 null,
                 null,
-                openingBalance
+                openingBalance,
+                null,
+                null
         );
         Assertions.assertEquals(openingBalance, accountStatement.openingBalance());
     }
@@ -68,7 +65,16 @@ class DefaultAccountStatementsTest {
         final AccountStatements accountStatement = new DefaultAccountStatements(
                 List.of(),
                 null,
-                bt -> new DefaultAccountStatement(1, CURRENT_YEAR, bt, MoneyAmount.ZERO)
+                bt -> new DefaultAccountStatement(
+                        1,
+                        CURRENT_YEAR,
+                        bt,
+                        MoneyAmount.ZERO,
+                        null,
+                        null
+                ),
+                null,
+                null
         );
         Assertions.assertNull(accountStatement.forType(null));
     }
@@ -76,15 +82,26 @@ class DefaultAccountStatementsTest {
     @Test
     void forTypeNullMap() {
         final AccountStatements accountStatement = new DefaultAccountStatements(
-                (Map<BookingType, AccountStatement>) null,
+                (Map<BookingType, LabeledAccountStatement>) null,
                 null,
-                bt -> new DefaultAccountStatement(1, CURRENT_YEAR, bt, MoneyAmount.ZERO)
+                bt -> new DefaultAccountStatement(
+                        1,
+                        CURRENT_YEAR,
+                        bt,
+                        MoneyAmount.ZERO,
+                        null,
+                        null
+                )
         );
         Assertions.assertEquals(
-                new DefaultAccountStatement(1,
+                new DefaultAccountStatement(
+                        1,
                         CURRENT_YEAR,
                         BookingType.WITHDRAWAL,
-                        MoneyAmount.ZERO),
+                        MoneyAmount.ZERO,
+                        null,
+                        null
+                ),
                 accountStatement.forType(BookingType.WITHDRAWAL)
         );
     }
@@ -92,7 +109,7 @@ class DefaultAccountStatementsTest {
     @Test
     void forTypeNullMapAndNoFallback() {
         final AccountStatements accountStatement = new DefaultAccountStatements(
-                (Map<BookingType, AccountStatement>) null,
+                (Map<BookingType, LabeledAccountStatement>) null,
                 null,
                 null
         );
@@ -104,19 +121,28 @@ class DefaultAccountStatementsTest {
     void forType(
             final List<AccountStatementEntity> accountStatements,
             final BookingType bookingType,
-            final Function<BookingType, AccountStatement> defaultsSupplier,
-            final AccountStatement expectedAccountStatement
+            final Function<BookingType, LabeledAccountStatement> defaultsSupplier,
+            final LabeledAccountStatement expectedAccountStatement
     ) {
         final AccountStatements accountStatement = new DefaultAccountStatements(
                 accountStatements,
                 null,
-                defaultsSupplier
+                defaultsSupplier,
+                null,
+                null
         );
         Assertions.assertEquals(expectedAccountStatement, accountStatement.forType(bookingType));
     }
 
     public static Stream<Arguments> forTypeArguments() {
-        final Function<BookingType, AccountStatement> defaultsSupplier = bt -> new DefaultAccountStatement(1, CURRENT_YEAR, bt, MoneyAmount.ZERO);
+        final Function<BookingType, LabeledAccountStatement> defaultsSupplier = bt -> new DefaultAccountStatement(
+                1,
+                CURRENT_YEAR,
+                bt,
+                MoneyAmount.ZERO,
+                null,
+                null
+        );
         return Stream.of(
                 Arguments.of(null, null, null, null),
                 Arguments.of(
@@ -159,7 +185,9 @@ class DefaultAccountStatementsTest {
                                 1,
                                 CURRENT_YEAR,
                                 BookingType.WITHDRAWAL,
-                                MoneyAmount.ofCents(10L)
+                                MoneyAmount.ofCents(10L),
+                                null,
+                                null
                         )
                 ),
                 Arguments.of(
@@ -183,7 +211,9 @@ class DefaultAccountStatementsTest {
                                 1,
                                 CURRENT_YEAR,
                                 BookingType.WITHDRAWAL,
-                                MoneyAmount.ofCents(10L)
+                                MoneyAmount.ofCents(10L),
+                                null,
+                                null
                         )
                 )
         );
@@ -207,14 +237,16 @@ class DefaultAccountStatementsTest {
         final AccountStatements accountStatement = new DefaultAccountStatements(
                 accountStatementEntities,
                 CURRENT_YEAR,
+                null,
+                null,
                 null
         );
 
         for (final BookingType bookingType : BookingType.values()) {
-            final AccountStatement expected = accountStatementEntities.stream()
+            final LabeledAccountStatement expected = accountStatementEntities.stream()
                     .filter(a -> bookingType == a.getType())
                     .findFirst()
-                    .map(DefaultAccountStatement::new)
+                    .map(ase -> new DefaultAccountStatement(ase, null, null))
                     .orElseThrow();
             Assertions.assertEquals(expected, accountStatement.forType(bookingType));
         }

@@ -35,10 +35,10 @@ public class ShareholdersService implements ShareholdersReader, ShareholdersWrit
     @Override
     public void create(final Shareholder shareholder) {
         if (shareholder == null) {
-            throw new IllegalArgumentException("ShareholdersService#create with shareholder == null"); // TODO: i18n
+            throw new IllegalArgumentException("ShareholdersService#create with shareholder == null");
         }
         if (shareholder.getId() != null) {
-            throw new IllegalArgumentException("ShareholdersService#create with shareholder.getId() != null"); // TODO: i18n
+            throw new IllegalArgumentException("ShareholdersService#create with shareholder.getId() != null");
         }
         repository.save(ShareholderEntity.fromDto(shareholder));
     }
@@ -46,10 +46,10 @@ public class ShareholdersService implements ShareholdersReader, ShareholdersWrit
     @Override
     public void update(final Shareholder shareholder) {
         if (shareholder == null) {
-            throw new IllegalArgumentException("ShareholdersService#update with shareholder == null"); // TODO: i18n
+            throw new IllegalArgumentException("ShareholdersService#update with shareholder == null");
         }
         if (shareholder.getId() == null) {
-            throw new IllegalArgumentException("ShareholdersService#update with shareholder.getId() == null"); // TODO: i18n
+            throw new IllegalArgumentException("ShareholdersService#update with shareholder.getId() == null");
         }
         repository.save(ShareholderEntity.fromDto(shareholder));
     }
@@ -57,7 +57,7 @@ public class ShareholdersService implements ShareholdersReader, ShareholdersWrit
     @Override
     public void delete(final Shareholder shareholder) {
         if (shareholder == null) {
-            throw new IllegalArgumentException("ShareholdersService#delete with shareholder == null"); // TODO: i18n
+            throw new IllegalArgumentException("ShareholdersService#delete with shareholder == null");
         }
         repository.delete(ShareholderEntity.fromDto(shareholder));
     }

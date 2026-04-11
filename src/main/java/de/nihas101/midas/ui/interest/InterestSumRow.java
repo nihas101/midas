@@ -1,29 +1,25 @@
 package de.nihas101.midas.ui.interest;
 
-import de.nihas101.midas.money.MoneyAmount;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Locale;
 
 @RequiredArgsConstructor
-public class InterestRow implements InterestCalculationRow {
-    private final MoneyAmount interest;
+public class InterestSumRow implements InterestCalculationRow {
+    private final BigDecimal interestSum;
     private final String label;
 
-    public InterestRow(
-            final MoneyAmount interest,
+    public InterestSumRow(
+            final BigDecimal interestSum,
             final MessageSource messageSource,
             final Locale locale
     ) {
         this(
-                interest,
-                messageSource.getMessage(
-                        "interest.summary.interest",
-                        null,
-                        locale
-                )
+                interestSum,
+                messageSource.getMessage("interest.summary.interest-sum", null, locale)
         );
     }
 
@@ -39,7 +35,7 @@ public class InterestRow implements InterestCalculationRow {
 
     @Override
     public Transaction balanceAtEndOfMonth() {
-        return new Transaction(interest);
+        return null;
     }
 
     @Override
@@ -49,11 +45,6 @@ public class InterestRow implements InterestCalculationRow {
 
     @Override
     public BigDecimal interestAmount() {
-        return null;
-    }
-
-    @Override
-    public String partName() {
-        return "single-separator";
+        return interestSum.setScale(0, RoundingMode.HALF_UP);
     }
 }

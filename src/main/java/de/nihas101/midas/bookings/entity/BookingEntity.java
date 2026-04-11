@@ -37,7 +37,7 @@ public class BookingEntity {
     @Generated(event = {EventType.INSERT})
     private Integer displayId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "shareholder_id", nullable = false)
     private ShareholderEntity shareholder;
 

@@ -37,8 +37,8 @@ public class DefaultInterestCalculationRow implements InterestCalculationRow {
     }
 
     @Override
-    public String monthAsString() {
-        return interestCalculationRow.monthAsString();
+    public String label() {
+        return interestCalculationRow.label();
     }
 
     @Override

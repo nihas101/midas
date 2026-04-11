@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 // TODO: It would probably be better to not expose the fields and instead just have the row consume a grid and add itself (same with bookingrow)
 public interface InterestCalculationRow {
 
-    String monthAsString();
+    String label();
 
     Transaction totalTransaction();
 

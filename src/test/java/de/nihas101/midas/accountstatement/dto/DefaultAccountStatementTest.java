@@ -21,18 +21,17 @@ class DefaultAccountStatementTest {
 
     @Test
     void nullTest() {
-        final AccountStatement accountStatement = new DefaultAccountStatement(null);
+        final LabeledAccountStatement accountStatement = new DefaultAccountStatement(null, null, null);
         Assertions.assertNull(accountStatement.id());
         Assertions.assertNull(accountStatement.amount());
         Assertions.assertNull(accountStatement.date());
-        Assertions.assertNull(accountStatement.label(null, null));
+        Assertions.assertNull(accountStatement.label());
     }
-
 
     @ParameterizedTest
     @MethodSource("idArguments")
     void id(final Integer id) {
-        final AccountStatement accountStatement = new DefaultAccountStatement(id, null, null, null);
+        final LabeledAccountStatement accountStatement = new DefaultAccountStatement(id, null, null, null, null);
         Assertions.assertEquals(id, accountStatement.id());
     }
 
@@ -48,7 +47,7 @@ class DefaultAccountStatementTest {
     @ParameterizedTest
     @MethodSource("dateArguments")
     void date(final Year year, LocalDate expectedDate) {
-        final AccountStatement accountStatement = new DefaultAccountStatement(null, year, null, null);
+        final LabeledAccountStatement accountStatement = new DefaultAccountStatement(null, year, null, null, null);
         Assertions.assertEquals(expectedDate, accountStatement.date());
     }
 
@@ -76,12 +75,12 @@ class DefaultAccountStatementTest {
     @ParameterizedTest
     @EnumSource(BookingType.class)
     void label(final BookingType bookingType) {
-        final AccountStatement accountStatement = new DefaultAccountStatement(null, null, bookingType, null);
         final MessageSource messageSource = Mockito.mock(MessageSource.class);
         Mockito.when(messageSource.getMessage(bookingType.getAccountStatementI18nKey(), null, Locale.ENGLISH))
                 .thenReturn("success");
+        final LabeledAccountStatement accountStatement = new DefaultAccountStatement(null, null, bookingType, null, messageSource, Locale.ENGLISH);
 
-        final String actualLabel = accountStatement.label(messageSource, Locale.ENGLISH);
+        final String actualLabel = accountStatement.label();
 
         Assertions.assertEquals("success", actualLabel);
     }
@@ -89,7 +88,7 @@ class DefaultAccountStatementTest {
     @ParameterizedTest
     @MethodSource("amountArguments")
     void amount(final MoneyAmount amount) {
-        final AccountStatement accountStatement = new DefaultAccountStatement(null, null, null, amount);
+        final LabeledAccountStatement accountStatement = new DefaultAccountStatement(null, null, null, amount, null);
         Assertions.assertEquals(amount, accountStatement.amount());
     }
 

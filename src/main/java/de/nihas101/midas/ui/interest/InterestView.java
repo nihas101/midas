@@ -342,7 +342,9 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
                 new OpeningBalanceInterestCalculationRow(
                         bookings,
                         year,
-                        interestRate
+                        interestRate,
+                        messageSource,
+                        getLocale()
                 )
         );
 
@@ -355,12 +357,26 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
 
         rows.addAll(
                 List.of(
-                        new ZinszahlSumRow(interestCalculation.interestSum()),
-                        new DivisorRow(interestCalculation.divisor()),
-                        new InterestRow(interestCalculation.interest()),
+                        new InterestSumRow(
+                                interestCalculation.interestSum(),
+                                messageSource,
+                                getLocale()
+                        ),
+                        new DivisorRow(
+                                interestCalculation.divisor(),
+                                messageSource,
+                                getLocale()
+                        ),
+                        new InterestRow(
+                                interestCalculation.interest(),
+                                messageSource,
+                                getLocale()
+                        ),
                         new FinalSumRow(
                                 year.atMonth(Month.DECEMBER).atEndOfMonth(),
-                                interestCalculation.finalSum()
+                                interestCalculation.finalSum(),
+                                messageSource,
+                                getLocale()
                         )
                 )
         );
@@ -451,7 +467,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
         interestCalculationGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.LUMO_NO_ROW_BORDERS);
 
         // TODO: Null safety! (Also create a wrapper for InterestCalculationRow that handles all the fallbacks and stuff in the lambdas here)
-        setupColumn(interestCalculationGrid.addColumn(InterestCalculationRow::monthAsString), "Monat", ColumnTextAlign.START);
+        setupColumn(interestCalculationGrid.addColumn(i -> i.label()), "interest.table.month", ColumnTextAlign.START);
         // TODO: These header wit S/H were displayed slightly different in the old program output, investigate how best to display that
         //       Probably involves a div or span
         setupColumn(
@@ -461,7 +477,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
                                 .map(Transaction::moneyAmount)
                                 .map(m -> m.format(getLocale()))
                                 .orElse("")
-                ), "Bewegungen", ColumnTextAlign.END); // TODO: i18n
+                ), "interest.table.transactions", ColumnTextAlign.END);
         setupColumn(
                 interestCalculationGrid.addColumn(
                         i -> Optional.ofNullable(i)
@@ -469,7 +485,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
                                 .map(Transaction::type)
                                 .map(TransactionType::getValue)
                                 .orElse("")
-                ), "S/H", ColumnTextAlign.START); // TODO: i18n
+                ), "interest.table.sh", ColumnTextAlign.START);
         setupColumn(interestCalculationGrid.addColumn(
                 i -> formatAmount(
                         Optional.ofNullable(i)
@@ -477,21 +493,21 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
                                 .map(Transaction::moneyAmount)
                                 .orElse(null)
                 )
-        ), "Saldo", ColumnTextAlign.END); // TODO: i18n
+        ), "interest.table.balance", ColumnTextAlign.END);
         setupColumn(interestCalculationGrid.addColumn(
                 i -> Optional.ofNullable(i)
                         .map(InterestCalculationRow::balanceAtEndOfMonth)
                         .map(Transaction::type)
                         .map(TransactionType::getValue)
                         .orElse("")
-        ), "S/H", ColumnTextAlign.START); // TODO: i18n
+        ), "interest.table.sh", ColumnTextAlign.START);
         setupColumn(interestCalculationGrid.addColumn(
                 i -> formatDays(
                         Optional.ofNullable(i)
                                 .map(InterestCalculationRow::interestDaysCount)
                                 .orElse(null)
                 )
-        ), "Zinstage", ColumnTextAlign.CENTER); // TODO: i18n
+        ), "interest.table.days", ColumnTextAlign.CENTER);
         // TODO: We need to format the comma for the divisor in the summary only here -> Create a wrapper for this that handles this and only wrap the divisor
         setupColumn(interestCalculationGrid.addColumn(
                 i -> formatInterestAmounts(
@@ -499,7 +515,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
                                 .map(InterestCalculationRow::interestAmount)
                                 .orElse(null)
                 )
-        ), "Zinszahl", ColumnTextAlign.CENTER); // TODO: i18n
+        ), "interest.table.interest-amount", ColumnTextAlign.CENTER);
 
         content.add(interestCalculationGrid);
     }
@@ -522,10 +538,10 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
     // TODO: Extract into common class for bookings view and this?
     private void setupColumn(
             final Grid.Column<?> column,
-            final String headerName,
+            final String i18nKey,
             final ColumnTextAlign columnTextAlign
     ) {
-        final Span header = new Span(headerName);
+        final Span header = new Span(messageSource.getMessage(i18nKey, null, getLocale()));
         header.getElement().setAttribute("part", "header-cell-content"); // To allow common header styling
 
         column.setAutoWidth(true)

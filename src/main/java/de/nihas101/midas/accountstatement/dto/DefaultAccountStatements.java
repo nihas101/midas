@@ -7,10 +7,12 @@ import de.nihas101.midas.openingbalance.dto.OpeningBalance;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import org.springframework.context.MessageSource;
 
 import java.time.Year;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -21,14 +23,16 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DefaultAccountStatements implements AccountStatements {
 
-    private final Map<BookingType, AccountStatement> accountStatements;
+    private final Map<BookingType, LabeledAccountStatement> accountStatements;
     private final OpeningBalance openingBalance;
-    private final Function<BookingType, AccountStatement> defaultsSupplier;
+    private final Function<BookingType, LabeledAccountStatement> defaultsSupplier;
 
     public DefaultAccountStatements(
             final List<AccountStatementEntity> accountStatementEntities, // TODO: Map to DTO beforehand!
             final Year year,
-            final OpeningBalance openingBalance
+            final OpeningBalance openingBalance,
+            final MessageSource messageSource,
+            final Locale locale
     ) {
         this(
                 accountStatementEntities,
@@ -37,16 +41,21 @@ public class DefaultAccountStatements implements AccountStatements {
                         null,
                         year,
                         bookingType,
-                        MoneyAmount.ZERO
-                )
-
+                        MoneyAmount.ZERO,
+                        messageSource,
+                        locale
+                ),
+                messageSource,
+                locale
         );
     }
 
     public DefaultAccountStatements(
             final List<AccountStatementEntity> accountStatementEntities, // TODO: Map to DTO beforehand!
             final OpeningBalance openingBalance,
-            final Function<BookingType, AccountStatement> defaultsSupplier
+            final Function<BookingType, LabeledAccountStatement> defaultsSupplier,
+            final MessageSource messageSource,
+            final Locale locale
     ) {
         this(
                 Optional.ofNullable(accountStatementEntities)
@@ -55,7 +64,7 @@ public class DefaultAccountStatements implements AccountStatements {
                         .collect(
                                 Collectors.toMap(
                                         AccountStatementEntity::getType,
-                                        DefaultAccountStatement::new,
+                                        ase -> new DefaultAccountStatement(ase, messageSource, locale),
                                         DefaultAccountStatements::firstAccountStatement
                                 )
                         ),
@@ -64,9 +73,9 @@ public class DefaultAccountStatements implements AccountStatements {
         );
     }
 
-    private static AccountStatement firstAccountStatement(
-            final AccountStatement first,
-            final AccountStatement second
+    private static LabeledAccountStatement firstAccountStatement(
+            final LabeledAccountStatement first,
+            final LabeledAccountStatement second
     ) {
         return first;
     }
@@ -77,11 +86,11 @@ public class DefaultAccountStatements implements AccountStatements {
     }
 
     @Override
-    public AccountStatement forType(final BookingType bookingType) {
+    public LabeledAccountStatement forType(final BookingType bookingType) {
         if (bookingType == null) {
             return null;
         }
-        final AccountStatement defaultValue = defaultsSupplier != null ? defaultsSupplier.apply(bookingType) : null;
+        final LabeledAccountStatement defaultValue = defaultsSupplier != null ? defaultsSupplier.apply(bookingType) : null;
         if (accountStatements == null) {
             return defaultValue;
         }

@@ -7,10 +7,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mockito;
+import org.springframework.context.MessageSource;
 
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
+import java.util.Locale;
 import java.util.stream.Stream;
 
 class OpeningRunningTotalAccountStatementTest {
@@ -19,7 +22,11 @@ class OpeningRunningTotalAccountStatementTest {
 
     @Test
     void nullTest() {
-        final OpeningRunningTotalAccountStatement statement = new OpeningRunningTotalAccountStatement(null);
+        final OpeningRunningTotalAccountStatement statement = new OpeningRunningTotalAccountStatement(
+                null,
+                Mockito.mock(MessageSource.class),
+                Locale.ENGLISH
+        );
         Assertions.assertThrows(NullPointerException.class, statement::currentBalance);
         Assertions.assertThrows(NullPointerException.class, statement::date);
     }
@@ -27,7 +34,14 @@ class OpeningRunningTotalAccountStatementTest {
     @ParameterizedTest
     @MethodSource("openingBalanceArguments")
     void implementationTests(final OpeningBalance openingBalance) {
-        final OpeningRunningTotalAccountStatement statement = new OpeningRunningTotalAccountStatement(openingBalance);
+        final MessageSource messageSource = Mockito.mock(MessageSource.class);
+        Mockito.when(messageSource.getMessage(Mockito.any(), Mockito.any(), Mockito.any()))
+                .thenReturn("Balance");
+        final OpeningRunningTotalAccountStatement statement = new OpeningRunningTotalAccountStatement(
+                openingBalance,
+                messageSource,
+                Locale.ENGLISH
+        );
 
         Assertions.assertEquals(openingBalance.getOpeningBalance(), statement.currentBalance());
         Assertions.assertEquals(openingBalance.getOpeningBalance(), statement.amount());
@@ -36,8 +50,7 @@ class OpeningRunningTotalAccountStatementTest {
         final LocalDate expectedDate = openingBalance.getYear().atMonth(Month.JANUARY).atDay(1);
         Assertions.assertEquals(expectedDate, statement.date());
 
-        // TODO: Currently hardcoded in implementation
-        Assertions.assertEquals("Saldovortrag", statement.label(null, null));
+        Assertions.assertEquals("Balance", statement.label());
     }
 
     public static Stream<Arguments> openingBalanceArguments() {

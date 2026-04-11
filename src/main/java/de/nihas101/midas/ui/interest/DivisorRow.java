@@ -1,18 +1,32 @@
 package de.nihas101.midas.ui.interest;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Locale;
 
 @RequiredArgsConstructor
 public class DivisorRow implements InterestCalculationRow {
     private final BigDecimal divisor;
+    private final String label;
+
+    public DivisorRow(
+            final BigDecimal divisor,
+            final MessageSource messageSource,
+            final Locale locale
+    ) {
+        this(
+                divisor,
+                messageSource.getMessage("interest.summary.divisor", null, locale)
+        );
+    }
 
     @Override
-    public String monthAsString() {
-        return "Divisor";
-    } // TODO: i18n
+    public String label() {
+        return label;
+    }
 
     @Override
     public Transaction totalTransaction() {

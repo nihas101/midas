@@ -1,6 +1,6 @@
 package de.nihas101.midas.accountstatement.runningtotal;
 
-import de.nihas101.midas.accountstatement.dto.AccountStatement;
+import de.nihas101.midas.accountstatement.dto.LabeledAccountStatement;
 import de.nihas101.midas.accountstatement.dto.AccountStatements;
 import de.nihas101.midas.accountstatement.dto.DefaultAccountStatement;
 import de.nihas101.midas.bookings.entity.BookingType;
@@ -8,9 +8,12 @@ import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.openingbalance.dto.OpeningBalance;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.context.MessageSource;
 
 import java.time.Year;
 import java.util.List;
+import java.util.Locale;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -26,7 +29,12 @@ class DefaultRunningTotalAccountStatementsTest {
 
         final DefaultRunningTotalAccountStatements runningTotals = new DefaultRunningTotalAccountStatements(
                 accountStatements,
-                List.of()
+                List.of(),
+                new OpeningRunningTotalAccountStatement(
+                        accountStatements.openingBalance(),
+                        Mockito.mock(MessageSource.class),
+                        Locale.ENGLISH
+                )
         );
 
         Assertions.assertTrue(runningTotals.isEmpty());
@@ -38,8 +46,22 @@ class DefaultRunningTotalAccountStatementsTest {
         // Arrange
         final OpeningBalance openingBalance = new OpeningBalance(null, null, MoneyAmount.ofCents(1000L), TEST_YEAR);
         
-        final AccountStatement withdrawal = new DefaultAccountStatement(1, TEST_YEAR, BookingType.WITHDRAWAL, MoneyAmount.ofCents(-200L));
-        final AccountStatement interest = new DefaultAccountStatement(2, TEST_YEAR, BookingType.INTEREST, MoneyAmount.ofCents(50L));
+        final LabeledAccountStatement withdrawal = new DefaultAccountStatement(
+                1,
+                TEST_YEAR,
+                BookingType.WITHDRAWAL,
+                MoneyAmount.ofCents(-200L),
+                null,
+                null
+        );
+        final LabeledAccountStatement interest = new DefaultAccountStatement(
+                2,
+                TEST_YEAR,
+                BookingType.INTEREST,
+                MoneyAmount.ofCents(50L),
+                null,
+                null
+        );
         
         final AccountStatements accountStatements = mock(AccountStatements.class);
         when(accountStatements.openingBalance()).thenReturn(openingBalance);
@@ -51,7 +73,8 @@ class DefaultRunningTotalAccountStatementsTest {
         // Act
         final DefaultRunningTotalAccountStatements runningTotals = new DefaultRunningTotalAccountStatements(
                 accountStatements,
-                typeOrder
+                typeOrder,
+                new OpeningRunningTotalAccountStatement(openingBalance, Mockito.mock(MessageSource.class), Locale.ENGLISH)
         );
 
         // Assert
@@ -82,8 +105,22 @@ class DefaultRunningTotalAccountStatementsTest {
         final AccountStatements accountStatements = mock(AccountStatements.class);
         when(accountStatements.openingBalance()).thenReturn(openingBalance);
         
-        final AccountStatement withdrawal = new DefaultAccountStatement(1, TEST_YEAR, BookingType.WITHDRAWAL, MoneyAmount.ofCents(10L));
-        final AccountStatement interest = new DefaultAccountStatement(2, TEST_YEAR, BookingType.INTEREST, MoneyAmount.ofCents(20L));
+        final LabeledAccountStatement withdrawal = new DefaultAccountStatement(
+                1,
+                TEST_YEAR,
+                BookingType.WITHDRAWAL,
+                MoneyAmount.ofCents(10L),
+                null,
+                null
+        );
+        final LabeledAccountStatement interest = new DefaultAccountStatement(
+                2,
+                TEST_YEAR,
+                BookingType.INTEREST,
+                MoneyAmount.ofCents(20L),
+                null,
+                null
+        );
         
         when(accountStatements.forType(BookingType.WITHDRAWAL)).thenReturn(withdrawal);
         when(accountStatements.forType(BookingType.INTEREST)).thenReturn(interest);
@@ -91,7 +128,8 @@ class DefaultRunningTotalAccountStatementsTest {
         // Act & Assert for Order A
         final DefaultRunningTotalAccountStatements orderA = new DefaultRunningTotalAccountStatements(
                 accountStatements,
-                List.of(BookingType.WITHDRAWAL, BookingType.INTEREST)
+                List.of(BookingType.WITHDRAWAL, BookingType.INTEREST),
+                new OpeningRunningTotalAccountStatement(openingBalance, Mockito.mock(MessageSource.class), Locale.ENGLISH)
         );
         Assertions.assertEquals(MoneyAmount.ofCents(10L), orderA.runningTotalAccountStatements().get(1).currentBalance());
         Assertions.assertEquals(MoneyAmount.ofCents(30L), orderA.runningTotalAccountStatements().get(2).currentBalance());
@@ -99,7 +137,8 @@ class DefaultRunningTotalAccountStatementsTest {
         // Act & Assert for Order B
         final DefaultRunningTotalAccountStatements orderB = new DefaultRunningTotalAccountStatements(
                 accountStatements,
-                List.of(BookingType.INTEREST, BookingType.WITHDRAWAL)
+                List.of(BookingType.INTEREST, BookingType.WITHDRAWAL),
+                new OpeningRunningTotalAccountStatement(openingBalance, Mockito.mock(MessageSource.class), Locale.ENGLISH)
         );
         Assertions.assertEquals(MoneyAmount.ofCents(20L), orderB.runningTotalAccountStatements().get(1).currentBalance());
         Assertions.assertEquals(MoneyAmount.ofCents(30L), orderB.runningTotalAccountStatements().get(2).currentBalance());

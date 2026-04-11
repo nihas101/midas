@@ -3,11 +3,13 @@ package de.nihas101.midas.ui.interest;
 import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.interest.interestamount.Interest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 @RequiredArgsConstructor
 public class OpeningBalanceInterestCalculationRow implements InterestCalculationRow { // TODO: Test
@@ -17,25 +19,29 @@ public class OpeningBalanceInterestCalculationRow implements InterestCalculation
     public OpeningBalanceInterestCalculationRow(
             final Bookings bookings,
             final Year year,
-            final BigDecimal interestRate
+            final BigDecimal interestRate,
+            final MessageSource messageSource,
+            final Locale locale
     ) {
-        this(
-                new BaseInterestCalculationRow(
-                        "Vortrag per 01.01." + year.format(DateTimeFormatter.ofPattern("yyyy")), // TODO: i18n
+        this.interestCalculationRow = new BaseInterestCalculationRow(
+                messageSource.getMessage(
+                        "interest.opening-balance",
+                        new Object[]{year.format(DateTimeFormatter.ofPattern("yyyy"))},
+                        locale
+                ),
+                bookings.openingBalance().getOpeningBalance(),
+                bookings.openingBalance().getOpeningBalance(),
+                new Interest(
                         bookings.openingBalance().getOpeningBalance(),
-                        bookings.openingBalance().getOpeningBalance(),
-                        new Interest(
-                                bookings.openingBalance().getOpeningBalance(),
-                                BigDecimal.valueOf(30L), // TODO: Make this passable from outside
-                                interestRate
-                        ).interestAmount()
-                )
+                        BigDecimal.valueOf(30L), // TODO: Make this passable from outside
+                        interestRate
+                ).interestAmount()
         );
     }
 
     @Override
-    public String monthAsString() {
-        return interestCalculationRow.monthAsString();
+    public String label() {
+        return interestCalculationRow.label();
     }
 
     @Override

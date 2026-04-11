@@ -1,12 +1,10 @@
 package de.nihas101.midas.ui.accountstatement;
 
-import de.nihas101.midas.accountstatement.runningtotal.RunningTotalAccountStatement;
 import de.nihas101.midas.accountstatement.runningtotal.RunningTotalAccountStatements;
 import de.nihas101.midas.money.MoneyAmount;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
@@ -14,18 +12,24 @@ import java.util.Locale;
 @RequiredArgsConstructor
 public class ClosingAccountStatementRow implements AccountStatementRow {
     private final MoneyAmount closingBalance;
-    private final LocalDate date;
+    private final String label;
 
-    public ClosingAccountStatementRow(final RunningTotalAccountStatements accountStatements) {
+    public ClosingAccountStatementRow(
+            final RunningTotalAccountStatements accountStatements,
+            final MessageSource messageSource,
+            final Locale locale
+    ) {
         this(
-                accountStatements.runningTotalAccountStatements().getLast()
-        );
-    }
-
-    private ClosingAccountStatementRow(final RunningTotalAccountStatement runningTotalAccountStatement) {
-        this(
-                runningTotalAccountStatement.currentBalance(),
-                runningTotalAccountStatement.date()
+                accountStatements.runningTotalAccountStatements().getLast().currentBalance(),
+                messageSource.getMessage(
+                        "account-statement.final-balance",
+                        new Object[]{
+                                accountStatements.runningTotalAccountStatements()
+                                        .getLast().date()
+                                        .format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+                        },
+                        locale
+                )
         );
     }
 
@@ -36,12 +40,12 @@ public class ClosingAccountStatementRow implements AccountStatementRow {
 
     @Override
     public String dateStr() {
-        return "Endstand per " + date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")); // TODO: i18n + extract pattern
+        return "";
     }
 
     @Override
-    public String label(final MessageSource messageSource, final Locale locale) {
-        return "";
+    public String label() {
+        return label;
     }
 
     @Override

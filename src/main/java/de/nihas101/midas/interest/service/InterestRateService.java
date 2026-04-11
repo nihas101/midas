@@ -28,7 +28,7 @@ public class InterestRateService {
 
     public void create(final InterestRate interestRate) {
         if (interestRate.getId() != null) {
-            throw new IllegalArgumentException("InterestRateService#create with interestRate.getId() != null"); // TODO: i18n
+            throw new IllegalArgumentException("InterestRateService#create with interestRate.getId() != null");
         }
 
         upsert(interestRate);
@@ -36,7 +36,7 @@ public class InterestRateService {
 
     public void update(final InterestRate interestRate) {
         if (interestRate.getId() == null) {
-            throw new IllegalArgumentException("InterestRateService#update with interestRate.getId() == null"); // TODO: i18n
+            throw new IllegalArgumentException("InterestRateService#update with interestRate.getId() == null");
         }
 
         upsert(interestRate);

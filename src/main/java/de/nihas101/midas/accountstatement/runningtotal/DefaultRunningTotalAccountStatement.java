@@ -1,21 +1,19 @@
 package de.nihas101.midas.accountstatement.runningtotal;
 
-import de.nihas101.midas.accountstatement.dto.AccountStatement;
+import de.nihas101.midas.accountstatement.dto.LabeledAccountStatement;
 import de.nihas101.midas.money.MoneyAmount;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
-import org.springframework.context.MessageSource;
 
 import java.time.LocalDate;
-import java.util.Locale;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor
 public class DefaultRunningTotalAccountStatement implements RunningTotalAccountStatement {
 
-    private final AccountStatement statement;
+    private final LabeledAccountStatement statement;
     private final MoneyAmount currentBalance;
 
     @Override
@@ -29,8 +27,8 @@ public class DefaultRunningTotalAccountStatement implements RunningTotalAccountS
     }
 
     @Override
-    public String label(final MessageSource messageSource, final Locale locale) {
-        return statement != null ? statement.label(messageSource, locale) : null;
+    public String label() {
+        return statement != null ? statement.label() : null;
     }
 
     @Override

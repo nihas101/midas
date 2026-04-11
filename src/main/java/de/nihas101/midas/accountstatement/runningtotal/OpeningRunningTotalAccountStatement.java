@@ -17,6 +17,18 @@ import java.util.Locale;
 public class OpeningRunningTotalAccountStatement implements RunningTotalAccountStatement {
 
     private final OpeningBalance openingBalance;
+    private final String label;
+
+    public OpeningRunningTotalAccountStatement(
+            final OpeningBalance openingBalance,
+            final MessageSource messageSource,
+            final Locale locale
+    ) {
+        this(
+                openingBalance,
+                messageSource.getMessage("account-statement.opening-balance", null, locale)
+        );
+    }
 
     @Override
     public MoneyAmount currentBalance() {
@@ -33,9 +45,8 @@ public class OpeningRunningTotalAccountStatement implements RunningTotalAccountS
         return openingBalance.getYear().atMonth(Month.JANUARY).atDay(1);
     }
 
-    @Override
-    public String label(final MessageSource messageSource, final Locale locale) {
-        return "Saldovortrag"; // TODO: i18n
+    public String label() {
+        return label;
     }
 
     @Override

@@ -175,7 +175,7 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
         final TextField lastNameField = new TextField();
         lastNameField.setWidthFull();
         binder.forField(lastNameField)
-                .asRequired(messageSource.getMessage("shareholder.last-name.label", null, locale) + " is required") // TODO: i18n
+                .asRequired(messageSource.getMessage("shareholder.last-name.required", null, locale))
                 .bind(Shareholder::getLastName, Shareholder::setLastName);
 
         this.addColumn(Shareholder::getLastName)
@@ -195,7 +195,7 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
         firstNameField.setWidthFull();
 
         binder.forField(firstNameField)
-                .asRequired(messageSource.getMessage("shareholder.first-name.label", null, locale) + " is required") // TODO: i18n
+                .asRequired(messageSource.getMessage("shareholder.first-name.required", null, locale))
                 .bind(Shareholder::getFirstName, Shareholder::setFirstName);
 
         this.addColumn(Shareholder::getFirstName)
