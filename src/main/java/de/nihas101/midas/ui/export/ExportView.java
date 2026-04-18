@@ -27,6 +27,7 @@ import org.springframework.context.MessageSource;
 
 import java.time.LocalDate;
 import java.time.Year;
+import java.util.List;
 import java.util.Set;
 
 @Slf4j
@@ -41,6 +42,7 @@ public class ExportView extends MidasView {
 
     private MultiSelectComboBox<Shareholder> shareholderPicker;
     private Checkbox selectAllCheckbox;
+    private CheckboxGroup<String> viewPicker;
     private DatePicker startDatePicker;
     private DatePicker endDatePicker;
     private CheckboxGroup<String> formatPicker;
@@ -62,13 +64,24 @@ public class ExportView extends MidasView {
         content.setSizeFull();
         content.setSpacing(true);
         content.setPadding(true);
+        content.setAlignItems(FlexComponent.Alignment.START);
 
         content.add(new H2(messageSource.getMessage("export", null, getLocale())));
 
-        setupShareholderSelection(content);
-        setupDateSelection(content);
-        setupFormatSelection(content);
-        setupActionButton(content);
+        // Form container to keep elements left-aligned but centered as a group
+        VerticalLayout formContainer = new VerticalLayout();
+        formContainer.setWidth("600px");
+        formContainer.setPadding(false);
+        formContainer.setSpacing(true);
+        formContainer.setAlignItems(FlexComponent.Alignment.START);
+
+        setupShareholderSelection(formContainer);
+        setupViewSelection(formContainer);
+        setupDateSelection(formContainer);
+        setupFormatSelection(formContainer);
+
+        content.add(formContainer);
+        content.setAlignSelf(FlexComponent.Alignment.CENTER, formContainer);
 
         updateExportButtonState();
 
@@ -76,12 +89,16 @@ public class ExportView extends MidasView {
     }
 
     private void updateExportButtonState() {
-        if (shareholderPicker == null || formatPicker == null || startDatePicker == null || endDatePicker == null || exportButton == null) {
+        if (shareholderPicker == null || viewPicker == null || formatPicker == null || startDatePicker == null || endDatePicker == null || exportButton == null) {
             return;
         }
         boolean shareholdersSelected = !shareholderPicker.getValue().isEmpty();
         shareholderPicker.setInvalid(!shareholdersSelected);
         shareholderPicker.setErrorMessage(shareholdersSelected ? "" : messageSource.getMessage("export.validation.no-shareholders", null, getLocale()));
+
+        boolean viewsSelected = !viewPicker.getValue().isEmpty();
+        viewPicker.setInvalid(!viewsSelected);
+        viewPicker.setErrorMessage(viewsSelected ? "" : messageSource.getMessage("export.validation.no-views", null, getLocale()));
 
         boolean formatsSelected = !formatPicker.getValue().isEmpty();
         formatPicker.setInvalid(!formatsSelected);
@@ -93,12 +110,13 @@ public class ExportView extends MidasView {
         endDatePicker.setInvalid(!datesValid);
         endDatePicker.setErrorMessage(datesValid ? "" : messageSource.getMessage("export.validation.invalid-dates", null, getLocale()));
 
-        exportButton.setEnabled(shareholdersSelected && formatsSelected && datesValid);
+        exportButton.setEnabled(shareholdersSelected && viewsSelected && formatsSelected && datesValid);
     }
 
     private void setupShareholderSelection(VerticalLayout content) {
         HorizontalLayout layout = new HorizontalLayout();
         layout.setAlignItems(FlexComponent.Alignment.BASELINE);
+        layout.setWidthFull();
 
         shareholderPicker = new MultiSelectComboBox<>(messageSource.getMessage("export.shareholders.label", null, getLocale()));
         final Set<Shareholder> allShareholders = Set.copyOf(shareholdersService.shareholders().toList());
@@ -131,12 +149,32 @@ public class ExportView extends MidasView {
         selectAllCheckbox.setValue(true);
 
         layout.add(shareholderPicker, selectAllCheckbox);
+        layout.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
         content.add(layout);
+    }
+
+    private void setupViewSelection(VerticalLayout content) {
+        final String bookingsLabel = messageSource.getMessage("export.view.bookings", null, getLocale());
+        final String interestLabel = messageSource.getMessage("export.view.interest", null, getLocale());
+        final String statementsLabel = messageSource.getMessage("export.view.account-statements", null, getLocale());
+        final List<String> allViews = List.of(bookingsLabel, interestLabel, statementsLabel);
+
+        viewPicker = new CheckboxGroup<>(messageSource.getMessage("export.views.label", null, getLocale()));
+        viewPicker.setItems(allViews);
+        viewPicker.addThemeVariants(CheckboxGroupVariant.LUMO_VERTICAL);
+        viewPicker.addValueChangeListener(e -> updateExportButtonState());
+
+        // Set defaults
+        viewPicker.select(allViews);
+
+        content.add(viewPicker);
     }
 
     private void setupDateSelection(VerticalLayout content) {
         HorizontalLayout dateLayout = new HorizontalLayout();
         dateLayout.setSpacing(true);
+        dateLayout.setWidthFull();
+        dateLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
 
         final DatePicker.DatePickerI18n i18n = DatePickerI18nProvider.datePickerI18n(
                 messageSource,
@@ -159,6 +197,10 @@ public class ExportView extends MidasView {
     }
 
     private void setupFormatSelection(VerticalLayout content) {
+        HorizontalLayout layout = new HorizontalLayout();
+        layout.setWidthFull();
+        layout.setAlignItems(FlexComponent.Alignment.END);
+
         formatPicker = new CheckboxGroup<>(messageSource.getMessage("export.formats.label", null, getLocale()));
         formatPicker.setItems(
                 messageSource.getMessage("export.format.xlsx", null, getLocale()),
@@ -168,26 +210,25 @@ public class ExportView extends MidasView {
         formatPicker.select(messageSource.getMessage("export.format.pdf", null, getLocale()));
         formatPicker.addValueChangeListener(e -> updateExportButtonState());
 
-        content.add(formatPicker);
-    }
-
-    private void setupActionButton(VerticalLayout content) {
         exportButton = new Button(
                 messageSource.getMessage("export.button", null, getLocale()),
                 VaadinIcon.DOWNLOAD.create()
         );
         exportButton.addThemeVariants(com.vaadin.flow.component.button.ButtonVariant.LUMO_PRIMARY);
-
-        // Mock click listener
         exportButton.addClickListener(e -> {
-            log.info("Export triggered for {} shareholders, from {} to {}, formats: {}",
+            log.info("Export triggered for {} shareholders, {} views, from {} to {}, formats: {}",
                     shareholderPicker.getValue().size(),
+                    viewPicker.getValue().size(),
                     startDatePicker.getValue(),
                     endDatePicker.getValue(),
                     formatPicker.getValue());
         });
 
-        content.add(exportButton);
+        layout.add(formatPicker, exportButton);
+        layout.setFlexGrow(1, formatPicker);
+        layout.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
+
+        content.add(layout);
     }
 
     public static Icon icon() {

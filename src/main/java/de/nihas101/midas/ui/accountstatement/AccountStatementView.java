@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Route("account-statements")
 @PageTitle("Account Statements")
-public class AccountStatementView extends MidasView implements BeforeEnterObserver { // TODO
+public class AccountStatementView extends MidasView implements BeforeEnterObserver { // TODO: Add a toggle to carry forward the closing balance to next year
 
     public static final VaadinIcon icon = VaadinIcon.WALLET;
 

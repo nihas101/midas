@@ -32,10 +32,9 @@ public class MidasApplication implements AppShellConfigurator {
 
     public static void main(String[] args) {
         // TODO: Add tooltips everywhere
-        // TODO: Try importing dbf files
         // TODO: Add support for imports via some kind of (xml?) file that defines the inputs and mappings
         //       - csv (but hide the item by default)
-        // TODO: Add support for exports to: csv
+        // TODO: Add support for exports to: csv, pdf, html(?)
         try {
             SpringApplication.run(MidasApplication.class, args);
         } catch (Exception e) {
