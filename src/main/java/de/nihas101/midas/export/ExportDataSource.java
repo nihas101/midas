@@ -5,6 +5,8 @@ import org.springframework.context.MessageSource;
 import java.util.List;
 import java.util.Locale;
 
+// TODO: Reverse this relationship, so the source does not need to expose all of its things
+//       This is currently very specific to excel-like exports anyway
 /**
  * Interface for providing data to an exporter in a format-agnostic way.
  */

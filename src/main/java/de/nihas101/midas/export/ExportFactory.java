@@ -1,6 +1,7 @@
 package de.nihas101.midas.export;
 
 import de.nihas101.midas.bookings.service.BookingsReader;
+import de.nihas101.midas.interest.service.InterestRateService;
 import de.nihas101.midas.openingbalance.service.DefaultOpeningBalanceService;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class ExportFactory {
 
     private final BookingsReader bookingsReader;
     private final DefaultOpeningBalanceService openingBalanceService;
+    private final InterestRateService interestRateService;
     private final MessageSource messageSource;
 
     /**
@@ -55,8 +57,19 @@ public class ExportFactory {
             );
         }
 
+        if (request.views().contains("interest")) {
+            dataSources.add(
+                    new InterestExportDataSource(
+                            request.shareholders(),
+                            request.startDate(),
+                            request.endDate(),
+                            bookingsReader,
+                            interestRateService
+                    )
+            );
+        }
+
         // Placeholder for future view implementations:
-        // if (request.views().contains("interest")) { ... }
         // if (request.views().contains("account-statements")) { ... }
 
         return new XlsxExporter(
