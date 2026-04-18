@@ -29,6 +29,11 @@ public class DefaultBookings implements Bookings {
     }
 
     @Override
+    public List<Booking> allBookings() {
+        return bookings;
+    }
+
+    @Override
     public boolean isEmpty() {
         return bookings.isEmpty() && openingBalance == null;
     }

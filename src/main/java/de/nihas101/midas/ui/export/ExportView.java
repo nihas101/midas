@@ -6,16 +6,21 @@ import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.checkbox.CheckboxGroupVariant;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.streams.DownloadHandler;
+import com.vaadin.flow.server.streams.DownloadResponse;
 import de.nihas101.midas.bookings.service.BookingsService;
 import de.nihas101.midas.config.MidasConfig;
+import de.nihas101.midas.export.ExportFactory;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersService;
 import de.nihas101.midas.ui.common.DatePickerI18nProvider;
@@ -25,6 +30,8 @@ import de.nihas101.midas.userconfig.service.UserConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
 import java.time.Year;
 import java.util.List;
@@ -39,6 +46,7 @@ public class ExportView extends MidasView {
 
     private final ShareholdersService shareholdersService;
     private final MessageSource messageSource;
+    private final ExportFactory exportFactory;
 
     private MultiSelectComboBox<Shareholder> shareholderPicker;
     private Checkbox selectAllCheckbox;
@@ -47,6 +55,7 @@ public class ExportView extends MidasView {
     private DatePicker endDatePicker;
     private CheckboxGroup<String> formatPicker;
     private Button exportButton;
+    private final VerticalLayout mainContent;
 
     public ExportView(
             final ShareholdersService shareholdersService,
@@ -54,19 +63,21 @@ public class ExportView extends MidasView {
             final MidasConfig config,
             final MessageSource messageSource,
             final UserConfigService userConfigService,
-            final MidasLocaleResolver midasLocaleResolver
+            final MidasLocaleResolver midasLocaleResolver,
+            final ExportFactory exportFactory
     ) {
         super(config, userConfigService, messageSource, midasLocaleResolver);
         this.shareholdersService = shareholdersService;
         this.messageSource = messageSource;
+        this.exportFactory = exportFactory;
 
-        VerticalLayout content = new VerticalLayout();
-        content.setSizeFull();
-        content.setSpacing(true);
-        content.setPadding(true);
-        content.setAlignItems(FlexComponent.Alignment.START);
+        mainContent = new VerticalLayout();
+        mainContent.setSizeFull();
+        mainContent.setSpacing(true);
+        mainContent.setPadding(true);
+        mainContent.setAlignItems(FlexComponent.Alignment.START);
 
-        content.add(new H2(messageSource.getMessage("export", null, getLocale())));
+        mainContent.add(new H2(messageSource.getMessage("export", null, getLocale())));
 
         // Form container to keep elements left-aligned but centered as a group
         VerticalLayout formContainer = new VerticalLayout();
@@ -80,12 +91,12 @@ public class ExportView extends MidasView {
         setupDateSelection(formContainer);
         setupFormatSelection(formContainer);
 
-        content.add(formContainer);
-        content.setAlignSelf(FlexComponent.Alignment.CENTER, formContainer);
+        mainContent.add(formContainer);
+        mainContent.setAlignSelf(FlexComponent.Alignment.CENTER, formContainer);
 
         updateExportButtonState();
 
-        setContent(content);
+        setContent(mainContent);
     }
 
     private void updateExportButtonState() {
@@ -154,13 +165,11 @@ public class ExportView extends MidasView {
     }
 
     private void setupViewSelection(VerticalLayout content) {
-        final String bookingsLabel = messageSource.getMessage("export.view.bookings", null, getLocale());
-        final String interestLabel = messageSource.getMessage("export.view.interest", null, getLocale());
-        final String statementsLabel = messageSource.getMessage("export.view.account-statements", null, getLocale());
-        final List<String> allViews = List.of(bookingsLabel, interestLabel, statementsLabel);
+        final List<String> allViews = List.of("bookings", "interest", "account-statements");
 
         viewPicker = new CheckboxGroup<>(messageSource.getMessage("export.views.label", null, getLocale()));
         viewPicker.setItems(allViews);
+        viewPicker.setItemLabelGenerator(key -> messageSource.getMessage("export.view." + key, null, getLocale()));
         viewPicker.addThemeVariants(CheckboxGroupVariant.LUMO_VERTICAL);
         viewPicker.addValueChangeListener(e -> updateExportButtonState());
 
@@ -201,13 +210,13 @@ public class ExportView extends MidasView {
         layout.setWidthFull();
         layout.setAlignItems(FlexComponent.Alignment.END);
 
+        final List<String> allFormats = List.of("xlsx", "pdf");
+
         formatPicker = new CheckboxGroup<>(messageSource.getMessage("export.formats.label", null, getLocale()));
-        formatPicker.setItems(
-                messageSource.getMessage("export.format.xlsx", null, getLocale()),
-                messageSource.getMessage("export.format.pdf", null, getLocale())
-        );
+        formatPicker.setItems(allFormats);
+        formatPicker.setItemLabelGenerator(key -> messageSource.getMessage("export.format." + key, null, getLocale()));
         formatPicker.addThemeVariants(CheckboxGroupVariant.LUMO_VERTICAL);
-        formatPicker.select(messageSource.getMessage("export.format.pdf", null, getLocale()));
+        formatPicker.select("pdf");
         formatPicker.addValueChangeListener(e -> updateExportButtonState());
 
         exportButton = new Button(
@@ -215,20 +224,54 @@ public class ExportView extends MidasView {
                 VaadinIcon.DOWNLOAD.create()
         );
         exportButton.addThemeVariants(com.vaadin.flow.component.button.ButtonVariant.LUMO_PRIMARY);
-        exportButton.addClickListener(e -> {
-            log.info("Export triggered for {} shareholders, {} views, from {} to {}, formats: {}",
-                    shareholderPicker.getValue().size(),
-                    viewPicker.getValue().size(),
-                    startDatePicker.getValue(),
-                    endDatePicker.getValue(),
-                    formatPicker.getValue());
-        });
+        exportButton.addClickListener(e -> runExport());
 
         layout.add(formatPicker, exportButton);
         layout.setFlexGrow(1, formatPicker);
         layout.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
 
         content.add(layout);
+    }
+
+    private void runExport() {
+        try {
+            final ExportFactory.ExportRequest request = new ExportFactory.ExportRequest(
+                    List.copyOf(shareholderPicker.getValue()),
+                    viewPicker.getValue(),
+                    startDatePicker.getValue(),
+                    endDatePicker.getValue(),
+                    formatPicker.getValue()
+            );
+
+            if (request.formats().size() == 1 && request.formats().contains("xlsx")) {
+                final ByteArrayOutputStream out = new ByteArrayOutputStream();
+                exportFactory.createXlsxExport(request, out, getLocale()).trigger();
+
+                final byte[] data = out.toByteArray();
+                final String fileName = "Midas_Export_" + LocalDate.now() + ".xlsx"; // TODO: Make this from -> to instead of now
+
+                final Anchor downloadAnchor = new Anchor(
+                        DownloadHandler.fromInputStream(event -> new DownloadResponse(
+                                new ByteArrayInputStream(data),
+                                fileName,
+                                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                                data.length
+                        )),
+                        ""
+                );
+                downloadAnchor.getElement().setAttribute("download", true);
+                downloadAnchor.getElement().getStyle().set("display", "none");
+                mainContent.add(downloadAnchor);
+
+                downloadAnchor.getElement().executeJs("this.click();");
+                Notification.show("Export successful");
+            } else {
+                Notification.show("Currently only XLSX export is supported in this implementation step.");
+            }
+        } catch (Exception e) {
+            log.error("Export failed", e);
+            Notification.show("Export failed: " + e.getMessage(), 5000, Notification.Position.MIDDLE);
+        }
     }
 
     public static Icon icon() {
