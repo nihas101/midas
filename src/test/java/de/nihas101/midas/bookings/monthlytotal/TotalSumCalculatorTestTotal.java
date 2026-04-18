@@ -52,6 +52,11 @@ class TotalSumCalculatorTestTotal {
             }
 
             @Override
+            public List<Booking> allBookings() {
+                return List.of();
+            }
+
+            @Override
             public boolean isEmpty() {
                 return true;
             }
@@ -99,6 +104,11 @@ class TotalSumCalculatorTestTotal {
             @Override
             public MonthlyBookings bookingsInMonth(Month m) {
                 return m == Month.MARCH ? monthlyBookings : new MonthlyBookings(List.of());
+            }
+
+            @Override
+            public List<Booking> allBookings() {
+                return List.of();
             }
 
             @Override

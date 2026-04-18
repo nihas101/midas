@@ -1,5 +1,6 @@
 package de.nihas101.midas.export;
 
+import de.nihas101.midas.accountstatement.service.AccountStatementService;
 import de.nihas101.midas.bookings.service.BookingsReader;
 import de.nihas101.midas.interest.service.InterestRateService;
 import de.nihas101.midas.openingbalance.service.DefaultOpeningBalanceService;
@@ -26,6 +27,7 @@ public class ExportFactory {
     private final BookingsReader bookingsReader;
     private final DefaultOpeningBalanceService openingBalanceService;
     private final InterestRateService interestRateService;
+    private final AccountStatementService accountStatementService;
     private final MessageSource messageSource;
 
     /**
@@ -43,6 +45,7 @@ public class ExportFactory {
     ) {
         final List<ExportDataSource> dataSources = new ArrayList<>();
 
+        // TODO: Don't do this via strings
         if (request.views().contains("bookings")) {
             dataSources.add(
                     new BookingsExportDataSource(
@@ -69,8 +72,18 @@ public class ExportFactory {
             );
         }
 
-        // Placeholder for future view implementations:
-        // if (request.views().contains("account-statements")) { ... }
+        if (request.views().contains("account-statements")) {
+            dataSources.add(
+                    new AccountStatementExportDataSource(
+                            request.shareholders(),
+                            request.startDate(),
+                            request.endDate(),
+                            accountStatementService,
+                            messageSource,
+                            locale
+                    )
+            );
+        }
 
         return new XlsxExporter(
                 dataSources,

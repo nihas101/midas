@@ -243,6 +243,8 @@ public class ExportView extends MidasView {
                     formatPicker.getValue()
             );
 
+            // TODO: Don't do this via strings
+            // TODO: This exposes too much of the logic in this view
             if (request.formats().size() == 1 && request.formats().contains("xlsx")) {
                 final ByteArrayOutputStream out = new ByteArrayOutputStream();
                 exportFactory.createXlsxExport(request, out, getLocale()).trigger();

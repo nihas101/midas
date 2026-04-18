@@ -309,6 +309,11 @@ class MonthlyTotalSummaryBookingRowTest {
             }
 
             @Override
+            public List<Booking> allBookings() {
+                return bookingsInMonth;
+            }
+
+            @Override
             public boolean isEmpty() {
                 return false;
             }
