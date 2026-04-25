@@ -21,6 +21,7 @@ import com.vaadin.flow.server.streams.DownloadResponse;
 import de.nihas101.midas.bookings.service.BookingsService;
 import de.nihas101.midas.config.MidasConfig;
 import de.nihas101.midas.export.ExportFactory;
+import de.nihas101.midas.export.ExportRequest;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersService;
 import de.nihas101.midas.ui.common.DatePickerI18nProvider;
@@ -237,7 +238,7 @@ public class ExportView extends MidasView {
         try {
             final LocalDate from = startDatePicker.getValue();
             final LocalDate to = endDatePicker.getValue();
-            final ExportFactory.ExportRequest request = new ExportFactory.ExportRequest(
+            final ExportRequest request = new ExportRequest(
                     List.copyOf(shareholderPicker.getValue()),
                     viewPicker.getValue(),
                     from,

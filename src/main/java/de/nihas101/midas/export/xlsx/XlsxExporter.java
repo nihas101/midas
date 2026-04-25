@@ -14,10 +14,26 @@ public class XlsxExporter implements Export {
 
     private final List<ExportDataSource> dataSources;
     private final OutputStream outputStream;
+    private final XlsxExportTargetFactory factory;
+
+    public XlsxExporter(
+            final List<ExportDataSource> dataSources,
+            final OutputStream outputStream
+    ) {
+        this(
+                dataSources,
+                outputStream,
+                new XlsxExportTargetFactory()
+        );
+    }
 
     @Override
     public void trigger() {
-        try (XlsxExportTarget exportTarget = new XlsxExportTarget()) {
+        if (dataSources.isEmpty()) {
+            return;
+        }
+
+        try (XlsxExportTarget exportTarget = factory.exportTarget()) {
             dataSources.forEach(dataSource -> dataSource.export(exportTarget));
             exportTarget.write(outputStream);
         } catch (Exception e) {

@@ -2,25 +2,24 @@ package de.nihas101.midas.export;
 
 import de.nihas101.midas.accountstatement.service.AccountStatementService;
 import de.nihas101.midas.bookings.service.BookingsReader;
+import de.nihas101.midas.export.accountstatement.AccountStatementExportDataSource;
+import de.nihas101.midas.export.accountstatement.AccountStatementsRowExtractor;
+import de.nihas101.midas.export.bookings.BookingsExportDataSource;
+import de.nihas101.midas.export.bookings.BookingsRowExtractor;
+import de.nihas101.midas.export.interest.InterestExportDataSource;
+import de.nihas101.midas.export.interest.InterestRowExtractor;
 import de.nihas101.midas.export.xlsx.XlsxExporter;
 import de.nihas101.midas.interest.service.InterestRateService;
 import de.nihas101.midas.openingbalance.service.DefaultOpeningBalanceService;
-import de.nihas101.midas.shareholders.dto.Shareholder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
 import java.io.OutputStream;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
-/**
- * Factory for creating Export instances.
- * Orchestrates the selection of data sources and the specific exporter implementation.
- */
 @Service
 @RequiredArgsConstructor
 public class ExportFactory {
@@ -31,14 +30,6 @@ public class ExportFactory {
     private final AccountStatementService accountStatementService;
     private final MessageSource messageSource;
 
-    /**
-     * Creates an Excel (XLSX) export.
-     *
-     * @param request      The export parameters from the UI.
-     * @param outputStream The stream to write the workbook to.
-     * @param locale       The locale for translations.
-     * @return An Export instance ready to be triggered.
-     */
     public Export createXlsxExport(
             final ExportRequest request,
             final OutputStream outputStream,
@@ -50,11 +41,15 @@ public class ExportFactory {
         if (request.views().contains("bookings")) {
             dataSources.add(
                     new BookingsExportDataSource(
-                            request.shareholders(),
-                            request.startDate(),
-                            request.endDate(),
-                            bookingsReader,
-                            openingBalanceService,
+                            new BookingsRowExtractor(
+                                    request.shareholders(),
+                                    request.startDate(),
+                                    request.endDate(),
+                                    bookingsReader,
+                                    openingBalanceService,
+                                    messageSource,
+                                    locale
+                            ),
                             messageSource,
                             locale
                     )
@@ -64,11 +59,13 @@ public class ExportFactory {
         if (request.views().contains("interest")) {
             dataSources.add(
                     new InterestExportDataSource(
-                            request.shareholders(),
-                            request.startDate(),
-                            request.endDate(),
-                            bookingsReader,
-                            interestRateService,
+                            new InterestRowExtractor(
+                                    request.shareholders(),
+                                    request.startDate(),
+                                    request.endDate(),
+                                    bookingsReader,
+                                    interestRateService
+                            ),
                             messageSource,
                             locale
                     )
@@ -78,10 +75,14 @@ public class ExportFactory {
         if (request.views().contains("account-statements")) {
             dataSources.add(
                     new AccountStatementExportDataSource(
-                            request.shareholders(),
-                            request.startDate(),
-                            request.endDate(),
-                            accountStatementService,
+                            new AccountStatementsRowExtractor(
+                                    request.shareholders(),
+                                    request.startDate(),
+                                    request.endDate(),
+                                    accountStatementService,
+                                    messageSource,
+                                    locale
+                            ),
                             messageSource,
                             locale
                     )
@@ -91,15 +92,4 @@ public class ExportFactory {
         return new XlsxExporter(dataSources, outputStream);
     }
 
-    /**
-     * DTO for transport of export parameters from the UI to the factory.
-     */
-    public record ExportRequest(
-            List<Shareholder> shareholders,
-            Set<String> views,
-            LocalDate startDate,
-            LocalDate endDate,
-            Set<String> formats
-    ) {
-    }
 }
