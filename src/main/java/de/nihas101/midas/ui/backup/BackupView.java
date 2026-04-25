@@ -1,12 +1,15 @@
 package de.nihas101.midas.ui.backup;
 
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.router.PageTitle;
@@ -66,29 +69,46 @@ public class BackupView extends MidasView {
         this.messageSource = messageSource;
 
         content = new VerticalLayout();
-
         content.setSizeFull();
         content.setPadding(true);
         content.setSpacing(true);
+        content.setAlignItems(FlexComponent.Alignment.START);
 
         content.add(new H2(messageSource.getMessage("backup", null, getLocale())));
 
+        // Form container to keep elements left-aligned but centered as a group
+        VerticalLayout formContainer = new VerticalLayout();
+        formContainer.setWidth("550px"); // Consistent with ExportView
+        formContainer.setPadding(false);
+        formContainer.setSpacing(true);
+        formContainer.setAlignItems(FlexComponent.Alignment.START);
+
         lastBackupLabel = new Span();
         updateLastBackupLabel();
-        content.add(lastBackupLabel);
+        formContainer.add(lastBackupLabel);
 
         progressBar = new ProgressBar();
         progressBar.setIndeterminate(true);
         progressBar.setVisible(false);
-        content.add(progressBar);
+        progressBar.setWidthFull();
+        formContainer.add(progressBar);
 
         statusText = new Span();
         statusText.setVisible(false);
-        content.add(statusText);
+        formContainer.add(statusText);
 
         backupButton = new Button(messageSource.getMessage("backup.create", null, getLocale()), VaadinIcon.DOWNLOAD.create());
+        backupButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         backupButton.addClickListener(e -> runBackup());
-        content.add(backupButton);
+
+        HorizontalLayout buttonLayout = new HorizontalLayout(backupButton);
+        buttonLayout.setWidthFull();
+        buttonLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        formContainer.add(buttonLayout);
+        formContainer.setAlignItems(FlexComponent.Alignment.CENTER);
+
+        content.add(formContainer);
+        content.setAlignSelf(FlexComponent.Alignment.CENTER, formContainer);
 
         setContent(content);
     }

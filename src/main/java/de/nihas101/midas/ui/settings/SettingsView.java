@@ -42,6 +42,12 @@ public class SettingsView extends MidasView {
 
         content.add(new H2(messageSource.getMessage("settings", null, getLocale())));
 
+        final VerticalLayout formContainer = new VerticalLayout();
+        formContainer.setWidth("550px"); // Consistent width with other views
+        formContainer.setPadding(false);
+        formContainer.setSpacing(true);
+        formContainer.setAlignItems(FlexComponent.Alignment.START);
+
         final ThemeToggleButton themeToggleButton = new ThemeToggleButton(
                 config,
                 userConfigService
@@ -54,7 +60,10 @@ public class SettingsView extends MidasView {
                 userConfigService
         );
 
-        content.add(themeToggleButton, localeSelect);
+        formContainer.add(themeToggleButton, localeSelect);
+        content.add(formContainer);
+        content.setAlignSelf(FlexComponent.Alignment.CENTER, formContainer);
+
         setContent(content);
     }
 

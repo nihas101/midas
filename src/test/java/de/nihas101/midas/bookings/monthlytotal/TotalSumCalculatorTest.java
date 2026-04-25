@@ -2,7 +2,7 @@ package de.nihas101.midas.bookings.monthlytotal;
 
 import de.nihas101.midas.bookings.dto.Booking;
 import de.nihas101.midas.bookings.dto.Bookings;
-import de.nihas101.midas.bookings.dto.MonthlyBookings;
+import de.nihas101.midas.bookings.dto.FilteredBookings;
 import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.openingbalance.dto.OpeningBalance;
@@ -14,10 +14,11 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class TotalSumCalculatorTestTotal {
+class TotalSumCalculatorTest {
 
     @ParameterizedTest
     @EnumSource(Month.class)
@@ -27,7 +28,7 @@ class TotalSumCalculatorTestTotal {
         Booking b2 = createBooking(BookingType.WITHDRAWAL, 500L, testMonth, "B");
         Booking b3 = createBooking(BookingType.INTEREST, 200L, testMonth, "C");
 
-        MonthlyTotalSum.MonthlySumTotalCalculator calculator = createCalculator(new MonthlyBookings(List.of(b1, b2, b3)));
+        MonthlyTotalSum.MonthlySumTotalCalculator calculator = createCalculator(new FilteredBookings(List.of(b1, b2, b3)));
 
         // Act
         MonthlyTotal totals = new MonthlyTotalSum(calculator);
@@ -47,8 +48,13 @@ class TotalSumCalculatorTestTotal {
             }
 
             @Override
-            public MonthlyBookings bookingsInMonth(Month m) {
-                return new MonthlyBookings(List.of());
+            public FilteredBookings bookingsInMonth(Month m) {
+                return new FilteredBookings(List.of());
+            }
+
+            @Override
+            public FilteredBookings filter(final Function<Booking, Boolean> condition) {
+                return new FilteredBookings(List.of());
             }
 
             @Override
@@ -71,7 +77,7 @@ class TotalSumCalculatorTestTotal {
         Booking pos = createBooking(BookingType.WITHDRAWAL, 1000L, Month.MARCH, "Plus");
         Booking neg = createBooking(BookingType.WITHDRAWAL, -400L, Month.MARCH, "Minus");
 
-        final MonthlyTotalSum.MonthlySumTotalCalculator calculator = createCalculator(new MonthlyBookings(List.of(pos, neg)));
+        final MonthlyTotalSum.MonthlySumTotalCalculator calculator = createCalculator(new FilteredBookings(List.of(pos, neg)));
 
         // Act
         Map<BookingType, MoneyAmount> totals = calculator.monthlyTotals();
@@ -89,7 +95,7 @@ class TotalSumCalculatorTestTotal {
         assertEquals(MoneyAmount.ZERO, totals.get(BookingType.WITHDRAWAL));
     }
 
-    private static MonthlyTotalSum.MonthlySumTotalCalculator createCalculator(final MonthlyBookings monthlyBookings) {
+    private static MonthlyTotalSum.MonthlySumTotalCalculator createCalculator(final FilteredBookings filteredBookings) {
         final Bookings bookings = new Bookings() {
             @Override
             public OpeningBalance openingBalance() {
@@ -97,8 +103,13 @@ class TotalSumCalculatorTestTotal {
             }
 
             @Override
-            public MonthlyBookings bookingsInMonth(Month m) {
-                return m == Month.MARCH ? monthlyBookings : new MonthlyBookings(List.of());
+            public FilteredBookings bookingsInMonth(Month m) {
+                return m == Month.MARCH ? filteredBookings : new FilteredBookings(List.of());
+            }
+
+            @Override
+            public FilteredBookings filter(final Function<Booking, Boolean> condition) {
+                return new FilteredBookings(List.of());
             }
 
             @Override

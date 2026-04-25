@@ -2,7 +2,7 @@ package de.nihas101.midas.bookings.monthlytotal;
 
 import de.nihas101.midas.bookings.dto.Booking;
 import de.nihas101.midas.bookings.dto.Bookings;
-import de.nihas101.midas.bookings.dto.MonthlyBookings;
+import de.nihas101.midas.bookings.dto.FilteredBookings;
 import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.money.MoneyAmount;
 import org.junit.jupiter.api.Assertions;
@@ -53,21 +53,21 @@ class MonthlyCumulativeSumTest {
 
         // Jan: Withdrawal 100
         final Booking janW = Booking.builder().type(BookingType.WITHDRAWAL).amount(MoneyAmount.ofCents(100L)).build();
-        when(bookings.bookingsInMonth(Month.JANUARY)).thenReturn(new MonthlyBookings(List.of(janW)));
+        when(bookings.bookingsInMonth(Month.JANUARY)).thenReturn(new FilteredBookings(List.of(janW)));
 
         // Feb: Interest 50
         final Booking febI = Booking.builder().type(BookingType.INTEREST).amount(MoneyAmount.ofCents(50L)).build();
-        when(bookings.bookingsInMonth(Month.FEBRUARY)).thenReturn(new MonthlyBookings(List.of(febI)));
+        when(bookings.bookingsInMonth(Month.FEBRUARY)).thenReturn(new FilteredBookings(List.of(febI)));
 
         // Mar: Withdrawal 200, Compensation 300
         final Booking marW = Booking.builder().type(BookingType.WITHDRAWAL).amount(MoneyAmount.ofCents(200L)).build();
         final Booking marC = Booking.builder().type(BookingType.COMPENSATION).amount(MoneyAmount.ofCents(300L)).build();
-        when(bookings.bookingsInMonth(Month.MARCH)).thenReturn(new MonthlyBookings(List.of(marW, marC)));
+        when(bookings.bookingsInMonth(Month.MARCH)).thenReturn(new FilteredBookings(List.of(marW, marC)));
 
         // Rest empty
         for (Month m : Month.values()) {
             if (m.getValue() > 3) {
-                when(bookings.bookingsInMonth(m)).thenReturn(new MonthlyBookings(List.of()));
+                when(bookings.bookingsInMonth(m)).thenReturn(new FilteredBookings(List.of()));
             }
         }
 

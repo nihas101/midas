@@ -2,7 +2,7 @@ package de.nihas101.midas.ui.bookings;
 
 import de.nihas101.midas.bookings.dto.Booking;
 import de.nihas101.midas.bookings.dto.Bookings;
-import de.nihas101.midas.bookings.dto.MonthlyBookings;
+import de.nihas101.midas.bookings.dto.FilteredBookings;
 import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.bookings.entity.Source;
 import de.nihas101.midas.bookings.monthlytotal.MonthlyTotalSum;
@@ -20,6 +20,7 @@ import java.time.Month;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static de.nihas101.midas.bookings.entity.BookingType.COMPENSATION;
@@ -304,8 +305,13 @@ class MonthlyTotalSummaryBookingRowTest {
             }
 
             @Override
-            public MonthlyBookings bookingsInMonth(final Month month) {
-                return new MonthlyBookings(bookingsInMonth);
+            public FilteredBookings bookingsInMonth(final Month month) {
+                return new FilteredBookings(bookingsInMonth);
+            }
+
+            @Override
+            public FilteredBookings filter(final Function<Booking, Boolean> condition) {
+                return new FilteredBookings(bookingsInMonth);
             }
 
             @Override

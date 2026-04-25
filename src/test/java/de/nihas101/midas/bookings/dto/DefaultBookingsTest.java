@@ -42,7 +42,7 @@ class DefaultBookingsTest {
 
         DefaultBookings defaultBookings = new DefaultBookings(List.of(correctMonth, wrongMonth), new OpeningBalance(1, 2, MoneyAmount.ofCents(5000L), Year.of(2026)));
 
-        MonthlyBookings result = defaultBookings.bookingsInMonth(month);
+        FilteredBookings result = defaultBookings.bookingsInMonth(month);
 
         assertEquals(1, result.bookings().size(), "Should only contain one booking for " + month);
         assertTrue(result.bookings().contains(correctMonth));
