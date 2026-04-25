@@ -18,7 +18,6 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.streams.DownloadHandler;
 import com.vaadin.flow.server.streams.DownloadResponse;
-import de.nihas101.midas.bookings.service.BookingsService;
 import de.nihas101.midas.config.MidasConfig;
 import de.nihas101.midas.export.ExportFactory;
 import de.nihas101.midas.export.ExportRequest;
@@ -60,7 +59,6 @@ public class ExportView extends MidasView {
 
     public ExportView(
             final ShareholdersService shareholdersService,
-            final BookingsService bookingsService,
             final MidasConfig config,
             final MessageSource messageSource,
             final UserConfigService userConfigService,
@@ -211,13 +209,15 @@ public class ExportView extends MidasView {
         layout.setWidthFull();
         layout.setAlignItems(FlexComponent.Alignment.END);
 
-        final List<String> allFormats = List.of("xlsx", "pdf");
+        //final List<String> allFormats = List.of("xlsx", "pdf"); // TODO: Use this when PDF is added (+ dont use strings for this)
+        final List<String> allFormats = List.of("xlsx");
 
         formatPicker = new CheckboxGroup<>(messageSource.getMessage("export.formats.label", null, getLocale()));
         formatPicker.setItems(allFormats);
         formatPicker.setItemLabelGenerator(key -> messageSource.getMessage("export.format." + key, null, getLocale()));
         formatPicker.addThemeVariants(CheckboxGroupVariant.LUMO_VERTICAL);
-        formatPicker.select("pdf");
+        formatPicker.select("xlsx");
+        // formatPicker.select("pdf"); // TODO: Make this the default when pdf is added
         formatPicker.addValueChangeListener(e -> updateExportButtonState());
 
         exportButton = new Button(
@@ -269,13 +269,13 @@ public class ExportView extends MidasView {
                 mainContent.add(downloadAnchor);
 
                 downloadAnchor.getElement().executeJs("this.click();");
-                Notification.show("Export successful");
+                Notification.show(messageSource.getMessage("export.notification.success", null, getLocale()));
             } else {
-                Notification.show("Currently only XLSX export is supported.");
+                Notification.show(messageSource.getMessage("export.notification.only-xlsx", null, getLocale()));
             }
         } catch (Exception e) {
             log.error("Export failed", e);
-            Notification.show("Export failed: " + e.getMessage(), 5000, Notification.Position.MIDDLE);
+            Notification.show(messageSource.getMessage("export.notification.error", new Object[]{e.getMessage()}, getLocale()), 5000, Notification.Position.MIDDLE);
         }
     }
 
