@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.Month;
 import java.util.List;
+import java.util.function.Function;
 
 @RequiredArgsConstructor
 public class DefaultBookings implements Bookings {
@@ -21,16 +22,16 @@ public class DefaultBookings implements Bookings {
     }
 
     @Override
-    public MonthlyBookings bookingsInMonth(final Month month) {
-        final List<Booking> monthlyBookings = bookings.stream()
-                .filter(b -> month.equals(b.getDate().getMonth()))
-                .toList();
-        return new MonthlyBookings(monthlyBookings);
+    public FilteredBookings bookingsInMonth(final Month month) {
+        return filter(b -> month.equals(b.getDate().getMonth()));
     }
 
     @Override
-    public List<Booking> allBookings() {
-        return bookings;
+    public FilteredBookings filter(final Function<Booking, Boolean> condition) {
+        final List<Booking> filteredBookings = bookings.stream()
+                .filter(condition::apply)
+                .toList();
+        return new FilteredBookings(filteredBookings);
     }
 
     @Override

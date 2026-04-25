@@ -2,6 +2,7 @@ package de.nihas101.midas.export;
 
 import de.nihas101.midas.accountstatement.service.AccountStatementService;
 import de.nihas101.midas.bookings.service.BookingsReader;
+import de.nihas101.midas.export.xlsx.XlsxExporter;
 import de.nihas101.midas.interest.service.InterestRateService;
 import de.nihas101.midas.openingbalance.service.DefaultOpeningBalanceService;
 import de.nihas101.midas.shareholders.dto.Shareholder;
@@ -67,7 +68,9 @@ public class ExportFactory {
                             request.startDate(),
                             request.endDate(),
                             bookingsReader,
-                            interestRateService
+                            interestRateService,
+                            messageSource,
+                            locale
                     )
             );
         }
@@ -85,12 +88,7 @@ public class ExportFactory {
             );
         }
 
-        return new XlsxExporter(
-                dataSources,
-                outputStream,
-                messageSource,
-                locale
-        );
+        return new XlsxExporter(dataSources, outputStream);
     }
 
     /**

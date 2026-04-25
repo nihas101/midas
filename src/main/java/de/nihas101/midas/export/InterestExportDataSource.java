@@ -36,14 +36,23 @@ public class InterestExportDataSource implements ExportDataSource {
     private final LocalDate endDate;
     private final BookingsReader bookingsReader;
     private final InterestRateService interestRateService;
+    private final MessageSource messageSource;
+    private final Locale locale;
 
     @Override
-    public String getSheetName(MessageSource messageSource, Locale locale) {
+    public void export(final ExportTarget exportTarget) {
+        exportTarget.export(
+                getSheetName(messageSource, locale),
+                getHeaders(messageSource, locale),
+                getRows()
+        );
+    }
+
+    private String getSheetName(MessageSource messageSource, Locale locale) {
         return messageSource.getMessage("interest-calculation", null, locale);
     }
 
-    @Override
-    public List<String> getHeaders(MessageSource messageSource, Locale locale) {
+    private List<String> getHeaders(MessageSource messageSource, Locale locale) {
         return List.of(
                 messageSource.getMessage("bookings.shareholder", null, locale),
                 messageSource.getMessage("interest.table.month", null, locale),
@@ -57,8 +66,7 @@ public class InterestExportDataSource implements ExportDataSource {
         );
     }
 
-    @Override
-    public List<List<Object>> getRows() {
+    private List<List<Object>> getRows() {
         List<ExportRow> rawRows = new ArrayList<>();
 
         for (Shareholder shareholder : shareholders) {

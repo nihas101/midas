@@ -31,13 +31,11 @@ public class AccountStatementExportDataSource implements ExportDataSource {
     private final MessageSource messageSource;
     private final Locale locale;
 
-    @Override
-    public String getSheetName(MessageSource messageSource, Locale locale) {
+    private String getSheetName(MessageSource messageSource, Locale locale) {
         return messageSource.getMessage("account-statements", null, locale);
     }
 
-    @Override
-    public List<String> getHeaders(MessageSource messageSource, Locale locale) {
+    private List<String> getHeaders(MessageSource messageSource, Locale locale) {
         return List.of(
                 messageSource.getMessage("bookings.shareholder", null, locale),
                 messageSource.getMessage("account-statements.table.id", null, locale),
@@ -49,8 +47,7 @@ public class AccountStatementExportDataSource implements ExportDataSource {
         );
     }
 
-    @Override
-    public List<List<Object>> getRows() {
+    private List<List<Object>> getRows() {
         List<ExportRow> rawRows = new ArrayList<>();
 
         for (Shareholder shareholder : shareholders) {
@@ -98,6 +95,15 @@ public class AccountStatementExportDataSource implements ExportDataSource {
                     return list;
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void export(final ExportTarget exportTarget) {
+        exportTarget.export(
+                getSheetName(messageSource, locale),
+                getHeaders(messageSource, locale),
+                getRows()
+        );
     }
 
     private boolean isWithinRange(LocalDate date) {

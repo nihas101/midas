@@ -36,13 +36,11 @@ public class BookingsExportDataSource implements ExportDataSource {
     private final MessageSource messageSource;
     private final Locale locale;
 
-    @Override
-    public String getSheetName(MessageSource messageSource, Locale locale) {
+    private String getSheetName(MessageSource messageSource, Locale locale) {
         return messageSource.getMessage("bookings", null, locale);
     }
 
-    @Override
-    public List<String> getHeaders(MessageSource messageSource, Locale locale) {
+    private List<String> getHeaders(MessageSource messageSource, Locale locale) {
         return List.of(
                 messageSource.getMessage("bookings.shareholder", null, locale),
                 messageSource.getMessage("bookings.table.id", null, locale),
@@ -57,8 +55,7 @@ public class BookingsExportDataSource implements ExportDataSource {
         );
     }
 
-    @Override
-    public List<List<Object>> getRows() {
+    private List<List<Object>> getRows() {
         List<ExportRow> rawRows = new ArrayList<>();
 
         for (Shareholder shareholder : shareholders) {
@@ -66,50 +63,72 @@ public class BookingsExportDataSource implements ExportDataSource {
 
             for (int yearValue = startDate.getYear(); yearValue <= endDate.getYear(); yearValue++) {
                 Year year = Year.of(yearValue);
-
-                // 1. Handle Opening Balance
-                final OpeningBalance ob = openingBalanceService.openingBalance(shareholder.getId(), year);
-                if (ob != null) {
-                    LocalDate obDate = year.atDay(1);
-                    if (isWithinRange(obDate)) {
-                        rawRows.add(new ExportRow(
-                                shareholderName,
-                                null,
-                                obDate,
-                                messageSource.getMessage("export.bookings.opening-balance", new Object[]{yearValue}, locale),
-                                TYPE_OPENING_BALANCE,
-                                ob.getOpeningBalance().toBigDecimal()
-                        ));
-                    }
-                }
-
-                // TODO: Handle this in a better way than exposing the booking in a list
-                // 2. Handle Real Bookings
-                bookingsReader.bookingsForShareholderAndYear(shareholder.getId(), year)
-                        .allBookings().stream()
-                        .filter(b -> isWithinRange(b.getDate()))
-                        .forEach(b -> rawRows.add(
-                                        new ExportRow(
-                                                shareholderName,
-                                                b.getId(),
-                                                b.getDate(),
-                                                b.getComment(),
-                                                b.getType().name(),
-                                                b.getAmount().toBigDecimal()
-                                        )
-                                )
-                        );
+                openingBalance(shareholder, year, rawRows, shareholderName, yearValue);
+                bookings(shareholder, year, rawRows, shareholderName);
             }
         }
 
-        // Sort: Shareholder Name ASC, then Date ASC
-        rawRows.sort(Comparator.comparing(ExportRow::shareholderName)
-                .thenComparing(ExportRow::date));
+        sort(rawRows);
 
-        // Transform to grid format
+        return transformToGridFormat(rawRows);
+    }
+
+    @Override
+    public void export(final ExportTarget exportTarget) {
+        exportTarget.export(
+                getSheetName(messageSource, locale),
+                getHeaders(messageSource, locale),
+                getRows()
+        );
+    }
+
+    private List<List<Object>> transformToGridFormat(final List<ExportRow> rawRows) {
         return rawRows.stream()
                 .map(this::toObjectList)
                 .collect(Collectors.toList());
+    }
+
+    private static void sort(final List<ExportRow> rawRows) {
+        rawRows.sort(Comparator.comparing(ExportRow::shareholderName)
+                .thenComparing(ExportRow::date));
+    }
+
+    private void openingBalance(final Shareholder shareholder, final Year year, final List<ExportRow> rawRows, final String shareholderName, final int yearValue) {
+        final OpeningBalance openingBalance = openingBalanceService.openingBalance(shareholder.getId(), year);
+        if (openingBalance == null) {
+            return;
+        }
+        LocalDate openingBalanceDate = year.atDay(1);
+        if (!isWithinRange(openingBalanceDate)) {
+            return;
+        }
+        rawRows.add(
+                new ExportRow(
+                        shareholderName,
+                        null,
+                        openingBalanceDate,
+                        messageSource.getMessage("export.bookings.opening-balance", new Object[]{yearValue}, locale),
+                        TYPE_OPENING_BALANCE,
+                        openingBalance.getOpeningBalance().toBigDecimal()
+                )
+        );
+    }
+
+    private void bookings(final Shareholder shareholder, final Year year, final List<ExportRow> rawRows, final String shareholderName) {
+        bookingsReader.bookingsForShareholderAndYear(shareholder.getId(), year)
+                .filter(b -> isWithinRange(b.getDate()))
+                .bookings()
+                .forEach(b -> rawRows.add(
+                                new ExportRow(
+                                        shareholderName,
+                                        b.getId(),
+                                        b.getDate(),
+                                        b.getComment(),
+                                        b.getType().name(),
+                                        b.getAmount().toBigDecimal()
+                                )
+                        )
+                );
     }
 
     private boolean isWithinRange(LocalDate date) {

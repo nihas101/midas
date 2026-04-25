@@ -2,7 +2,7 @@ package de.nihas101.midas.ui.bookings;
 
 import de.nihas101.midas.bookings.dto.Booking;
 import de.nihas101.midas.bookings.dto.Bookings;
-import de.nihas101.midas.bookings.dto.MonthlyBookings;
+import de.nihas101.midas.bookings.dto.FilteredBookings;
 import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.bookings.monthlytotal.MonthlyTotalSum;
 import de.nihas101.midas.money.MoneyAmount;
@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DefaultBookingsToBookingRowConverter implements BookingsToBookingRowConverter {
 
-    private final MonthlyBookings monthBookings;
+    private final FilteredBookings monthBookings;
     private final MoneyAmount startingBalance;
     private final DateTimeFormatter dateFormat;
     private final Consumer<BookingRow> consumer;
