@@ -235,22 +235,24 @@ public class ExportView extends MidasView {
 
     private void runExport() {
         try {
+            final LocalDate from = startDatePicker.getValue();
+            final LocalDate to = endDatePicker.getValue();
             final ExportFactory.ExportRequest request = new ExportFactory.ExportRequest(
                     List.copyOf(shareholderPicker.getValue()),
                     viewPicker.getValue(),
-                    startDatePicker.getValue(),
-                    endDatePicker.getValue(),
+                    from,
+                    to,
                     formatPicker.getValue()
             );
 
             // TODO: Don't do this via strings
-            // TODO: This exposes too much of the logic in this view
             if (request.formats().size() == 1 && request.formats().contains("xlsx")) {
                 final ByteArrayOutputStream out = new ByteArrayOutputStream();
-                exportFactory.createXlsxExport(request, out, getLocale()).trigger();
+                exportFactory.createXlsxExport(request, out, getLocale())
+                        .trigger();
 
                 final byte[] data = out.toByteArray();
-                final String fileName = "Midas_Export_" + LocalDate.now() + ".xlsx"; // TODO: Make this from -> to instead of now
+                final String fileName = "export_" + from + "_" + to + ".xlsx";
 
                 final Anchor downloadAnchor = new Anchor(
                         DownloadHandler.fromInputStream(event -> new DownloadResponse(
@@ -268,7 +270,7 @@ public class ExportView extends MidasView {
                 downloadAnchor.getElement().executeJs("this.click();");
                 Notification.show("Export successful");
             } else {
-                Notification.show("Currently only XLSX export is supported in this implementation step.");
+                Notification.show("Currently only XLSX export is supported.");
             }
         } catch (Exception e) {
             log.error("Export failed", e);
