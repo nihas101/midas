@@ -44,14 +44,14 @@ class ShareholderPersistenceTest {
         // Given
         Shareholder dto = new Shareholder(null, null, "Jane", "Doe");
         service.create(dto);
-        
+
         Shareholder saved = service.shareholders().toList().stream()
                 .filter(s -> s.getFirstName().equals("Jane") && s.getLastName().equals("Doe"))
                 .findFirst()
                 .orElseThrow();
-        
+
         assertEquals(saved.getId(), saved.getDisplayId(), "If no display ID is provided, it should default to the database ID");
-        
+
         int originalDisplayId = saved.getDisplayId();
         int newDisplayId = 888;
         saved.setDisplayId(newDisplayId);

@@ -1,8 +1,8 @@
 package de.nihas101.midas.accountstatement.runningtotal;
 
-import de.nihas101.midas.accountstatement.dto.LabeledAccountStatement;
 import de.nihas101.midas.accountstatement.dto.AccountStatements;
 import de.nihas101.midas.accountstatement.dto.DefaultAccountStatement;
+import de.nihas101.midas.accountstatement.dto.LabeledAccountStatement;
 import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.openingbalance.dto.OpeningBalance;
@@ -45,7 +45,7 @@ class DefaultRunningTotalAccountStatementsTest {
     void calculationTest() {
         // Arrange
         final OpeningBalance openingBalance = new OpeningBalance(null, null, MoneyAmount.ofCents(1000L), TEST_YEAR);
-        
+
         final LabeledAccountStatement withdrawal = new DefaultAccountStatement(
                 1,
                 TEST_YEAR,
@@ -62,7 +62,7 @@ class DefaultRunningTotalAccountStatementsTest {
                 null,
                 null
         );
-        
+
         final AccountStatements accountStatements = mock(AccountStatements.class);
         when(accountStatements.openingBalance()).thenReturn(openingBalance);
         when(accountStatements.forType(BookingType.WITHDRAWAL)).thenReturn(withdrawal);
@@ -80,7 +80,7 @@ class DefaultRunningTotalAccountStatementsTest {
         // Assert
         Assertions.assertFalse(runningTotals.isEmpty());
         final List<RunningTotalAccountStatement> resultList = runningTotals.runningTotalAccountStatements();
-        
+
         // 1 (Opening) + 2 (Types) = 3 rows
         Assertions.assertEquals(3, resultList.size());
 
@@ -104,7 +104,7 @@ class DefaultRunningTotalAccountStatementsTest {
         final OpeningBalance openingBalance = new OpeningBalance(null, null, MoneyAmount.ZERO, TEST_YEAR);
         final AccountStatements accountStatements = mock(AccountStatements.class);
         when(accountStatements.openingBalance()).thenReturn(openingBalance);
-        
+
         final LabeledAccountStatement withdrawal = new DefaultAccountStatement(
                 1,
                 TEST_YEAR,
@@ -121,7 +121,7 @@ class DefaultRunningTotalAccountStatementsTest {
                 null,
                 null
         );
-        
+
         when(accountStatements.forType(BookingType.WITHDRAWAL)).thenReturn(withdrawal);
         when(accountStatements.forType(BookingType.INTEREST)).thenReturn(interest);
 
