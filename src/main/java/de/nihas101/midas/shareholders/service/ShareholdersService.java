@@ -40,7 +40,6 @@ public class ShareholdersService implements ShareholdersReader, ShareholdersWrit
         if (shareholder.getId() != null) {
             throw new IllegalArgumentException("ShareholdersService#create with shareholder.getId() != null");
         }
-        // TODO: This can cause the display id to be overwritten (maybe, could also be a frontend issue)
         repository.save(ShareholderEntity.fromDto(shareholder));
     }
 
