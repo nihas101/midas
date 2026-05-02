@@ -1,0 +1,22 @@
+<div th:fragment="content">
+    <h1 th:text="#{export.view.bookings}">Bookings</h1>
+    
+    <div class="header-info">
+        <p><strong>Gesellschafter:</strong> <span th:text="${data.shareholderName}">Name</span></p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th th:each="header : ${data.headers}" th:text="${header}">Header</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="row : ${data.rows}">
+                <td th:each="cell, iterStat : ${row}" 
+                    th:text="${cell}"
+                    th:classappend="${iterStat.index > 3} ? 'text-right amount' : ''">Cell</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

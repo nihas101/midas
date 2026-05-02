@@ -8,6 +8,8 @@ import de.nihas101.midas.export.bookings.BookingsExportDataSource;
 import de.nihas101.midas.export.bookings.BookingsRowExtractor;
 import de.nihas101.midas.export.interest.InterestExportDataSource;
 import de.nihas101.midas.export.interest.InterestRowExtractor;
+import de.nihas101.midas.export.pdf.PdfExporter;
+import de.nihas101.midas.export.pdf.PdfService;
 import de.nihas101.midas.export.xlsx.XlsxExporter;
 import de.nihas101.midas.interest.service.InterestRateService;
 import de.nihas101.midas.openingbalance.service.DefaultOpeningBalanceService;
@@ -29,6 +31,7 @@ public class ExportFactory {
     private final InterestRateService interestRateService;
     private final AccountStatementService accountStatementService;
     private final MessageSource messageSource;
+    private final PdfService pdfService;
 
     public Export createXlsxExport(
             final ExportRequest request,
@@ -90,6 +93,24 @@ public class ExportFactory {
         }
 
         return new XlsxExporter(dataSources, outputStream);
+    }
+
+    public Export createPdfExport(
+            final ExportRequest request,
+            final OutputStream outputStream,
+            final Locale locale
+    ) {
+        return new PdfExporter(
+                request,
+                outputStream,
+                locale,
+                pdfService,
+                bookingsReader,
+                openingBalanceService,
+                interestRateService,
+                accountStatementService,
+                messageSource
+        );
     }
 
 }

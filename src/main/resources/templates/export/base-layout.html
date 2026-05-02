@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+            @bottom-right {
+                content: "Seite " counter(page) " von " counter(pages);
+                font-family: "Liberation Serif", serif;
+                font-size: 10pt;
+            }
+            @bottom-left {
+                content: element(footerLeft);
+            }
+        }
+        #footerLeft {
+            position: running(footerLeft);
+            font-family: "Liberation Serif", serif;
+            font-size: 10pt;
+        }
+        body {
+            font-family: "Liberation Serif", serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            color: #333;
+        }
+        h1 {
+            font-size: 18pt;
+            margin-bottom: 0.5cm;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 0.2cm;
+        }
+        .header-info {
+            margin-bottom: 1cm;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.5cm;
+            table-layout: auto;
+        }
+        thead {
+            display: table-header-group;
+        }
+        th {
+            text-align: left;
+            border-bottom: 2px solid #333;
+            padding: 8px 4px;
+            font-weight: bold;
+            background-color: #f9f9f9;
+        }
+        td {
+            padding: 6px 4px;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .amount {
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+    <div id="footerLeft" th:text="${data.shareholderName}">Name</div>
+    <div th:insert="${content}">
+        <!-- Content will be injected here -->
+    </div>
+</body>
+</html>

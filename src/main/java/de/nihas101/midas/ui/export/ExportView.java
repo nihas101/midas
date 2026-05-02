@@ -209,15 +209,13 @@ public class ExportView extends MidasView {
         layout.setWidthFull();
         layout.setAlignItems(FlexComponent.Alignment.END);
 
-        //final List<String> allFormats = List.of("xlsx", "pdf"); // TODO: Use this when PDF is added (+ dont use strings for this)
-        final List<String> allFormats = List.of("xlsx");
+        final List<String> allFormats = List.of("xlsx", "pdf");
 
         formatPicker = new CheckboxGroup<>(messageSource.getMessage("export.formats.label", null, getLocale()));
         formatPicker.setItems(allFormats);
         formatPicker.setItemLabelGenerator(key -> messageSource.getMessage("export.format." + key, null, getLocale()));
         formatPicker.addThemeVariants(CheckboxGroupVariant.LUMO_VERTICAL);
-        formatPicker.select("xlsx");
-        // formatPicker.select("pdf"); // TODO: Make this the default when pdf is added
+        formatPicker.select("pdf");
         formatPicker.addValueChangeListener(e -> updateExportButtonState());
 
         exportButton = new Button(
@@ -246,37 +244,68 @@ public class ExportView extends MidasView {
                     formatPicker.getValue()
             );
 
-            // TODO: Don't do this via strings
-            if (request.formats().size() == 1 && request.formats().contains("xlsx")) {
-                final ByteArrayOutputStream out = new ByteArrayOutputStream();
-                exportFactory.createXlsxExport(request, out, getLocale())
-                        .trigger();
-
-                final byte[] data = out.toByteArray();
-                final String fileName = "export_" + from + "_" + to + ".xlsx";
-
-                final Anchor downloadAnchor = new Anchor(
-                        DownloadHandler.fromInputStream(event -> new DownloadResponse(
-                                new ByteArrayInputStream(data),
-                                fileName,
-                                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                                data.length
-                        )),
-                        ""
-                );
-                downloadAnchor.getElement().setAttribute("download", true);
-                downloadAnchor.getElement().getStyle().set("display", "none");
-                mainContent.add(downloadAnchor);
-
-                downloadAnchor.getElement().executeJs("this.click();");
-                Notification.show(messageSource.getMessage("export.notification.success", null, getLocale()));
-            } else {
-                Notification.show(messageSource.getMessage("export.notification.only-xlsx", null, getLocale()));
+            if (request.formats().contains("xlsx")) {
+                runXlsxExport(request, from, to);
             }
+            if (request.formats().contains("pdf")) {
+                runPdfExport(request, from, to);
+            }
+
+            Notification.show(messageSource.getMessage("export.notification.success", null, getLocale()));
         } catch (Exception e) {
             log.error("Export failed", e);
             Notification.show(messageSource.getMessage("export.notification.error", new Object[]{e.getMessage()}, getLocale()), 5000, Notification.Position.MIDDLE);
         }
+    }
+
+    private void runXlsxExport(ExportRequest request, LocalDate from, LocalDate to) {
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        exportFactory.createXlsxExport(request, out, getLocale())
+                .trigger();
+
+        final byte[] data = out.toByteArray();
+        final String fileName = "export_" + from + "_" + to + ".xlsx";
+
+        triggerDownload(data, fileName, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    }
+
+    private void runPdfExport(ExportRequest request, LocalDate from, LocalDate to) {
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        exportFactory.createPdfExport(request, out, getLocale())
+                .trigger();
+
+        final byte[] data = out.toByteArray();
+
+        int totalFiles = request.shareholders().size() * request.views().size();
+        String fileName;
+        String mimeType;
+
+        if (totalFiles > 1) {
+            fileName = "export_" + from + "_" + to + ".zip";
+            mimeType = "application/zip";
+        } else {
+            fileName = "export_" + from + "_" + to + ".pdf";
+            mimeType = "application/pdf";
+        }
+
+        triggerDownload(data, fileName, mimeType);
+    }
+
+    private void triggerDownload(byte[] data, String fileName, String mimeType) {
+        final Anchor downloadAnchor = new Anchor(
+                DownloadHandler.fromInputStream(event -> new DownloadResponse(
+                        new ByteArrayInputStream(data),
+                        fileName,
+                        mimeType,
+                        data.length
+                )),
+                ""
+        );
+        downloadAnchor.getElement().setAttribute("download", true);
+        downloadAnchor.getElement().getStyle().set("display", "none");
+        mainContent.add(downloadAnchor);
+
+        downloadAnchor.getElement().executeJs("this.click();");
     }
 
     public static Icon icon() {
