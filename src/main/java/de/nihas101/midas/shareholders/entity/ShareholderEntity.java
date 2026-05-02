@@ -24,8 +24,7 @@ public class ShareholderEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "display_id", insertable = false)
-    @Generated(event = {EventType.INSERT})
+    @Column(name = "display_id")
     private Integer displayId;
 
     @Column(name = "first_name", nullable = false)
