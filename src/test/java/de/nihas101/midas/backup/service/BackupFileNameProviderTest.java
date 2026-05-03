@@ -21,6 +21,6 @@ class BackupFileNameProviderTest {
 
         final String fileName = backupFileNameProvider.getBackupFileName();
 
-        Assertions.assertEquals("midas_backup_20260404_120013.zip", fileName);
+        Assertions.assertEquals("midas_backup_2026-04-04_120013.zip", fileName);
     }
 }
