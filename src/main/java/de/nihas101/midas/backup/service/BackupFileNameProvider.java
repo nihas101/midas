@@ -31,7 +31,7 @@ public class BackupFileNameProvider {
     ) {
         this(
                 midasExecutableNameResolver,
-                DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"),
+                DateTimeFormatter.ofPattern("yyyy-MM-dd_HHmmss"),
                 "%s_backup_%s.zip",
                 localDateTimeSupplier
         );
