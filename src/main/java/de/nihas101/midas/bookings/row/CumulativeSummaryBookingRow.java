@@ -1,4 +1,4 @@
-package de.nihas101.midas.ui.bookings;
+package de.nihas101.midas.bookings.row;
 
 import de.nihas101.midas.bookings.dto.Booking;
 import de.nihas101.midas.bookings.dto.Bookings;

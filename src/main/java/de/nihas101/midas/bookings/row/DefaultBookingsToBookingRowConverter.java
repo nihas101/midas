@@ -1,4 +1,4 @@
-package de.nihas101.midas.ui.bookings;
+package de.nihas101.midas.bookings.row;
 
 import de.nihas101.midas.bookings.dto.Booking;
 import de.nihas101.midas.bookings.dto.Bookings;
@@ -67,7 +67,7 @@ public class DefaultBookingsToBookingRowConverter implements BookingsToBookingRo
             }
 
             runningTotal = runningTotal.plus(entryTotal);
-            final BookingRow bookingRow = new DefaultBookingRow( // TODO: Get rid of this dependency to the UI?
+            final BookingRow bookingRow = new DefaultBookingRow(
                     String.valueOf(first.getDisplayId()),
                     first.getDate().format(dateFormat),
                     first.getComment(),

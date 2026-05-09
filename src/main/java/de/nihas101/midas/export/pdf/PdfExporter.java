@@ -1,17 +1,18 @@
 package de.nihas101.midas.export.pdf;
 
+import de.nihas101.midas.accountstatement.row.AccountStatementRowService;
+import de.nihas101.midas.accountstatement.runningtotal.RunningTotalAccountStatements;
 import de.nihas101.midas.accountstatement.service.AccountStatementService;
-import de.nihas101.midas.bookings.service.BookingsReader;
+import de.nihas101.midas.bookings.dto.Bookings;
+import de.nihas101.midas.bookings.row.BookingRow;
+import de.nihas101.midas.bookings.row.BookingRowService;
 import de.nihas101.midas.export.Export;
 import de.nihas101.midas.export.ExportRequest;
-import de.nihas101.midas.export.accountstatement.AccountStatementExportDataSource;
-import de.nihas101.midas.export.accountstatement.AccountStatementsRowExtractor;
-import de.nihas101.midas.export.bookings.BookingsExportDataSource;
-import de.nihas101.midas.export.bookings.BookingsRowExtractor;
-import de.nihas101.midas.export.interest.InterestExportDataSource;
-import de.nihas101.midas.export.interest.InterestRowExtractor;
+import de.nihas101.midas.interest.InterestCalculation;
+import de.nihas101.midas.interest.dto.InterestRate;
+import de.nihas101.midas.interest.row.InterestRowService;
+import de.nihas101.midas.interest.service.InterestBookingsReader;
 import de.nihas101.midas.interest.service.InterestRateService;
-import de.nihas101.midas.openingbalance.service.DefaultOpeningBalanceService;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,9 @@ import org.springframework.context.MessageSource;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigDecimal;
+import java.time.Year;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.zip.ZipEntry;
@@ -34,16 +38,17 @@ public class PdfExporter implements Export {
     private final Locale locale;
     private final PdfService pdfService;
 
-    // Services needed for data extraction
-    private final BookingsReader bookingsReader;
-    private final DefaultOpeningBalanceService openingBalanceService;
+    private final InterestBookingsReader bookingsReader;
     private final InterestRateService interestRateService;
     private final AccountStatementService accountStatementService;
     private final MessageSource messageSource;
+    private final BookingRowService bookingRowService;
+    private final AccountStatementRowService accountStatementRowService;
+    private final InterestRowService interestRowService;
 
     @Override
     public void trigger() {
-        int totalFiles = request.shareholders().size() * request.views().size();
+        final int totalFiles = request.shareholders().size() * request.views().size();
 
         if (totalFiles == 0) {
             return;
@@ -57,9 +62,9 @@ public class PdfExporter implements Export {
     }
 
     private void generateSinglePdf() {
-        Shareholder sh = request.shareholders().getFirst();
-        String view = request.views().iterator().next();
-        PdfViewData data = extractData(sh, view);
+        final Shareholder sh = request.shareholders().getFirst();
+        final String view = request.views().iterator().next();
+        final PdfViewData data = extractData(sh, view);
         pdfService.generatePdf(data, locale, outputStream);
     }
 
@@ -67,22 +72,22 @@ public class PdfExporter implements Export {
         try (ZipOutputStream zos = new ZipOutputStream(outputStream)) {
             for (Shareholder sh : request.shareholders()) {
                 for (String view : request.views()) {
-                    PdfViewData data = extractData(sh, view);
-                    String filename = String.format("%s_%s_%s.pdf",
+                    final PdfViewData data = extractData(sh, view);
+                    final String filename = String.format("%s_%s_%s.pdf",
                             view,
                             (sh.getFirstName() + "_" + sh.getLastName()).replace(" ", "_"),
                             request.startDate().toString());
 
                     zos.putNextEntry(new ZipEntry(filename));
-                    
+
                     // We need a temporary buffer because PdfService writes to the stream 
                     // and we don't want it to close the ZipOutputStream prematurely 
                     // (though OpenHTMLToPDF shouldn't close it, it's safer this way 
                     // if we wanted to be absolutely sure, but ZipOutputStream expects entries)
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     pdfService.generatePdf(data, locale, baos);
                     zos.write(baos.toByteArray());
-                    
+
                     zos.closeEntry();
                 }
             }
@@ -93,61 +98,94 @@ public class PdfExporter implements Export {
     }
 
     private PdfViewData extractData(Shareholder shareholder, String view) {
-        PdfExportTarget target = new PdfExportTarget();
-        List<Shareholder> singleShList = List.of(shareholder);
-
         if ("bookings".equals(view)) {
-            new BookingsExportDataSource(
-                    new BookingsRowExtractor(
-                            singleShList,
-                            request.startDate(),
-                            request.endDate(),
-                            bookingsReader,
-                            openingBalanceService,
-                            messageSource,
-                            locale
-                    ),
-                    messageSource,
-                    locale
-            ).export(target);
-        } else if ("interest".equals(view)) {
-            new InterestExportDataSource(
-                    new InterestRowExtractor(
-                            singleShList,
-                            request.startDate(),
-                            request.endDate(),
-                            bookingsReader,
-                            interestRateService
-                    ),
-                    messageSource,
-                    locale
-            ).export(target);
-        } else if ("account-statements".equals(view)) {
-            new AccountStatementExportDataSource(
-                    new AccountStatementsRowExtractor(
-                            singleShList,
-                            request.startDate(),
-                            request.endDate(),
-                            accountStatementService,
-                            messageSource,
-                            locale
-                    ),
-                    messageSource,
-                    locale
-            ).export(target);
+            return extractBookingsData(shareholder);
+        }
+        if ("account-statements".equals(view)) {
+            return extractAccountStatementsData(shareholder);
+        }
+        if ("interest".equals(view)) {
+            return extractInterestData(shareholder);
         }
 
-        if (target.getViews().isEmpty()) {
-            // Should not happen if data exists, but return empty data to avoid NPE
-            return new PdfViewData(view, shareholder.getFirstName() + " " + shareholder.getLastName(), List.of(), List.of());
-        }
+        return new PdfViewData(view, shareholder.getFirstName() + " " + shareholder.getLastName(), List.of(), List.of());
+    }
 
-        PdfExportTarget.ViewData viewData = target.getViews().getFirst();
+    private PdfViewData extractBookingsData(Shareholder shareholder) {
+        List<String> headers = List.of(
+                messageSource.getMessage("bookings.table.id", null, locale),
+                messageSource.getMessage("bookings.table.date", null, locale),
+                messageSource.getMessage("bookings.table.comment", null, locale),
+                messageSource.getMessage("bookings.table.total", null, locale),
+                messageSource.getMessage("bookings.type.withdrawal", null, locale),
+                messageSource.getMessage("bookings.type.tax-previous-year", null, locale),
+                messageSource.getMessage("bookings.type.tax-credit", null, locale),
+                messageSource.getMessage("bookings.type.interest", null, locale),
+                messageSource.getMessage("bookings.type.compensation", null, locale),
+                messageSource.getMessage("bookings.table.balance", null, locale)
+        );
+
+        final Year year = Year.of(request.startDate().getYear());
+        final Bookings bookings = bookingsReader.interestRelatedBookingsForShareholderAndYear(shareholder.getId(), year);
+        final List<BookingRow> rows = bookingRowService.generateRows(bookings, locale);
+
         return new PdfViewData(
-                view,
+                "bookings",
                 shareholder.getFirstName() + " " + shareholder.getLastName(),
-                viewData.headers(),
-                viewData.rows()
+                headers,
+                new ArrayList<>(rows)
+        );
+    }
+
+    private PdfViewData extractAccountStatementsData(Shareholder shareholder) {
+        List<String> headers = List.of(
+                messageSource.getMessage("account-statements.table.id", null, locale),
+                messageSource.getMessage("account-statements.table.date", null, locale),
+                messageSource.getMessage("account-statements.table.type", null, locale),
+                messageSource.getMessage("account-statements.table.debit", null, locale),
+                messageSource.getMessage("account-statements.table.credit", null, locale),
+                messageSource.getMessage("account-statements.table.balance", null, locale)
+        );
+
+        final Year year = Year.of(request.startDate().getYear());
+        final RunningTotalAccountStatements statements = accountStatementService.runningTotalAccountStatements(shareholder, year, messageSource, locale);
+
+        final List<Object> rows = new ArrayList<>(accountStatementRowService.generateRows(statements));
+        rows.add(accountStatementRowService.generateClosingRow(statements, locale));
+
+        return new PdfViewData(
+                "account-statements",
+                shareholder.getFirstName() + " " + shareholder.getLastName(),
+                headers,
+                rows
+        );
+    }
+
+    private PdfViewData extractInterestData(Shareholder shareholder) {
+        List<String> headers = List.of(
+                messageSource.getMessage("interest.table.month", null, locale),
+                messageSource.getMessage("interest.table.transactions", null, locale),
+                messageSource.getMessage("interest.table.sh", null, locale),
+                messageSource.getMessage("interest.table.balance", null, locale),
+                messageSource.getMessage("interest.table.sh", null, locale),
+                messageSource.getMessage("interest.table.days", null, locale),
+                messageSource.getMessage("interest.table.interest-amount", null, locale)
+        );
+
+        final Year year = Year.of(request.startDate().getYear());
+        final InterestRate rate = interestRateService.interestRate(shareholder.getId(), year);
+        final BigDecimal interestRate = rate != null ? rate.getInterestRate() : BigDecimal.ZERO;
+
+        final Bookings bookings = bookingsReader.interestRelatedBookingsForShareholderAndYear(shareholder.getId(), year);
+        final InterestCalculation interestCalculation = new InterestCalculation(bookings, year, interestRate);
+
+        final List<Object> rows = new ArrayList<>(interestRowService.generateRows(year, bookings, interestRate, interestCalculation, locale));
+
+        return new PdfViewData(
+                "interest",
+                shareholder.getFirstName() + " " + shareholder.getLastName(),
+                headers,
+                rows
         );
     }
 }

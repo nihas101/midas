@@ -1,4 +1,4 @@
-package de.nihas101.midas.ui.accountstatement;
+package de.nihas101.midas.accountstatement.row;
 
 import de.nihas101.midas.accountstatement.runningtotal.RunningTotalAccountStatement;
 import de.nihas101.midas.money.MoneyAmount;

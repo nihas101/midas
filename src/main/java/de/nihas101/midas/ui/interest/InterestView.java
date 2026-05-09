@@ -1,8 +1,5 @@
 package de.nihas101.midas.ui.interest;
 
-import com.vaadin.flow.component.AbstractField;
-import com.vaadin.flow.component.HasValue;
-import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
@@ -27,6 +24,10 @@ import de.nihas101.midas.bookings.entity.Source;
 import de.nihas101.midas.config.MidasConfig;
 import de.nihas101.midas.interest.InterestCalculation;
 import de.nihas101.midas.interest.dto.InterestRate;
+import de.nihas101.midas.interest.row.InterestCalculationRow;
+import de.nihas101.midas.interest.row.InterestRowService;
+import de.nihas101.midas.interest.row.Transaction;
+import de.nihas101.midas.interest.row.TransactionType;
 import de.nihas101.midas.interest.service.InterestBookingsReader;
 import de.nihas101.midas.interest.service.InterestBookingsService;
 import de.nihas101.midas.interest.service.InterestBookingsWriter;
@@ -34,10 +35,9 @@ import de.nihas101.midas.interest.service.InterestRateService;
 import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersService;
-import de.nihas101.midas.ui.bookings.BookingRow;
-import de.nihas101.midas.ui.bookings.DefaultBookingsToBookingRowConverter;
 import de.nihas101.midas.ui.common.MidasView;
 import de.nihas101.midas.ui.common.ShareholderPicker;
+import de.nihas101.midas.ui.common.YearPicker;
 import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
 import de.nihas101.midas.userconfig.service.UserConfigService;
 import io.micrometer.common.util.StringUtils;
@@ -45,17 +45,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.IntStream;
 
 @Slf4j
 @Route("interest-calculation")
@@ -69,6 +63,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
     private final InterestBookingsReader bookingsReader;
     private final InterestRateService interestRateService;
     private final MessageSource messageSource;
+    private final InterestRowService interestRowService;
     private ComboBox<Shareholder> shareholderPicker; // TODO: Store the selected shareholder somewhere so that we can use that in the same filter when switching views
     private ComboBox<Integer> yearPicker; // TODO: Store the selected shareholder somewhere so that we can use that in the same filter when switching views
     private BigDecimalField interestRateField;
@@ -83,7 +78,8 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
             final MidasConfig config,
             final MessageSource messageSource,
             final UserConfigService userConfigService,
-            final MidasLocaleResolver midasLocaleResolver
+            final MidasLocaleResolver midasLocaleResolver,
+            final InterestRowService interestRowService
     ) {
         super(config, userConfigService, messageSource, midasLocaleResolver);
         this.shareholdersService = shareholdersService;
@@ -91,6 +87,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
         this.bookingsReader = bookingsService;
         this.interestRateService = interestRateService;
         this.messageSource = messageSource;
+        this.interestRowService = interestRowService;
 
         VerticalLayout content = new VerticalLayout();
         content.setSizeFull();
@@ -143,12 +140,16 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
 
         shareholderPicker = new ShareholderPicker(
                 messageSource.getMessage("bookings.shareholder", null, getLocale()),
-                shareholdersService.shareholders(),
-                e -> recalculateInterestForDisplay(),
-                messageSource.getMessage("shareholder-picker.placeholder", null, getLocale())
+                messageSource.getMessage("shareholder-picker.placeholder", null, getLocale()),
+                shareholdersService,
+                e -> recalculateInterestForDisplay()
         );
-        setupYearPicker();
-        headerActionRow = createActionRow();
+        yearPicker = new YearPicker(
+                messageSource.getMessage("bookings.year", null, getLocale()),
+                e -> recalculateInterestForDisplay()
+        );
+
+        headerActionRow = createHeaderActionRow();
         headerActionRow.setVisible(false);
 
         header.add(shareholderPicker, yearPicker, headerActionRow);
@@ -156,41 +157,19 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
         content.add(header);
     }
 
-    private void setupYearPicker() {
-        LocalDate now = LocalDate.now(ZoneId.systemDefault());
-
-        List<Integer> selectableYears = IntStream.rangeClosed(0, 99)
-                .map(i -> now.getYear() - i)
-                .boxed()
-                .toList();
-        yearPicker = new ComboBox<>(messageSource.getMessage("bookings.year", null, getLocale()), selectableYears);
-        yearPicker.setValue(LocalDate.now().getYear());
-        yearPicker.setWidth(6, Unit.EM);
-        yearPicker.addValueChangeListener(e -> recalculateInterestForDisplay());
-    }
-
-    private HorizontalLayout createActionRow() {
-        updateInterestAutomaticallyToggle = new Checkbox(
-                messageSource.getMessage("interest.update.automatically.toggle.label", null, getLocale()),
-                false,
-                (HasValue.ValueChangeListener<AbstractField.ComponentValueChangeEvent<Checkbox, Boolean>>) event -> {
-                    if (!event.isFromClient()) {
-                        return;
-                    }
-
-                    if (Boolean.TRUE.equals(event.getValue())) {
-                        recalculateInterest();
-                    } else {
-                        bookingsWriter.deleteInterestBooking(shareholderPicker.getValue(), Year.of(yearPicker.getValue()));
-                    }
-                });
-
-        // TODO: Extract this into its own class, so we always set the locale
+    private HorizontalLayout createHeaderActionRow() {
         interestRateField = new BigDecimalField(messageSource.getMessage("interest.rate.label", null, getLocale()));
         interestRateField.setMaxWidth("5em");
         interestRateField.setLocale(getLocale());
         interestRateField.setSuffixComponent(new Span("%"));
         interestRateField.addValueChangeListener(e -> {
+            if (e.isFromClient()) {
+                recalculateInterest();
+            }
+        });
+
+        updateInterestAutomaticallyToggle = new Checkbox(messageSource.getMessage("interest.update.automatically.toggle.label", null, getLocale()));
+        updateInterestAutomaticallyToggle.addValueChangeListener(e -> {
             if (e.isFromClient()) {
                 recalculateInterest();
             }
@@ -221,7 +200,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
         final InterestCalculation interestCalculation = new InterestCalculation(
                 bookings,
                 year,
-                interestRate
+                interestRate.getInterestRate()
         );
 
         if (Boolean.TRUE.equals(updateInterestAutomaticallyToggle.getValue())) {
@@ -229,11 +208,12 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
         }
 
         interestCalculationGrid.setItems(
-                createRows(
+                interestRowService.generateRows(
                         year,
                         bookings,
                         rate,
-                        interestCalculation
+                        interestCalculation,
+                        getLocale()
                 )
         );
     }
@@ -311,14 +291,14 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
                 interestRate
         );
         interestCalculationGrid.setItems(
-                createRows(
+                interestRowService.generateRows(
                         year,
                         bookings,
                         interestRate,
-                        interestCalculation
+                        interestCalculation,
+                        getLocale()
                 )
         );
-
     }
 
     private InterestRate interestRate(final Shareholder shareholder, final Year year) {
@@ -329,135 +309,6 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
         return rate;
     }
 
-    // TODO: Introduce classes for all this logic
-    private List<InterestCalculationRow> createRows(
-            final Year year,
-            final Bookings bookings,
-            final BigDecimal interestRate,
-            final InterestCalculation interestCalculation
-    ) {
-        final List<InterestCalculationRow> rows = new ArrayList<>();
-        rows.add(
-                new OpeningBalanceInterestCalculationRow(
-                        bookings,
-                        year,
-                        interestRate,
-                        messageSource,
-                        getLocale()
-                )
-        );
-
-        final List<InterestCalculationRow> interestCalculationRows = interestRows(
-                year,
-                bookings,
-                interestCalculation
-        );
-        rows.addAll(interestCalculationRows);
-
-        rows.addAll(
-                List.of(
-                        new InterestSumRow(
-                                interestCalculation.interestSum(),
-                                messageSource,
-                                getLocale()
-                        ),
-                        new DivisorRow(
-                                interestCalculation.divisor(),
-                                messageSource,
-                                getLocale()
-                        ),
-                        new InterestRow(
-                                interestCalculation.interest(),
-                                messageSource,
-                                getLocale()
-                        ),
-                        new FinalSumRow(
-                                year.atMonth(Month.DECEMBER).atEndOfMonth(),
-                                interestCalculation.finalSum(),
-                                messageSource,
-                                getLocale()
-                        )
-                )
-        );
-        return rows;
-    }
-
-    private List<InterestCalculationRow> interestRows(
-            final Year year,
-            final Bookings bookings,
-            final InterestCalculation interestCalculation
-    ) {
-        final List<InterestCalculationRow> rows = new ArrayList<>();
-        final AtomicReference<MoneyAmount> currentBalance = new AtomicReference<>(
-                bookings.openingBalance()
-                        .getOpeningBalance()
-        );
-
-        final List<Month> months = Arrays.stream(Month.values())
-                .filter(month -> !bookings.bookingsInMonth(month)
-                        .bookings()
-                        .isEmpty())
-                .toList();
-
-        months.stream()
-                .limit(months.size() - 1)
-                .forEach(month -> generateInterestRow(
-                                year,
-                                bookings,
-                                interestCalculation,
-                                month,
-                                currentBalance,
-                                rows,
-                                "no-separator-column"
-                        )
-                );
-
-        generateInterestRow(
-                year,
-                bookings,
-                interestCalculation,
-                months.getLast(),
-                currentBalance,
-                rows,
-                "single-separator"
-        );
-        return rows;
-    }
-
-    private void generateInterestRow(
-            final Year year,
-            final Bookings bookings,
-            final InterestCalculation interestCalculation,
-            final Month month,
-            final AtomicReference<MoneyAmount> currentBalance,
-            final List<InterestCalculationRow> rows,
-            final String partName
-    ) {
-        final List<BookingRow> bookingRows = new ArrayList<>();
-        // TODO: This should not depend on the booking row
-        new DefaultBookingsToBookingRowConverter(
-                bookings,
-                month,
-                currentBalance.get(),
-                bookingRows::add
-        ).generate();
-        // TODO: Create it's own class for this instead of piggybacking off of the DefaultBookingsToBookingRowConverter
-        if (!bookingRows.isEmpty()) {
-            currentBalance.set(bookingRows.getLast().balance());
-            rows.add(
-                    new DefaultInterestCalculationRow(
-                            year.atMonth(month),
-                            interestCalculation.interests().get(month),
-                            getLocale(),
-                            interestCalculation.monthlyBalances().get(month),
-                            interestCalculation.monthlyTotalSums().get(month),
-                            partName
-                    )
-            );
-        }
-    }
-
-    // TODO: Move to own class (same in bookings view)
     private void setupInterestGrid(final VerticalLayout content) {
         interestCalculationGrid = new Grid<>();
         interestCalculationGrid.setEmptyStateText(messageSource.getMessage("bookings.table.empty-state-text", null, getLocale()));

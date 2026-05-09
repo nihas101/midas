@@ -6,6 +6,7 @@ import de.nihas101.midas.bookings.dto.FilteredBookings;
 import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.bookings.entity.Source;
 import de.nihas101.midas.bookings.monthlytotal.MonthlyTotalSum;
+import de.nihas101.midas.bookings.row.MonthlySummaryBookingRow;
 import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.openingbalance.dto.OpeningBalance;
 import org.junit.jupiter.api.Assertions;

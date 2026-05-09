@@ -18,6 +18,8 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
+import de.nihas101.midas.accountstatement.row.AccountStatementRow;
+import de.nihas101.midas.accountstatement.row.AccountStatementRowService;
 import de.nihas101.midas.accountstatement.runningtotal.RunningTotalAccountStatements;
 import de.nihas101.midas.accountstatement.service.AccountStatementService;
 import de.nihas101.midas.config.MidasConfig;
@@ -35,9 +37,7 @@ import org.springframework.context.MessageSource;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Route("account-statements")
@@ -49,6 +49,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
     private final ShareholdersService shareholdersService;
     private final AccountStatementService accountStatementService;
     private final MessageSource messageSource;
+    private final AccountStatementRowService accountStatementRowService;
     private ComboBox<Shareholder> shareholderPicker;
     private ComboBox<Integer> yearPicker;
     private Grid<AccountStatementRow> accountStatementGrid;
@@ -60,12 +61,14 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
             final MidasConfig config,
             final MessageSource messageSource,
             final UserConfigService userConfigService,
-            final MidasLocaleResolver midasLocaleResolver
+            final MidasLocaleResolver midasLocaleResolver,
+            final AccountStatementRowService accountStatementRowService
     ) {
         super(config, userConfigService, messageSource, midasLocaleResolver);
         this.shareholdersService = shareholdersService;
         this.accountStatementService = accountStatementService;
         this.messageSource = messageSource;
+        this.accountStatementRowService = accountStatementRowService;
 
         VerticalLayout content = new VerticalLayout();
         content.setSizeFull();
@@ -161,8 +164,16 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         accountStatementGrid.setPartNameGenerator(AccountStatementRow::partName);
         accountStatementGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.LUMO_COMPACT);
 
-        setupColumn(accountStatementGrid.addColumn(AccountStatementRow::displayId), "account-statements.table.id", ColumnTextAlign.START);
-        setupColumn(accountStatementGrid.addColumn(AccountStatementRow::dateStr), "account-statements.table.date", ColumnTextAlign.START);
+        setupColumn(
+                accountStatementGrid.addColumn(AccountStatementRow::displayId),
+                "account-statements.table.id",
+                ColumnTextAlign.START
+        );
+        setupColumn(
+                accountStatementGrid.addColumn(AccountStatementRow::dateStr),
+                "account-statements.table.date",
+                ColumnTextAlign.START
+        );
         setupColumn(
                 accountStatementGrid.addColumn(AccountStatementRow::label),
                 "account-statements.table.type",
@@ -266,23 +277,8 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
             return;
         }
 
-        accountStatementGrid.setItems(createRows(accountStatements));
-        closingStatementGrid.setItems(createRow(accountStatements));
-    }
-
-    private List<AccountStatementRow> createRows(final RunningTotalAccountStatements accountStatements) {
-        return accountStatements.runningTotalAccountStatements()
-                .stream()
-                .map(RunningTotalAccountStatementRow::new)
-                .collect(Collectors.toList());
-    }
-
-    private AccountStatementRow createRow(final RunningTotalAccountStatements accountStatements) {
-        return new ClosingAccountStatementRow(
-                accountStatements,
-                messageSource,
-                getLocale()
-        );
+        accountStatementGrid.setItems(accountStatementRowService.generateRows(accountStatements));
+        closingStatementGrid.setItems(accountStatementRowService.generateClosingRow(accountStatements, getLocale()));
     }
 
     public static Icon icon() {

@@ -12,10 +12,23 @@
             </tr>
         </thead>
         <tbody>
-            <tr th:each="row : ${data.rows}">
-                <td th:each="cell, iterStat : ${row}" 
-                    th:text="${cell}"
-                    th:classappend="${iterStat.index == 2 or iterStat.index >= 4} ? 'text-right amount' : ''">Cell</td>
+            <tr th:each="row : ${data.rows}" 
+                th:classappend="${(row instanceof T(de.nihas101.midas.interest.row.OpeningBalanceInterestCalculationRow) or 
+                                  row instanceof T(de.nihas101.midas.interest.row.InterestSumRow) or
+                                  row instanceof T(de.nihas101.midas.interest.row.DivisorRow) or
+                                  row instanceof T(de.nihas101.midas.interest.row.InterestRow) or
+                                  row instanceof T(de.nihas101.midas.interest.row.FinalSumRow) ? 'summary-row ' : '') + row.partName()}">
+                
+                <td th:text="${row.label()}">Month</td>
+                
+                <td class="text-right amount" th:text="${row.totalTransaction() != null and row.totalTransaction().moneyAmount().cents != 0 ? row.totalTransaction().moneyAmount().format(#locale) : ''}">Transactions</td>
+                <td th:text="${row.totalTransaction() != null and row.totalTransaction().moneyAmount().cents != 0 ? row.totalTransaction().type().getValue() : ''}">S/H</td>
+                
+                <td class="text-right amount" th:text="${row.balanceAtEndOfMonth() != null ? row.balanceAtEndOfMonth().moneyAmount().format(#locale) : ''}">Balance</td>
+                <td th:text="${row.balanceAtEndOfMonth() != null ? row.balanceAtEndOfMonth().type().getValue() : ''}">S/H</td>
+                
+                <td class="text-center" th:text="${row.interestDaysCount() != null ? row.interestDaysCount() : ''}">Days</td>
+                <td class="text-center" th:text="${row.interestAmount() != null ? row.interestAmount() : ''}">Interest number</td>
             </tr>
         </tbody>
     </table>

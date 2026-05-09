@@ -23,6 +23,8 @@ import de.nihas101.midas.bookings.dto.Booking;
 import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.bookings.entity.Source;
+import de.nihas101.midas.bookings.row.BookingRow;
+import de.nihas101.midas.bookings.row.BookingRowService;
 import de.nihas101.midas.bookings.service.BookingsReader;
 import de.nihas101.midas.bookings.service.BookingsService;
 import de.nihas101.midas.bookings.service.BookingsWriter;
@@ -48,14 +50,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 
 import java.math.BigDecimal;
-import java.time.Month;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static com.vaadin.flow.component.button.ButtonVariant.LUMO_ERROR;
 
@@ -71,6 +69,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
     private final BookingsWriter bookingsWriter;
     private final OpeningBalanceService openingBalanceService;
     private final MessageSource messageSource;
+    private final BookingRowService bookingRowService;
 
     private ComboBox<Shareholder> shareholderPicker;
     private ComboBox<Integer> yearPicker;
@@ -86,7 +85,8 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
             final MidasConfig config,
             final MessageSource messageSource,
             final UserConfigService userConfigService,
-            final MidasLocaleResolver midasLocaleResolver
+            final MidasLocaleResolver midasLocaleResolver,
+            final BookingRowService bookingRowService
     ) {
         super(config, userConfigService, messageSource, midasLocaleResolver);
         this.shareholdersService = shareholdersService;
@@ -94,6 +94,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         this.bookingsWriter = bookingsWriter;
         this.openingBalanceService = openingBalanceService;
         this.messageSource = messageSource;
+        this.bookingRowService = bookingRowService;
 
         VerticalLayout content = new VerticalLayout();
         content.setSizeFull();
@@ -106,7 +107,6 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         setContent(content);
     }
 
-    // TODO: Also add these to local storage
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
         event.getLocation().getQueryParameters().getSingleParameter(QUERY_PARAM_SHAREHOLDER)
@@ -399,77 +399,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
             grid.setItems(Collections.emptyList());
             return;
         }
-        grid.setItems(createRows(bookings));
-    }
-
-    private List<BookingRow> createRows(final Bookings bookings) {
-        List<BookingRow> rows = new ArrayList<>();
-        rows.add(new OpeningBalanceBookingRow(bookings));
-        rows.addAll(monthlySummaryRows(bookings));
-        return rows;
-    }
-
-    private List<BookingRow> monthlySummaryRows(final Bookings bookings) {
-        final List<BookingRow> rows = new ArrayList<>();
-        final AtomicReference<MoneyAmount> currentBalance = new AtomicReference<>(
-                bookings.openingBalance()
-                        .getOpeningBalance()
-        );
-
-        final List<Month> months = Arrays.stream(Month.values())
-                // TODO: Only calculate bookingsInMonth once and pass it to the BookingsToBookingRowConverter
-                .filter(m -> !bookings.bookingsInMonth(m).bookings().isEmpty())
-                .toList();
-        months.stream()
-                .limit(months.size() - 1)
-                .forEach(month -> {
-                    final CumulativeSummaryBookingRow summaryBookingRow = generateBookingRows(
-                            bookings,
-                            month,
-                            currentBalance.get(),
-                            rows,
-                            "single-separator"
-                    );
-                    currentBalance.set(summaryBookingRow.balance());
-                });
-
-        generateBookingRows(bookings, months.getLast(), currentBalance.get(), rows, "double-separator");
-
-        return rows;
-    }
-
-    private CumulativeSummaryBookingRow generateBookingRows(
-            final Bookings bookings,
-            final Month month,
-            final MoneyAmount curr,
-            final List<BookingRow> rows,
-            final String partName
-    ) {
-        final CumulativeSummaryBookingRow cumulativeSummaryBookingRow = new CumulativeSummaryBookingRow(
-                "",
-                messageSource.getMessage("bookings.table.summary.cumulative", null, getLocale()),
-                bookings,
-                month,
-                partName
-        );
-
-        new SummarizingBookingsToBookingRowConverter(
-                new DefaultBookingsToBookingRowConverter(
-                        bookings,
-                        month,
-                        curr,
-                        rows::add
-                ),
-                new MonthlySummaryBookingRow(
-                        messageSource.getMessage("bookings.table.summary.monthly", null, getLocale()),
-                        bookings,
-                        month
-                ),
-                cumulativeSummaryBookingRow,
-                rows::add
-        ).generate();
-
-        return cumulativeSummaryBookingRow;
+        grid.setItems(bookingRowService.generateRows(bookings, getLocale()));
     }
 
     public static Icon icon() {

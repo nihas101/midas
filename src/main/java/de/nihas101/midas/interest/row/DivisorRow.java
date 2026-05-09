@@ -1,4 +1,4 @@
-package de.nihas101.midas.ui.interest;
+package de.nihas101.midas.interest.row;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
@@ -8,18 +8,18 @@ import java.math.RoundingMode;
 import java.util.Locale;
 
 @RequiredArgsConstructor
-public class InterestSumRow implements InterestCalculationRow {
-    private final BigDecimal interestSum;
+public class DivisorRow implements InterestCalculationRow {
+    private final BigDecimal divisor;
     private final String label;
 
-    public InterestSumRow(
-            final BigDecimal interestSum,
+    public DivisorRow(
+            final BigDecimal divisor,
             final MessageSource messageSource,
             final Locale locale
     ) {
         this(
-                interestSum,
-                messageSource.getMessage("interest.summary.interest-sum", null, locale)
+                divisor,
+                messageSource.getMessage("interest.summary.divisor", null, locale)
         );
     }
 
@@ -45,6 +45,6 @@ public class InterestSumRow implements InterestCalculationRow {
 
     @Override
     public BigDecimal interestAmount() {
-        return interestSum.setScale(0, RoundingMode.HALF_UP);
+        return divisor.setScale(2, RoundingMode.HALF_UP);
     }
 }

@@ -12,10 +12,16 @@
             </tr>
         </thead>
         <tbody>
-            <tr th:each="row : ${data.rows}">
-                <td th:each="cell, iterStat : ${row}" 
-                    th:text="${cell}"
-                    th:classappend="${iterStat.index >= 4} ? 'text-right amount' : ''">Cell</td>
+            <tr th:each="row : ${data.rows}" 
+                th:classappend="${row instanceof T(de.nihas101.midas.accountstatement.row.ClosingAccountStatementRow)} ? 'summary-row' : ''">
+                
+                <td th:text="${row.displayId() != null ? row.displayId() : ''}">ID</td>
+                <td th:text="${row.dateStr()}">Date</td>
+                <td th:text="${row.label()}">Type</td>
+                
+                <td class="text-right amount" th:text="${row.debit() != null and row.debit().cents != 0 ? row.debit().format(#locale) : ''}">Debit</td>
+                <td class="text-right amount" th:text="${row.credit() != null and row.credit().cents != 0 ? row.credit().format(#locale) : ''}">Credit</td>
+                <td class="text-right amount" th:text="${row.balance() != null ? row.balance().format(#locale) : ''}">Balance</td>
             </tr>
         </tbody>
     </table>

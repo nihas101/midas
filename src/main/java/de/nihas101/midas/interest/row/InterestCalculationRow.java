@@ -1,4 +1,4 @@
-package de.nihas101.midas.ui.interest;
+package de.nihas101.midas.interest.row;
 
 import java.math.BigDecimal;
 

@@ -1,8 +1,7 @@
-package de.nihas101.midas.ui.interest;
+package de.nihas101.midas.interest.row;
 
 import lombok.Getter;
 
-// TODO: Upgrade to classes?
 @Getter
 public enum TransactionType {
     CREDIT("H"),
