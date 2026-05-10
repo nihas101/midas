@@ -1,4 +1,4 @@
-package de.nihas101.midas.export.pdf;
+package de.nihas101.midas.manual;
 
 import de.nihas101.midas.accountstatement.row.AccountStatementRowService;
 import de.nihas101.midas.accountstatement.runningtotal.RunningTotalAccountStatements;
@@ -6,113 +6,119 @@ import de.nihas101.midas.accountstatement.service.AccountStatementService;
 import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.row.BookingRow;
 import de.nihas101.midas.bookings.row.BookingRowService;
-import de.nihas101.midas.export.Export;
-import de.nihas101.midas.export.ExportRequest;
+import de.nihas101.midas.export.pdf.PdfViewData;
 import de.nihas101.midas.interest.InterestCalculation;
 import de.nihas101.midas.interest.dto.InterestRate;
 import de.nihas101.midas.interest.row.InterestRowService;
 import de.nihas101.midas.interest.service.InterestBookingsReader;
 import de.nihas101.midas.interest.service.InterestRateService;
 import de.nihas101.midas.shareholders.dto.Shareholder;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import de.nihas101.midas.shareholders.service.ShareholdersService;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.MessageSource;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring6.SpringTemplateEngine;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
-@Slf4j
-@RequiredArgsConstructor
-public class PdfExporter implements Export {
+@Disabled("For generating previews and debugging templates quickly")
+@SpringBootTest
+public class TemplatePreviewGeneratorTest {
 
-    private final ExportRequest request;
-    private final OutputStream outputStream;
-    private final Locale locale;
-    private final PdfService pdfService;
+    @Autowired
+    private SpringTemplateEngine pdfTemplateEngine;
 
-    private final InterestBookingsReader bookingsReader;
-    private final InterestRateService interestRateService;
-    private final AccountStatementService accountStatementService;
-    private final MessageSource messageSource;
-    private final BookingRowService bookingRowService;
-    private final AccountStatementRowService accountStatementRowService;
-    private final InterestRowService interestRowService;
+    @Autowired
+    private ShareholdersService shareholdersService;
 
-    @Override
-    public void trigger() {
-        final int totalFiles = request.shareholders().size() * request.views().size();
+    @Autowired
+    private InterestBookingsReader bookingsReader;
 
-        if (totalFiles == 0) {
+    @Autowired
+    private InterestRateService interestRateService;
+
+    @Autowired
+    private AccountStatementService accountStatementService;
+
+    @Autowired
+    private MessageSource messageSource;
+
+    @Autowired
+    private BookingRowService bookingRowService;
+
+    @Autowired
+    private AccountStatementRowService accountStatementRowService;
+
+    @Autowired
+    private InterestRowService interestRowService;
+
+    @Test
+    public void generatePreviews() throws IOException {
+        final List<Shareholder> shareholders = shareholdersService.shareholders().toList();
+        if (shareholders.isEmpty()) {
+            System.out.println("No shareholders found in midas.db. Please add some data first.");
             return;
         }
 
-        if (totalFiles == 1) {
-            generateSinglePdf();
-        } else {
-            generateZipOfPdfs();
+        final Path outputDir = Paths.get("target/template-previews");
+        Files.createDirectories(outputDir);
+
+        final Locale locale = Locale.GERMAN; // Or whatever you prefer
+        final LocalDate startDate = LocalDate.of(2026, 1, 1); // Sample date
+
+        for (Shareholder sh : shareholders) {
+            System.out.println("Generating previews for: " + sh.getFirstName() + " " + sh.getLastName());
+            generatePreview(sh, "bookings", startDate, locale, outputDir);
+            generatePreview(sh, "account-statements", startDate, locale, outputDir);
+            generatePreview(sh, "interest", startDate, locale, outputDir);
         }
+
+        System.out.println("Previews generated in: " + outputDir.toAbsolutePath());
     }
 
-    private void generateSinglePdf() {
-        final Shareholder sh = request.shareholders().getFirst();
-        final String view = request.views().iterator().next();
-        final PdfViewData data = extractData(sh, view);
-        pdfService.generatePdf(data, locale, outputStream);
+    private void generatePreview(Shareholder sh, String view, LocalDate startDate, Locale locale, Path outputDir) throws IOException {
+        final PdfViewData data = extractData(sh, view, startDate, locale);
+        
+        Context context = new Context(locale);
+        context.setVariable("data", data);
+        context.setVariable("content", data.viewName());
+
+        String html = pdfTemplateEngine.process("base-layout", context);
+        
+        String filename = String.format("%s_%s_%s.html",
+                view,
+                (sh.getFirstName() + "_" + sh.getLastName()).replace(" ", "_"),
+                startDate.getYear());
+        
+        Files.writeString(outputDir.resolve(filename), html);
     }
 
-    private void generateZipOfPdfs() {
-        try (ZipOutputStream zos = new ZipOutputStream(outputStream)) {
-            for (Shareholder sh : request.shareholders()) {
-                for (String view : request.views()) {
-                    final PdfViewData data = extractData(sh, view);
-                    final String filename = String.format("%s_%s_%s.pdf",
-                            view,
-                            (sh.getFirstName() + "_" + sh.getLastName()).replace(" ", "_"),
-                            request.startDate().toString());
-
-                    zos.putNextEntry(new ZipEntry(filename));
-
-                    // We need a temporary buffer because PdfService writes to the stream 
-                    // and we don't want it to close the ZipOutputStream prematurely 
-                    // (though OpenHTMLToPDF shouldn't close it, it's safer this way 
-                    // if we wanted to be absolutely sure, but ZipOutputStream expects entries)
-                    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    pdfService.generatePdf(data, locale, baos);
-                    zos.write(baos.toByteArray());
-
-                    zos.closeEntry();
-                }
-            }
-        } catch (IOException e) {
-            log.error("Failed to generate ZIP of PDFs", e);
-            throw new RuntimeException("Export failed", e);
-        }
-    }
-
-    private PdfViewData extractData(Shareholder shareholder, String view) {
+    private PdfViewData extractData(Shareholder shareholder, String view, LocalDate startDate, Locale locale) {
         if ("bookings".equals(view)) {
-            return extractBookingsData(shareholder);
+            return extractBookingsData(shareholder, startDate, locale);
         }
         if ("account-statements".equals(view)) {
-            return extractAccountStatementsData(shareholder);
+            return extractAccountStatementsData(shareholder, startDate, locale);
         }
         if ("interest".equals(view)) {
-            return extractInterestData(shareholder);
+            return extractInterestData(shareholder, startDate, locale);
         }
-
-        final Integer year = request.startDate().getYear();
-        return new PdfViewData(view, shareholder.getFirstName() + " " + shareholder.getLastName(), shareholder, year, List.of(), List.of());
+        return new PdfViewData(view, shareholder.getFirstName() + " " + shareholder.getLastName(), shareholder, startDate.getYear(), List.of(), List.of());
     }
 
-    private PdfViewData extractBookingsData(Shareholder shareholder) {
+    private PdfViewData extractBookingsData(Shareholder shareholder, LocalDate startDate, Locale locale) {
         List<String> headers = List.of(
                 messageSource.getMessage("bookings.table.id", null, locale),
                 messageSource.getMessage("bookings.table.date", null, locale),
@@ -126,7 +132,7 @@ public class PdfExporter implements Export {
                 messageSource.getMessage("bookings.table.balance", null, locale)
         );
 
-        final Year year = Year.of(request.startDate().getYear());
+        final Year year = Year.of(startDate.getYear());
         final Bookings bookings = bookingsReader.interestRelatedBookingsForShareholderAndYear(shareholder.getId(), year);
         final List<BookingRow> rows = bookingRowService.generateRows(bookings, locale);
 
@@ -140,7 +146,7 @@ public class PdfExporter implements Export {
         );
     }
 
-    private PdfViewData extractAccountStatementsData(Shareholder shareholder) {
+    private PdfViewData extractAccountStatementsData(Shareholder shareholder, LocalDate startDate, Locale locale) {
         List<String> headers = List.of(
                 messageSource.getMessage("account-statements.table.id", null, locale),
                 messageSource.getMessage("account-statements.table.date", null, locale),
@@ -150,7 +156,7 @@ public class PdfExporter implements Export {
                 messageSource.getMessage("account-statements.table.balance", null, locale)
         );
 
-        final Year year = Year.of(request.startDate().getYear());
+        final Year year = Year.of(startDate.getYear());
         final RunningTotalAccountStatements statements = accountStatementService.runningTotalAccountStatements(shareholder, year, messageSource, locale);
 
         final List<Object> rows = new ArrayList<>(accountStatementRowService.generateRows(statements));
@@ -166,7 +172,7 @@ public class PdfExporter implements Export {
         );
     }
 
-    private PdfViewData extractInterestData(Shareholder shareholder) {
+    private PdfViewData extractInterestData(Shareholder shareholder, LocalDate startDate, Locale locale) {
         List<String> headers = List.of(
                 messageSource.getMessage("interest.table.month", null, locale),
                 messageSource.getMessage("interest.table.transactions", null, locale),
@@ -177,7 +183,7 @@ public class PdfExporter implements Export {
                 messageSource.getMessage("interest.table.interest-amount", null, locale)
         );
 
-        final Year year = Year.of(request.startDate().getYear());
+        final Year year = Year.of(startDate.getYear());
         final InterestRate rate = interestRateService.interestRate(shareholder.getId(), year);
         final BigDecimal interestRate = rate != null ? rate.getInterestRate() : BigDecimal.ZERO;
 
