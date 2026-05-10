@@ -23,5 +23,6 @@ public class PdfExportTarget implements ExportTarget {
         views.add(new ViewData(viewName, headers, rows));
     }
 
-    public record ViewData(String name, List<String> headers, List<List<Object>> rows) {}
+    public record ViewData(String name, List<String> headers, List<List<Object>> rows) {
+    }
 }

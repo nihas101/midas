@@ -115,7 +115,7 @@ public class TemplatePreviewGeneratorTest {
         if ("interest".equals(view)) {
             return extractInterestData(shareholder, startDate, locale);
         }
-        return new PdfViewData(view, shareholder.getFirstName() + " " + shareholder.getLastName(), shareholder, startDate.getYear(), List.of(), List.of());
+        return new PdfViewData(view, shareholder.getFirstName() + " " + shareholder.getLastName(), shareholder, startDate.getYear(), null, List.of(), List.of());
     }
 
     private PdfViewData extractBookingsData(Shareholder shareholder, LocalDate startDate, Locale locale) {
@@ -141,6 +141,7 @@ public class TemplatePreviewGeneratorTest {
                 shareholder.getFirstName() + " " + shareholder.getLastName(),
                 shareholder,
                 year.getValue(),
+                null,
                 headers,
                 new ArrayList<>(rows)
         );
@@ -167,6 +168,7 @@ public class TemplatePreviewGeneratorTest {
                 shareholder.getFirstName() + " " + shareholder.getLastName(),
                 shareholder,
                 year.getValue(),
+                null,
                 headers,
                 rows
         );
@@ -197,6 +199,7 @@ public class TemplatePreviewGeneratorTest {
                 shareholder.getFirstName() + " " + shareholder.getLastName(),
                 shareholder,
                 year.getValue(),
+                interestRate,
                 headers,
                 rows
         );

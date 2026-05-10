@@ -109,7 +109,7 @@ public class PdfExporter implements Export {
         }
 
         final Integer year = request.startDate().getYear();
-        return new PdfViewData(view, shareholder.getFirstName() + " " + shareholder.getLastName(), shareholder, year, List.of(), List.of());
+        return new PdfViewData(view, shareholder.getFirstName() + " " + shareholder.getLastName(), shareholder, year, null, List.of(), List.of());
     }
 
     private PdfViewData extractBookingsData(Shareholder shareholder) {
@@ -135,6 +135,7 @@ public class PdfExporter implements Export {
                 shareholder.getFirstName() + " " + shareholder.getLastName(),
                 shareholder,
                 year.getValue(),
+                null,
                 headers,
                 new ArrayList<>(rows)
         );
@@ -161,6 +162,7 @@ public class PdfExporter implements Export {
                 shareholder.getFirstName() + " " + shareholder.getLastName(),
                 shareholder,
                 year.getValue(),
+                null,
                 headers,
                 rows
         );
@@ -191,6 +193,7 @@ public class PdfExporter implements Export {
                 shareholder.getFirstName() + " " + shareholder.getLastName(),
                 shareholder,
                 year.getValue(),
+                interestRate,
                 headers,
                 rows
         );

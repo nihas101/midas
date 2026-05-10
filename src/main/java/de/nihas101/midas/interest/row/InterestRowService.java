@@ -89,7 +89,7 @@ public class InterestRowService {
                         .bookings()
                         .isEmpty())
                 .toList();
-        
+
         if (months.isEmpty()) {
             return rows;
         }
@@ -138,7 +138,7 @@ public class InterestRowService {
                 currentBalance.get(),
                 bookingRows::add
         ).generate();
-        
+
         if (!bookingRows.isEmpty()) {
             currentBalance.set(bookingRows.getLast().balance());
             rows.add(

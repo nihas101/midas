@@ -1,35 +1,178 @@
+<th:block th:fragment="style">
+    <style>
+        .ir-header-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 5px;
+        }
+        .ir-header-table td {
+            border: none;
+            padding: 0;
+            vertical-align: bottom;
+        }
+        .ir-title {
+            text-align: center;
+            font-size: 14pt;
+            font-weight: bold;
+            width: 60%;
+        }
+        .ir-date {
+            text-align: right;
+            font-size: 10pt;
+            width: 20%;
+        }
+        .ir-spacer {
+            width: 20%;
+        }
+        .ir-double-line {
+            border-top: 1px solid black;
+            border-bottom: 1px solid black;
+            height: 2px;
+            margin-bottom: 10px;
+        }
+        .ir-info-line {
+            width: 100%;
+            margin-bottom: 0;
+        }
+        .ir-page {
+            float: right;
+            font-size: 10pt;
+        }
+        .ir-shareholder {
+            float: left;
+            font-size: 10pt;
+        }
+        .ir-shareholder-label {
+            margin-right: 10px;
+        }
+        /* Page numbering for the body flow */
+        .page-num::after {
+            content: counter(page);
+        }
+        
+        /* Reset header-info and footerLeft from base-layout for this view */
+        .header-info, #footerLeft {
+            display: none !important;
+        }
+        h1 {
+            display: none;
+        }
+
+        /* Table styling */
+        .ir-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-top: 1px dashed #333;
+            margin-top: 0 !important;
+        }
+        .ir-table th, .ir-table td {
+            padding: 6px 4px;
+            border-bottom: none; /* Remove horizontal lines */
+        }
+        .ir-table th {
+            background-color: transparent !important;
+            border-bottom: 3px double #333;
+            font-weight: bold;
+        }
+        .ir-table .text-right {
+            text-align: right;
+        }
+        .ir-table .text-center {
+            text-align: center;
+        }
+        .ir-table .separator-column {
+            border-left: 1px solid #ccc;
+        }
+        
+        /* Summary row styling */
+        .summary-row td {
+            padding-top: 2px;
+            padding-bottom: 2px;
+        }
+        .summary-row {
+            font-weight: normal !important;
+            background-color: transparent !important;
+        }
+        
+        /* Specific separators */
+        .single-separator td:nth-child(n+2) {
+            border-bottom: 1px dashed #333;
+        }
+        .single-separator td:first-child {
+            border-bottom: none;
+        }
+        .double-separator td {
+            border-bottom: 3px double #333; /* Continuous double line for the final row */
+        }
+    </style>
+</th:block>
+
 <div th:fragment="content">
-    <h1 th:text="#{export.view.interest}">Zinsberechnung</h1>
-    
-    <div class="header-info">
-        <p><strong>Gesellschafter:</strong> <span th:text="${data.shareholderName}">Name</span></p>
+    <table class="ir-header-table">
+        <tr>
+            <td class="ir-spacer"></td>
+            <td class="ir-title" th:text="#{interest.header.title(${#numbers.formatInteger(data.year, 0)})}">
+                Zinsrechnung 2026
+            </td>
+            <td class="ir-date" th:text="${#temporals.format(#temporals.createNow(), 'dd.MM.yyyy')}">10.05.2026</td>
+        </tr>
+    </table>
+
+    <div class="ir-double-line"></div>
+
+    <div class="ir-info-line">
+        <div class="ir-shareholder">
+            <strong class="ir-shareholder-label" th:text="#{bookings.shareholder} + ':'">Gesellschafter:</strong>
+            <span th:text="${data.shareholder.displayId} + ' ' + ${data.shareholder.firstName} + ' ' + ${data.shareholder.lastName}">1 Max Mustermann</span>
+        </div>
+        <div class="ir-page">
+            <span th:text="#{interest.header.interest-rate(${#numbers.formatDecimal(data.interestRate, 1, 'DEFAULT', 2, 'DEFAULT')})}">Zinssatz = 5.00%</span>
+        </div>
+        <div style="clear: both;"></div>
     </div>
 
-    <table>
+    <table class="ir-table">
         <thead>
-            <tr>
-                <th th:each="header : ${data.headers}" th:text="${header}">Header</th>
-            </tr>
+        <tr>
+            <th th:text="${data.headers[0]}">Month</th>
+            <th class="text-right" th:text="${data.headers[1]}">Transactions</th>
+            <th th:text="${data.headers[2]}">S/H</th>
+            <th class="text-right" th:text="${data.headers[3]}">Balance</th>
+            <th th:text="${data.headers[4]}">S/H</th>
+            <th class="text-center" th:text="${data.headers[5]}">Days</th>
+            <th class="text-center" th:text="${data.headers[6]}">Interest number</th>
+        </tr>
         </thead>
         <tbody>
-            <tr th:each="row : ${data.rows}" 
-                th:classappend="${(row instanceof T(de.nihas101.midas.interest.row.OpeningBalanceInterestCalculationRow) or 
-                                  row instanceof T(de.nihas101.midas.interest.row.InterestSumRow) or
+        <tr th:each="row : ${data.rows}"
+            th:classappend="${((row instanceof T(de.nihas101.midas.interest.row.InterestSumRow) or
                                   row instanceof T(de.nihas101.midas.interest.row.DivisorRow) or
                                   row instanceof T(de.nihas101.midas.interest.row.InterestRow) or
-                                  row instanceof T(de.nihas101.midas.interest.row.FinalSumRow) ? 'summary-row ' : '') + row.partName()}">
-                
-                <td th:text="${row.label()}">Month</td>
-                
-                <td class="text-right amount" th:text="${row.totalTransaction() != null and row.totalTransaction().moneyAmount().cents != 0 ? row.totalTransaction().moneyAmount().format(#locale) : ''}">Transactions</td>
-                <td th:text="${row.totalTransaction() != null and row.totalTransaction().moneyAmount().cents != 0 ? row.totalTransaction().type().getValue() : ''}">S/H</td>
-                
-                <td class="text-right amount" th:text="${row.balanceAtEndOfMonth() != null ? row.balanceAtEndOfMonth().moneyAmount().format(#locale) : ''}">Balance</td>
-                <td th:text="${row.balanceAtEndOfMonth() != null ? row.balanceAtEndOfMonth().type().getValue() : ''}">S/H</td>
-                
-                <td class="text-center" th:text="${row.interestDaysCount() != null ? row.interestDaysCount() : ''}">Days</td>
-                <td class="text-center" th:text="${row.interestAmount() != null ? row.interestAmount() : ''}">Interest number</td>
-            </tr>
+                                  row instanceof T(de.nihas101.midas.interest.row.FinalSumRow)) ? 'summary-row ' : '') + row.partName()}">
+
+            <td th:text="${row.label()}">Month</td>
+
+            <td class="text-right amount"
+                th:text="${row.totalTransaction() != null and row.totalTransaction().moneyAmount().cents != 0 ? row.totalTransaction().moneyAmount().format(#locale) : ''}">
+                Transactions
+            </td>
+            <td th:text="${row.totalTransaction() != null and row.totalTransaction().moneyAmount().cents != 0 ? row.totalTransaction().type().getValue() : ''}">
+                S/H
+            </td>
+
+            <td class="text-right amount"
+                th:text="${row.balanceAtEndOfMonth() != null ? row.balanceAtEndOfMonth().moneyAmount().format(#locale) : ''}">
+                Balance
+            </td>
+            <td th:text="${row.balanceAtEndOfMonth() != null ? row.balanceAtEndOfMonth().type().getValue() : ''}">S/H
+            </td>
+
+            <td class="text-center" th:text="${row.interestDaysCount() != null ? row.interestDaysCount() : ''}">Days
+            </td>
+            <td class="text-center" th:text="${row.interestAmount() != null ? row.interestAmount() : ''}">Interest
+                number
+            </td>
+        </tr>
         </tbody>
     </table>
 </div>

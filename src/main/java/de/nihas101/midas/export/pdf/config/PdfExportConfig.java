@@ -18,15 +18,15 @@ public class PdfExportConfig {
     @Bean
     public SpringTemplateEngine pdfTemplateEngine() {
         SpringTemplateEngine templateEngine = new SpringTemplateEngine();
-        
+
         // External template resolver (optional, highest priority)
         if (externalTemplatePath != null && !externalTemplatePath.isEmpty()) {
             templateEngine.addTemplateResolver(fileTemplateResolver());
         }
-        
+
         // Default classpath template resolver
         templateEngine.addTemplateResolver(classpathTemplateResolver());
-        
+
         return templateEngine;
     }
 

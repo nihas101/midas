@@ -38,10 +38,10 @@ public class PdfService {
             PdfRendererBuilder builder = new PdfRendererBuilder();
             builder.useFastMode();
             builder.withHtmlContent(html, null);
-            
+
             // Register Liberation Serif fonts
             registerFonts(builder);
-            
+
             builder.toStream(outputStream);
             builder.run();
         } catch (Exception e) {

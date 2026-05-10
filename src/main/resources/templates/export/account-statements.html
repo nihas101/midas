@@ -103,7 +103,7 @@
 
     <div class="as-double-line"></div>
 
-    <div class="as-info-line" style="margin-bottom: 0;"> <!-- Reduced space by 1 line (10px -> 0) -->
+    <div class="as-info-line" style="margin-bottom: 0;"> <!-- Reduced space -->
         <div class="as-shareholder">
             <strong class="as-shareholder-label" th:text="#{bookings.shareholder} + ':'">Gesellschafter:</strong>
             <span th:text="${data.shareholder.displayId} + ' ' + ${data.shareholder.firstName} + ' ' + ${data.shareholder.lastName}">1 Max Mustermann</span>
@@ -145,10 +145,10 @@
                     th:text="${row.balance() != null ? row.balance().format(#locale) : ''}">Balance
                 </td>
             </tr>
-            <!-- Closing Row (Endstand) -->
+            <!-- Closing Row -->
             <tr th:if="${row instanceof T(de.nihas101.midas.accountstatement.row.ClosingAccountStatementRow)}"
                 class="as-closing-row">
-                <!-- Spans across ID, Date, Type and Debit to end under Lastschrift -->
+                <!-- Spans across ID, Date, Type and Debit -->
                 <td colspan="4" class="text-right" th:text="${row.label()}">Endstand per ...</td>
                 <td></td> <!-- Removed separator-column -->
                 <td class="text-right amount" th:text="${row.balance() != null ? row.balance().format(#locale) : ''}">

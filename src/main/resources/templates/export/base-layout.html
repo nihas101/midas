@@ -84,9 +84,9 @@
     <th:block th:replace="~{__${content}__ :: style} ?: ~{}"></th:block>
 </head>
 <body>
-    <div id="footerLeft" th:text="${data.shareholderName}">Name</div>
-    <div th:insert="~{__${content}__ :: content}">
-        <!-- Content will be injected here -->
-    </div>
+<div id="footerLeft" th:text="${data.shareholderName}">Name</div>
+<div th:insert="~{__${content}__ :: content}">
+    <!-- Content will be injected here -->
+</div>
 </body>
 </html>
