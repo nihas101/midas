@@ -3,6 +3,7 @@
         .as-header-table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 0 !important;
             margin-bottom: 5px;
         }
         .as-header-table td {
@@ -32,7 +33,7 @@
         }
         .as-info-line {
             width: 100%;
-            margin-bottom: 10px;
+            margin-bottom: 0;
         }
         .as-page {
             float: right;
@@ -63,29 +64,28 @@
             width: 100%;
             border-collapse: collapse;
             border-top: 1px dashed #333;
-            margin-top: 0 !important; /* Remove global 0.5cm margin-top */
+            margin-top: 0 !important;
         }
         .as-table th, .as-table td {
             padding: 6px 4px;
-            border-bottom: none; /* Remove horizontal lines between rows */
+            border-bottom: none;
         }
         .as-table .separator-column {
             border-left: 1px solid #ccc;
         }
         .as-table th {
-            background-color: transparent !important; /* Explicitly override global grey background */
-            border-bottom: 3px double #333; /* double line under header */
+            background-color: transparent !important;
+            border-bottom: 3px double #333;
             font-weight: bold;
         }
         .as-table .text-right {
             text-align: right;
         }
         .as-col-type {
-            width: 30%; /* Reduce horizontal size of Typ header/column */
+            width: 30%;
         }
-        /* final statement styling */
         .as-closing-row td {
-            border-bottom: 3px double #333; /* double line at the end */
+            border-bottom: 3px double #333;
         }
     </style>
 </th:block>
@@ -103,7 +103,7 @@
 
     <div class="as-double-line"></div>
 
-    <div class="as-info-line" style="margin-bottom: 0;"> <!-- Reduced space -->
+    <div class="as-info-line">
         <div class="as-shareholder">
             <strong class="as-shareholder-label" th:text="#{bookings.shareholder} + ':'">Gesellschafter:</strong>
             <span th:text="${data.shareholder.displayId} + ' ' + ${data.shareholder.firstName} + ' ' + ${data.shareholder.lastName}">1 Max Mustermann</span>
@@ -128,7 +128,6 @@
         </thead>
         <tbody>
         <th:block th:each="row : ${data.rows}">
-            <!-- Normal Data Row -->
             <tr th:if="${!(row instanceof T(de.nihas101.midas.accountstatement.row.ClosingAccountStatementRow))}">
                 <td th:text="${row.displayId() != null and row.displayId() != 0 ? row.displayId() : ''}">ID</td>
                 <td th:text="${row.dateStr()}">Date</td>
@@ -145,12 +144,10 @@
                     th:text="${row.balance() != null ? row.balance().format(#locale) : ''}">Balance
                 </td>
             </tr>
-            <!-- Closing Row -->
             <tr th:if="${row instanceof T(de.nihas101.midas.accountstatement.row.ClosingAccountStatementRow)}"
                 class="as-closing-row">
-                <!-- Spans across ID, Date, Type and Debit -->
                 <td colspan="4" class="text-right" th:text="${row.label()}">Endstand per ...</td>
-                <td></td> <!-- Removed separator-column -->
+                <td></td>
                 <td class="text-right amount" th:text="${row.balance() != null ? row.balance().format(#locale) : ''}">
                     Balance
                 </td>

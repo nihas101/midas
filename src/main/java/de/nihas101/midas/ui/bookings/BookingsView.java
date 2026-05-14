@@ -399,6 +399,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
             grid.setItems(Collections.emptyList());
             return;
         }
+        // TODO: We are missing the `Total sum` final line here (and in the PDF export)
         grid.setItems(bookingRowService.generateRows(bookings, getLocale()));
     }
 

@@ -1,36 +1,193 @@
-<div th:fragment="content">
-    <h1 th:text="#{export.view.bookings}">Bookings</h1>
-    
-    <div class="header-info">
-        <p><strong>Gesellschafter:</strong> <span th:text="${data.shareholderName}">Name</span></p>
-    </div>
+<th:block th:fragment="style">
+    <style>
+        .bk-header-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0 !important;
+            margin-bottom: 5px;
+        }
+        .bk-header-table td {
+            border: none;
+            padding: 0;
+            vertical-align: bottom;
+        }
+        .bk-title {
+            text-align: center;
+            font-size: 14pt;
+            font-weight: bold;
+            width: 60%;
+        }
+        .bk-date {
+            text-align: right;
+            font-size: 10pt;
+            width: 20%;
+        }
+        .bk-spacer {
+            width: 20%;
+        }
+        .bk-double-line {
+            border-top: 1px solid black;
+            border-bottom: 1px solid black;
+            height: 2px;
+            margin-bottom: 10px;
+        }
+        .bk-info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 0;
+            margin-top: 0;
+            font-size: 10pt;
+        }
+        .bk-info-table td {
+            border: none;
+            padding: 0;
+            vertical-align: top;
+        }
+        .bk-page-cell {
+            text-align: right;
+        }
+        .bk-shareholder-label {
+            margin-right: 10px;
+        }
+        .page-num::after {
+            content: counter(page);
+        }
+        
+        .header-info, #footerLeft {
+            display: none !important;
+        }
+        h1 {
+            display: none;
+        }
 
-    <table>
+        .bk-main-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0 !important;
+            table-layout: fixed;
+            font-size: 9pt;
+            -fs-table-paginate: paginate;
+        }
+        .bk-main-table thead {
+            display: table-header-group !important;
+        }
+        .bk-main-table th, .bk-main-table td {
+            padding: 4px 2px;
+            border-bottom: none;
+            word-wrap: break-word;
+        }
+        .bk-main-table th {
+            background-color: transparent !important;
+            border-bottom: 3px double #333;
+            font-weight: bold;
+            text-align: left;
+        }
+        .bk-main-table .text-right {
+            text-align: right;
+        }
+        .bk-main-table .separator-column {
+            border-left: 1px solid #ccc;
+        }
+        .bk-main-table .double-separator-column {
+            border-left: 3px double #333;
+        }
+        
+        .bk-header-repeat-row th {
+            border: none !important;
+            padding: 0 !important;
+            background: transparent !important;
+            font-weight: normal !important;
+            line-height: 1.2 !important;
+            vertical-align: top !important;
+        }
+        .bk-dashed-line {
+            border-bottom: 1px dashed #333;
+            margin-top: 5px;
+        }
+
+        .summary-row, .cumulative-summary {
+            background-color: transparent !important;
+            font-weight: normal !important;
+        }
+        .bk-final-row td {
+            border-bottom: 3px double #333 !important;
+        }
+        .bk-cumulative-separator-row td {
+            border-bottom: 1px solid #333 !important;
+        }
+    </style>
+</th:block>
+
+<div th:fragment="content">
+    <table class="bk-main-table">
+        <colgroup>
+            <col style="width: 5%;"/>
+            <col style="width: 10%;"/>
+            <col style="width: 16%;"/>
+            <col style="width: 10%;"/>
+            <col style="width: 9%;"/>
+            <col style="width: 9%;"/>
+            <col style="width: 9%;"/>
+            <col style="width: 9%;"/>
+            <col style="width: 9%;"/>
+            <col style="width: 14%;"/>
+        </colgroup>
         <thead>
+            <tr class="bk-header-repeat-row">
+                <th colspan="10">
+                    <table class="bk-header-table">
+                        <tr>
+                            <td class="bk-spacer"></td>
+                            <td class="bk-title" th:text="#{bookings.header.title(${#numbers.formatInteger(data.year, 0)})}">
+                                Gesellschafter - Buchungen für 2026
+                            </td>
+                            <td class="bk-date" th:text="${#temporals.format(#temporals.createNow(), 'dd.MM.yyyy')}">10.05.2026</td>
+                        </tr>
+                    </table>
+
+                    <div class="bk-double-line"></div>
+
+                    <table class="bk-info-table">
+                        <tr>
+                            <td>
+                                <strong class="bk-shareholder-label" th:text="#{bookings.shareholder} + ':'">Gesellschafter:</strong>
+                                <span th:text="${data.shareholder.displayId} + ' ' + ${data.shareholder.firstName} + ' ' + ${data.shareholder.lastName}">1 Max Mustermann</span>
+                            </td>
+                            <td class="bk-page-cell">
+                                <span th:text="#{account-statement.header.page}">Seite:</span>
+                                <span class="page-num"></span>
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="bk-dashed-line"></div>
+                </th>
+            </tr>
             <tr>
-                <th th:each="header : ${data.headers}" th:text="${header}">Header</th>
+                <th th:each="header, iterStat : ${data.headers}" 
+                    th:text="${header}"
+                    th:classappend="${iterStat.index == 3 or iterStat.index == 4 ? 'double-separator-column' : (iterStat.index > 4 ? 'separator-column' : '')}">Header</th>
             </tr>
         </thead>
         <tbody>
-            <tr th:each="row : ${data.rows}" 
+            <tr th:each="row, iterStat : ${data.rows}" 
                 th:with="isOpening=${row instanceof T(de.nihas101.midas.bookings.row.OpeningBalanceBookingRow)},
                          isMonthly=${row instanceof T(de.nihas101.midas.bookings.row.MonthlySummaryBookingRow)},
                          isCumulative=${row instanceof T(de.nihas101.midas.bookings.row.CumulativeSummaryBookingRow)}"
-                th:classappend="${(isOpening or isMonthly ? 'summary-row ' : '') + (isCumulative ? 'cumulative-summary ' : '') + row.partName()}">
+                th:classappend="${(isOpening or isMonthly ? 'summary-row ' : '') + (isCumulative ? 'cumulative-summary bk-cumulative-separator-row ' : '') + (iterStat.last ? 'bk-final-row ' : '') + row.partName()}">
                 
                 <td th:text="${row.displayId()}">ID</td>
                 <td th:text="${row.dateStr()}">Date</td>
                 <td th:text="${row.comment()}">Comment</td>
                 
-                <td class="text-right amount" th:text="${row.total() != null and row.total().cents != 0 ? row.total().format(#locale) : ''}">Total</td>
+                <td class="text-right amount double-separator-column" th:text="${row.total() != null and row.total().cents != 0 ? row.total().format(#locale) : ''}">Total</td>
                 
-                <td class="text-right amount" th:text="${row.amount(T(de.nihas101.midas.bookings.entity.BookingType).WITHDRAWAL).cents != 0 ? row.amount(T(de.nihas101.midas.bookings.entity.BookingType).WITHDRAWAL).format(#locale) : ''}">Withdrawal</td>
-                <td class="text-right amount" th:text="${row.amount(T(de.nihas101.midas.bookings.entity.BookingType).TAX_PREVIOUS_YEAR).cents != 0 ? row.amount(T(de.nihas101.midas.bookings.entity.BookingType).TAX_PREVIOUS_YEAR).format(#locale) : ''}">Tax Prev</td>
-                <td class="text-right amount" th:text="${row.amount(T(de.nihas101.midas.bookings.entity.BookingType).TAX_CREDIT).cents != 0 ? row.amount(T(de.nihas101.midas.bookings.entity.BookingType).TAX_CREDIT).format(#locale) : ''}">Tax Credit</td>
-                <td class="text-right amount" th:text="${row.amount(T(de.nihas101.midas.bookings.entity.BookingType).INTEREST).cents != 0 ? row.amount(T(de.nihas101.midas.bookings.entity.BookingType).INTEREST).format(#locale) : ''}">Interest</td>
-                <td class="text-right amount" th:text="${row.amount(T(de.nihas101.midas.bookings.entity.BookingType).COMPENSATION).cents != 0 ? row.amount(T(de.nihas101.midas.bookings.entity.BookingType).COMPENSATION).format(#locale) : ''}">Comp</td>
+                <td class="text-right amount double-separator-column" th:text="${row.amount(T(de.nihas101.midas.bookings.entity.BookingType).WITHDRAWAL).cents != 0 ? row.amount(T(de.nihas101.midas.bookings.entity.BookingType).WITHDRAWAL).format(#locale) : ''}">Withdrawal</td>
+                <td class="text-right amount separator-column" th:text="${row.amount(T(de.nihas101.midas.bookings.entity.BookingType).TAX_PREVIOUS_YEAR).cents != 0 ? row.amount(T(de.nihas101.midas.bookings.entity.BookingType).TAX_PREVIOUS_YEAR).format(#locale) : ''}">Tax Prev</td>
+                <td class="text-right amount separator-column" th:text="${row.amount(T(de.nihas101.midas.bookings.entity.BookingType).TAX_CREDIT).cents != 0 ? row.amount(T(de.nihas101.midas.bookings.entity.BookingType).TAX_CREDIT).format(#locale) : ''}">Tax Credit</td>
+                <td class="text-right amount separator-column" th:text="${row.amount(T(de.nihas101.midas.bookings.entity.BookingType).INTEREST).cents != 0 ? row.amount(T(de.nihas101.midas.bookings.entity.BookingType).INTEREST).format(#locale) : ''}">Interest</td>
+                <td class="text-right amount separator-column" th:text="${row.amount(T(de.nihas101.midas.bookings.entity.BookingType).COMPENSATION).cents != 0 ? row.amount(T(de.nihas101.midas.bookings.entity.BookingType).COMPENSATION).format(#locale) : ''}">Comp</td>
                 
-                <td class="text-right amount" th:text="${row.balance() != null and row.balance().cents != 0 ? row.balance().format(#locale) : ''}">Balance</td>
+                <td class="text-right amount separator-column" th:text="${row.balance() != null and row.balance().cents != 0 ? row.balance().format(#locale) : ''}">Balance</td>
             </tr>
         </tbody>
     </table>
