@@ -113,6 +113,7 @@ public class ExportFactory {
                 outputStream,
                 locale,
                 pdfService,
+                bookingsReader,
                 interestBookingsService,
                 interestRateService,
                 accountStatementService,

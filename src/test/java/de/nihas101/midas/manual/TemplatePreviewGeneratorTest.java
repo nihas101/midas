@@ -6,6 +6,7 @@ import de.nihas101.midas.accountstatement.service.AccountStatementService;
 import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.row.BookingRow;
 import de.nihas101.midas.bookings.row.BookingRowService;
+import de.nihas101.midas.bookings.service.BookingsReader;
 import de.nihas101.midas.export.pdf.PdfViewData;
 import de.nihas101.midas.interest.InterestCalculation;
 import de.nihas101.midas.interest.dto.InterestRate;
@@ -44,7 +45,10 @@ public class TemplatePreviewGeneratorTest {
     private ShareholdersService shareholdersService;
 
     @Autowired
-    private InterestBookingsReader bookingsReader;
+    private BookingsReader bookingsReader;
+
+    @Autowired
+    private InterestBookingsReader interestBookingsReader;
 
     @Autowired
     private InterestRateService interestRateService;
@@ -120,20 +124,20 @@ public class TemplatePreviewGeneratorTest {
 
     private PdfViewData extractBookingsData(Shareholder shareholder, LocalDate startDate, Locale locale) {
         List<String> headers = List.of(
-                messageSource.getMessage("bookings.table.id", null, locale),
-                messageSource.getMessage("bookings.table.date", null, locale),
-                messageSource.getMessage("bookings.table.comment", null, locale),
-                messageSource.getMessage("bookings.table.total", null, locale),
-                messageSource.getMessage("bookings.type.withdrawal", null, locale),
-                messageSource.getMessage("bookings.type.tax-previous-year", null, locale),
-                messageSource.getMessage("bookings.type.tax-credit", null, locale),
-                messageSource.getMessage("bookings.type.interest", null, locale),
-                messageSource.getMessage("bookings.type.compensation", null, locale),
-                messageSource.getMessage("bookings.table.balance", null, locale)
+                messageSource.getMessage("export.pdf.bookings.table.id", null, locale),
+                messageSource.getMessage("export.pdf.bookings.table.date", null, locale),
+                messageSource.getMessage("export.pdf.bookings.table.comment", null, locale),
+                messageSource.getMessage("export.pdf.bookings.table.total", null, locale),
+                messageSource.getMessage("export.pdf.bookings.table.withdrawal", null, locale),
+                messageSource.getMessage("export.pdf.bookings.table.tax-previous-year", null, locale),
+                messageSource.getMessage("export.pdf.bookings.table.tax-credit", null, locale),
+                messageSource.getMessage("export.pdf.bookings.table.interest", null, locale),
+                messageSource.getMessage("export.pdf.bookings.table.compensation", null, locale),
+                messageSource.getMessage("export.pdf.bookings.table.balance", null, locale)
         );
 
         final Year year = Year.of(startDate.getYear());
-        final Bookings bookings = bookingsReader.interestRelatedBookingsForShareholderAndYear(shareholder.getId(), year);
+        final Bookings bookings = bookingsReader.bookingsForShareholderAndYear(shareholder.getId(), year);
         final List<BookingRow> rows = bookingRowService.generateRows(bookings, locale);
 
         return new PdfViewData(
@@ -189,7 +193,7 @@ public class TemplatePreviewGeneratorTest {
         final InterestRate rate = interestRateService.interestRate(shareholder.getId(), year);
         final BigDecimal interestRate = rate != null ? rate.getInterestRate() : BigDecimal.ZERO;
 
-        final Bookings bookings = bookingsReader.interestRelatedBookingsForShareholderAndYear(shareholder.getId(), year);
+        final Bookings bookings = interestBookingsReader.interestRelatedBookingsForShareholderAndYear(shareholder.getId(), year);
         final InterestCalculation interestCalculation = new InterestCalculation(bookings, year, interestRate);
 
         final List<Object> rows = new ArrayList<>(interestRowService.generateRows(year, bookings, interestRate, interestCalculation, locale));

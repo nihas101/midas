@@ -13,13 +13,13 @@
         }
         .bk-title {
             text-align: center;
-            font-size: 14pt;
+            font-size: 13pt;
             font-weight: bold;
             width: 60%;
         }
         .bk-date {
             text-align: right;
-            font-size: 10pt;
+            font-size: 9pt;
             width: 20%;
         }
         .bk-spacer {
@@ -36,7 +36,7 @@
             border-collapse: collapse;
             margin-bottom: 0;
             margin-top: 0;
-            font-size: 10pt;
+            font-size: 9pt;
         }
         .bk-info-table td {
             border: none;
@@ -65,14 +65,14 @@
             border-collapse: collapse;
             margin-top: 0 !important;
             table-layout: fixed;
-            font-size: 9pt;
+            font-size: 7pt;
             -fs-table-paginate: paginate;
         }
         .bk-main-table thead {
             display: table-header-group !important;
         }
         .bk-main-table th, .bk-main-table td {
-            padding: 4px 2px;
+            padding: 2px;
             border-bottom: none;
             word-wrap: break-word;
         }
@@ -92,6 +92,14 @@
             border-left: 3px double #333;
         }
         
+        /* Remove padding between Comment and Summary Label */
+        .bk-no-left-padding {
+            padding-left: 0 !important;
+        }
+        .bk-no-right-padding {
+            padding-right: 0 !important;
+        }
+
         .bk-header-repeat-row th {
             border: none !important;
             padding: 0 !important;
@@ -109,11 +117,11 @@
             background-color: transparent !important;
             font-weight: normal !important;
         }
-        .bk-final-row td {
-            border-bottom: 3px double #333 !important;
-        }
         .bk-cumulative-separator-row td {
             border-bottom: 1px solid #333 !important;
+        }
+        .bk-final-row td {
+            border-bottom: 3px double #333 !important;
         }
     </style>
 </th:block>
@@ -121,74 +129,120 @@
 <div th:fragment="content">
     <table class="bk-main-table">
         <colgroup>
-            <col style="width: 5%;"/>
-            <col style="width: 10%;"/>
-            <col style="width: 16%;"/>
-            <col style="width: 10%;"/>
-            <col style="width: 9%;"/>
-            <col style="width: 9%;"/>
-            <col style="width: 9%;"/>
-            <col style="width: 9%;"/>
-            <col style="width: 9%;"/>
-            <col style="width: 14%;"/>
+            <col style="width: 8%;"/>   <!-- ID -->
+            <col style="width: 6%;"/>  <!-- Date -->
+            <col style="width: 7%;"/>   <!-- Comment: Spans into the next row, so it's okay to have this smaller -->
+            <col style="width: 10%;"/>  <!-- Summary Label -->
+            <col style="width: 10%;"/>  <!-- Total -->
+            <col style="width: 10%;"/>   <!-- Withdrawal -->
+            <col style="width: 10%;"/>   <!-- Tax Prev -->
+            <col style="width: 10%;"/>   <!-- Tax Credit -->
+            <col style="width: 10%;"/>   <!-- Interest -->
+            <col style="width: 10%;"/>   <!-- Comp -->
+            <col style="width: 10%;"/>  <!-- Balance -->
         </colgroup>
         <thead>
-            <tr class="bk-header-repeat-row">
-                <th colspan="10">
-                    <table class="bk-header-table">
-                        <tr>
-                            <td class="bk-spacer"></td>
-                            <td class="bk-title" th:text="#{bookings.header.title(${#numbers.formatInteger(data.year, 0)})}">
-                                Gesellschafter - Buchungen für 2026
-                            </td>
-                            <td class="bk-date" th:text="${#temporals.format(#temporals.createNow(), 'dd.MM.yyyy')}">10.05.2026</td>
-                        </tr>
-                    </table>
+        <tr class="bk-header-repeat-row">
+            <th colspan="11">
+                <table class="bk-header-table">
+                    <tr>
+                        <td class="bk-spacer"></td>
+                        <td class="bk-title"
+                            th:text="#{bookings.header.title(${#numbers.formatInteger(data.year, 0)})}">
+                            Gesellschafter - Buchungen für 2026
+                        </td>
+                        <td class="bk-date" th:text="${#temporals.format(#temporals.createNow(), 'dd.MM.yyyy')}">
+                            10.05.2026
+                        </td>
+                    </tr>
+                </table>
 
-                    <div class="bk-double-line"></div>
+                <div class="bk-double-line"></div>
 
-                    <table class="bk-info-table">
-                        <tr>
-                            <td>
-                                <strong class="bk-shareholder-label" th:text="#{bookings.shareholder} + ':'">Gesellschafter:</strong>
-                                <span th:text="${data.shareholder.displayId} + ' ' + ${data.shareholder.firstName} + ' ' + ${data.shareholder.lastName}">1 Max Mustermann</span>
-                            </td>
-                            <td class="bk-page-cell">
-                                <span th:text="#{account-statement.header.page}">Seite:</span>
-                                <span class="page-num"></span>
-                            </td>
-                        </tr>
-                    </table>
-                    <div class="bk-dashed-line"></div>
-                </th>
-            </tr>
-            <tr>
-                <th th:each="header, iterStat : ${data.headers}" 
-                    th:text="${header}"
-                    th:classappend="${iterStat.index == 3 or iterStat.index == 4 ? 'double-separator-column' : (iterStat.index > 4 ? 'separator-column' : '')}">Header</th>
-            </tr>
+                <table class="bk-info-table">
+                    <tr>
+                        <td>
+                            <strong class="bk-shareholder-label"
+                                    th:text="#{bookings.shareholder} + ':'">Gesellschafter:</strong>
+                            <span th:text="${data.shareholder.displayId} + ' ' + ${data.shareholder.firstName} + ' ' + ${data.shareholder.lastName}">1 Max Mustermann</span>
+                        </td>
+                        <td class="bk-page-cell">
+                            <span th:text="#{account-statement.header.page}">Seite:</span>
+                            <span class="page-num"></span>
+                        </td>
+                    </tr>
+                </table>
+                <div class="bk-dashed-line"></div>
+            </th>
+        </tr>
+        <tr>
+            <th th:text="${data.headers[0]}">ID</th>
+            <th th:text="${data.headers[1]}">Date</th>
+            <th class="bk-no-right-padding" th:text="${data.headers[2]}">Comment</th>
+            <!-- Empty header for the Summary Label column, no separator -->
+            <th class="bk-no-left-padding"></th>
+
+            <th class="text-right double-separator-column" th:text="${data.headers[3]}">Total</th>
+            <th class="text-right double-separator-column" th:text="${data.headers[4]}">Withdrawal</th>
+            <th class="text-right separator-column" th:text="${data.headers[5]}">Tax Prev</th>
+            <th class="text-right separator-column" th:text="${data.headers[6]}">Tax Credit</th>
+            <th class="text-right separator-column" th:text="${data.headers[7]}">Interest</th>
+            <th class="text-right separator-column" th:text="${data.headers[8]}">Comp</th>
+            <th class="text-right separator-column" th:text="${data.headers[9]}">Balance</th>
+        </tr>
         </thead>
         <tbody>
-            <tr th:each="row, iterStat : ${data.rows}" 
-                th:with="isOpening=${row instanceof T(de.nihas101.midas.bookings.row.OpeningBalanceBookingRow)},
+        <tr th:each="row, iterStat : ${data.rows}"
+            th:with="isOpening=${row instanceof T(de.nihas101.midas.bookings.row.OpeningBalanceBookingRow)},
                          isMonthly=${row instanceof T(de.nihas101.midas.bookings.row.MonthlySummaryBookingRow)},
                          isCumulative=${row instanceof T(de.nihas101.midas.bookings.row.CumulativeSummaryBookingRow)}"
-                th:classappend="${(isOpening or isMonthly ? 'summary-row ' : '') + (isCumulative ? 'cumulative-summary bk-cumulative-separator-row ' : '') + (iterStat.last ? 'bk-final-row ' : '') + row.partName()}">
-                
+            th:classappend="${(isOpening or isMonthly ? 'summary-row ' : '') + (isCumulative ? 'cumulative-summary bk-cumulative-separator-row ' : '') + (iterStat.last ? 'bk-final-row ' : '') + row.partName()}">
+
+            <!-- Normal Data Columns -->
+            <th:block th:if="${!isMonthly and !isCumulative}">
                 <td th:text="${row.displayId()}">ID</td>
                 <td th:text="${row.dateStr()}">Date</td>
-                <td th:text="${row.comment()}">Comment</td>
-                
-                <td class="text-right amount double-separator-column" th:text="${row.total() != null and row.total().cents != 0 ? row.total().format(#locale) : ''}">Total</td>
-                
-                <td class="text-right amount double-separator-column" th:text="${row.amount(T(de.nihas101.midas.bookings.entity.BookingType).WITHDRAWAL).cents != 0 ? row.amount(T(de.nihas101.midas.bookings.entity.BookingType).WITHDRAWAL).format(#locale) : ''}">Withdrawal</td>
-                <td class="text-right amount separator-column" th:text="${row.amount(T(de.nihas101.midas.bookings.entity.BookingType).TAX_PREVIOUS_YEAR).cents != 0 ? row.amount(T(de.nihas101.midas.bookings.entity.BookingType).TAX_PREVIOUS_YEAR).format(#locale) : ''}">Tax Prev</td>
-                <td class="text-right amount separator-column" th:text="${row.amount(T(de.nihas101.midas.bookings.entity.BookingType).TAX_CREDIT).cents != 0 ? row.amount(T(de.nihas101.midas.bookings.entity.BookingType).TAX_CREDIT).format(#locale) : ''}">Tax Credit</td>
-                <td class="text-right amount separator-column" th:text="${row.amount(T(de.nihas101.midas.bookings.entity.BookingType).INTEREST).cents != 0 ? row.amount(T(de.nihas101.midas.bookings.entity.BookingType).INTEREST).format(#locale) : ''}">Interest</td>
-                <td class="text-right amount separator-column" th:text="${row.amount(T(de.nihas101.midas.bookings.entity.BookingType).COMPENSATION).cents != 0 ? row.amount(T(de.nihas101.midas.bookings.entity.BookingType).COMPENSATION).format(#locale) : ''}">Comp</td>
-                
-                <td class="text-right amount separator-column" th:text="${row.balance() != null and row.balance().cents != 0 ? row.balance().format(#locale) : ''}">Balance</td>
-            </tr>
+                <td colspan="2" th:text="${row.comment()}">Comment</td>
+            </th:block>
+
+            <!-- Summary Rows Columns -->
+            <th:block th:if="${isMonthly or isCumulative}">
+                <td></td> <!-- ID -->
+                <td></td> <!-- Date -->
+                <td class="bk-no-right-padding"></td> <!-- Comment -->
+                <td class="bk-no-left-padding" th:text="${row.comment()}">Summary Label</td>
+            </th:block>
+
+            <td class="text-right amount double-separator-column"
+                th:text="${row.total() != null and row.total().cents != 0 ? row.total().format(#locale) : ''}">Total
+            </td>
+
+            <td class="text-right amount double-separator-column"
+                th:text="${row.amount(T(de.nihas101.midas.bookings.entity.BookingType).WITHDRAWAL).cents != 0 ? row.amount(T(de.nihas101.midas.bookings.entity.BookingType).WITHDRAWAL).format(#locale) : ''}">
+                Withdrawal
+            </td>
+            <td class="text-right amount separator-column"
+                th:text="${row.amount(T(de.nihas101.midas.bookings.entity.BookingType).TAX_PREVIOUS_YEAR).cents != 0 ? row.amount(T(de.nihas101.midas.bookings.entity.BookingType).TAX_PREVIOUS_YEAR).format(#locale) : ''}">
+                Tax Prev
+            </td>
+            <td class="text-right amount separator-column"
+                th:text="${row.amount(T(de.nihas101.midas.bookings.entity.BookingType).TAX_CREDIT).cents != 0 ? row.amount(T(de.nihas101.midas.bookings.entity.BookingType).TAX_CREDIT).format(#locale) : ''}">
+                Tax Credit
+            </td>
+            <td class="text-right amount separator-column"
+                th:text="${row.amount(T(de.nihas101.midas.bookings.entity.BookingType).INTEREST).cents != 0 ? row.amount(T(de.nihas101.midas.bookings.entity.BookingType).INTEREST).format(#locale) : ''}">
+                Interest
+            </td>
+            <td class="text-right amount separator-column"
+                th:text="${row.amount(T(de.nihas101.midas.bookings.entity.BookingType).COMPENSATION).cents != 0 ? row.amount(T(de.nihas101.midas.bookings.entity.BookingType).COMPENSATION).format(#locale) : ''}">
+                Comp
+            </td>
+
+            <td class="text-right amount separator-column"
+                th:text="${row.balance() != null and row.balance().cents != 0 ? row.balance().format(#locale) : ''}">
+                Balance
+            </td>
+        </tr>
         </tbody>
     </table>
 </div>

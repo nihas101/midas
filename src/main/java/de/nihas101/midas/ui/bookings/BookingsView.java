@@ -400,6 +400,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
             return;
         }
         // TODO: We are missing the `Total sum` final line here (and in the PDF export)
+        // TODO: Monthly sum is missing the number of the month (and in the PDF export)
         grid.setItems(bookingRowService.generateRows(bookings, getLocale()));
     }
 

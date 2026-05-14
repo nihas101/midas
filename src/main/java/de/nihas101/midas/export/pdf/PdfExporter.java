@@ -6,6 +6,7 @@ import de.nihas101.midas.accountstatement.service.AccountStatementService;
 import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.row.BookingRow;
 import de.nihas101.midas.bookings.row.BookingRowService;
+import de.nihas101.midas.bookings.service.BookingsReader;
 import de.nihas101.midas.export.Export;
 import de.nihas101.midas.export.ExportRequest;
 import de.nihas101.midas.interest.InterestCalculation;
@@ -38,7 +39,8 @@ public class PdfExporter implements Export {
     private final Locale locale;
     private final PdfService pdfService;
 
-    private final InterestBookingsReader bookingsReader;
+    private final BookingsReader bookingsReader;
+    private final InterestBookingsReader interestBookingsReader;
     private final InterestRateService interestRateService;
     private final AccountStatementService accountStatementService;
     private final MessageSource messageSource;
@@ -114,20 +116,20 @@ public class PdfExporter implements Export {
 
     private PdfViewData extractBookingsData(Shareholder shareholder) {
         List<String> headers = List.of(
-                messageSource.getMessage("bookings.table.id", null, locale),
-                messageSource.getMessage("bookings.table.date", null, locale),
-                messageSource.getMessage("bookings.table.comment", null, locale),
-                messageSource.getMessage("bookings.table.total", null, locale),
-                messageSource.getMessage("bookings.type.withdrawal", null, locale),
-                messageSource.getMessage("bookings.type.tax-previous-year", null, locale),
-                messageSource.getMessage("bookings.type.tax-credit", null, locale),
-                messageSource.getMessage("bookings.type.interest", null, locale),
-                messageSource.getMessage("bookings.type.compensation", null, locale),
-                messageSource.getMessage("bookings.table.balance", null, locale)
+                messageSource.getMessage("export.pdf.bookings.table.id", null, locale),
+                messageSource.getMessage("export.pdf.bookings.table.date", null, locale),
+                messageSource.getMessage("export.pdf.bookings.table.comment", null, locale),
+                messageSource.getMessage("export.pdf.bookings.table.total", null, locale),
+                messageSource.getMessage("export.pdf.bookings.table.withdrawal", null, locale),
+                messageSource.getMessage("export.pdf.bookings.table.tax-previous-year", null, locale),
+                messageSource.getMessage("export.pdf.bookings.table.tax-credit", null, locale),
+                messageSource.getMessage("export.pdf.bookings.table.interest", null, locale),
+                messageSource.getMessage("export.pdf.bookings.table.compensation", null, locale),
+                messageSource.getMessage("export.pdf.bookings.table.balance", null, locale)
         );
 
         final Year year = Year.of(request.startDate().getYear());
-        final Bookings bookings = bookingsReader.interestRelatedBookingsForShareholderAndYear(shareholder.getId(), year);
+        final Bookings bookings = bookingsReader.bookingsForShareholderAndYear(shareholder.getId(), year);
         final List<BookingRow> rows = bookingRowService.generateRows(bookings, locale);
 
         return new PdfViewData(
@@ -183,7 +185,7 @@ public class PdfExporter implements Export {
         final InterestRate rate = interestRateService.interestRate(shareholder.getId(), year);
         final BigDecimal interestRate = rate != null ? rate.getInterestRate() : BigDecimal.ZERO;
 
-        final Bookings bookings = bookingsReader.interestRelatedBookingsForShareholderAndYear(shareholder.getId(), year);
+        final Bookings bookings = interestBookingsReader.interestRelatedBookingsForShareholderAndYear(shareholder.getId(), year);
         final InterestCalculation interestCalculation = new InterestCalculation(bookings, year, interestRate);
 
         final List<Object> rows = new ArrayList<>(interestRowService.generateRows(year, bookings, interestRate, interestCalculation, locale));
