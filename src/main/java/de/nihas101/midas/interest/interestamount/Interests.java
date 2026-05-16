@@ -13,12 +13,6 @@ public class Interests { // TODO: Think about using something else than BigDecim
 
     private final Map<Month, Interest> interests;
 
-    // TODO: Do I really need this?
-    // TODO: Write tests
-    public BigDecimal dailyInterestRate(Month month) {
-        return interests.get(month).dailyInterestRate(); // TODO: Handle null
-    }
-
     public BigDecimal interest() {
         return interestAmountSum().divide(interestDivisor(), RoundingMode.HALF_UP);
     }

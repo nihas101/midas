@@ -74,7 +74,14 @@
         .bk-main-table th, .bk-main-table td {
             padding: 2px;
             border-bottom: none;
-            word-wrap: break-word;
+        }
+        .bk-main-table tr {
+            page-break-inside: avoid; /* Prevent rows from splitting across pages */
+        }
+        .bk-truncate {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .bk-main-table th {
             background-color: transparent !important;
@@ -132,7 +139,7 @@
             <col style="width: 8%;"/>   <!-- ID -->
             <col style="width: 6%;"/>  <!-- Date -->
             <col style="width: 7%;"/>   <!-- Comment: Spans into the next row, so it's okay to have this smaller -->
-            <col style="width: 10%;"/>  <!-- Summary Label -->
+            <col style="width: 12%;"/>  <!-- Summary Label -->
             <col style="width: 10%;"/>  <!-- Total -->
             <col style="width: 10%;"/>   <!-- Withdrawal -->
             <col style="width: 10%;"/>   <!-- Tax Prev -->
@@ -202,7 +209,7 @@
             <th:block th:if="${!isMonthly and !isCumulative}">
                 <td th:text="${row.displayId()}">ID</td>
                 <td th:text="${row.dateStr()}">Date</td>
-                <td colspan="2" th:text="${row.comment()}">Comment</td>
+                <td colspan="2" class="bk-truncate" th:text="${row.comment()}">Comment</td>
             </th:block>
 
             <!-- Summary Rows Columns -->
@@ -210,9 +217,8 @@
                 <td></td> <!-- ID -->
                 <td></td> <!-- Date -->
                 <td class="bk-no-right-padding"></td> <!-- Comment -->
-                <td class="bk-no-left-padding" th:text="${row.comment()}">Summary Label</td>
+                <td class="bk-no-left-padding bk-truncate" th:text="${row.comment()}">Summary Label</td>
             </th:block>
-
             <td class="text-right amount double-separator-column"
                 th:text="${row.total() != null and row.total().cents != 0 ? row.total().format(#locale) : ''}">Total
             </td>

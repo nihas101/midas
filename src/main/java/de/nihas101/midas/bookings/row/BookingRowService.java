@@ -57,6 +57,14 @@ public class BookingRowService {
 
         generateBookingRows(bookings, months.getLast(), currentBalance.get(), rows, "double-separator", locale);
 
+        rows.add(new CumulativeSummaryBookingRow(
+                "",
+                messageSource.getMessage("bookings.table.summary.total-sums", null, locale),
+                bookings,
+                months.getLast(),
+                "double-separator"
+        ));
+
         return rows;
     }
 
