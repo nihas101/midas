@@ -25,7 +25,7 @@ import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersReader;
 import de.nihas101.midas.ui.common.CancelButton;
 import de.nihas101.midas.ui.common.SaveButton;
-import io.micrometer.common.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.MessageSource;
 
 import java.math.BigDecimal;

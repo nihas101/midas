@@ -19,8 +19,10 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.streams.DownloadHandler;
 import com.vaadin.flow.server.streams.DownloadResponse;
 import de.nihas101.midas.config.MidasConfig;
+import de.nihas101.midas.export.Export;
 import de.nihas101.midas.export.ExportFactory;
 import de.nihas101.midas.export.ExportRequest;
+import de.nihas101.midas.export.ExportViews;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersService;
 import de.nihas101.midas.ui.common.DatePickerI18nProvider;
@@ -131,7 +133,7 @@ public class ExportView extends MidasView {
         shareholderPicker = new MultiSelectComboBox<>(messageSource.getMessage("export.shareholders.label", null, getLocale()));
         final Set<Shareholder> allShareholders = Set.copyOf(shareholdersService.shareholders().toList());
         shareholderPicker.setItems(allShareholders);
-        shareholderPicker.setItemLabelGenerator(s -> s.getFirstName() + " " + s.getLastName() + " (" + s.getId() + ")");
+        shareholderPicker.setItemLabelGenerator(s -> s.getFirstName() + " " + s.getLastName() + " (" + s.getDisplayId() + ")");
         shareholderPicker.setWidth("400px");
 
         selectAllCheckbox = new Checkbox(messageSource.getMessage("export.select-all.label", null, getLocale()));
@@ -209,15 +211,13 @@ public class ExportView extends MidasView {
         layout.setWidthFull();
         layout.setAlignItems(FlexComponent.Alignment.END);
 
-        //final List<String> allFormats = List.of("xlsx", "pdf"); // TODO: Use this when PDF is added (+ dont use strings for this)
-        final List<String> allFormats = List.of("xlsx");
+        final List<String> allFormats = List.of("xlsx", "pdf");
 
         formatPicker = new CheckboxGroup<>(messageSource.getMessage("export.formats.label", null, getLocale()));
         formatPicker.setItems(allFormats);
         formatPicker.setItemLabelGenerator(key -> messageSource.getMessage("export.format." + key, null, getLocale()));
         formatPicker.addThemeVariants(CheckboxGroupVariant.LUMO_VERTICAL);
-        formatPicker.select("xlsx");
-        // formatPicker.select("pdf"); // TODO: Make this the default when pdf is added
+        formatPicker.select("pdf");
         formatPicker.addValueChangeListener(e -> updateExportButtonState());
 
         exportButton = new Button(
@@ -238,45 +238,65 @@ public class ExportView extends MidasView {
         try {
             final LocalDate from = startDatePicker.getValue();
             final LocalDate to = endDatePicker.getValue();
+            final Set<String> views = viewPicker.getValue();
             final ExportRequest request = new ExportRequest(
                     List.copyOf(shareholderPicker.getValue()),
-                    viewPicker.getValue(),
+                    new ExportViews(views, messageSource, getLocale()),
                     from,
                     to,
                     formatPicker.getValue()
             );
 
-            // TODO: Don't do this via strings
-            if (request.formats().size() == 1 && request.formats().contains("xlsx")) {
-                final ByteArrayOutputStream out = new ByteArrayOutputStream();
-                exportFactory.createXlsxExport(request, out, getLocale())
-                        .trigger();
-
-                final byte[] data = out.toByteArray();
-                final String fileName = "export_" + from + "_" + to + ".xlsx";
-
-                final Anchor downloadAnchor = new Anchor(
-                        DownloadHandler.fromInputStream(event -> new DownloadResponse(
-                                new ByteArrayInputStream(data),
-                                fileName,
-                                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                                data.length
-                        )),
-                        ""
-                );
-                downloadAnchor.getElement().setAttribute("download", true);
-                downloadAnchor.getElement().getStyle().set("display", "none");
-                mainContent.add(downloadAnchor);
-
-                downloadAnchor.getElement().executeJs("this.click();");
-                Notification.show(messageSource.getMessage("export.notification.success", null, getLocale()));
-            } else {
-                Notification.show(messageSource.getMessage("export.notification.only-xlsx", null, getLocale()));
+            if (request.formats().contains("xlsx")) {
+                runXlsxExport(request);
             }
+            if (request.formats().contains("pdf")) {
+                runPdfExport(request);
+            }
+
+            Notification.show(messageSource.getMessage("export.notification.success", null, getLocale()));
         } catch (Exception e) {
             log.error("Export failed", e);
             Notification.show(messageSource.getMessage("export.notification.error", new Object[]{e.getMessage()}, getLocale()), 5000, Notification.Position.MIDDLE);
         }
+    }
+
+    private void runXlsxExport(final ExportRequest request) {
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        final Export xlsxExport = exportFactory.createXlsxExport(request, out, getLocale());
+        xlsxExport.trigger();
+
+        final byte[] data = out.toByteArray();
+        triggerDownload(data, xlsxExport.fileName(), xlsxExport.mimeType());
+    }
+
+    private void runPdfExport(final ExportRequest request) {
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        final Export pdfExport = exportFactory.createPdfExport(request, out, getLocale());
+        pdfExport.trigger();
+        final byte[] data = out.toByteArray();
+        triggerDownload(data, pdfExport.fileName(), pdfExport.mimeType());
+    }
+
+    private void triggerDownload(
+            final byte[] data,
+            final String fileName,
+            final String mimeType
+    ) {
+        final Anchor downloadAnchor = new Anchor(
+                DownloadHandler.fromInputStream(event -> new DownloadResponse(
+                        new ByteArrayInputStream(data),
+                        fileName,
+                        mimeType,
+                        data.length
+                )),
+                ""
+        );
+        downloadAnchor.getElement().setAttribute("download", true);
+        downloadAnchor.getElement().getStyle().set("display", "none");
+        mainContent.add(downloadAnchor);
+
+        downloadAnchor.getElement().executeJs("this.click();");
     }
 
     public static Icon icon() {

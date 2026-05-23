@@ -35,6 +35,13 @@ public class ZipArchive implements ArchiveWriter, AutoCloseable {
     }
 
     @Override
+    public void addDirectory(final String directoryName) throws IOException {
+        final ZipEntry dirEntry = new ZipEntry(directoryName.endsWith("/") ? directoryName : directoryName + "/");
+        zos.putNextEntry(dirEntry);
+        zos.closeEntry();
+    }
+
+    @Override
     public void close() throws Exception {
         baos.close();
         zos.close();

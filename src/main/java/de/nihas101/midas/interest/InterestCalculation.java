@@ -3,7 +3,6 @@ package de.nihas101.midas.interest;
 import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.monthlytotal.MonthlyCumulativeSum;
 import de.nihas101.midas.bookings.monthlytotal.MonthlyTotalSum;
-import de.nihas101.midas.interest.dto.InterestRate;
 import de.nihas101.midas.interest.interestamount.Interest;
 import de.nihas101.midas.money.MoneyAmount;
 
@@ -27,18 +26,6 @@ public record InterestCalculation(
         Map<Month, MoneyAmount> monthlyBalances,
         Map<Month, Interest> interests
 ) {
-
-    public InterestCalculation(
-            final Bookings bookings,
-            final Year year,
-            final InterestRate interestRate
-    ) {
-        this(
-                bookings,
-                year,
-                interestRate.getInterestRate()
-        );
-    }
 
     public InterestCalculation(
             final Bookings bookings,

@@ -1,0 +1,159 @@
+<th:block th:fragment="style">
+    <style>
+        .as-header-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0 !important;
+            margin-bottom: 5px;
+        }
+        .as-header-table td {
+            border: none;
+            padding: 0;
+            vertical-align: bottom;
+        }
+        .as-title {
+            text-align: center;
+            font-size: 13pt;
+            font-weight: bold;
+            width: 60%;
+        }
+        .as-date {
+            text-align: right;
+            font-size: 9pt;
+            width: 20%;
+        }
+        .as-spacer {
+            width: 20%;
+        }
+        .as-double-line {
+            border-top: 1px solid black;
+            border-bottom: 1px solid black;
+            height: 2px;
+            margin-bottom: 10px;
+        }
+        .as-info-line {
+            width: 100%;
+            margin-bottom: 0;
+        }
+        .as-page {
+            float: right;
+            font-size: 9pt;
+        }
+        .as-shareholder {
+            float: left;
+            font-size: 9pt;
+        }
+        .as-shareholder-label {
+            margin-right: 10px;
+        }
+        /* Page numbering for the body flow */
+        .page-num::after {
+            content: counter(page);
+        }
+        
+        /* Reset header-info and footerLeft from base-layout for this view */
+        .header-info, #footerLeft {
+            display: none !important;
+        }
+        h1 {
+            display: none;
+        }
+
+        /* Table styling */
+        .as-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-top: 1px dashed #333;
+            margin-top: 0 !important;
+            font-size: 9.5pt;
+        }
+        .as-table th, .as-table td {
+            padding: 3px 4px;
+            border-bottom: none;
+        }
+        .as-table .separator-column {
+            border-left: 1px solid #ccc;
+        }
+        .as-table th {
+            background-color: transparent !important;
+            border-bottom: 3px double #333;
+            font-weight: bold;
+        }
+        .as-table .text-right {
+            text-align: right;
+        }
+        .as-col-type {
+            width: 30%;
+        }
+        .as-closing-row td {
+            border-bottom: 3px double #333;
+        }
+    </style>
+</th:block>
+
+<div th:fragment="content">
+    <table class="as-header-table">
+        <tr>
+            <td class="as-spacer"></td>
+            <td class="as-title" th:text="#{account-statement.header.title(${#numbers.formatInteger(data.year, 0)})}">
+                Gesellschafter - Abrechnungskonto 2026
+            </td>
+            <td class="as-date" th:text="${#temporals.format(#temporals.createNow(), 'dd.MM.yyyy')}">10.05.2026</td>
+        </tr>
+    </table>
+
+    <div class="as-double-line"></div>
+
+    <div class="as-info-line">
+        <div class="as-shareholder">
+            <strong class="as-shareholder-label" th:text="#{bookings.shareholder} + ':'">Gesellschafter:</strong>
+            <span th:text="${data.shareholder.displayId} + ' ' + ${data.shareholder.firstName} + ' ' + ${data.shareholder.lastName}">1 Max Mustermann</span>
+        </div>
+        <div class="as-page">
+            <span th:text="#{account-statement.header.page}">Seite:</span>
+            <span class="page-num"></span>
+        </div>
+        <div style="clear: both;"></div>
+    </div>
+
+    <table class="as-table">
+        <thead>
+        <tr>
+            <th th:text="${data.headers[0]}">ID</th>
+            <th th:text="${data.headers[1]}">Date</th>
+            <th class="as-col-type" th:text="${data.headers[2]}">Type</th>
+            <th class="text-right separator-column" th:text="${data.headers[3]}">Debit</th>
+            <th class="text-right separator-column" th:text="${data.headers[4]}">Credit</th>
+            <th class="text-right separator-column" th:text="${data.headers[5]}">Balance</th>
+        </tr>
+        </thead>
+        <tbody>
+        <th:block th:each="row : ${data.rows}">
+            <tr th:if="${!(row instanceof T(de.nihas101.midas.accountstatement.row.ClosingAccountStatementRow))}">
+                <td th:text="${row.displayId() != null and row.displayId() != 0 ? row.displayId() : ''}">ID</td>
+                <td th:text="${row.dateStr()}">Date</td>
+                <td th:text="${row.label()}">Type</td>
+
+                <td class="text-right amount separator-column"
+                    th:text="${row.debit() != null and row.debit().cents != 0 ? row.debit().format(#locale) : ''}">Debit
+                </td>
+                <td class="text-right amount separator-column"
+                    th:text="${row.credit() != null and row.credit().cents != 0 ? row.credit().format(#locale) : ''}">
+                    Credit
+                </td>
+                <td class="text-right amount separator-column"
+                    th:text="${row.balance() != null ? row.balance().format(#locale) : ''}">Balance
+                </td>
+            </tr>
+            <tr th:if="${row instanceof T(de.nihas101.midas.accountstatement.row.ClosingAccountStatementRow)}"
+                class="as-closing-row">
+                <td colspan="4" class="text-right" th:text="${row.label()}">Endstand per ...</td>
+                <td></td>
+                <td class="text-right amount" th:text="${row.balance() != null ? row.balance().format(#locale) : ''}">
+                    Balance
+                </td>
+            </tr>
+        </th:block>
+        </tbody>
+    </table>
+</div>

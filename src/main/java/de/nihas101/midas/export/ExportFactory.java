@@ -1,6 +1,8 @@
 package de.nihas101.midas.export;
 
+import de.nihas101.midas.accountstatement.row.AccountStatementRowService;
 import de.nihas101.midas.accountstatement.service.AccountStatementService;
+import de.nihas101.midas.bookings.row.BookingRowService;
 import de.nihas101.midas.bookings.service.BookingsReader;
 import de.nihas101.midas.export.accountstatement.AccountStatementExportDataSource;
 import de.nihas101.midas.export.accountstatement.AccountStatementsRowExtractor;
@@ -8,7 +10,12 @@ import de.nihas101.midas.export.bookings.BookingsExportDataSource;
 import de.nihas101.midas.export.bookings.BookingsRowExtractor;
 import de.nihas101.midas.export.interest.InterestExportDataSource;
 import de.nihas101.midas.export.interest.InterestRowExtractor;
+import de.nihas101.midas.export.pdf.PdfExporter;
+import de.nihas101.midas.export.pdf.PdfService;
 import de.nihas101.midas.export.xlsx.XlsxExporter;
+import de.nihas101.midas.export.xlsx.XslxFile;
+import de.nihas101.midas.interest.row.InterestRowService;
+import de.nihas101.midas.interest.service.InterestBookingsService;
 import de.nihas101.midas.interest.service.InterestRateService;
 import de.nihas101.midas.openingbalance.service.DefaultOpeningBalanceService;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +36,11 @@ public class ExportFactory {
     private final InterestRateService interestRateService;
     private final AccountStatementService accountStatementService;
     private final MessageSource messageSource;
+    private final PdfService pdfService;
+    private final BookingRowService bookingRowService;
+    private final AccountStatementRowService accountStatementRowService;
+    private final InterestRowService interestRowService;
+    private final InterestBookingsService interestBookingsService;
 
     public Export createXlsxExport(
             final ExportRequest request,
@@ -89,7 +101,35 @@ public class ExportFactory {
             );
         }
 
-        return new XlsxExporter(dataSources, outputStream);
+        return new XlsxExporter(
+                dataSources,
+                outputStream,
+                new XslxFile(
+                        request.startDate(),
+                        request.endDate()
+                )
+        );
+    }
+
+    public Export createPdfExport(
+            final ExportRequest request,
+            final OutputStream outputStream,
+            final Locale locale
+    ) {
+        return new PdfExporter(
+                request,
+                outputStream,
+                locale,
+                pdfService,
+                bookingsReader,
+                interestBookingsService,
+                interestRateService,
+                accountStatementService,
+                messageSource,
+                bookingRowService,
+                accountStatementRowService,
+                interestRowService
+        );
     }
 
 }

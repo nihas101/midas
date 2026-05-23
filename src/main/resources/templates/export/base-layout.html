@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <style>
+        /* ... previous styles ... */
+        @page {
+            size: A4;
+            margin: 2cm;
+            @bottom-left {
+                content: element(footerLeft);
+            }
+        }
+        #footerLeft {
+            position: running(footerLeft);
+            font-family: "Liberation Serif", serif;
+            font-size: 10pt;
+        }
+        body {
+            font-family: "Liberation Serif", serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            color: #333;
+        }
+        h1 {
+            font-size: 18pt;
+            margin-bottom: 0.5cm;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 0.2cm;
+        }
+        .header-info {
+            margin-bottom: 1cm;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.5cm;
+            table-layout: auto;
+        }
+        thead {
+            display: table-header-group;
+        }
+        th {
+            text-align: left;
+            border-bottom: 2px solid #333;
+            padding: 8px 4px;
+            font-weight: bold;
+            background-color: #f9f9f9;
+        }
+        td {
+            padding: 6px 4px;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .amount {
+            white-space: nowrap;
+        }
+        .summary-row {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+        .separator-column {
+            border-left: 1px solid #ccc;
+        }
+        .cumulative-summary {
+            background-color: #e0e0e0;
+            font-weight: bold;
+        }
+        .single-separator td {
+            border-bottom: 1px solid #333;
+        }
+        .double-separator td {
+            border-bottom: 3px double #333;
+        }
+    </style>
+    <th:block th:replace="~{__${content}__ :: style} ?: ~{}"></th:block>
+</head>
+<body>
+<div id="footerLeft" th:text="${data.shareholderName}">Name</div>
+<div th:insert="~{__${content}__ :: content}">
+    <!-- Content will be injected here -->
+</div>
+</body>
+</html>

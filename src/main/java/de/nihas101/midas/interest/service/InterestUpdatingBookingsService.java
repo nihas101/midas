@@ -20,7 +20,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class InterestUpdatingBookingsService implements BookingsWriter { // TODO: Tests
+public class InterestUpdatingBookingsService implements BookingsWriter {
 
     private final BookingsWriter delegate;
     private final InterestBookingsReader bookingsReader;

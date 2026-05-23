@@ -5,10 +5,10 @@ import de.nihas101.midas.bookings.service.BookingsReader;
 import de.nihas101.midas.interest.InterestCalculation;
 import de.nihas101.midas.interest.dto.InterestRate;
 import de.nihas101.midas.interest.interestamount.Interest;
+import de.nihas101.midas.interest.row.TransactionType;
 import de.nihas101.midas.interest.service.InterestRateService;
 import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.shareholders.dto.Shareholder;
-import de.nihas101.midas.ui.interest.TransactionType;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;

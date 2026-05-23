@@ -93,22 +93,31 @@ public class XlsxExportTarget implements ExportTarget, AutoCloseable {
     private void writeRows(final Sheet sheet, final List<List<Object>> rows) {
         int rowNum = 1;
         for (List<Object> rowData : rows) {
-            final Row row = sheet.createRow(rowNum++);
-            for (int i = 0; i < rowData.size(); i++) {
-                final Cell cell = row.createCell(i);
-                final Object value = rowData.get(i);
+            rowNum = writeRow(sheet, rowData, rowNum);
+        }
+    }
 
-                if (value instanceof LocalDate localDate) {
-                    cell.setCellValue(localDate);
-                    cell.setCellStyle(dateStyle);
-                } else if (value instanceof BigDecimal bigDecimal) {
-                    cell.setCellValue(bigDecimal.doubleValue());
-                } else if (value instanceof Number number) {
-                    cell.setCellValue(number.doubleValue());
-                } else if (value != null) {
-                    cell.setCellValue(value.toString());
-                }
-            }
+    private int writeRow(final Sheet sheet, final List<Object> rowData, int rowNum) {
+        final Row row = sheet.createRow(rowNum++);
+        for (int i = 0; i < rowData.size(); i++) {
+            writeCell(rowData, row, i);
+        }
+        return rowNum;
+    }
+
+    private void writeCell(final List<Object> rowData, final Row row, final int column) {
+        final Cell cell = row.createCell(column);
+        final Object value = rowData.get(column);
+
+        if (value instanceof LocalDate localDate) {
+            cell.setCellValue(localDate);
+            cell.setCellStyle(dateStyle);
+        } else if (value instanceof BigDecimal bigDecimal) {
+            cell.setCellValue(bigDecimal.doubleValue());
+        } else if (value instanceof Number number) {
+            cell.setCellValue(number.doubleValue());
+        } else if (value != null) {
+            cell.setCellValue(value.toString());
         }
     }
 

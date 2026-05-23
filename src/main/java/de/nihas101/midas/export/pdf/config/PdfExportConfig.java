@@ -1,0 +1,59 @@
+package de.nihas101.midas.export.pdf.config;
+
+import lombok.Data;
+import lombok.Getter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.thymeleaf.spring6.SpringTemplateEngine;
+import org.thymeleaf.templatemode.TemplateMode;
+import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
+import org.thymeleaf.templateresolver.FileTemplateResolver;
+import org.thymeleaf.templateresolver.ITemplateResolver;
+
+@Data
+@Configuration
+@ConfigurationProperties(prefix = "midas.export.pdf")
+public class PdfExportConfig {
+
+    @Getter
+    private String templatePath = null;
+
+    @Bean
+    public SpringTemplateEngine springTemplateEngine() {
+        final SpringTemplateEngine templateEngine = new SpringTemplateEngine();
+
+        // External template resolver (optional, highest priority)
+        if (templatePath != null && !templatePath.isEmpty()) {
+            templateEngine.addTemplateResolver(fileTemplateResolver());
+        }
+
+        // Default classpath template resolver
+        templateEngine.addTemplateResolver(classpathTemplateResolver());
+
+        return templateEngine;
+    }
+
+    private ITemplateResolver classpathTemplateResolver() {
+        final ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
+        resolver.setPrefix("templates/export/");
+        resolver.setSuffix(".html");
+        resolver.setTemplateMode(TemplateMode.HTML);
+        resolver.setCharacterEncoding("UTF-8");
+        resolver.setOrder(2);
+        resolver.setCheckExistence(true);
+        return resolver;
+    }
+
+    private ITemplateResolver fileTemplateResolver() {
+        final FileTemplateResolver resolver = new FileTemplateResolver();
+        String prefix = templatePath.endsWith("/") ? templatePath : templatePath + "/";
+        resolver.setPrefix(prefix);
+        resolver.setSuffix(".html");
+        resolver.setTemplateMode(TemplateMode.HTML);
+        resolver.setCharacterEncoding("UTF-8");
+        resolver.setOrder(1);
+        resolver.setCheckExistence(true);
+        return resolver;
+    }
+}

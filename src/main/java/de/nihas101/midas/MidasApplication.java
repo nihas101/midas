@@ -20,21 +20,13 @@ import java.util.Properties;
 @EnableConfigurationProperties
 public class MidasApplication implements AppShellConfigurator {
 
+    // TODO: Implement clean up of 10 year old bookings etc
+
     // TODO: Create a private repository that defines mappings specific to the client
-    //       i.e. rename midas -> GSHB
+    //       i.e. rename midas -> Geselschafterbuchhaltung
     //       Set everything necessary in the application properties etc.
 
-    // TODO: Think about splitting this project into multiple modules
-    //       sqlite persistence module
-    //       persistance interface module
-    //       business logic
-    //       frontend (+ project that combines them all)
-
     public static void main(String[] args) {
-        // TODO: Add tooltips everywhere
-        // TODO: Add support for imports via some kind of (xml?) file that defines the inputs and mappings
-        //       - csv (but hide the item by default)
-        // TODO: Add support for exports to: csv, pdf, html(?)
         try {
             SpringApplication.run(MidasApplication.class, args);
         } catch (Exception e) {

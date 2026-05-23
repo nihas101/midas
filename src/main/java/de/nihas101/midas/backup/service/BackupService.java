@@ -22,17 +22,20 @@ public class BackupService { // TODO: Extract interface
     private final JdbcTemplate jdbcTemplate;
     private final BackupStatusWriter backupStatusWriter;
     private final MidasExecutableResolver executableResolver;
+    private final MidasTemplatesResolver templatesResolver;
     private final String datasourceUrl;
 
     public BackupService(
             final JdbcTemplate jdbcTemplate,
             final BackupStatusWriter backupStatusWriter,
             final MidasExecutableResolver executableResolver,
+            final MidasTemplatesResolver templatesResolver,
             @Value("${spring.datasource.url}") final String datasourceUrl
     ) {
         this.jdbcTemplate = jdbcTemplate;
         this.backupStatusWriter = backupStatusWriter;
         this.executableResolver = executableResolver;
+        this.templatesResolver = templatesResolver;
         this.datasourceUrl = datasourceUrl;
     }
 
@@ -63,11 +66,16 @@ public class BackupService { // TODO: Extract interface
                 ),
                 new ApplicationPropertiesSnapshot(
                         zipArchive,
-                        databaseLocation
+                        databaseLocation,
+                        templatesResolver
                 ),
                 new JarSnapshot(
                         zipArchive,
                         executableResolver
+                ),
+                new TemplatesSnapshot(
+                        zipArchive,
+                        templatesResolver
                 )
         );
     }

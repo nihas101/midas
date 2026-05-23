@@ -15,7 +15,6 @@ import de.nihas101.midas.userconfig.service.UserConfigService;
 import org.springframework.context.MessageSource;
 
 // TODO: Add descriptions to the settings
-// TODO: Add property to hide settings
 @Route("settings")
 @PageTitle("Settings")
 public class SettingsView extends MidasView {

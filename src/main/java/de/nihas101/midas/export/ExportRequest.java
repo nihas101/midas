@@ -8,7 +8,7 @@ import java.util.Set;
 
 public record ExportRequest(
         List<Shareholder> shareholders,
-        Set<String> views,
+        ExportViews views,
         LocalDate startDate,
         LocalDate endDate,
         Set<String> formats
