@@ -11,4 +11,6 @@ public interface ArchiveWriter {
     void add(File file, String name) throws IOException;
 
     void add(Properties props) throws IOException;
+
+    void addDirectory(final String directoryName) throws IOException;
 }

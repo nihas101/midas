@@ -1,5 +1,7 @@
 package de.nihas101.midas.export.pdf.config;
 
+import lombok.Data;
+import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,10 +11,12 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import org.thymeleaf.templateresolver.FileTemplateResolver;
 import org.thymeleaf.templateresolver.ITemplateResolver;
 
+@Data
 @Configuration
 @ConfigurationProperties(prefix = "midas.export.pdf")
 public class PdfExportConfig {
 
+    @Getter
     private String templatePath = null;
 
     @Bean
