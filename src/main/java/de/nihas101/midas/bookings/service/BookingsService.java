@@ -28,18 +28,31 @@ public class BookingsService implements BookingsWriter, BookingsReader {
 
     @Override
     public Bookings bookingsForShareholderAndYear(final Integer shareholderId, final Year year) {
+        return bookingsForShareholderAndDates(
+                shareholderId,
+                year.atMonth(Month.JANUARY).atDay(1),
+                year.atMonth(Month.DECEMBER).atEndOfMonth()
+        );
+    }
+
+    @Override
+    public Bookings bookingsForShareholderAndDates(
+            final Integer shareholderId,
+            final LocalDate startDate,
+            final LocalDate endDate
+    ) {
         final ShareholderEntity shareholder = shareholdersRepository.findById(shareholderId)
                 .orElseThrow(() -> new IllegalArgumentException("Shareholder not found"));
 
-        final LocalDate startOfYear = year.atMonth(Month.JANUARY).atDay(1);
-        final LocalDate endOfYear = year.atMonth(Month.DECEMBER).atEndOfMonth();
-
-        final List<Booking> bookings = bookingsRepository.findByShareholderAndDateBetweenOrderByDateAsc(shareholder, startOfYear, endOfYear)
+        final List<Booking> bookings = bookingsRepository.findByShareholderAndDateBetweenOrderByDateAsc(shareholder, startDate, endDate)
                 .stream()
                 .map(Booking::fromEntity)
                 .toList();
 
-        final OpeningBalance openingBalance = openingBalanceRepository.findByShareholderAndDate(shareholder, year.atMonth(Month.JANUARY).atDay(1))
+        final OpeningBalance openingBalance = openingBalanceRepository.findByShareholderAndDate(
+                        shareholder,
+                        Year.of(startDate.getYear()).atMonth(Month.JANUARY).atDay(1)
+                )
                 .map(OpeningBalance::fromEntity)
                 .orElse(null);
 

@@ -17,7 +17,7 @@ public class PdfExportConfig {
 
     @Bean
     public SpringTemplateEngine pdfTemplateEngine() {
-        SpringTemplateEngine templateEngine = new SpringTemplateEngine();
+        final SpringTemplateEngine templateEngine = new SpringTemplateEngine();
 
         // External template resolver (optional, highest priority)
         if (externalTemplatePath != null && !externalTemplatePath.isEmpty()) {
@@ -31,7 +31,7 @@ public class PdfExportConfig {
     }
 
     private ITemplateResolver classpathTemplateResolver() {
-        ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
+        final ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
         resolver.setPrefix("templates/export/");
         resolver.setSuffix(".html");
         resolver.setTemplateMode(TemplateMode.HTML);
@@ -42,7 +42,7 @@ public class PdfExportConfig {
     }
 
     private ITemplateResolver fileTemplateResolver() {
-        FileTemplateResolver resolver = new FileTemplateResolver();
+        final FileTemplateResolver resolver = new FileTemplateResolver();
         String prefix = externalTemplatePath.endsWith("/") ? externalTemplatePath : externalTemplatePath + "/";
         resolver.setPrefix(prefix);
         resolver.setSuffix(".html");

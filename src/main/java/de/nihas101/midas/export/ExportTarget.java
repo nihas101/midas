@@ -5,7 +5,11 @@ import java.io.OutputStream;
 import java.util.List;
 
 public interface ExportTarget {
-    void write(OutputStream outputStream) throws IOException;
+    void write(final OutputStream outputStream) throws IOException;
 
-    void export(String sheetName, List<String> headers, List<List<Object>> rows);
+    void export(
+            final String sheetName,
+            final List<String> headers,
+            final List<List<Object>> rows
+    );
 }

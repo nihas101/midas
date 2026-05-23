@@ -30,6 +30,8 @@
         <java.version>21</java.version>
         <vaadin.version>25.0.4</vaadin.version>
         <poi.version>5.5.1</poi.version>
+        <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
+        <openhtmltopdf.version>1.0.10</openhtmltopdf.version>
     </properties>
     <dependencies>
         <dependency>
@@ -87,12 +89,12 @@
         <dependency>
             <groupId>com.openhtmltopdf</groupId>
             <artifactId>openhtmltopdf-pdfbox</artifactId>
-            <version>1.0.10</version>
+            <version>${openhtmltopdf.version}</version>
         </dependency>
         <dependency>
             <groupId>com.openhtmltopdf</groupId>
             <artifactId>openhtmltopdf-slf4j</artifactId>
-            <version>1.0.10</version>
+            <version>${openhtmltopdf.version}</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

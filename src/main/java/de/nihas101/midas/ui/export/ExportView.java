@@ -131,7 +131,7 @@ public class ExportView extends MidasView {
         shareholderPicker = new MultiSelectComboBox<>(messageSource.getMessage("export.shareholders.label", null, getLocale()));
         final Set<Shareholder> allShareholders = Set.copyOf(shareholdersService.shareholders().toList());
         shareholderPicker.setItems(allShareholders);
-        shareholderPicker.setItemLabelGenerator(s -> s.getFirstName() + " " + s.getLastName() + " (" + s.getId() + ")");
+        shareholderPicker.setItemLabelGenerator(s -> s.getFirstName() + " " + s.getLastName() + " (" + s.getDisplayId() + ")");
         shareholderPicker.setWidth("400px");
 
         selectAllCheckbox = new Checkbox(messageSource.getMessage("export.select-all.label", null, getLocale()));
