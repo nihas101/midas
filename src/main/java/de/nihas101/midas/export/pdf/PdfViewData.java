@@ -8,7 +8,7 @@ import java.util.List;
 public record PdfViewData(
         String viewName,
         String shareholderName,
-        Shareholder shareholder,
+        Shareholder shareholder, // TODO: Create a separate class for this instead of reusing shareholder
         Integer year,
         BigDecimal interestRate,
         List<String> headers,
