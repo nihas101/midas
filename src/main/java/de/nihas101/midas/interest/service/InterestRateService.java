@@ -17,7 +17,7 @@ public class InterestRateService {
     private final InterestRateRepository interestRateRepository;
     private final ShareholdersRepository shareholdersRepository;
 
-    public InterestRate interestRate(Integer shareholderId, Year year) {
+    public InterestRate interestRate(final Integer shareholderId, final Year year) {
         ShareholderEntity shareholder = shareholdersRepository.findById(shareholderId)
                 .orElseThrow(() -> new IllegalArgumentException("Shareholder not found"));
 

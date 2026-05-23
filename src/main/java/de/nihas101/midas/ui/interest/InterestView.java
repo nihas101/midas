@@ -40,8 +40,8 @@ import de.nihas101.midas.ui.common.ShareholderPicker;
 import de.nihas101.midas.ui.common.YearPicker;
 import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
 import de.nihas101.midas.userconfig.service.UserConfigService;
-import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.MessageSource;
 
 import java.math.BigDecimal;
@@ -317,8 +317,6 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
         interestCalculationGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.LUMO_NO_ROW_BORDERS, GridVariant.LUMO_COMPACT);
 
         setupColumn(interestCalculationGrid.addColumn(InterestCalculationRow::label), "interest.table.month", ColumnTextAlign.START);
-        // TODO: These header wit S/H were displayed slightly different in the old program output, investigate how best to display that
-        //       Probably involves a div or span
         setupColumn(
                 interestCalculationGrid.addColumn(
                         i -> Optional.ofNullable(i)

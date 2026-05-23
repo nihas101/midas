@@ -5,6 +5,7 @@ import de.nihas101.midas.accountstatement.service.AccountStatementService;
 import de.nihas101.midas.bookings.row.BookingRowService;
 import de.nihas101.midas.bookings.service.BookingsReader;
 import de.nihas101.midas.export.ExportRequest;
+import de.nihas101.midas.export.ExportViews;
 import de.nihas101.midas.interest.row.InterestRowService;
 import de.nihas101.midas.interest.service.InterestBookingsReader;
 import de.nihas101.midas.interest.service.InterestRateService;
@@ -75,9 +76,9 @@ class PdfExporterTest {
 
     @ParameterizedTest
     @MethodSource("noFileCases")
-    void constructor_noFile_triggersException(List<Shareholder> shareholders, Set<String> views) {
+    void constructor_noFile_triggersException(final List<Shareholder> shareholders, final Set<String> views) {
         when(request.shareholders()).thenReturn(shareholders);
-        when(request.views()).thenReturn(views);
+        when(request.views()).thenReturn(new ExportViews(views));
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> new PdfExporter(
                 request,
@@ -106,7 +107,7 @@ class PdfExporterTest {
     @Test
     void trigger_singleFile_usesSinglePdfGeneratorAndCallsPdfServiceOnce() {
         when(request.shareholders()).thenReturn(List.of(shareholder));
-        when(request.views()).thenReturn(Set.of("view1"));
+        when(request.views()).thenReturn(new ExportViews(Set.of("view1")));
         when(request.startDate()).thenReturn(LocalDate.now());
         PdfExporter exporter = new PdfExporter(
                 request, outputStream, Locale.GERMAN, pdfService,
@@ -121,7 +122,7 @@ class PdfExporterTest {
     void trigger_multiFile_usesMultiPdfGeneratorAndCallsPdfServiceForEachFile() {
         Shareholder shareholder2 = mock(Shareholder.class);
         when(request.shareholders()).thenReturn(List.of(shareholder, shareholder2));
-        when(request.views()).thenReturn(Set.of("viewA", "viewB"));
+        when(request.views()).thenReturn(new ExportViews(Set.of("viewA", "viewB")));
         when(request.startDate()).thenReturn(Year.of(2026).atMonth(Month.JANUARY).atDay(1));
         when(request.endDate()).thenReturn(Year.of(2026).atMonth(Month.DECEMBER).atEndOfMonth());
         when(shareholder.getFirstName()).thenReturn("John");

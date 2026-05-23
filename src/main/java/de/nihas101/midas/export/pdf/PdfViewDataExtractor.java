@@ -130,7 +130,7 @@ public class PdfViewDataExtractor {
     }
 
     private PdfViewData extractInterestData(final Shareholder shareholder) {
-        List<String> headers = List.of(
+        final List<String> headers = List.of(
                 messageSource.getMessage("interest.table.month", null, locale),
                 messageSource.getMessage("interest.table.transactions", null, locale),
                 messageSource.getMessage("interest.table.sh", null, locale),

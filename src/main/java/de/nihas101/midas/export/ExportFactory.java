@@ -13,6 +13,7 @@ import de.nihas101.midas.export.interest.InterestRowExtractor;
 import de.nihas101.midas.export.pdf.PdfExporter;
 import de.nihas101.midas.export.pdf.PdfService;
 import de.nihas101.midas.export.xlsx.XlsxExporter;
+import de.nihas101.midas.export.xlsx.XslxFile;
 import de.nihas101.midas.interest.row.InterestRowService;
 import de.nihas101.midas.interest.service.InterestBookingsService;
 import de.nihas101.midas.interest.service.InterestRateService;
@@ -100,7 +101,14 @@ public class ExportFactory {
             );
         }
 
-        return new XlsxExporter(dataSources, outputStream);
+        return new XlsxExporter(
+                dataSources,
+                outputStream,
+                new XslxFile(
+                        request.startDate(),
+                        request.endDate()
+                )
+        );
     }
 
     public Export createPdfExport(

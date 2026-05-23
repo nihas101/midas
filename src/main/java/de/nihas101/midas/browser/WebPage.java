@@ -1,5 +1,7 @@
 package de.nihas101.midas.browser;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.IOException;
 
 public class WebPage {
@@ -11,7 +13,12 @@ public class WebPage {
     }
 
     public void open() throws IOException {
-        String os = System.getProperty("os.name").toLowerCase();
+        final String osName = System.getProperty("os.name");
+        if (StringUtils.isBlank(osName)) {
+            throw new RuntimeException("Failed to determine operating system");
+        }
+
+        String os = osName.toLowerCase();
 
         ProcessBuilder pb = null;
 

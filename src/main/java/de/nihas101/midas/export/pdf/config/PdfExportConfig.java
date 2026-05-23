@@ -1,6 +1,6 @@
 package de.nihas101.midas.export.pdf.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.thymeleaf.spring6.SpringTemplateEngine;
@@ -10,17 +10,17 @@ import org.thymeleaf.templateresolver.FileTemplateResolver;
 import org.thymeleaf.templateresolver.ITemplateResolver;
 
 @Configuration
+@ConfigurationProperties(prefix = "midas.export.pdf")
 public class PdfExportConfig {
 
-    @Value("${midas.export.pdf.template-path:#{null}}")
-    private String externalTemplatePath;
+    private String templatePath = null;
 
     @Bean
-    public SpringTemplateEngine pdfTemplateEngine() {
+    public SpringTemplateEngine springTemplateEngine() {
         final SpringTemplateEngine templateEngine = new SpringTemplateEngine();
 
         // External template resolver (optional, highest priority)
-        if (externalTemplatePath != null && !externalTemplatePath.isEmpty()) {
+        if (templatePath != null && !templatePath.isEmpty()) {
             templateEngine.addTemplateResolver(fileTemplateResolver());
         }
 
@@ -43,7 +43,7 @@ public class PdfExportConfig {
 
     private ITemplateResolver fileTemplateResolver() {
         final FileTemplateResolver resolver = new FileTemplateResolver();
-        String prefix = externalTemplatePath.endsWith("/") ? externalTemplatePath : externalTemplatePath + "/";
+        String prefix = templatePath.endsWith("/") ? templatePath : templatePath + "/";
         resolver.setPrefix(prefix);
         resolver.setSuffix(".html");
         resolver.setTemplateMode(TemplateMode.HTML);

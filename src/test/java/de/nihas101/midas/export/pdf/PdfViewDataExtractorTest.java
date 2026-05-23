@@ -10,6 +10,7 @@ import de.nihas101.midas.bookings.row.BookingRow;
 import de.nihas101.midas.bookings.row.BookingRowService;
 import de.nihas101.midas.bookings.service.BookingsReader;
 import de.nihas101.midas.export.ExportRequest;
+import de.nihas101.midas.export.ExportViews;
 import de.nihas101.midas.interest.dto.InterestRate;
 import de.nihas101.midas.interest.row.InterestCalculationRow;
 import de.nihas101.midas.interest.row.InterestRowService;
@@ -28,7 +29,6 @@ import org.mockito.quality.Strictness;
 import org.springframework.context.MessageSource;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
 import java.util.Collections;
@@ -110,7 +110,7 @@ class PdfViewDataExtractorTest {
     @Test
     void extractData_bookingsView_returnsPdfViewDataWithBookings() {
         setupCommonMocks();
-        when(request.views()).thenReturn(Set.of("bookings"));
+        when(request.views()).thenReturn(new ExportViews(Set.of("bookings")));
         when(bookingsReader.bookingsForShareholderAndDates(eq(1), any(), any()))
                 .thenReturn(bookings);
         when(bookingRowService.generateRows(any(Bookings.class), eq(locale)))
@@ -128,7 +128,7 @@ class PdfViewDataExtractorTest {
     @Test
     void extractData_accountStatementsView_returnsPdfViewDataWithAccountStatements() {
         setupCommonMocks();
-        when(request.views()).thenReturn(Set.of("account-statements"));
+        when(request.views()).thenReturn(new ExportViews(Set.of("account-statements")));
         RunningTotalAccountStatements mockRunningTotal = mock(RunningTotalAccountStatements.class);
         when(accountStatementService.runningTotalAccountStatements(eq(shareholder), any(Year.class), eq(messageSource), eq(locale)))
                 .thenReturn(mockRunningTotal);
@@ -144,7 +144,7 @@ class PdfViewDataExtractorTest {
     @Test
     void extractData_interestView_returnsPdfViewDataWithInterest() {
         setupCommonMocks();
-        when(request.views()).thenReturn(Set.of("interest"));
+        when(request.views()).thenReturn(new ExportViews(Set.of("interest")));
         final InterestRate mockRate = mock(InterestRate.class);
         when(interestRateService.interestRate(eq(1), any(Year.class))).thenReturn(mockRate);
         when(mockRate.getInterestRate()).thenReturn(new BigDecimal("5.0"));
@@ -164,7 +164,7 @@ class PdfViewDataExtractorTest {
     @Test
     void extractData_unknownView_returnsDefaultPdfViewData() {
         setupCommonMocks();
-        when(request.views()).thenReturn(Set.of("unknown"));
+        when(request.views()).thenReturn(new ExportViews(Set.of("unknown")));
 
         final PdfViewData result = extractor.extractData(shareholder, "unknown");
         assertEquals("unknown", result.viewName());

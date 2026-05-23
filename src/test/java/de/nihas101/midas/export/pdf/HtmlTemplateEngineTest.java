@@ -2,7 +2,6 @@ package de.nihas101.midas.export.pdf;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -17,9 +16,6 @@ class HtmlTemplateEngineTest {
     @Mock
     private TemplateEngine templateEngine;
 
-    @InjectMocks
-    private HtmlTemplateEngine htmlTemplateEngine;
-
     @Test
     void generateHtml_successfulReturnsHtml() {
         // Arrange
@@ -29,7 +25,7 @@ class HtmlTemplateEngineTest {
                 .thenReturn("<html>generated</html>");
 
         // Act
-        final String result = htmlTemplateEngine.generateHtml(data, context);
+        final String result = new HtmlTemplateEngine(templateEngine).generateHtml(data, context);
 
         // Assert
         assertEquals("<html>generated</html>", result);
@@ -48,7 +44,7 @@ class HtmlTemplateEngineTest {
         // Act & Assert
         final PdfExportException ex = assertThrows(
                 PdfExportException.class,
-                () -> htmlTemplateEngine.generateHtml(data, context)
+                () -> new HtmlTemplateEngine(templateEngine).generateHtml(data, context)
         );
         assertTrue(ex.getMessage().contains("Error processing template"));
         verify(templateEngine).process(eq("base-layout"), eq(context));

@@ -7,9 +7,8 @@ import java.math.RoundingMode;
 import java.time.Month;
 import java.util.Map;
 
-// TODO: Use for calculation and display
 @RequiredArgsConstructor
-public class Interests { // TODO: Think about using something else than BigDecimal here
+public class Interests {
 
     private final Map<Month, Interest> interests;
 

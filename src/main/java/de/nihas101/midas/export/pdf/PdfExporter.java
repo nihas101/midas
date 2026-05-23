@@ -91,4 +91,14 @@ public class PdfExporter implements Export {
         pdfGenerator.generate();
     }
 
+    @Override
+    public String fileName() {
+        return pdfGenerator.fileName();
+    }
+
+    @Override
+    public String mimeType() {
+        return pdfGenerator.mimeType();
+    }
+
 }

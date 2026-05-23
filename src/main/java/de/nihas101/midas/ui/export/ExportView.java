@@ -19,8 +19,10 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.streams.DownloadHandler;
 import com.vaadin.flow.server.streams.DownloadResponse;
 import de.nihas101.midas.config.MidasConfig;
+import de.nihas101.midas.export.Export;
 import de.nihas101.midas.export.ExportFactory;
 import de.nihas101.midas.export.ExportRequest;
+import de.nihas101.midas.export.ExportViews;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersService;
 import de.nihas101.midas.ui.common.DatePickerI18nProvider;
@@ -236,19 +238,20 @@ public class ExportView extends MidasView {
         try {
             final LocalDate from = startDatePicker.getValue();
             final LocalDate to = endDatePicker.getValue();
+            final Set<String> views = viewPicker.getValue();
             final ExportRequest request = new ExportRequest(
                     List.copyOf(shareholderPicker.getValue()),
-                    viewPicker.getValue(),
+                    new ExportViews(views, messageSource, getLocale()),
                     from,
                     to,
                     formatPicker.getValue()
             );
 
             if (request.formats().contains("xlsx")) {
-                runXlsxExport(request, from, to);
+                runXlsxExport(request);
             }
             if (request.formats().contains("pdf")) {
-                runPdfExport(request, from, to);
+                runPdfExport(request);
             }
 
             Notification.show(messageSource.getMessage("export.notification.success", null, getLocale()));
@@ -258,40 +261,28 @@ public class ExportView extends MidasView {
         }
     }
 
-    private void runXlsxExport(ExportRequest request, LocalDate from, LocalDate to) {
+    private void runXlsxExport(final ExportRequest request) {
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        exportFactory.createXlsxExport(request, out, getLocale())
-                .trigger();
+        final Export xlsxExport = exportFactory.createXlsxExport(request, out, getLocale());
+        xlsxExport.trigger();
 
         final byte[] data = out.toByteArray();
-        final String fileName = "export_" + from + "_" + to + ".xlsx";
-
-        triggerDownload(data, fileName, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        triggerDownload(data, xlsxExport.fileName(), xlsxExport.mimeType());
     }
 
-    private void runPdfExport(ExportRequest request, LocalDate from, LocalDate to) {
+    private void runPdfExport(final ExportRequest request) {
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        exportFactory.createPdfExport(request, out, getLocale())
-                .trigger();
-
+        final Export pdfExport = exportFactory.createPdfExport(request, out, getLocale());
+        pdfExport.trigger();
         final byte[] data = out.toByteArray();
-
-        int totalFiles = request.shareholders().size() * request.views().size();
-        String fileName;
-        String mimeType;
-
-        if (totalFiles > 1) {
-            fileName = "export_" + from + "_" + to + ".zip";
-            mimeType = "application/zip";
-        } else {
-            fileName = "export_" + from + "_" + to + ".pdf";
-            mimeType = "application/pdf";
-        }
-
-        triggerDownload(data, fileName, mimeType);
+        triggerDownload(data, pdfExport.fileName(), pdfExport.mimeType());
     }
 
-    private void triggerDownload(byte[] data, String fileName, String mimeType) {
+    private void triggerDownload(
+            final byte[] data,
+            final String fileName,
+            final String mimeType
+    ) {
         final Anchor downloadAnchor = new Anchor(
                 DownloadHandler.fromInputStream(event -> new DownloadResponse(
                         new ByteArrayInputStream(data),

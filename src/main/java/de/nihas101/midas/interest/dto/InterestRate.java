@@ -23,7 +23,7 @@ public class InterestRate {
     private BigDecimal interestRate;
     private Year year;
 
-    public static InterestRate fromEntity(InterestRateEntity interestRateEntity) {
+    public static InterestRate fromEntity(final InterestRateEntity interestRateEntity) {
         if (interestRateEntity == null) {
             return null;
         }

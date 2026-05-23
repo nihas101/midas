@@ -45,8 +45,8 @@ import de.nihas101.midas.ui.common.YearPicker;
 import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
 import de.nihas101.midas.ui.interest.InterestView;
 import de.nihas101.midas.userconfig.service.UserConfigService;
-import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.MessageSource;
 
 import java.math.BigDecimal;
@@ -399,7 +399,6 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
             grid.setItems(Collections.emptyList());
             return;
         }
-        // TODO: Monthly sum is missing the number of the month (and in the PDF export)
         grid.setItems(bookingRowService.generateRows(bookings, getLocale()));
     }
 

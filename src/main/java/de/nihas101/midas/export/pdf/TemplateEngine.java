@@ -11,10 +11,10 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 @RequiredArgsConstructor
 public class TemplateEngine {
 
-    private final SpringTemplateEngine htmlTemplateEngine;
+    private final SpringTemplateEngine springTemplateEngine;
 
     public String process(final String template, final TemplateContext templateContext) {
-        return htmlTemplateEngine.process(
+        return springTemplateEngine.process(
                 template,
                 new Context(
                         templateContext.locale(),

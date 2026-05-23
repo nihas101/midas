@@ -27,9 +27,6 @@ public class MidasApplication implements AppShellConfigurator {
     //       Set everything necessary in the application properties etc.
 
     public static void main(String[] args) {
-        // TODO: Add tooltips everywhere
-        // TODO: Add support for imports via some kind of (xml?) file that defines the inputs and mappings
-        //       - csv (but hide the item by default)
         try {
             SpringApplication.run(MidasApplication.class, args);
         } catch (Exception e) {

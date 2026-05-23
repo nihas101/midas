@@ -1,6 +1,7 @@
 package de.nihas101.midas.export.pdf;
 
 import de.nihas101.midas.export.ExportRequest;
+import de.nihas101.midas.export.ExportViews;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,27 +29,27 @@ import static org.mockito.Mockito.*;
 class MultiPdfGeneratorTest {
 
     @Mock
-    ExportRequest request;
+    private ExportRequest request;
 
     @Mock
-    PdfService pdfService;
+    private PdfService pdfService;
 
     @Mock
-    PdfViewDataExtractor pdfViewDataExtractor;
+    private PdfViewDataExtractor pdfViewDataExtractor;
 
     @Mock
-    Shareholder shareholder;
+    private Shareholder shareholder;
 
     @Mock
-    PdfViewData pdfViewData;
+    private PdfViewData pdfViewData;
 
     @InjectMocks
-    MultiPdfGenerator generator;
+    private MultiPdfGenerator generator;
 
     @Test
     void generate_createsZipWithCorrectEntries() throws Exception {
         when(request.shareholders()).thenReturn(Collections.singletonList(shareholder));
-        when(request.views()).thenReturn(Set.of("sampleView"));
+        when(request.views()).thenReturn(new ExportViews(Set.of("sampleView")));
         when(request.startDate()).thenReturn(Year.of(2026).atMonth(Month.JANUARY).atDay(1));
         when(request.endDate()).thenReturn(Year.of(2026).atMonth(Month.DECEMBER).atEndOfMonth());
         when(shareholder.getFirstName()).thenReturn("John");
@@ -56,13 +57,13 @@ class MultiPdfGeneratorTest {
         when(pdfViewDataExtractor.extractData(eq(shareholder), eq("sampleView"))).thenReturn(pdfViewData);
         // Mock pdfService to write dummy bytes
         doAnswer(invocation -> {
-            ByteArrayOutputStream baos = invocation.getArgument(2);
+            final ByteArrayOutputStream baos = invocation.getArgument(2);
             baos.write(new byte[]{1, 2, 3});
             return null;
         }).when(pdfService).generatePdf(eq(pdfViewData), any(Locale.class), any(ByteArrayOutputStream.class));
 
         // Use a real ByteArrayOutputStream for the Zip result
-        ByteArrayOutputStream zipOut = new ByteArrayOutputStream();
+        final ByteArrayOutputStream zipOut = new ByteArrayOutputStream();
         // Recreate generator with real output stream
         generator = new MultiPdfGenerator(
                 request,
@@ -79,10 +80,10 @@ class MultiPdfGeneratorTest {
         verify(pdfService).generatePdf(eq(pdfViewData), any(Locale.class), any(ByteArrayOutputStream.class));
 
         // Read the zip content and verify entry name and content
-        try (ZipInputStream zipIn = new ZipInputStream(new ByteArrayInputStream(zipOut.toByteArray()))) {
-            ZipEntry entry = zipIn.getNextEntry();
+        try (final ZipInputStream zipIn = new ZipInputStream(new ByteArrayInputStream(zipOut.toByteArray()))) {
+            final ZipEntry entry = zipIn.getNextEntry();
             assertNotNull(entry, "Zip should contain an entry");
-            String expectedName = "sampleView_John_Doe_2026-01-01-2026-12-31.pdf";
+            final String expectedName = "John_Doe_(0-0)_sampleView_2026-01-01_2026-12-31.pdf";
             assertEquals(expectedName, entry.getName());
             // Ensure there is data inside the entry
             byte[] buffer = new byte[10];
@@ -95,7 +96,7 @@ class MultiPdfGeneratorTest {
     @Test
     void generate_propagatesPdfExportException() {
         when(request.shareholders()).thenReturn(Collections.singletonList(shareholder));
-        when(request.views()).thenReturn(Set.of("view"));
+        when(request.views()).thenReturn(new ExportViews(Set.of("view")));
         when(request.startDate()).thenReturn(LocalDate.now());
         when(request.endDate()).thenReturn(LocalDate.now().plusDays(1));
         when(pdfViewDataExtractor.extractData(any(), any())).thenReturn(pdfViewData);

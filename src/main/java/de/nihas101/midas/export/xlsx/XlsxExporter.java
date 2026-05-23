@@ -15,15 +15,18 @@ public class XlsxExporter implements Export {
     private final List<ExportDataSource> dataSources;
     private final OutputStream outputStream;
     private final XlsxExportTargetFactory factory;
+    private final XslxFile xslxFile;
 
     public XlsxExporter(
             final List<ExportDataSource> dataSources,
-            final OutputStream outputStream
+            final OutputStream outputStream,
+            final XslxFile xslxFile
     ) {
         this(
                 dataSources,
                 outputStream,
-                new XlsxExportTargetFactory()
+                new XlsxExportTargetFactory(),
+                xslxFile
         );
     }
 
@@ -40,5 +43,15 @@ public class XlsxExporter implements Export {
             log.error("Failed to generate XLSX export", e);
             throw new RuntimeException("Export failed", e);
         }
+    }
+
+    @Override
+    public String fileName() {
+        return xslxFile.name();
+    }
+
+    @Override
+    public String mimeType() {
+        return xslxFile.mimeType();
     }
 }
