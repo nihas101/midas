@@ -9,7 +9,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Properties;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -36,7 +35,7 @@ class FilePropertiesLoaderTest {
         try (MockedStatic<Files> files = Mockito.mockStatic(Files.class)) {
             files.when(() -> Files.exists(any())).thenReturn(true);
             files.when(() -> Files.newInputStream(any()))
-                 .thenReturn(new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)));
+                    .thenReturn(new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)));
 
             Properties result = loader.load();
 

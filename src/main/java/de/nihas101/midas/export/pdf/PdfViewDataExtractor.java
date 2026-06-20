@@ -113,9 +113,14 @@ public class PdfViewDataExtractor {
         );
 
         final Year year = Year.of(request.startDate().getYear());
-        final RunningTotalAccountStatements statements = accountStatementService.runningTotalAccountStatements(shareholder, year, messageSource, locale);
+        final RunningTotalAccountStatements statements = accountStatementService.runningTotalAccountStatements(
+                shareholder,
+                year,
+                messageSource,
+                locale
+        );
 
-        final List<Object> rows = new ArrayList<>(accountStatementRowService.generateRows(statements));
+        final List<Object> rows = new ArrayList<>(accountStatementRowService.generateRows(statements, false));
         rows.add(accountStatementRowService.generateClosingRow(statements, locale));
 
         return new PdfViewData(

@@ -1,8 +1,8 @@
 package de.nihas101.midas.accountstatement.runningtotal;
 
-import de.nihas101.midas.accountstatement.dto.LabeledAccountStatement;
 import de.nihas101.midas.accountstatement.dto.AccountStatements;
 import de.nihas101.midas.accountstatement.dto.DefaultAccountStatement;
+import de.nihas101.midas.accountstatement.dto.LabeledAccountStatement;
 import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.openingbalance.dto.OpeningBalance;
@@ -45,7 +45,7 @@ class DefaultRunningTotalAccountStatementsTest {
     void calculationTest() {
         // Arrange
         final OpeningBalance openingBalance = new OpeningBalance(null, null, MoneyAmount.ofCents(1000L), TEST_YEAR);
-        
+
         final LabeledAccountStatement withdrawal = new DefaultAccountStatement(
                 1,
                 TEST_YEAR,
@@ -62,7 +62,7 @@ class DefaultRunningTotalAccountStatementsTest {
                 null,
                 null
         );
-        
+
         final AccountStatements accountStatements = mock(AccountStatements.class);
         when(accountStatements.openingBalance()).thenReturn(openingBalance);
         when(accountStatements.forType(BookingType.WITHDRAWAL)).thenReturn(withdrawal);
@@ -80,7 +80,7 @@ class DefaultRunningTotalAccountStatementsTest {
         // Assert
         Assertions.assertFalse(runningTotals.isEmpty());
         final List<RunningTotalAccountStatement> resultList = runningTotals.runningTotalAccountStatements();
-        
+
         // 1 (Opening) + 2 (Types) = 3 rows
         Assertions.assertEquals(3, resultList.size());
 
@@ -104,7 +104,7 @@ class DefaultRunningTotalAccountStatementsTest {
         final OpeningBalance openingBalance = new OpeningBalance(null, null, MoneyAmount.ZERO, TEST_YEAR);
         final AccountStatements accountStatements = mock(AccountStatements.class);
         when(accountStatements.openingBalance()).thenReturn(openingBalance);
-        
+
         final LabeledAccountStatement withdrawal = new DefaultAccountStatement(
                 1,
                 TEST_YEAR,
@@ -121,7 +121,7 @@ class DefaultRunningTotalAccountStatementsTest {
                 null,
                 null
         );
-        
+
         when(accountStatements.forType(BookingType.WITHDRAWAL)).thenReturn(withdrawal);
         when(accountStatements.forType(BookingType.INTEREST)).thenReturn(interest);
 
@@ -142,5 +142,66 @@ class DefaultRunningTotalAccountStatementsTest {
         );
         Assertions.assertEquals(MoneyAmount.ofCents(20L), orderB.runningTotalAccountStatements().get(1).currentBalance());
         Assertions.assertEquals(MoneyAmount.ofCents(30L), orderB.runningTotalAccountStatements().get(2).currentBalance());
+    }
+
+    @Test
+    void manualStatementsCalculationTest() {
+        // Arrange
+        final OpeningBalance openingBalance = new OpeningBalance(null, null, MoneyAmount.ofCents(1000L), TEST_YEAR);
+
+        final LabeledAccountStatement withdrawal = new DefaultAccountStatement(
+                1,
+                TEST_YEAR,
+                BookingType.WITHDRAWAL,
+                MoneyAmount.ofCents(-200L),
+                "Entnahmen",
+                false,
+                false,
+                true
+        );
+        final LabeledAccountStatement manualExtra = new DefaultAccountStatement(
+                99,
+                TEST_YEAR,
+                null,
+                MoneyAmount.ofCents(150L),
+                "Zusatz",
+                false,
+                false,
+                true
+        );
+
+        final AccountStatements accountStatements = mock(AccountStatements.class);
+        when(accountStatements.openingBalance()).thenReturn(openingBalance);
+        when(accountStatements.forType(BookingType.WITHDRAWAL)).thenReturn(withdrawal);
+        when(accountStatements.manualStatements()).thenReturn(List.of(manualExtra));
+
+        final List<BookingType> typeOrder = List.of(BookingType.WITHDRAWAL);
+
+        // Act
+        final DefaultRunningTotalAccountStatements runningTotals = new DefaultRunningTotalAccountStatements(
+                accountStatements,
+                typeOrder,
+                new OpeningRunningTotalAccountStatement(openingBalance, Mockito.mock(MessageSource.class), Locale.ENGLISH)
+        );
+
+        // Assert
+        Assertions.assertFalse(runningTotals.isEmpty());
+        final List<RunningTotalAccountStatement> resultList = runningTotals.runningTotalAccountStatements();
+
+        // 1 (Opening) + 1 (Withdrawal) + 1 (Manual Extra) = 3 rows
+        Assertions.assertEquals(3, resultList.size());
+
+        // Row 0: Opening Balance
+        Assertions.assertEquals(MoneyAmount.ofCents(1000L), resultList.get(0).currentBalance());
+
+        // Row 1: Withdrawal (1000 - 200 = 800)
+        Assertions.assertEquals(MoneyAmount.ofCents(800L), resultList.get(1).currentBalance());
+
+        // Row 2: Manual Extra (800 + 150 = 950)
+        Assertions.assertEquals(MoneyAmount.ofCents(950L), resultList.get(2).currentBalance());
+        Assertions.assertEquals(MoneyAmount.ofCents(150L), resultList.get(2).amount());
+        Assertions.assertEquals("Zusatz", resultList.get(2).label());
+        Assertions.assertTrue(resultList.get(2).isManualExtra());
+        Assertions.assertFalse(resultList.get(2).isOverridden());
     }
 }

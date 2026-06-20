@@ -15,7 +15,10 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class XlsxExportTargetTest {
 
@@ -40,7 +43,7 @@ class XlsxExportTargetTest {
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         target.write(bos);
-        
+
         try (XSSFWorkbook resultWorkbook = new XSSFWorkbook(new ByteArrayInputStream(bos.toByteArray()))) {
             assertEquals(1, resultWorkbook.getNumberOfSheets());
             Sheet sheet = resultWorkbook.getSheet(sheetName);

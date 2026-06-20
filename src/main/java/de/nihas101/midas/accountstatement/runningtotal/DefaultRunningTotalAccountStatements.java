@@ -46,6 +46,16 @@ public class DefaultRunningTotalAccountStatements implements RunningTotalAccount
                     )
             );
         }
+
+        for (final LabeledAccountStatement statement : accountStatements.manualStatements()) {
+            currentBalance = currentBalance.plus(statement.amount());
+            runningTotalAccountStatements.add(
+                    new DefaultRunningTotalAccountStatement(
+                            statement,
+                            currentBalance
+                    )
+            );
+        }
     }
 
     @Override

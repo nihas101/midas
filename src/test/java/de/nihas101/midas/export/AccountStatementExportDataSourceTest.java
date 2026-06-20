@@ -90,10 +90,20 @@ class AccountStatementExportDataSourceTest {
         when(bobRow.id()).thenReturn(102);
         when(bobStatements.runningTotalAccountStatements()).thenReturn(List.of(bobRow));
 
-        when(accountStatementService.runningTotalAccountStatements(eq(alice), eq(Year.of(2023)), eq(messageSource), eq(locale)))
-                .thenReturn(aliceStatements);
-        when(accountStatementService.runningTotalAccountStatements(eq(bob), eq(Year.of(2023)), eq(messageSource), eq(locale)))
-                .thenReturn(bobStatements);
+        when(accountStatementService.runningTotalAccountStatements(
+                        eq(alice),
+                        eq(Year.of(2023)),
+                        eq(messageSource),
+                        eq(locale)
+                )
+        ).thenReturn(aliceStatements);
+        when(accountStatementService.runningTotalAccountStatements(
+                        eq(bob),
+                        eq(Year.of(2023)),
+                        eq(messageSource),
+                        eq(locale)
+                )
+        ).thenReturn(bobStatements);
 
         // When
         underTest.export(exportTarget);

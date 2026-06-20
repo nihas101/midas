@@ -36,7 +36,6 @@ public class AccountStatementsRowExtractor {
     }
 
     private List<ExportRow> rowsForShareholder(final Shareholder shareholder) {
-
         return IntStream.rangeClosed(startDate.getYear(), endDate.getYear())
                 .mapToObj(yearValue ->
                         rowsForYear(shareholder, yearValue)
@@ -50,12 +49,17 @@ public class AccountStatementsRowExtractor {
     ) {
         final Year year = Year.of(yearValue);
         final RunningTotalAccountStatements statements = accountStatementService.runningTotalAccountStatements(
-                shareholder, year, messageSource, locale);
+                shareholder,
+                year,
+                messageSource,
+                locale
+        );
         final String shareholderName = shareholder.getFirstName() + " " + shareholder.getLastName();
 
         return statements.runningTotalAccountStatements()
                 .stream()
                 .filter(stmt -> isWithinRange(stmt.date()))
+                .filter(stmt -> !stmt.isHidden())
                 .map(stmt -> exportRow(shareholderName, stmt)).toList();
     }
 

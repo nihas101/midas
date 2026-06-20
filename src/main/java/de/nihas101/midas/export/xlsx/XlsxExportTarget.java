@@ -81,6 +81,7 @@ public class XlsxExportTarget implements ExportTarget, AutoCloseable {
         return workbook.createSheet(sheetName);
     }
 
+    // TODO: Add the display id here and sort by that (instead of the shareholder name)
     private void writeHeader(final Sheet sheet, final List<String> headers) {
         final Row headerRow = sheet.createRow(0);
         for (int i = 0; i < headers.size(); i++) {

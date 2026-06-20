@@ -53,4 +53,24 @@ public class OpeningRunningTotalAccountStatement implements RunningTotalAccountS
     public MoneyAmount amount() {
         return openingBalance.getOpeningBalance();
     }
+
+    @Override
+    public boolean isOverridden() {
+        return false;
+    } // TODO: Remove
+
+    @Override
+    public boolean isHidden() {
+        return false;
+    }
+
+    @Override
+    public boolean isManualExtra() {
+        return false;
+    } // TODO: Needed?
+
+    @Override
+    public de.nihas101.midas.bookings.entity.BookingType bookingType() {
+        return null;
+    }
 }

@@ -42,4 +42,35 @@ public class RunningTotalAccountStatementRow implements AccountStatementRow {
     public MoneyAmount balance() {
         return accountStatement.currentBalance();
     }
+
+    @Override
+    public MoneyAmount amount() {
+        return accountStatement.amount();
+    }
+
+    @Override
+    public boolean isOpeningBalance() {
+        return accountStatement instanceof de.nihas101.midas.accountstatement.runningtotal.OpeningRunningTotalAccountStatement;
+    }
+
+    // TODO: Get rid of this
+    @Override
+    public boolean isOverridden() {
+        return accountStatement.isOverridden();
+    }
+
+    @Override
+    public boolean isHidden() {
+        return accountStatement.isHidden();
+    }
+
+    @Override
+    public boolean isManualExtra() {
+        return accountStatement.isManualExtra();
+    }
+
+    @Override
+    public de.nihas101.midas.bookings.entity.BookingType bookingType() {
+        return accountStatement.bookingType();
+    }
 }

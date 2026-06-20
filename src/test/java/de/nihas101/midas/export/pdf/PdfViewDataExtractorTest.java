@@ -115,9 +115,15 @@ class PdfViewDataExtractorTest {
         when(messageSource.getMessage(anyString(), any(), eq(locale))).thenReturn("dummy");
 
         RunningTotalAccountStatements mockRunningTotal = mock(RunningTotalAccountStatements.class);
-        when(accountStatementService.runningTotalAccountStatements(eq(shareholder), any(Year.class), eq(messageSource), eq(locale)))
-                .thenReturn(mockRunningTotal);
-        when(accountStatementRowService.generateRows(mockRunningTotal)).thenReturn(List.of(mock(AccountStatementRow.class)));
+        when(
+                accountStatementService.runningTotalAccountStatements(
+                        eq(shareholder),
+                        any(Year.class),
+                        eq(messageSource),
+                        eq(locale)
+                )
+        ).thenReturn(mockRunningTotal);
+        when(accountStatementRowService.generateRows(mockRunningTotal, false)).thenReturn(List.of(mock(AccountStatementRow.class)));
         when(accountStatementRowService.generateClosingRow(mockRunningTotal, locale)).thenReturn(mock(AccountStatementRow.class));
 
         final PdfViewData result = extractor.extractData(shareholder, "account-statements");
