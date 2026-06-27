@@ -156,7 +156,6 @@ class DefaultRunningTotalAccountStatementsTest {
                 MoneyAmount.ofCents(-200L),
                 "Entnahmen",
                 false,
-                false,
                 true
         );
         final LabeledAccountStatement manualExtra = new DefaultAccountStatement(
@@ -165,7 +164,6 @@ class DefaultRunningTotalAccountStatementsTest {
                 null,
                 MoneyAmount.ofCents(150L),
                 "Zusatz",
-                false,
                 false,
                 true
         );
@@ -202,6 +200,5 @@ class DefaultRunningTotalAccountStatementsTest {
         Assertions.assertEquals(MoneyAmount.ofCents(150L), resultList.get(2).amount());
         Assertions.assertEquals("Zusatz", resultList.get(2).label());
         Assertions.assertTrue(resultList.get(2).isManualExtra());
-        Assertions.assertFalse(resultList.get(2).isOverridden());
     }
 }

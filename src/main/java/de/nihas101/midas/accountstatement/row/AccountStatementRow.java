@@ -38,10 +38,6 @@ public interface AccountStatementRow {
         return false;
     }
 
-    default boolean isOverridden() {
-        return false;
-    }
-
     default boolean isHidden() {
         return false;
     }

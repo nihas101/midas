@@ -43,11 +43,6 @@ public class DefaultRunningTotalAccountStatement implements RunningTotalAccountS
     }
 
     @Override
-    public boolean isOverridden() {
-        return statement != null && statement.isOverridden();
-    }
-
-    @Override
     public boolean isHidden() {
         return statement != null && statement.isHidden();
     }

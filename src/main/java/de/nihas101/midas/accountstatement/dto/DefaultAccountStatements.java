@@ -142,7 +142,6 @@ public class DefaultAccountStatements implements AccountStatements {
                         type,
                         systemEntity != null ? systemEntity.getAmount() : override.getAmount(),
                         label, // TODO: Override with label if it exists
-                        true, // TODO: Needed?
                         override.getHidden(),
                         false
                 );
@@ -183,7 +182,6 @@ public class DefaultAccountStatements implements AccountStatements {
                         null,
                         o.getAmount(),
                         o.getLabelOverride(),
-                        false,
                         false,
                         true
                 ))

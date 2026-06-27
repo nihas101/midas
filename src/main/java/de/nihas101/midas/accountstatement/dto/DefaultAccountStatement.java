@@ -23,7 +23,6 @@ public final class DefaultAccountStatement implements LabeledAccountStatement {
     private final BookingType type;
     private final MoneyAmount amount;
     private final String label;
-    private final boolean overridden; // TODO: Remove
     private final boolean hidden;
     private final boolean manualExtra; // TODO: Needed?
 
@@ -63,7 +62,6 @@ public final class DefaultAccountStatement implements LabeledAccountStatement {
                         ? messageSource.getMessage(type.getAccountStatementI18nKey(), null, locale)
                         : null,
                 false,
-                false,
                 false
         );
     }
@@ -81,7 +79,6 @@ public final class DefaultAccountStatement implements LabeledAccountStatement {
                 type,
                 amount,
                 label,
-                false,
                 false,
                 false
         );
@@ -105,11 +102,6 @@ public final class DefaultAccountStatement implements LabeledAccountStatement {
     @Override
     public MoneyAmount amount() {
         return amount;
-    }
-
-    @Override
-    public boolean isOverridden() {
-        return overridden;
     }
 
     @Override

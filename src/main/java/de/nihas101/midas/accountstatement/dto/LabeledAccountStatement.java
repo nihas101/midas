@@ -6,8 +6,6 @@ public interface LabeledAccountStatement extends AccountStatement {
 
     String label();
 
-    boolean isOverridden();
-
     boolean isManualExtra();
 
     default BookingType bookingType() {

@@ -53,12 +53,6 @@ public class RunningTotalAccountStatementRow implements AccountStatementRow {
         return accountStatement instanceof de.nihas101.midas.accountstatement.runningtotal.OpeningRunningTotalAccountStatement;
     }
 
-    // TODO: Get rid of this
-    @Override
-    public boolean isOverridden() {
-        return accountStatement.isOverridden();
-    }
-
     @Override
     public boolean isHidden() {
         return accountStatement.isHidden();

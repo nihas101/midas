@@ -55,11 +55,6 @@ public class OpeningRunningTotalAccountStatement implements RunningTotalAccountS
     }
 
     @Override
-    public boolean isOverridden() {
-        return false;
-    } // TODO: Remove
-
-    @Override
     public boolean isHidden() {
         return false;
     }
