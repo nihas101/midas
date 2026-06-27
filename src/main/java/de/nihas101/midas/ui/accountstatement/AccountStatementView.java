@@ -29,7 +29,8 @@ import com.vaadin.flow.router.Route;
 import de.nihas101.midas.accountstatement.row.AccountStatementRow;
 import de.nihas101.midas.accountstatement.row.AccountStatementRowService;
 import de.nihas101.midas.accountstatement.runningtotal.RunningTotalAccountStatements;
-import de.nihas101.midas.accountstatement.service.AccountStatementService;
+import de.nihas101.midas.accountstatement.service.DefaultAccountStatementService;
+import de.nihas101.midas.accountstatement.service.RunningTotalAccountStatementService;
 import de.nihas101.midas.bookings.dto.Booking;
 import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.service.BookingsReader;
@@ -67,7 +68,8 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
     public static final Icon HANDLE = new Icon(VaadinIcon.MENU);
 
     private final ShareholdersService shareholdersService;
-    private final AccountStatementService accountStatementService;
+    private final DefaultAccountStatementService accountStatementService;
+    private final RunningTotalAccountStatementService runningTotalAccountStatementService;
     private final MessageSource messageSource;
     private final AccountStatementRowService accountStatementRowService;
     private final BookingsReader bookingsReader;
@@ -85,7 +87,8 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
 
     public AccountStatementView(
             final ShareholdersService shareholdersService,
-            final AccountStatementService accountStatementService,
+            final DefaultAccountStatementService accountStatementService,
+            final RunningTotalAccountStatementService runningTotalAccountStatementService,
             final MidasConfig config,
             final MessageSource messageSource,
             final UserConfigService userConfigService,
@@ -96,6 +99,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         super(config, userConfigService, messageSource, midasLocaleResolver);
         this.shareholdersService = shareholdersService;
         this.accountStatementService = accountStatementService;
+        this.runningTotalAccountStatementService = runningTotalAccountStatementService;
         this.messageSource = messageSource;
         this.accountStatementRowService = accountStatementRowService;
         this.bookingsReader = bookingsReader;
@@ -560,7 +564,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
             actionRow.setVisible(true);
         }
 
-        final RunningTotalAccountStatements accountStatements = accountStatementService.runningTotalAccountStatements(
+        final RunningTotalAccountStatements accountStatements = runningTotalAccountStatementService.runningTotalAccountStatements(
                 shareholder,
                 Year.of(yearValue),
                 messageSource,

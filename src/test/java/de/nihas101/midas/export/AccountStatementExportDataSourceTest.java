@@ -2,7 +2,7 @@ package de.nihas101.midas.export;
 
 import de.nihas101.midas.accountstatement.runningtotal.RunningTotalAccountStatement;
 import de.nihas101.midas.accountstatement.runningtotal.RunningTotalAccountStatements;
-import de.nihas101.midas.accountstatement.service.AccountStatementService;
+import de.nihas101.midas.accountstatement.service.RunningTotalAccountStatementService;
 import de.nihas101.midas.export.accountstatement.AccountStatementExportDataSource;
 import de.nihas101.midas.export.accountstatement.AccountStatementsRowExtractor;
 import de.nihas101.midas.money.MoneyAmount;
@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
 class AccountStatementExportDataSourceTest {
 
     @Mock
-    private AccountStatementService accountStatementService;
+    private RunningTotalAccountStatementService runningTotalAccountStatementService;
 
     @Mock
     private MessageSource messageSource;
@@ -56,7 +56,7 @@ class AccountStatementExportDataSourceTest {
                         List.of(alice, bob),
                         startDate,
                         endDate,
-                        accountStatementService,
+                        runningTotalAccountStatementService,
                         messageSource,
                         locale
                 ),
@@ -90,14 +90,14 @@ class AccountStatementExportDataSourceTest {
         when(bobRow.id()).thenReturn(102);
         when(bobStatements.runningTotalAccountStatements()).thenReturn(List.of(bobRow));
 
-        when(accountStatementService.runningTotalAccountStatements(
+        when(runningTotalAccountStatementService.runningTotalAccountStatements(
                         eq(alice),
                         eq(Year.of(2023)),
                         eq(messageSource),
                         eq(locale)
                 )
         ).thenReturn(aliceStatements);
-        when(accountStatementService.runningTotalAccountStatements(
+        when(runningTotalAccountStatementService.runningTotalAccountStatements(
                         eq(bob),
                         eq(Year.of(2023)),
                         eq(messageSource),
@@ -141,7 +141,7 @@ class AccountStatementExportDataSourceTest {
                         List.of(alice),
                         LocalDate.of(2023, 6, 1),
                         LocalDate.of(2023, 6, 30),
-                        accountStatementService,
+                        runningTotalAccountStatementService,
                         messageSource,
                         locale
                 ),
@@ -159,7 +159,7 @@ class AccountStatementExportDataSourceTest {
         when(rowOut.date()).thenReturn(LocalDate.of(2023, 5, 15));
 
         when(aliceStatements.runningTotalAccountStatements()).thenReturn(List.of(rowIn, rowOut));
-        when(accountStatementService.runningTotalAccountStatements(any(), any(), any(), any())).thenReturn(aliceStatements);
+        when(runningTotalAccountStatementService.runningTotalAccountStatements(any(), any(), any(), any())).thenReturn(aliceStatements);
 
         // When
         underTest.export(exportTarget);
@@ -178,7 +178,7 @@ class AccountStatementExportDataSourceTest {
                         List.of(alice),
                         LocalDate.of(2022, 12, 31),
                         LocalDate.of(2023, 1, 1),
-                        accountStatementService,
+                        runningTotalAccountStatementService,
                         messageSource,
                         locale
                 ),
@@ -191,14 +191,14 @@ class AccountStatementExportDataSourceTest {
         RunningTotalAccountStatements s2023 = mock(RunningTotalAccountStatements.class);
         when(s2023.runningTotalAccountStatements()).thenReturn(List.of());
 
-        when(accountStatementService.runningTotalAccountStatements(eq(alice), eq(Year.of(2022)), any(), any())).thenReturn(s2022);
-        when(accountStatementService.runningTotalAccountStatements(eq(alice), eq(Year.of(2023)), any(), any())).thenReturn(s2023);
+        when(runningTotalAccountStatementService.runningTotalAccountStatements(eq(alice), eq(Year.of(2022)), any(), any())).thenReturn(s2022);
+        when(runningTotalAccountStatementService.runningTotalAccountStatements(eq(alice), eq(Year.of(2023)), any(), any())).thenReturn(s2023);
 
         // When
         underTest.export(exportTarget);
 
         // Then
-        verify(accountStatementService).runningTotalAccountStatements(eq(alice), eq(Year.of(2022)), any(), any());
-        verify(accountStatementService).runningTotalAccountStatements(eq(alice), eq(Year.of(2023)), any(), any());
+        verify(runningTotalAccountStatementService).runningTotalAccountStatements(eq(alice), eq(Year.of(2022)), any(), any());
+        verify(runningTotalAccountStatementService).runningTotalAccountStatements(eq(alice), eq(Year.of(2023)), any(), any());
     }
 }

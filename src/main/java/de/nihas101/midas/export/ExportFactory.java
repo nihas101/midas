@@ -1,7 +1,7 @@
 package de.nihas101.midas.export;
 
 import de.nihas101.midas.accountstatement.row.AccountStatementRowService;
-import de.nihas101.midas.accountstatement.service.AccountStatementService;
+import de.nihas101.midas.accountstatement.service.RunningTotalAccountStatementService;
 import de.nihas101.midas.bookings.row.BookingRowService;
 import de.nihas101.midas.bookings.service.BookingsReader;
 import de.nihas101.midas.export.accountstatement.AccountStatementExportDataSource;
@@ -34,7 +34,7 @@ public class ExportFactory {
     private final BookingsReader bookingsReader;
     private final DefaultOpeningBalanceService openingBalanceService;
     private final InterestRateService interestRateService;
-    private final AccountStatementService accountStatementService;
+    private final RunningTotalAccountStatementService runningTotalAccountStatementService;
     private final MessageSource messageSource;
     private final PdfService pdfService;
     private final BookingRowService bookingRowService;
@@ -91,7 +91,7 @@ public class ExportFactory {
                                     request.shareholders(),
                                     request.startDate(),
                                     request.endDate(),
-                                    accountStatementService,
+                                    runningTotalAccountStatementService,
                                     messageSource,
                                     locale
                             ),
@@ -124,7 +124,7 @@ public class ExportFactory {
                 bookingsReader,
                 interestBookingsService,
                 interestRateService,
-                accountStatementService,
+                runningTotalAccountStatementService,
                 messageSource,
                 bookingRowService,
                 accountStatementRowService,

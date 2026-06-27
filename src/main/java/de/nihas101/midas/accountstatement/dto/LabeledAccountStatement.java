@@ -15,10 +15,6 @@ public interface LabeledAccountStatement extends AccountStatement {
     boolean isHidden();
 
     default String rowKey() {
-        if (bookingType() != null) {
-            return "TYPE:" + bookingType().name();
-        } else {
-            return "MANUAL:" + id();
-        }
+        return new RowKey(bookingType(), id()).toString();
     }
 }

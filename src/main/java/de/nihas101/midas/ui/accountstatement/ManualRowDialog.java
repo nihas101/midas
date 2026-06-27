@@ -6,7 +6,7 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.TextField;
-import de.nihas101.midas.accountstatement.service.AccountStatementService;
+import de.nihas101.midas.accountstatement.service.DefaultAccountStatementService;
 import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.ui.common.SaveButton;
@@ -21,7 +21,7 @@ public class ManualRowDialog extends Dialog {
 
     public ManualRowDialog(
             final MessageSource messageSource,
-            final AccountStatementService accountStatementService,
+            final DefaultAccountStatementService accountStatementService,
             final Shareholder shareholder,
             final Year year,
             Runnable afterSave,
@@ -73,7 +73,7 @@ public class ManualRowDialog extends Dialog {
 
     private void handleSave(
             final MessageSource messageSource,
-            final AccountStatementService accountStatementService,
+            final DefaultAccountStatementService accountStatementService,
             final Shareholder shareholder,
             final Year year,
             final Runnable afterSave,

@@ -2,7 +2,7 @@ package de.nihas101.midas.manual;
 
 import de.nihas101.midas.accountstatement.row.AccountStatementRowService;
 import de.nihas101.midas.accountstatement.runningtotal.RunningTotalAccountStatements;
-import de.nihas101.midas.accountstatement.service.AccountStatementService;
+import de.nihas101.midas.accountstatement.service.RunningTotalAccountStatementService;
 import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.row.BookingRow;
 import de.nihas101.midas.bookings.row.BookingRowService;
@@ -54,7 +54,7 @@ public class TemplatePreviewGeneratorTest {
     private InterestRateService interestRateService;
 
     @Autowired
-    private AccountStatementService accountStatementService;
+    private RunningTotalAccountStatementService runningTotalAccountStatementService;
 
     @Autowired
     private MessageSource messageSource;
@@ -162,7 +162,12 @@ public class TemplatePreviewGeneratorTest {
         );
 
         final Year year = Year.of(startDate.getYear());
-        final RunningTotalAccountStatements statements = accountStatementService.runningTotalAccountStatements(shareholder, year, messageSource, locale);
+        final RunningTotalAccountStatements statements = runningTotalAccountStatementService.runningTotalAccountStatements(
+                shareholder,
+                year,
+                messageSource,
+                locale
+        );
 
         final List<Object> rows = new ArrayList<>(accountStatementRowService.generateRows(statements, true));
         rows.add(accountStatementRowService.generateClosingRow(statements, locale));

@@ -2,7 +2,7 @@ package de.nihas101.midas.export.pdf;
 
 import de.nihas101.midas.accountstatement.row.AccountStatementRowService;
 import de.nihas101.midas.accountstatement.runningtotal.RunningTotalAccountStatements;
-import de.nihas101.midas.accountstatement.service.AccountStatementService;
+import de.nihas101.midas.accountstatement.service.RunningTotalAccountStatementService;
 import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.row.BookingRowService;
 import de.nihas101.midas.bookings.service.BookingsReader;
@@ -32,7 +32,7 @@ public class PdfViewDataExtractor {
     private final Locale locale;
     private final BookingsReader bookingsReader;
     private final BookingRowService bookingRowService;
-    private final AccountStatementService accountStatementService;
+    private final RunningTotalAccountStatementService runningTotalAccountStatementService;
     private final AccountStatementRowService accountStatementRowService;
     private final InterestRateService interestRateService;
     private final InterestBookingsReader interestBookingsReader;
@@ -113,7 +113,7 @@ public class PdfViewDataExtractor {
         );
 
         final Year year = Year.of(request.startDate().getYear());
-        final RunningTotalAccountStatements statements = accountStatementService.runningTotalAccountStatements(
+        final RunningTotalAccountStatements statements = runningTotalAccountStatementService.runningTotalAccountStatements(
                 shareholder,
                 year,
                 messageSource,
