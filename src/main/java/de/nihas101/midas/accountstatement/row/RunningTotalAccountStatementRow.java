@@ -4,6 +4,7 @@ import de.nihas101.midas.accountstatement.runningtotal.RunningTotalAccountStatem
 import de.nihas101.midas.money.MoneyAmount;
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 @RequiredArgsConstructor
@@ -18,7 +19,12 @@ public class RunningTotalAccountStatementRow implements AccountStatementRow {
 
     @Override
     public String dateStr() {
-        return accountStatement.date().format(DateTimeFormatter.ofPattern("dd.MM")); // TODO: Make this configurable
+        final LocalDate date = accountStatement.date();
+        if (date != null) {
+            return date.format(DateTimeFormatter.ofPattern("dd.MM")); // TODO: Make this configurable
+        } else {
+            return "";
+        }
     }
 
     @Override
@@ -66,5 +72,10 @@ public class RunningTotalAccountStatementRow implements AccountStatementRow {
     @Override
     public de.nihas101.midas.bookings.entity.BookingType bookingType() {
         return accountStatement.bookingType();
+    }
+
+    @Override
+    public String rowKey() {
+        return accountStatement.rowKey();
     }
 }

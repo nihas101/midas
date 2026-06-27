@@ -47,4 +47,12 @@ public interface AccountStatementRow {
     default BookingType bookingType() {
         return null;
     }
+
+    default String rowKey() {
+        if (bookingType() != null) {
+            return "TYPE:" + bookingType().name();
+        } else {
+            return "MANUAL:" + displayId();
+        }
+    }
 }

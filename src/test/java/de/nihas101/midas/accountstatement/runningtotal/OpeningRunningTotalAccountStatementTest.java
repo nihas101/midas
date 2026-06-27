@@ -27,8 +27,8 @@ class OpeningRunningTotalAccountStatementTest {
                 Mockito.mock(MessageSource.class),
                 Locale.ENGLISH
         );
-        Assertions.assertThrows(NullPointerException.class, statement::currentBalance);
-        Assertions.assertThrows(NullPointerException.class, statement::date);
+        Assertions.assertEquals(MoneyAmount.ZERO, statement.currentBalance());
+        Assertions.assertEquals(LocalDate.of(LocalDate.now().getYear(), Month.JANUARY, 1), statement.date());
     }
 
     @ParameterizedTest

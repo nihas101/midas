@@ -10,6 +10,8 @@ import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
+import com.vaadin.flow.component.grid.dnd.GridDropLocation;
+import com.vaadin.flow.component.grid.dnd.GridDropMode;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
@@ -62,6 +64,7 @@ import static java.util.Collections.emptyList;
 public class AccountStatementView extends MidasView implements BeforeEnterObserver { // TODO: Add a toggle to carry forward the closing balance to next year
 
     public static final VaadinIcon icon = VaadinIcon.WALLET;
+    public static final Icon HANDLE = new Icon(VaadinIcon.MENU);
 
     private final ShareholdersService shareholdersService;
     private final AccountStatementService accountStatementService;
@@ -77,6 +80,8 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
     private Grid<AccountStatementRow> closingStatementGrid;
     private HorizontalLayout actionRow;
     private Checkbox displayHiddenEntriesCheckbox;
+    private AccountStatementRow draggedRow;
+    private List<AccountStatementRow> currentRows;
 
     public AccountStatementView(
             final ShareholdersService shareholdersService,
@@ -97,6 +102,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
 
         VerticalLayout content = new VerticalLayout();
         content.setSizeFull();
+        addClassName("account-statement-view");
 
         content.add(new H2(messageSource.getMessage("account-statements", null, getLocale())));
 
@@ -253,11 +259,74 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
 
     private void setupAccountStatementGrid(final VerticalLayout content) {
         accountStatementGrid = new Grid<>();
+        // Drag‑handle column – shows a grip icon for rows that can be moved
+        // Opening‑balance rows get an empty placeholder so they cannot be dragged
+        Grid.Column<AccountStatementRow> dragHandleColumn = accountStatementGrid.addComponentColumn(row -> {
+            if (row.isOpeningBalance()) {
+                return new Span();
+            }
+            HANDLE.addClassName("drag-handle");
+            return HANDLE;
+        });
+        dragHandleColumn.setHeader("");
+        dragHandleColumn.setFlexGrow(0);
+        dragHandleColumn.setWidth("40px");
+        dragHandleColumn.setResizable(false);
+
         accountStatementGrid.setEmptyStateText(messageSource.getMessage("bookings.table.empty-state-text", null, getLocale()));
         accountStatementGrid.setWidthFull();
         accountStatementGrid.setAllRowsVisible(true);
         accountStatementGrid.setPartNameGenerator(AccountStatementRow::partName);
-        accountStatementGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.LUMO_COMPACT);
+
+        accountStatementGrid.setRowsDraggable(true);
+        accountStatementGrid.setDropMode(GridDropMode.BETWEEN);
+
+        accountStatementGrid.addDragStartListener(event -> draggedRow = event.getDraggedItems().getFirst());
+        accountStatementGrid.addDragEndListener(event -> draggedRow = null);
+
+        accountStatementGrid.addDropListener(event -> {
+            final AccountStatementRow targetRow = event.getDropTargetItem().orElse(null);
+            final GridDropLocation dropLocation = event.getDropLocation();
+
+            if (draggedRow == null || targetRow == null || draggedRow.equals(targetRow)) {
+                return;
+            }
+
+            if (draggedRow.isOpeningBalance() || targetRow.isOpeningBalance()) {
+                return;
+            }
+
+            if (currentRows == null) {
+                return;
+            }
+
+            final List<AccountStatementRow> items = new java.util.ArrayList<>(currentRows);
+            items.remove(draggedRow);
+
+            int targetIndex = items.indexOf(targetRow);
+            if (targetIndex < 0) {
+                return;
+            }
+
+            if (dropLocation == GridDropLocation.BELOW) {
+                items.add(targetIndex + 1, draggedRow);
+            } else {
+                items.add(targetIndex, draggedRow);
+            }
+
+            final List<String> rowKeys = items.stream()
+                    .filter(row -> !row.isOpeningBalance())
+                    .map(AccountStatementRow::rowKey)
+                    .toList();
+
+            accountStatementService.saveOrder(
+                    shareholderPicker.getValue(),
+                    Year.of(yearPicker.getValue()),
+                    rowKeys
+            );
+
+            refreshContent();
+        });
 
         setupColumn(
                 accountStatementGrid.addColumn(AccountStatementRow::displayId),
@@ -322,7 +391,6 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                     final Button editButton = new Button(new Icon(VaadinIcon.EDIT));
                     editButton.setTooltipText(messageSource.getMessage("global.edit", null, getLocale()));
                     editButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
-                    // TODO: Make it editable in line instead
                     editButton.addClickListener(e -> openOverrideDialog(row));
                     actions.add(editButton);
                 } else {
@@ -506,6 +574,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         }
 
         final List<AccountStatementRow> rows = accountStatementRowService.generateRows(accountStatements, displayHiddenEntriesCheckbox.getValue());
+        this.currentRows = rows;
         accountStatementGrid.setItems(rows);
         closingStatementGrid.setItems(accountStatementRowService.generateClosingRow(accountStatements, getLocale()));
         checkForDivergence(shareholder, yearValue, rows);

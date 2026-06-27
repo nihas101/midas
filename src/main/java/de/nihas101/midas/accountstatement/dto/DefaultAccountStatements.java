@@ -100,7 +100,7 @@ public class DefaultAccountStatements implements AccountStatements {
                                 Collectors.toMap(
                                         AccountStatementEntity::getType,
                                         ase -> new DefaultAccountStatement(ase, messageSource, locale),
-                                        DefaultAccountStatements::firstAccountStatement
+                                        (first, second) -> first
                                 )
                         ),
                 openingBalance,
@@ -187,13 +187,6 @@ public class DefaultAccountStatements implements AccountStatements {
                         Source.USER
                 ))
                 .toList();
-    }
-
-    private static LabeledAccountStatement firstAccountStatement(
-            final LabeledAccountStatement first,
-            final LabeledAccountStatement second
-    ) {
-        return first;
     }
 
     @Override

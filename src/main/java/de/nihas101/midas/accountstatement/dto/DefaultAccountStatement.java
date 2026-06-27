@@ -62,7 +62,7 @@ public final class DefaultAccountStatement implements LabeledAccountStatement {
                 type != null && messageSource != null
                         ? messageSource.getMessage(type.getAccountStatementI18nKey(), null, locale)
                         : null,
-                false,
+                MoneyAmount.ZERO.equals(amount), // Hide zero amounts by default, unless the user overrides this
                 Source.SYSTEM
         );
     }
