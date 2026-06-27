@@ -3,6 +3,7 @@ package de.nihas101.midas.accountstatement.dto;
 import de.nihas101.midas.accountstatement.repository.AccountStatementEntity;
 import de.nihas101.midas.accountstatement.repository.AccountStatementOverrideEntity;
 import de.nihas101.midas.bookings.entity.BookingType;
+import de.nihas101.midas.bookings.entity.Source;
 import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.openingbalance.dto.OpeningBalance;
 import lombok.EqualsAndHashCode;
@@ -143,7 +144,7 @@ public class DefaultAccountStatements implements AccountStatements {
                         systemEntity != null ? systemEntity.getAmount() : override.getAmount(),
                         label, // TODO: Override with label if it exists
                         override.getHidden(),
-                        false
+                        Source.SYSTEM
                 );
                 merged.put(
                         type,
@@ -183,7 +184,7 @@ public class DefaultAccountStatements implements AccountStatements {
                         o.getAmount(),
                         o.getLabelOverride(),
                         false,
-                        true
+                        Source.USER
                 ))
                 .toList();
     }

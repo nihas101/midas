@@ -26,14 +26,12 @@ public interface AccountStatementRow {
             return "hidden no-separator-column";
         }
 
-        // TODO: Do we need this
         if (isManualExtra()) {
             return "manual-extra no-separator-column";
         }
         return "no-separator-column";
     }
 
-    // TODO: Remove these defaults here and make them normal interface methods
     default boolean isOpeningBalance() {
         return false;
     }

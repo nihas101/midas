@@ -4,6 +4,7 @@ import de.nihas101.midas.accountstatement.dto.AccountStatements;
 import de.nihas101.midas.accountstatement.dto.DefaultAccountStatement;
 import de.nihas101.midas.accountstatement.dto.LabeledAccountStatement;
 import de.nihas101.midas.bookings.entity.BookingType;
+import de.nihas101.midas.bookings.entity.Source;
 import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.openingbalance.dto.OpeningBalance;
 import org.junit.jupiter.api.Assertions;
@@ -156,7 +157,7 @@ class DefaultRunningTotalAccountStatementsTest {
                 MoneyAmount.ofCents(-200L),
                 "Entnahmen",
                 false,
-                true
+                Source.USER
         );
         final LabeledAccountStatement manualExtra = new DefaultAccountStatement(
                 99,
@@ -165,7 +166,7 @@ class DefaultRunningTotalAccountStatementsTest {
                 MoneyAmount.ofCents(150L),
                 "Zusatz",
                 false,
-                true
+                Source.USER
         );
 
         final AccountStatements accountStatements = mock(AccountStatements.class);
