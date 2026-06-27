@@ -74,7 +74,7 @@ public class OpeningRunningTotalAccountStatement implements RunningTotalAccountS
     @Override
     public boolean isManualExtra() {
         return false;
-    } // TODO: Needed?
+    }
 
     @Override
     public de.nihas101.midas.bookings.entity.BookingType bookingType() {

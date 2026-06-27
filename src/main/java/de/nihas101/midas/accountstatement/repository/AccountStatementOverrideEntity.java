@@ -24,7 +24,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AccountStatementOverrideEntity {
-    // TODO: Also implement re-ordering
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
