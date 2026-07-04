@@ -362,6 +362,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
                 i -> formatInterestAmounts(
                         Optional.ofNullable(i)
                                 .map(InterestCalculationRow::interestAmount)
+                                .filter(t -> 0L != t.longValue())
                                 .orElse(null)
                 )
         ), "interest.table.interest-amount", ColumnTextAlign.CENTER);

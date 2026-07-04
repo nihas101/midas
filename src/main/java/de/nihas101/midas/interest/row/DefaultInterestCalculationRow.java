@@ -7,9 +7,12 @@ import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Month;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+
+import static java.math.BigDecimal.ZERO;
 
 @RequiredArgsConstructor
 public class DefaultInterestCalculationRow implements InterestCalculationRow {
@@ -30,7 +33,7 @@ public class DefaultInterestCalculationRow implements InterestCalculationRow {
                         yearMonth.atEndOfMonth().format(DateTimeFormatter.ofPattern("dd. MMMM", locale)),
                         monthTotalSum.sum(),
                         balanceAtEndOfMonth,
-                        interest.interestAmount()
+                        Month.DECEMBER == yearMonth.getMonth() ? ZERO : interest.interestAmount()
                 ),
                 partName
         );

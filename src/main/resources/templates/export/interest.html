@@ -166,7 +166,7 @@
 
             <td class="text-center" th:text="${row.interestDaysCount() != null ? row.interestDaysCount() : ''}">Days
             </td>
-            <td class="text-center" th:text="${row.interestAmount() != null ? row.interestAmount() : ''}">Interest
+            <td class="text-center" th:text="${row.interestAmount() != null and row.interestAmount() != 0 ? row.interestAmount() : ''}">Interest
                 number
             </td>
         </tr>
