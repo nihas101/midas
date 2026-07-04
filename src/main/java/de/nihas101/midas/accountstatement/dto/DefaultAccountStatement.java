@@ -2,6 +2,7 @@ package de.nihas101.midas.accountstatement.dto;
 
 import de.nihas101.midas.accountstatement.repository.AccountStatementEntity;
 import de.nihas101.midas.bookings.entity.BookingType;
+import de.nihas101.midas.bookings.entity.Source;
 import de.nihas101.midas.money.MoneyAmount;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,8 @@ public final class DefaultAccountStatement implements LabeledAccountStatement {
     private final BookingType type;
     private final MoneyAmount amount;
     private final String label;
+    private final boolean hidden;
+    private final Source source;
 
     public DefaultAccountStatement(
             final AccountStatementEntity accountStatementEntity,
@@ -58,7 +61,27 @@ public final class DefaultAccountStatement implements LabeledAccountStatement {
                 amount,
                 type != null && messageSource != null
                         ? messageSource.getMessage(type.getAccountStatementI18nKey(), null, locale)
-                        : null
+                        : null,
+                MoneyAmount.ZERO.equals(amount), // Hide zero amounts by default, unless the user overrides this
+                Source.SYSTEM
+        );
+    }
+
+    public DefaultAccountStatement(
+            final Integer id,
+            final Year year,
+            final BookingType type,
+            final MoneyAmount amount,
+            final String label
+    ) {
+        this(
+                id,
+                year,
+                type,
+                amount,
+                label,
+                false,
+                Source.SYSTEM
         );
     }
 
@@ -82,4 +105,18 @@ public final class DefaultAccountStatement implements LabeledAccountStatement {
         return amount;
     }
 
+    @Override
+    public boolean isHidden() {
+        return hidden;
+    }
+
+    @Override
+    public boolean isManualExtra() {
+        return source == Source.USER;
+    }
+
+    @Override
+    public BookingType bookingType() {
+        return type;
+    }
 }

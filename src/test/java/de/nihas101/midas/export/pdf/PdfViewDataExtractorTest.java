@@ -3,7 +3,7 @@ package de.nihas101.midas.export.pdf;
 import de.nihas101.midas.accountstatement.row.AccountStatementRow;
 import de.nihas101.midas.accountstatement.row.AccountStatementRowService;
 import de.nihas101.midas.accountstatement.runningtotal.RunningTotalAccountStatements;
-import de.nihas101.midas.accountstatement.service.AccountStatementService;
+import de.nihas101.midas.accountstatement.service.RunningTotalAccountStatementService;
 import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.dto.FilteredBookings;
 import de.nihas101.midas.bookings.row.BookingRow;
@@ -64,7 +64,7 @@ class PdfViewDataExtractorTest {
     private BookingRowService bookingRowService;
 
     @Mock
-    private AccountStatementService accountStatementService;
+    private RunningTotalAccountStatementService runningTotalAccountStatementService;
 
     @Mock
     private AccountStatementRowService accountStatementRowService;
@@ -115,9 +115,15 @@ class PdfViewDataExtractorTest {
         when(messageSource.getMessage(anyString(), any(), eq(locale))).thenReturn("dummy");
 
         RunningTotalAccountStatements mockRunningTotal = mock(RunningTotalAccountStatements.class);
-        when(accountStatementService.runningTotalAccountStatements(eq(shareholder), any(Year.class), eq(messageSource), eq(locale)))
-                .thenReturn(mockRunningTotal);
-        when(accountStatementRowService.generateRows(mockRunningTotal)).thenReturn(List.of(mock(AccountStatementRow.class)));
+        when(
+                runningTotalAccountStatementService.runningTotalAccountStatements(
+                        eq(shareholder),
+                        any(Year.class),
+                        eq(messageSource),
+                        eq(locale)
+                )
+        ).thenReturn(mockRunningTotal);
+        when(accountStatementRowService.generateRows(mockRunningTotal, false)).thenReturn(List.of(mock(AccountStatementRow.class)));
         when(accountStatementRowService.generateClosingRow(mockRunningTotal, locale)).thenReturn(mock(AccountStatementRow.class));
 
         final PdfViewData result = extractor.extractData(shareholder, "account-statements");

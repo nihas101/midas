@@ -13,6 +13,13 @@ public class SaveButton extends Button {
     ) {
         super(label);
         this.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        this.addClickListener(clickEvenListener);
+        this.setDisableOnClick(true);
+        this.addClickListener(e -> {
+            try {
+                clickEvenListener.onComponentEvent(e);
+            } finally {
+                e.getSource().setEnabled(true);
+            }
+        });
     }
 }

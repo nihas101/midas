@@ -2,7 +2,7 @@ package de.nihas101.midas.manual;
 
 import de.nihas101.midas.accountstatement.row.AccountStatementRowService;
 import de.nihas101.midas.accountstatement.runningtotal.RunningTotalAccountStatements;
-import de.nihas101.midas.accountstatement.service.AccountStatementService;
+import de.nihas101.midas.accountstatement.service.RunningTotalAccountStatementService;
 import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.row.BookingRow;
 import de.nihas101.midas.bookings.row.BookingRowService;
@@ -54,7 +54,7 @@ public class TemplatePreviewGeneratorTest {
     private InterestRateService interestRateService;
 
     @Autowired
-    private AccountStatementService accountStatementService;
+    private RunningTotalAccountStatementService runningTotalAccountStatementService;
 
     @Autowired
     private MessageSource messageSource;
@@ -94,18 +94,18 @@ public class TemplatePreviewGeneratorTest {
 
     private void generatePreview(Shareholder sh, String view, LocalDate startDate, Locale locale, Path outputDir) throws IOException {
         final PdfViewData data = extractData(sh, view, startDate, locale);
-        
+
         Context context = new Context(locale);
         context.setVariable("data", data);
         context.setVariable("content", data.viewName());
 
         String html = pdfTemplateEngine.process("base-layout", context);
-        
+
         String filename = String.format("%s_%s_%s.html",
                 view,
                 (sh.getFirstName() + "_" + sh.getLastName()).replace(" ", "_"),
                 startDate.getYear());
-        
+
         Files.writeString(outputDir.resolve(filename), html);
     }
 
@@ -162,9 +162,14 @@ public class TemplatePreviewGeneratorTest {
         );
 
         final Year year = Year.of(startDate.getYear());
-        final RunningTotalAccountStatements statements = accountStatementService.runningTotalAccountStatements(shareholder, year, messageSource, locale);
+        final RunningTotalAccountStatements statements = runningTotalAccountStatementService.runningTotalAccountStatements(
+                shareholder,
+                year,
+                messageSource,
+                locale
+        );
 
-        final List<Object> rows = new ArrayList<>(accountStatementRowService.generateRows(statements));
+        final List<Object> rows = new ArrayList<>(accountStatementRowService.generateRows(statements, true));
         rows.add(accountStatementRowService.generateClosingRow(statements, locale));
 
         return new PdfViewData(

@@ -1,6 +1,7 @@
 package de.nihas101.midas.accountstatement.runningtotal;
 
 import de.nihas101.midas.accountstatement.dto.LabeledAccountStatement;
+import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.money.MoneyAmount;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -39,5 +40,20 @@ public class DefaultRunningTotalAccountStatement implements RunningTotalAccountS
     @Override
     public MoneyAmount currentBalance() {
         return statement != null ? currentBalance : null;
+    }
+
+    @Override
+    public boolean isHidden() {
+        return statement != null && statement.isHidden();
+    }
+
+    @Override
+    public boolean isManualExtra() {
+        return statement != null && statement.isManualExtra();
+    }
+
+    @Override
+    public BookingType bookingType() {
+        return statement != null ? statement.bookingType() : null;
     }
 }

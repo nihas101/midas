@@ -2,7 +2,7 @@ package de.nihas101.midas.export.accountstatement;
 
 import de.nihas101.midas.accountstatement.runningtotal.RunningTotalAccountStatement;
 import de.nihas101.midas.accountstatement.runningtotal.RunningTotalAccountStatements;
-import de.nihas101.midas.accountstatement.service.AccountStatementService;
+import de.nihas101.midas.accountstatement.service.RunningTotalAccountStatementService;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
@@ -23,7 +23,7 @@ public class AccountStatementsRowExtractor {
     private final List<Shareholder> shareholders;
     private final LocalDate startDate;
     private final LocalDate endDate;
-    private final AccountStatementService accountStatementService;
+    private final RunningTotalAccountStatementService runningTotalAccountStatementService;
     private final MessageSource messageSource;
     private final Locale locale;
 
@@ -36,7 +36,6 @@ public class AccountStatementsRowExtractor {
     }
 
     private List<ExportRow> rowsForShareholder(final Shareholder shareholder) {
-
         return IntStream.rangeClosed(startDate.getYear(), endDate.getYear())
                 .mapToObj(yearValue ->
                         rowsForYear(shareholder, yearValue)
@@ -49,13 +48,18 @@ public class AccountStatementsRowExtractor {
             final int yearValue
     ) {
         final Year year = Year.of(yearValue);
-        final RunningTotalAccountStatements statements = accountStatementService.runningTotalAccountStatements(
-                shareholder, year, messageSource, locale);
+        final RunningTotalAccountStatements statements = runningTotalAccountStatementService.runningTotalAccountStatements(
+                shareholder,
+                year,
+                messageSource,
+                locale
+        );
         final String shareholderName = shareholder.getFirstName() + " " + shareholder.getLastName();
 
         return statements.runningTotalAccountStatements()
                 .stream()
                 .filter(stmt -> isWithinRange(stmt.date()))
+                .filter(stmt -> !stmt.isHidden())
                 .map(stmt -> exportRow(shareholderName, stmt)).toList();
     }
 

@@ -1,7 +1,7 @@
 package de.nihas101.midas.export.pdf;
 
 import de.nihas101.midas.accountstatement.row.AccountStatementRowService;
-import de.nihas101.midas.accountstatement.service.AccountStatementService;
+import de.nihas101.midas.accountstatement.service.RunningTotalAccountStatementService;
 import de.nihas101.midas.bookings.row.BookingRowService;
 import de.nihas101.midas.bookings.service.BookingsReader;
 import de.nihas101.midas.export.Export;
@@ -30,7 +30,7 @@ public class PdfExporter implements Export {
             final BookingsReader bookingsReader,
             final InterestBookingsReader interestBookingsReader,
             final InterestRateService interestRateService,
-            final AccountStatementService accountStatementService,
+            final RunningTotalAccountStatementService runningTotalAccountStatementService,
             final MessageSource messageSource,
             final BookingRowService bookingRowService,
             final AccountStatementRowService accountStatementRowService,
@@ -47,7 +47,7 @@ public class PdfExporter implements Export {
                         locale,
                         bookingsReader,
                         bookingRowService,
-                        accountStatementService,
+                        runningTotalAccountStatementService,
                         accountStatementRowService,
                         interestRateService,
                         interestBookingsReader,

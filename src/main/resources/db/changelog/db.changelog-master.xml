@@ -12,4 +12,6 @@
     <include file="db/changelog/004-create-interest-rates-table.xml"/>
     <include file="db/changelog/005-create-opening-balances-table.xml"/>
     <include file="db/changelog/006-create-backup-status-table.xml"/>
+    <include file="db/changelog/007-create-account-statement-overrides-table.xml"/>
+    <include file="db/changelog/008-create-account-statement-orders-table.xml"/>
 </databaseChangeLog>

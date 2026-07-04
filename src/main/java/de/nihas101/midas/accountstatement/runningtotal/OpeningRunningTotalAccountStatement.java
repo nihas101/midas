@@ -32,7 +32,11 @@ public class OpeningRunningTotalAccountStatement implements RunningTotalAccountS
 
     @Override
     public MoneyAmount currentBalance() {
-        return openingBalance.getOpeningBalance();
+        if (openingBalance != null) {
+            return openingBalance.getOpeningBalance();
+        } else {
+            return MoneyAmount.ZERO;
+        }
     }
 
     @Override
@@ -42,7 +46,11 @@ public class OpeningRunningTotalAccountStatement implements RunningTotalAccountS
 
     @Override
     public LocalDate date() {
-        return openingBalance.getYear().atMonth(Month.JANUARY).atDay(1);
+        if (openingBalance != null) {
+            return openingBalance.getYear().atMonth(Month.JANUARY).atDay(1);
+        } else {
+            return LocalDate.of(LocalDate.now().getYear(), Month.JANUARY, 1);
+        }
     }
 
     public String label() {
@@ -51,6 +59,25 @@ public class OpeningRunningTotalAccountStatement implements RunningTotalAccountS
 
     @Override
     public MoneyAmount amount() {
-        return openingBalance.getOpeningBalance();
+        if (openingBalance != null) {
+            return openingBalance.getOpeningBalance();
+        } else {
+            return MoneyAmount.ZERO;
+        }
+    }
+
+    @Override
+    public boolean isHidden() {
+        return false;
+    }
+
+    @Override
+    public boolean isManualExtra() {
+        return false;
+    }
+
+    @Override
+    public de.nihas101.midas.bookings.entity.BookingType bookingType() {
+        return null;
     }
 }

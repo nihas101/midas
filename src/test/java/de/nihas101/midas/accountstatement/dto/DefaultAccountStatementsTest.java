@@ -28,6 +28,7 @@ class DefaultAccountStatementsTest {
     void nullTests() {
         final AccountStatements accountStatement = new DefaultAccountStatements(
                 null,
+                null,
                 (Year) null,
                 null,
                 null,
@@ -41,6 +42,7 @@ class DefaultAccountStatementsTest {
     @MethodSource("openingBalanceArguments")
     void openingBalance(final OpeningBalance openingBalance) {
         final AccountStatements accountStatement = new DefaultAccountStatements(
+                null,
                 null,
                 null,
                 openingBalance,
@@ -236,6 +238,7 @@ class DefaultAccountStatementsTest {
 
         final AccountStatements accountStatement = new DefaultAccountStatements(
                 accountStatementEntities,
+                null,
                 CURRENT_YEAR,
                 null,
                 null,

@@ -1,7 +1,7 @@
 package de.nihas101.midas.export.pdf;
 
 import de.nihas101.midas.accountstatement.row.AccountStatementRowService;
-import de.nihas101.midas.accountstatement.service.AccountStatementService;
+import de.nihas101.midas.accountstatement.service.RunningTotalAccountStatementService;
 import de.nihas101.midas.bookings.row.BookingRowService;
 import de.nihas101.midas.bookings.service.BookingsReader;
 import de.nihas101.midas.export.ExportRequest;
@@ -57,7 +57,7 @@ class PdfExporterTest {
     private InterestRateService interestRateService;
 
     @Mock
-    private AccountStatementService accountStatementService;
+    private RunningTotalAccountStatementService runningTotalAccountStatementService;
 
     @Mock
     private MessageSource messageSource;
@@ -88,7 +88,7 @@ class PdfExporterTest {
                 bookingsReader,
                 interestBookingsReader,
                 interestRateService,
-                accountStatementService,
+                runningTotalAccountStatementService,
                 messageSource,
                 bookingRowService,
                 accountStatementRowService,
@@ -112,7 +112,7 @@ class PdfExporterTest {
         PdfExporter exporter = new PdfExporter(
                 request, outputStream, Locale.GERMAN, pdfService,
                 bookingsReader, interestBookingsReader, interestRateService,
-                accountStatementService, messageSource, bookingRowService,
+                runningTotalAccountStatementService, messageSource, bookingRowService,
                 accountStatementRowService, interestRowService);
         exporter.trigger();
         verify(pdfService, times(1)).generatePdf(any(), any(), any());
@@ -132,7 +132,7 @@ class PdfExporterTest {
         PdfExporter exporter = new PdfExporter(
                 request, outputStream, Locale.US, pdfService,
                 bookingsReader, interestBookingsReader, interestRateService,
-                accountStatementService, messageSource, bookingRowService,
+                runningTotalAccountStatementService, messageSource, bookingRowService,
                 accountStatementRowService, interestRowService);
         exporter.trigger();
         verify(pdfService, times(4)).generatePdf(any(), any(), any());
