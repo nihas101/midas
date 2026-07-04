@@ -116,21 +116,22 @@ class AccountStatementExportDataSourceTest {
         assertEquals(2, rows.size());
 
         // Verify Alice's row (Sorted by name)
-        List<Object> row1 = rows.get(0);
-        assertEquals("Alice A", row1.get(0));
-        assertEquals(101, row1.get(1));
-        assertEquals(LocalDate.of(2023, 5, 10), row1.get(2));
-        assertEquals("Withdrawal", row1.get(3));
+        List<Object> row1 = rows.getFirst();
+        assertEquals(1, row1.get(0));
+        assertEquals("Alice A", row1.get(1));
+        assertEquals(101, row1.get(2));
+        assertEquals(LocalDate.of(2023, 5, 10), row1.get(3));
+        assertEquals("Withdrawal", row1.get(4));
         // Use compareTo for BigDecimals to ignore scale differences
-        assertEquals(0, ((BigDecimal) row1.get(4)).compareTo(new BigDecimal("50.00"))); // Debit
-        assertEquals(0, ((BigDecimal) row1.get(5)).compareTo(new BigDecimal("0.00")));  // Credit
-        assertEquals(0, ((BigDecimal) row1.get(6)).compareTo(new BigDecimal("100.00"))); // Balance
+        assertEquals(0, ((BigDecimal) row1.get(5)).compareTo(new BigDecimal("50.00"))); // Debit
+        assertEquals(0, ((BigDecimal) row1.get(6)).compareTo(new BigDecimal("0.00")));  // Credit
+        assertEquals(0, ((BigDecimal) row1.get(7)).compareTo(new BigDecimal("100.00"))); // Balance
 
         // Verify Bob's row
         List<Object> row2 = rows.get(1);
-        assertEquals("Bob B", row2.get(0));
-        assertEquals(0, ((BigDecimal) row2.get(4)).compareTo(new BigDecimal("0.00")));  // Debit
-        assertEquals(0, ((BigDecimal) row2.get(5)).compareTo(new BigDecimal("200.00"))); // Credit
+        assertEquals("Bob B", row2.get(1));
+        assertEquals(0, ((BigDecimal) row2.get(5)).compareTo(new BigDecimal("0.00")));  // Debit
+        assertEquals(0, ((BigDecimal) row2.get(6)).compareTo(new BigDecimal("200.00"))); // Credit
     }
 
     @Test

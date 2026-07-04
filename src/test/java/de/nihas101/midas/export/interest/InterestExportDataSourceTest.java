@@ -50,6 +50,7 @@ class InterestExportDataSourceTest {
     @Test
     void export_callsTargetWithFormattedData() {
         ExportRow row1 = new ExportRow(
+                1,
                 "Alice A",
                 LocalDate.of(2023, 1, 31),
                 new BigDecimal("100.00"),
@@ -71,15 +72,15 @@ class InterestExportDataSourceTest {
         assertEquals(1, resultRows.size());
 
         List<Object> resultRow = resultRows.getFirst();
-        assertEquals("Alice A", resultRow.get(0));
-        assertEquals(LocalDate.of(2023, 1, 31), resultRow.get(1));
-        assertEquals(new BigDecimal("100.00"), resultRow.get(2));
-        assertEquals("H", resultRow.get(3));
-        assertEquals(new BigDecimal("1000.00"), resultRow.get(4));
-        assertEquals("H", resultRow.get(5));
-        assertEquals(30, resultRow.get(6));
-        assertEquals(new BigDecimal("5"), resultRow.get(7));
-        assertEquals(new BigDecimal("2.5"), resultRow.get(8));
+        assertEquals("Alice A", resultRow.get(1));
+        assertEquals(LocalDate.of(2023, 1, 31), resultRow.get(2));
+        assertEquals(new BigDecimal("100.00"), resultRow.get(3));
+        assertEquals("H", resultRow.get(4));
+        assertEquals(new BigDecimal("1000.00"), resultRow.get(5));
+        assertEquals("H", resultRow.get(6));
+        assertEquals(30, resultRow.get(7));
+        assertEquals(new BigDecimal("5"), resultRow.get(8));
+        assertEquals(new BigDecimal("2.5"), resultRow.get(9));
     }
 
     @Test
@@ -94,6 +95,7 @@ class InterestExportDataSourceTest {
     @Test
     void getHeaders_localizesAllColumns() {
         ExportRow row = new ExportRow(
+                1,
                 "Alice A",
                 LocalDate.of(2023, 1, 31),
                 new BigDecimal("100.00"),

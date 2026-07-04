@@ -1,6 +1,8 @@
 package de.nihas101.midas.export.bookings;
 
 import de.nihas101.midas.bookings.service.BookingsReader;
+import de.nihas101.midas.export.sort.DisplayIdExportRowSort;
+import de.nihas101.midas.export.sort.ExportRowSort;
 import de.nihas101.midas.openingbalance.dto.OpeningBalance;
 import de.nihas101.midas.openingbalance.service.OpeningBalanceService;
 import de.nihas101.midas.shareholders.dto.Shareholder;
@@ -11,7 +13,6 @@ import java.time.LocalDate;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -29,13 +30,35 @@ public class BookingsRowExtractor {
     private final OpeningBalanceService openingBalanceService;
     private final MessageSource messageSource;
     private final Locale locale;
+    private final ExportRowSort exportRowSort;
+
+    public BookingsRowExtractor(
+            final List<Shareholder> shareholders,
+            final LocalDate startDate,
+            final LocalDate endDate,
+            final BookingsReader bookingsReader,
+            final OpeningBalanceService openingBalanceService,
+            final MessageSource messageSource,
+            final Locale locale
+    ) {
+        this(
+                shareholders,
+                startDate,
+                endDate,
+                bookingsReader,
+                openingBalanceService,
+                messageSource,
+                locale,
+                new DisplayIdExportRowSort()
+        );
+    }
 
     public List<ExportRow> rows() {
         return shareholders.stream()
                 .flatMap(shareholder -> IntStream.rangeClosed(startDate.getYear(), endDate.getYear())
                         .mapToObj(yearValue -> exportRows(shareholder, yearValue))
                         .flatMap(Collection::stream))
-                .sorted(Comparator.comparing(ExportRow::shareholderName).thenComparing(ExportRow::date))
+                .sorted(exportRowSort)
                 .toList();
     }
 
@@ -67,6 +90,7 @@ public class BookingsRowExtractor {
 
         return Optional.of(
                 new ExportRow(
+                        shareholder.getDisplayId(),
                         shareholderName,
                         null,
                         openingBalanceDate,
@@ -88,6 +112,7 @@ public class BookingsRowExtractor {
                 .stream()
                 .map(b ->
                         new ExportRow(
+                                shareholder.getDisplayId(),
                                 shareholderName,
                                 b.getId(),
                                 b.getDate(),
