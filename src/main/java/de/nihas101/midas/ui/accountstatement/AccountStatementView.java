@@ -65,7 +65,6 @@ import static java.util.Collections.emptyList;
 public class AccountStatementView extends MidasView implements BeforeEnterObserver { // TODO: Add a toggle to carry forward the closing balance to next year
 
     public static final VaadinIcon icon = VaadinIcon.WALLET;
-    public static final Icon HANDLE = new Icon(VaadinIcon.MENU);
 
     private final ShareholdersService shareholdersService;
     private final DefaultAccountStatementService accountStatementService;
@@ -269,8 +268,9 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
             if (row.isOpeningBalance()) {
                 return new Span();
             }
-            HANDLE.addClassName("drag-handle");
-            return HANDLE;
+            final Icon icon = new Icon(VaadinIcon.MENU);
+            icon.addClassName("drag-handle");
+            return icon;
         });
         dragHandleColumn.setHeader("");
         dragHandleColumn.setFlexGrow(0);
@@ -304,7 +304,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                 return;
             }
 
-            final List<AccountStatementRow> items = new java.util.ArrayList<>(currentRows);
+            final List<AccountStatementRow> items = new ArrayList<>(currentRows);
             items.remove(draggedRow);
 
             int targetIndex = items.indexOf(targetRow);
@@ -475,16 +475,16 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
     }
 
     private void toggleExclude(final AccountStatementRow row, final boolean hidden) {
-        accountStatementService.setHidden(
+        accountStatementService.saveOverride(
                 shareholderPicker.getValue(),
                 Year.of(yearPicker.getValue()),
                 row.bookingType(),
+                row.amount(),
                 hidden
         );
         refreshContent();
     }
 
-    // TODO: Instead of handling this via a new dialog, just have the label editable in the table etc.
     private void openOverrideDialog(final AccountStatementRow row) {
         final Dialog dialog = new Dialog();
         dialog.setHeaderTitle(messageSource.getMessage("bookings.dialog.title.edit", null, getLocale()));
@@ -528,13 +528,20 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                             labelField.setInvalid(true);
                             return;
                         }
-                        accountStatementService.updateManualExtra(row.displayId(), labelVal, newAmount);
+                        accountStatementService.saveManualExtra(
+                                row.displayId(),
+                                shareholderPicker.getValue(),
+                                Year.of(yearPicker.getValue()),
+                                labelVal,
+                                newAmount
+                        );
                     } else {
                         accountStatementService.saveOverride(
                                 shareholderPicker.getValue(),
                                 Year.of(yearPicker.getValue()),
                                 row.bookingType(),
-                                newAmount
+                                newAmount,
+                                false
                         );
                     }
                     dialog.close();

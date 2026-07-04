@@ -95,6 +95,7 @@ public class ManualRowDialog extends Dialog {
         }
         final MoneyAmount newAmount = MoneyAmount.of(moneyAmount);
         accountStatementService.saveManualExtra(
+                null,
                 shareholder,
                 year,
                 labelVal,

@@ -70,86 +70,103 @@ public class DefaultAccountStatementService {
         );
     }
 
-    // TODO: Maybe just combine with the other method?
-    @Transactional
-    public void setHidden(
-            final Shareholder shareholder,
-            final Year year,
-            final BookingType bookingType,
-            final boolean hidden
-    ) {
-        final Optional<AccountStatementOverrideEntity> existing = accountStatementOverridesRepository
-                .findByShareholderIdAndYearAndBookingType(shareholder.getId(), year.getValue(), bookingType);
-
-        final AccountStatementOverrideEntity entity;
-        if (existing.isPresent()) {
-            entity = existing.get();
-            entity.setHidden(hidden);
-        } else {
-            entity = AccountStatementOverrideEntity.builder()
-                    .shareholder(ShareholderEntity.fromDto(shareholder))
-                    .year(year.getValue())
-                    .bookingType(bookingType)
-                    .hidden(hidden)
-                    .build();
-        }
-        accountStatementOverridesRepository.save(entity);
-    }
-
-    // TODO: Pass in an override rather than the things individually?
     @Transactional
     public void saveOverride(
             final Shareholder shareholder,
             final Year year,
             final BookingType bookingType,
-            final MoneyAmount amount
+            final MoneyAmount amount,
+            final boolean hidden
     ) {
-        final Optional<AccountStatementOverrideEntity> existing = accountStatementOverridesRepository
-                .findByShareholderIdAndYearAndBookingType(shareholder.getId(), year.getValue(), bookingType);
+        final AccountStatementOverrideEntity entity = accountStatementOverrideEntity(
+                shareholder,
+                year,
+                bookingType,
+                amount,
+                hidden,
+                accountStatementOverridesRepository
+                        .findByShareholderIdAndYearAndBookingType(
+                                shareholder.getId(),
+                                year.getValue(),
+                                bookingType
+                        )
+        );
+        accountStatementOverridesRepository.save(entity);
+    }
 
-        final AccountStatementOverrideEntity entity;
+    private AccountStatementOverrideEntity accountStatementOverrideEntity(
+            final Shareholder shareholder,
+            final Year year,
+            final BookingType bookingType,
+            final MoneyAmount amount,
+            final boolean hidden,
+            final Optional<AccountStatementOverrideEntity> existing
+    ) {
         if (existing.isPresent()) {
-            entity = existing.get();
+            final AccountStatementOverrideEntity entity = existing.get();
             entity.setAmount(amount);
+            entity.setHidden(hidden);
+            return entity;
         } else {
-            entity = AccountStatementOverrideEntity.builder()
+            return AccountStatementOverrideEntity.builder()
                     .shareholder(ShareholderEntity.fromDto(shareholder))
                     .year(year.getValue())
                     .bookingType(bookingType)
                     .amount(amount)
+                    .hidden(hidden)
                     .build();
         }
-        accountStatementOverridesRepository.save(entity);
     }
 
     @Transactional
     public void saveManualExtra(
+            final Integer id,
             final Shareholder shareholder,
             final Year year,
             final String label,
             final MoneyAmount amount
     ) {
-        final AccountStatementOverrideEntity entity = AccountStatementOverrideEntity.builder()
-                .shareholder(ShareholderEntity.fromDto(shareholder))
-                .year(year.getValue())
-                .bookingType(null)
-                .labelOverride(label)
-                .amount(amount)
-                .build();
-        accountStatementOverridesRepository.save(entity);
+        accountStatementOverridesRepository.save(
+                updateAccountStatementOverrideEntity(
+                        shareholder,
+                        year,
+                        label,
+                        amount,
+                        fetchAccountStatementOverrideEntity(id)
+                )
+        );
     }
 
-    @Transactional
-    public void updateManualExtra(
-            final Integer id,
+    private Optional<AccountStatementOverrideEntity> fetchAccountStatementOverrideEntity(final Integer id) {
+        if (id == null) {
+            return Optional.empty();
+        }
+
+        return accountStatementOverridesRepository.findById(id);
+    }
+
+    private AccountStatementOverrideEntity updateAccountStatementOverrideEntity(
+            final Shareholder shareholder,
+            final Year year,
             final String label,
-            final MoneyAmount amount
+            final MoneyAmount amount,
+            final Optional<AccountStatementOverrideEntity> entity
     ) {
-        accountStatementOverridesRepository.findById(id).ifPresent(entity -> {
-            entity.setLabelOverride(label);
-            entity.setAmount(amount);
-            accountStatementOverridesRepository.save(entity);
-        });
+        if (entity.isPresent()) {
+            AccountStatementOverrideEntity en = entity.get();
+            en.setLabelOverride(label);
+            en.setAmount(amount);
+            return en;
+        } else {
+            return AccountStatementOverrideEntity.builder()
+                    .shareholder(ShareholderEntity.fromDto(shareholder))
+                    .year(year.getValue())
+                    .bookingType(null)
+                    .labelOverride(label)
+                    .amount(amount)
+                    .hidden(false)
+                    .build();
+        }
     }
 
     @Transactional
