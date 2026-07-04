@@ -15,6 +15,9 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static java.math.BigDecimal.ZERO;
+import static java.math.BigDecimal.valueOf;
+
 // TODO: Tests
 // TODO: These constructors are a mess, extract classes from that logic
 public record InterestCalculation(
@@ -54,7 +57,7 @@ public record InterestCalculation(
                 Arrays.stream(Month.values()).collect(
                         Collectors.toMap(Function.identity(), month -> new Interest(
                                 monthlyBalances.get(month),
-                                BigDecimal.valueOf(30L),
+                                valueOf(30L),
                                 interestRate
                         )))
         );
@@ -94,13 +97,18 @@ public record InterestCalculation(
                         .filter(e -> !Month.DECEMBER.equals(e.getKey()))
                         .map(Map.Entry::getValue)
                         .map(Interest::interestAmount)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add)
-                        // TODO: Make this explicit (so that the 'Vortrag' is handled at one place)
-                        .add(BigDecimal.valueOf(300L)), // We add 300 vor the 'Vortrag',
+                        .reduce(ZERO, BigDecimal::add)
+                        .add(
+                                new Interest(
+                                        bookings.openingBalance() != null ? bookings.openingBalance().getOpeningBalance() : MoneyAmount.ZERO,
+                                        valueOf(30L),
+                                        interestRate
+                                ).interestAmount()
+                        ),
                 interests.values()
                         .stream()
                         .map(Interest::interestDays)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add),
+                        .reduce(ZERO, BigDecimal::add),
                 interestRate,
                 Arrays.stream(Month.values())
                         .collect(Collectors.toMap(Function.identity(), month -> new MonthlyTotalSum(bookings, year.atMonth(month).getMonth()))),
@@ -119,7 +127,7 @@ public record InterestCalculation(
     ) {
         this(
                 interestSum,
-                interestRate.compareTo(BigDecimal.ZERO) > 0 ? daysInInterestYear.divide(interestRate, RoundingMode.HALF_UP) : BigDecimal.ZERO, // divisor
+                interestRate.compareTo(ZERO) > 0 ? daysInInterestYear.divide(interestRate, RoundingMode.HALF_UP) : ZERO, // divisor
                 monthlyTotalSums,
                 monthlyBalances,
                 interests
@@ -137,7 +145,7 @@ public record InterestCalculation(
                 interestSum,
                 divisor,
                 // interest
-                divisor.compareTo(BigDecimal.ZERO) > 0
+                divisor.compareTo(ZERO) > 0
                         ? MoneyAmount.of(interestSum.setScale(4, RoundingMode.HALF_UP).divide(divisor, RoundingMode.HALF_UP))
                         : MoneyAmount.ZERO,
                 monthlyTotalSums,
