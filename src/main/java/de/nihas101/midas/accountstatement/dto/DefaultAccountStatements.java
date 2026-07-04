@@ -142,7 +142,7 @@ public class DefaultAccountStatements implements AccountStatements {
                         year,
                         type,
                         systemEntity != null ? systemEntity.getAmount() : override.getAmount(),
-                        label, // TODO: Override with label if it exists
+                        label,
                         override.getHidden(),
                         Source.SYSTEM
                 );
@@ -172,20 +172,18 @@ public class DefaultAccountStatements implements AccountStatements {
             final List<AccountStatementOverrideEntity> overrides,
             final Year year
     ) {
-        // TODO: Introduce a manual account statement type for this?
         return Optional.ofNullable(overrides)
                 .stream()
                 .flatMap(Collection::stream)
                 .filter(o -> o.getBookingType() == null)
-                .map(o -> (LabeledAccountStatement) new DefaultAccountStatement(
-                        o.getId(),
-                        year,
-                        null,
-                        o.getAmount(),
-                        o.getLabelOverride(),
-                        false,
-                        Source.USER
-                ))
+                .map(o -> (LabeledAccountStatement) new ManualAccountStatement(
+                                o.getId(),
+                                year,
+                                o.getAmount(),
+                                o.getLabelOverride(),
+                                false
+                        )
+                )
                 .toList();
     }
 
