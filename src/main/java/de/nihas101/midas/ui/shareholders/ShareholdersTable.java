@@ -126,6 +126,7 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
 
                     return actions;
                 }).setHeader(messageSource.getMessage("shareholders.table.actions", null, locale))
+                .setKey("actions")
                 .setAutoWidth(true);
     }
 
