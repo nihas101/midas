@@ -322,6 +322,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
                         i -> Optional.ofNullable(i)
                                 .map(InterestCalculationRow::totalTransaction)
                                 .map(Transaction::moneyAmount)
+                                .filter(t -> 0L != t.getCents())
                                 .map(m -> m.format(getLocale()))
                                 .orElse("")
                 ), "interest.table.transactions", ColumnTextAlign.END);
@@ -329,6 +330,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
                 interestCalculationGrid.addColumn(
                         i -> Optional.ofNullable(i)
                                 .map(InterestCalculationRow::totalTransaction)
+                                .filter(t -> 0L != t.moneyAmount().getCents())
                                 .map(Transaction::type)
                                 .map(TransactionType::getValue)
                                 .orElse("")

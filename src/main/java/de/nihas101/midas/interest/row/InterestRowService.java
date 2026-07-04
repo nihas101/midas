@@ -84,16 +84,7 @@ public class InterestRowService {
                         .getOpeningBalance()
         );
 
-        final List<Month> months = Arrays.stream(Month.values())
-                .filter(month -> !bookings.bookingsInMonth(month)
-                        .bookings()
-                        .isEmpty())
-                .toList();
-
-        if (months.isEmpty()) {
-            return rows;
-        }
-
+        final List<Month> months = Arrays.stream(Month.values()).toList();
         months.stream()
                 .limit(months.size() - 1)
                 .forEach(month -> generateInterestRow(
@@ -139,18 +130,16 @@ public class InterestRowService {
                 bookingRows::add
         ).generate();
 
-        if (!bookingRows.isEmpty()) {
-            currentBalance.set(bookingRows.getLast().balance());
-            rows.add(
-                    new DefaultInterestCalculationRow(
-                            year.atMonth(month),
-                            interestCalculation.interests().get(month),
-                            locale,
-                            interestCalculation.monthlyBalances().get(month),
-                            interestCalculation.monthlyTotalSums().get(month),
-                            partName
-                    )
-            );
-        }
+        currentBalance.set(bookingRows.isEmpty() ? MoneyAmount.ZERO : bookingRows.getLast().balance());
+        rows.add(
+                new DefaultInterestCalculationRow(
+                        year.atMonth(month),
+                        interestCalculation.interests().get(month),
+                        locale,
+                        interestCalculation.monthlyBalances().get(month),
+                        interestCalculation.monthlyTotalSums().get(month),
+                        partName
+                )
+        );
     }
 }
