@@ -2,6 +2,8 @@ package de.nihas101.midas.export.interest;
 
 import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.service.BookingsReader;
+import de.nihas101.midas.export.sort.DisplayIdExportRowSort;
+import de.nihas101.midas.export.sort.ExportRowSort;
 import de.nihas101.midas.interest.InterestCalculation;
 import de.nihas101.midas.interest.dto.InterestRate;
 import de.nihas101.midas.interest.interestamount.Interest;
@@ -17,12 +19,13 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
+import static java.math.BigDecimal.ZERO;
 
 @RequiredArgsConstructor
 public class InterestRowExtractor {
@@ -32,13 +35,31 @@ public class InterestRowExtractor {
     private final LocalDate endDate;
     private final BookingsReader bookingsReader;
     private final InterestRateService interestRateService;
+    private final ExportRowSort exportRowSort;
+
+    public InterestRowExtractor(
+            final List<Shareholder> shareholders,
+            final LocalDate startDate,
+            final LocalDate endDate,
+            final BookingsReader bookingsReader,
+            final InterestRateService interestRateService
+    ) {
+        this(
+                shareholders,
+                startDate,
+                endDate,
+                bookingsReader,
+                interestRateService,
+                new DisplayIdExportRowSort()
+        );
+    }
 
     public List<ExportRow> rows() {
         return shareholders.stream()
                 .flatMap(shareholder -> IntStream.rangeClosed(startDate.getYear(), endDate.getYear())
                         .mapToObj(Year::of)
                         .flatMap(year -> exportRows(shareholder, year)))
-                .sorted(Comparator.comparing(ExportRow::shareholderName).thenComparing(ExportRow::date))
+                .sorted(exportRowSort)
                 .toList();
     }
 
@@ -48,7 +69,7 @@ public class InterestRowExtractor {
     ) {
         final BigDecimal rate = Optional.ofNullable(interestRateService.interestRate(shareholder.getId(), year))
                 .map(InterestRate::getInterestRate)
-                .orElse(BigDecimal.ZERO);
+                .orElse(ZERO);
         final Bookings bookings = bookingsReader.bookingsForShareholderAndYear(shareholder.getId(), year);
         final InterestCalculation calc = new InterestCalculation(bookings, year, rate);
         return Arrays.stream(Month.values())
@@ -63,6 +84,7 @@ public class InterestRowExtractor {
 
                     final String shareholderName = shareholder.getFirstName() + " " + shareholder.getLastName();
                     return new ExportRow(
+                            shareholder.getDisplayId(),
                             shareholderName,
                             date,
                             trans.toBigDecimal().abs(),

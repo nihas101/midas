@@ -106,21 +106,21 @@ class BookingsExportDataSourceTest {
         // Verify Alice's rows (Sorted by name)
         // Alice OB (01.01.2023)
         List<Object> row1 = rows.getFirst();
-        assertEquals("Alice A", row1.get(0));
-        assertEquals("", row1.get(1));
-        assertEquals(LocalDate.of(2023, 1, 1), row1.get(2));
-        assertEquals(0, ((BigDecimal) row1.get(9)).compareTo(new BigDecimal("1000.00"))); // OB column
+        assertEquals("Alice A", row1.get(1));
+        assertEquals("", row1.get(2));
+        assertEquals(LocalDate.of(2023, 1, 1), row1.get(3));
+        assertEquals(0, ((BigDecimal) row1.get(10)).compareTo(new BigDecimal("1000.00"))); // OB column
 
         // Alice Booking (10.05.2023)
         List<Object> row2 = rows.get(1);
-        assertEquals("Alice A", row2.get(0));
-        assertEquals(101, row2.get(1));
-        assertEquals(0, ((BigDecimal) row2.get(4)).compareTo(new BigDecimal("-100.00"))); // Withdrawal column
+        assertEquals("Alice A", row2.get(1));
+        assertEquals(101, row2.get(2));
+        assertEquals(0, ((BigDecimal) row2.get(5)).compareTo(new BigDecimal("-100.00"))); // Withdrawal column
 
         // Bob Booking (15.06.2023)
         List<Object> row3 = rows.get(2);
-        assertEquals("Bob B", row3.get(0));
-        assertEquals(0, ((BigDecimal) row3.get(7)).compareTo(new BigDecimal("5.50"))); // Interest column
+        assertEquals("Bob B", row3.get(1));
+        assertEquals(0, ((BigDecimal) row3.get(8)).compareTo(new BigDecimal("5.50"))); // Interest column
     }
 
     @Test
@@ -156,7 +156,7 @@ class BookingsExportDataSourceTest {
         ArgumentCaptor<List<List<Object>>> rowsCaptor = ArgumentCaptor.forClass(List.class);
         verify(exportTarget).export(any(), any(), rowsCaptor.capture());
         assertEquals(1, rowsCaptor.getValue().size());
-        assertEquals(1, rowsCaptor.getValue().getFirst().get(1)); // Only bIn remains
+        assertEquals(1, rowsCaptor.getValue().getFirst().get(2)); // Only bIn remains
     }
 
     @Test

@@ -22,6 +22,7 @@ public class AccountStatementExportDataSource implements ExportDataSource {
 
     private List<String> getHeaders(final MessageSource messageSource, final Locale locale) {
         return List.of(
+                messageSource.getMessage("bookings.shareholder.display-id", null, locale),
                 messageSource.getMessage("bookings.shareholder", null, locale),
                 messageSource.getMessage("account-statements.table.id", null, locale),
                 messageSource.getMessage("account-statements.table.date", null, locale),
@@ -50,6 +51,7 @@ public class AccountStatementExportDataSource implements ExportDataSource {
 
     private List<Object> toGenericRow(final ExportRow exportRow) {
         List<Object> row = new ArrayList<>();
+        row.add(exportRow.shareholderId());
         row.add(exportRow.shareholderName());
         row.add(exportRow.id() != null ? exportRow.id() : "");
         row.add(exportRow.date());

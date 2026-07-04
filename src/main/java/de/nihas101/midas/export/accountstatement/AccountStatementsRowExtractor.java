@@ -3,6 +3,8 @@ package de.nihas101.midas.export.accountstatement;
 import de.nihas101.midas.accountstatement.runningtotal.RunningTotalAccountStatement;
 import de.nihas101.midas.accountstatement.runningtotal.RunningTotalAccountStatements;
 import de.nihas101.midas.accountstatement.service.RunningTotalAccountStatementService;
+import de.nihas101.midas.export.sort.DisplayIdExportRowSort;
+import de.nihas101.midas.export.sort.ExportRowSort;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
@@ -12,11 +14,12 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.Year;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static java.math.BigDecimal.ZERO;
 
 @RequiredArgsConstructor
 public class AccountStatementsRowExtractor {
@@ -26,21 +29,35 @@ public class AccountStatementsRowExtractor {
     private final RunningTotalAccountStatementService runningTotalAccountStatementService;
     private final MessageSource messageSource;
     private final Locale locale;
+    private final ExportRowSort exportRowSort;
+
+    public AccountStatementsRowExtractor(
+            final List<Shareholder> shareholders,
+            final LocalDate startDate,
+            final LocalDate endDate,
+            final RunningTotalAccountStatementService runningTotalAccountStatementService,
+            final MessageSource messageSource,
+            final Locale locale
+    ) {
+        this(
+                shareholders,
+                startDate,
+                endDate,
+                runningTotalAccountStatementService,
+                messageSource,
+                locale,
+                new DisplayIdExportRowSort()
+        );
+    }
 
     public List<ExportRow> rows() {
         return shareholders.stream()
-                .map(this::rowsForShareholder)
+                .map(shareholder -> IntStream.rangeClosed(startDate.getYear(), endDate.getYear())
+                        .mapToObj(yearValue -> rowsForYear(shareholder, yearValue)).flatMap(Collection::stream)
+                        .toList())
                 .flatMap(Collection::stream)
-                .sorted(Comparator.comparing(ExportRow::shareholderName).thenComparing(ExportRow::date))
+                .sorted(exportRowSort)
                 .collect(Collectors.toList());
-    }
-
-    private List<ExportRow> rowsForShareholder(final Shareholder shareholder) {
-        return IntStream.rangeClosed(startDate.getYear(), endDate.getYear())
-                .mapToObj(yearValue ->
-                        rowsForYear(shareholder, yearValue)
-                ).flatMap(Collection::stream)
-                .toList();
     }
 
     private List<ExportRow> rowsForYear(
@@ -60,18 +77,27 @@ public class AccountStatementsRowExtractor {
                 .stream()
                 .filter(stmt -> isWithinRange(stmt.date()))
                 .filter(stmt -> !stmt.isHidden())
-                .map(stmt -> exportRow(shareholderName, stmt)).toList();
+                .map(stmt -> exportRow(
+                        shareholder.getDisplayId(),
+                        shareholderName,
+                        stmt
+                )).toList();
     }
 
-    private ExportRow exportRow(final String shareholderName, final RunningTotalAccountStatement stmt) {
+    private ExportRow exportRow(
+            final Integer shareholderId,
+            final String shareholderName,
+            final RunningTotalAccountStatement stmt
+    ) {
         final BigDecimal amount = stmt.amount().toBigDecimal();
-        final BigDecimal debit = amount.compareTo(BigDecimal.ZERO) < 0
+        final BigDecimal debit = amount.compareTo(ZERO) < 0
                 ? amount.abs()
-                : BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
-        final BigDecimal credit = amount.compareTo(BigDecimal.ZERO) >= 0
+                : ZERO.setScale(2, RoundingMode.HALF_UP);
+        final BigDecimal credit = amount.compareTo(ZERO) >= 0
                 ? amount
-                : BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+                : ZERO.setScale(2, RoundingMode.HALF_UP);
         return new ExportRow(
+                shareholderId,
                 shareholderName,
                 stmt.id(),
                 stmt.date(),

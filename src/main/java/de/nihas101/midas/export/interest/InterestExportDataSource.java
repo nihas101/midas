@@ -34,17 +34,18 @@ public class InterestExportDataSource implements ExportDataSource {
     }
 
     private List<Object> toGenericRow(final ExportRow exportRow) {
-        List<Object> list = new ArrayList<>();
-        list.add(exportRow.shareholderName());
-        list.add(exportRow.date());
-        list.add(exportRow.transactions());
-        list.add(exportRow.transSH());
-        list.add(exportRow.balance());
-        list.add(exportRow.balanceSH());
-        list.add(exportRow.days());
-        list.add(exportRow.interestNumber());
-        list.add(exportRow.rate());
-        return list;
+        List<Object> row = new ArrayList<>();
+        row.add(exportRow.shareholderId());
+        row.add(exportRow.shareholderName());
+        row.add(exportRow.date());
+        row.add(exportRow.transactions());
+        row.add(exportRow.transSH());
+        row.add(exportRow.balance());
+        row.add(exportRow.balanceSH());
+        row.add(exportRow.days());
+        row.add(exportRow.interestNumber());
+        row.add(exportRow.rate());
+        return row;
     }
 
     private String getSheetName(final MessageSource messageSource, final Locale locale) {
@@ -53,6 +54,7 @@ public class InterestExportDataSource implements ExportDataSource {
 
     private List<String> getHeaders(final MessageSource messageSource, final Locale locale) {
         return List.of(
+                messageSource.getMessage("bookings.shareholder.display-id", null, locale),
                 messageSource.getMessage("bookings.shareholder", null, locale),
                 messageSource.getMessage("interest.table.month", null, locale),
                 messageSource.getMessage("interest.table.transactions", null, locale),

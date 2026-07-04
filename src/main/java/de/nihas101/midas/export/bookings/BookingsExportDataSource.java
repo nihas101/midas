@@ -26,6 +26,7 @@ public class BookingsExportDataSource implements ExportDataSource {
 
     private List<String> getHeaders(final MessageSource messageSource, final Locale locale) {
         return List.of(
+                messageSource.getMessage("bookings.shareholder.display-id", null, locale),
                 messageSource.getMessage("bookings.shareholder", null, locale),
                 messageSource.getMessage("bookings.table.id", null, locale),
                 messageSource.getMessage("bookings.date", null, locale),
@@ -55,22 +56,23 @@ public class BookingsExportDataSource implements ExportDataSource {
         );
     }
 
-    private List<Object> toGenericRow(ExportRow row) {
-        final List<Object> list = new ArrayList<>();
-        list.add(row.shareholderName());
-        list.add(row.id() != null ? row.id() : "");
-        list.add(row.date());
-        list.add(row.comment());
+    private List<Object> toGenericRow(ExportRow exportRow) {
+        final List<Object> row = new ArrayList<>();
+        row.add(exportRow.shareholderId());
+        row.add(exportRow.shareholderName());
+        row.add(exportRow.id() != null ? exportRow.id() : "");
+        row.add(exportRow.date());
+        row.add(exportRow.comment());
 
         // Map the amount to the correct column based on type, use 0.00 for others
-        list.add(getValueForType(row, BookingType.WITHDRAWAL.name()));
-        list.add(getValueForType(row, BookingType.TAX_PREVIOUS_YEAR.name()));
-        list.add(getValueForType(row, BookingType.TAX_CREDIT.name()));
-        list.add(getValueForType(row, BookingType.INTEREST.name()));
-        list.add(getValueForType(row, BookingType.COMPENSATION.name()));
-        list.add(getValueForType(row, BookingsRowExtractor.TYPE_OPENING_BALANCE));
+        row.add(getValueForType(exportRow, BookingType.WITHDRAWAL.name()));
+        row.add(getValueForType(exportRow, BookingType.TAX_PREVIOUS_YEAR.name()));
+        row.add(getValueForType(exportRow, BookingType.TAX_CREDIT.name()));
+        row.add(getValueForType(exportRow, BookingType.INTEREST.name()));
+        row.add(getValueForType(exportRow, BookingType.COMPENSATION.name()));
+        row.add(getValueForType(exportRow, BookingsRowExtractor.TYPE_OPENING_BALANCE));
 
-        return list;
+        return row;
     }
 
     private BigDecimal getValueForType(ExportRow row, String typeName) {
