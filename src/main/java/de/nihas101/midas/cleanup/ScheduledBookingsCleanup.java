@@ -16,10 +16,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ScheduledBookingsCleanup {
 
-    public static final int ONE_HOUR = 3_600_000;
     private final BookingsCleanup bookingsCleanup;
 
-    @Scheduled(fixedDelay = ONE_HOUR)
+    @Scheduled(fixedDelayString = "#{@midasConfig.cleanup.delayBetweenCleanups}")
     public void cleanUp() {
         bookingsCleanup.cleanUp();
     }

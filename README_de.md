@@ -53,7 +53,7 @@ Eigenschaften aufgeführt:
 * `midas.desktop`
     * `auto-shutdown-enabled`: Wenn `true`, wird die Anwendung automatisch heruntergefahren, sobald keine
       Browserfenster (und Sessions) mehr aktiv sind (Standard: `true`).
-    * `grace-period`: Die Zeitspanne (in in [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601#Durations)), die die Anwendung wartet, nachdem das letzte Browserfenster
+    * `grace-period`: Die Zeitspanne (in [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601#Durations)), die die Anwendung wartet, nachdem das letzte Browserfenster
       geschlossen wurde, bevor sie herunterfahren wird (Standard: `PT60S`).
 * `midas.export.pdf.template-path`: Pfad zu den HTML‑Templates, die über [Thymeleaf](https://www.thymeleaf.org/) für den
   PDF‑Export gerendert werden.
@@ -62,6 +62,7 @@ Eigenschaften aufgeführt:
 * `midas.cleanup`
     * `enabled`: Gibt an, ob beim Start der Applikation eine Bereinigung alter Buchungen ausgelöst wird (Standard: `true`)
     * `cutoff`: Der Zeitraum, nach dessen Ablauf eine Buchung als 'veraltet' gilt und zur Bereinigung in Frage kommt (Standard: `PT10Y`)
+    * `delayBetweenCleanups`: Legt die Dauer (in [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601#Durations))zwischen einzelnen Bereinigungsläufen fest (Standard: `PT1H`).
     * `limit`: Die maximale Anzahl der Buchungen, die während der Bereinigungsphase gelöscht werden. Setzen Sie den Wert auf `-1`, um kein Limit festzulegen (Standard: `1000`).
 * `spring`
     * `datasource.url`: Die JDBC‑URL für die SQLite‑Datenbank (z.B. `jdbc:sqlite:midas.db`).

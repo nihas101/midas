@@ -18,6 +18,7 @@ The project follows a modular package structure under `de.nihas101.midas`:
 * **`desktop`**: Desktop-specific features like auto-shutdown and browser integration
 * **`ui`**: Vaadin views and components
 * **`config`**: Spring Boot configuration classes and properties
+* ...
 
 ## 3. Development Workflow
 
@@ -79,6 +80,4 @@ The `.github/workflows/maven-publish.yml` workflow will:
 1. Trigger on the release creation
 2. **Synchronize Version**: Extract the version from the tag (e.g., `1.0.0`) and update `pom.xml` automatically
 3. **Production Build**: Build the project with the `-Pproduction` profile (optimizes frontend)
-4. **Upload Assets**: Attach the following to the GitHub Release:
-    * `midas.jar`: The executable Fat-JAR
-    * `midas.bat` & `midas.sh`: OS-specific launcher scripts
+4. **Upload Assets**: Attach `midas.jar` (an executable Fat-JAR) to the release
