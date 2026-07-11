@@ -2,9 +2,11 @@ package de.nihas101.midas.config;
 
 import lombok.Data;
 
+import java.time.Duration;
+
 @Data
 public class DesktopConfig {
     private boolean autoShutdownEnabled = true;
-    private int gracePeriodSeconds = 60; // TODO: Define this via PTD string?
+    private Duration gracePeriod = Duration.ofSeconds(60);
     private boolean launchBrowser = true;
 }

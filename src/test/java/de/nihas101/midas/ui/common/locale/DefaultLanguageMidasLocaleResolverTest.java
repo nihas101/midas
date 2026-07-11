@@ -1,5 +1,6 @@
 package de.nihas101.midas.ui.common.locale;
 
+import de.nihas101.midas.cleanup.CleanupConfig;
 import de.nihas101.midas.config.DesktopConfig;
 import de.nihas101.midas.config.I18nConfig;
 import de.nihas101.midas.config.MidasConfig;
@@ -44,7 +45,8 @@ class DefaultLanguageMidasLocaleResolverTest {
                                 new ThemeConfig(),
                                 new UIConfig(),
                                 new I18nConfig(),
-                                new DesktopConfig()
+                                new DesktopConfig(),
+                                new CleanupConfig()
                         ), Locale.ENGLISH
                 ),
                 Arguments.of(
@@ -52,7 +54,8 @@ class DefaultLanguageMidasLocaleResolverTest {
                                 new ThemeConfig(),
                                 new UIConfig(),
                                 new I18nConfig("", false),
-                                new DesktopConfig()
+                                new DesktopConfig(),
+                                new CleanupConfig()
                         ), null
                 ),
                 Arguments.of(
@@ -60,7 +63,8 @@ class DefaultLanguageMidasLocaleResolverTest {
                                 new ThemeConfig(),
                                 new UIConfig(),
                                 new I18nConfig("        ", false),
-                                new DesktopConfig()
+                                new DesktopConfig(),
+                                new CleanupConfig()
                         ), null
                 ),
                 Arguments.of(
@@ -68,7 +72,8 @@ class DefaultLanguageMidasLocaleResolverTest {
                                 new ThemeConfig(),
                                 new UIConfig(),
                                 new I18nConfig("notAValidLocale", false),
-                                new DesktopConfig()
+                                new DesktopConfig(),
+                                new CleanupConfig()
                         ), null
                 ),
                 Arguments.of(
@@ -76,7 +81,8 @@ class DefaultLanguageMidasLocaleResolverTest {
                                 new ThemeConfig(),
                                 new UIConfig(),
                                 new I18nConfig("en", false),
-                                new DesktopConfig()
+                                new DesktopConfig(),
+                                new CleanupConfig()
                         ), Locale.ENGLISH
                 ),
                 Arguments.of(
@@ -84,7 +90,8 @@ class DefaultLanguageMidasLocaleResolverTest {
                                 new ThemeConfig(),
                                 new UIConfig(),
                                 new I18nConfig("de", false),
-                                new DesktopConfig()
+                                new DesktopConfig(),
+                                new CleanupConfig()
                         ), Locale.GERMAN
                 )
         );

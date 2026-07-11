@@ -40,7 +40,7 @@ public class DesktopLifecycleService {
         }
 
         if (config.isAutoShutdownEnabled()) {
-            log.info("Auto-shutdown is enabled with a grace period of {} seconds.", config.getGracePeriodSeconds());
+            log.info("Auto-shutdown is enabled with a grace period of {}.", config.getGracePeriod());
             checkAndScheduleShutdown();
         }
     }
@@ -75,8 +75,8 @@ public class DesktopLifecycleService {
         }
 
         if (activeUiCount.get() <= 0 && (shutdownTask == null || shutdownTask.isDone())) {
-            log.info("No active UIs detected. Scheduling shutdown in {} seconds.", config.getGracePeriodSeconds());
-            shutdownTask = scheduler.schedule(this::shutdown, config.getGracePeriodSeconds(), TimeUnit.SECONDS);
+            log.info("No active UIs detected. Scheduling shutdown in {}.", config.getGracePeriod());
+            shutdownTask = scheduler.schedule(this::shutdown, config.getGracePeriod().getSeconds(), TimeUnit.SECONDS);
         }
     }
 

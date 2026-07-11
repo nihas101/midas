@@ -50,12 +50,17 @@ The application can be configured using `application.properties`. Below are some
 * `midas.desktop`
     * `.auto-shutdown-enabled`: If `true`, the application will automatically shut down when no browser
       windows (and sessions) are active (default: `true`).
-    * `grace-period-seconds`: The amount of time (in seconds) the application will wait after the last browser
-      window is closed before shutting down (default: `60`).
+    * `grace-period`: The amount of time (in [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601#Durations)) the application will wait after the last browser
+      window is closed before shutting down (default: `PT60S`).
 * `midas.export.pdf.template-path`: The path to HTML templates to be rendered
   via [Thymeleaf](https://www.thymeleaf.org/) in the PDF export
     * See `src/main/resources/templates/export` for the default templates
     * See `de.nihas101.midas.export.pdf.PdfViewData` for the data structure used as input
+* `midas.cleanup`
+  * `enabled`: Whether a cleanup of old bookings is triggered on startup of the application (default: `true`).
+  * `cutoff`: The period after which a booking is considered 'old' and eligible for cleanup (default: `PT10Y`).
+  * `delayBetweenCleanups`: Defines the duration (in [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601#Durations)) between separate cleanup runs (default: `PT1H`).
+  * `limit`: The maximum number of bookings deleted during the cleanup phase. Set to `-1` for no limit (default: `1000`).
 * `spring`
     * `datasource.url`: The JDBC URL for the SQLite database (e.g., `jdbc:sqlite:midas.db`).
     * `jpa.show-sql`: If `true`, Hibernate will log all SQL statements to the console.
