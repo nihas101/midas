@@ -1,12 +1,11 @@
 package de.nihas101.midas.stress;
 
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.EnabledIf;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -24,13 +23,12 @@ import java.util.Random;
  * exist it exits immediately without writing anything.
  * <p>
  * Run with:
- * mvn test -Dtest=DataPopulator -Dskip.unit.tests=false
+ * ./mvnw test -Dtest=DataPopulator -Dspring.profiles.active=stress
  */
 @Slf4j
 @SpringBootTest
-@ActiveProfiles("test")
-@Disabled("For populating the DB locally for stress testing. Runs for around 2h and generates a 24MB file.")
-public class DataPopulator { // TODO: Make this run on a separate db, so it doesn't get cleaned up afterwards and can be reused
+@EnabledIf(expression = "#{environment.acceptsProfiles('stress')}", reason = "Only run when 'stress' profile is active")
+public class DataPopulator {
 
     private static final String STRESS_PREFIX = "Stress_";
     private static final int NUM_SHAREHOLDERS = 100;
