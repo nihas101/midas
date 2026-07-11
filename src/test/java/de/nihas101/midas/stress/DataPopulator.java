@@ -16,14 +16,14 @@ import java.util.Random;
  * Populates the test database with stress-test data:
  * - 100 shareholders (identified by the "Stress_" first-name prefix)
  * - 1 000 bookings per shareholder per year
- * - 5 years of history  (current year − 4 … current year)
+ * - 5 years of history  (current year − 4 ... current year)
  * => ~500 000 booking rows in total
  * <p>
  * The populator is idempotent: if the 100 stress-test shareholders already
  * exist it exits immediately without writing anything.
  * <p>
  * Run with:
- * ./mvnw test -Dtest=DataPopulator -Dspring.profiles.active=stress
+ * mvn test -Dtest=DataPopulator -Dspring.profiles.active=stress
  */
 @Slf4j
 @SpringBootTest
@@ -41,7 +41,7 @@ public class DataPopulator {
      */
     private static final int[] BOOKING_TYPE_IDS = {1, 2, 3, 5}; // WITHDRAWAL, TAX_PREV_YEAR, TAX_CREDIT, COMPENSATION
 
-    private static final Random RNG = new Random(42); // fixed seed → deterministic amounts
+    private static final Random RNG = new Random(42);
 
     @Autowired
     private JdbcTemplate jdbc;
@@ -149,7 +149,7 @@ public class DataPopulator {
                 "INSERT INTO bookings (shareholder_id, date, type, amount, comment, source) VALUES (?, ?, ?, ?, ?, ?)",
                 chunk
         );
-        log.debug("Flushed chunk of {} bookings.", chunk.size());
+        log.info("Flushed chunk of {} bookings.", chunk.size());
         chunk.clear();
     }
 }

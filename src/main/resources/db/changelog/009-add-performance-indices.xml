@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+
+    <changeSet id="009-add-performance-indices" author="midas">
+        <createIndex tableName="bookings" indexName="idx_bookings_shareholder_date">
+            <column name="shareholder_id"/>
+            <column name="date"/>
+        </createIndex>
+        <createIndex tableName="bookings" indexName="idx_bookings_shareholder_type_date">
+            <column name="shareholder_id"/>
+            <column name="type"/>
+            <column name="date"/>
+        </createIndex>
+        <createIndex tableName="interest_rates" indexName="idx_interest_rates_shareholder_date">
+            <column name="shareholder_id"/>
+            <column name="date"/>
+        </createIndex>
+        <createIndex tableName="opening_balances" indexName="idx_opening_balances_shareholder_date">
+            <column name="shareholder_id"/>
+            <column name="date"/>
+        </createIndex>
+        <createIndex tableName="account_statement_overrides" indexName="idx_as_overrides_shareholder_year">
+            <column name="shareholder_id"/>
+            <column name="year"/>
+        </createIndex>
+        <createIndex tableName="account_statement_orders" indexName="idx_as_orders_shareholder_year">
+            <column name="shareholder_id"/>
+            <column name="year"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

@@ -81,3 +81,31 @@ The `.github/workflows/maven-publish.yml` workflow will:
 2. **Synchronize Version**: Extract the version from the tag (e.g., `1.0.0`) and update `pom.xml` automatically
 3. **Production Build**: Build the project with the `-Pproduction` profile (optimizes frontend)
 4. **Upload Assets**: Attach `midas.jar` (an executable Fat-JAR) to the release
+
+## 7. Stress Testing & Performance
+
+For testing system responsiveness under heavy load, the project includes a dedicated `stress` profile.
+
+### 7.1. Configuration and Database Isolation
+
+Running under the `stress` profile activates the configuration in `application-stress.properties` which:
+* Points to a separate database file: `midas-stress.db` (so your development and unit test databases remain untouched).
+* Disables automatic browser launching and Vaadin UI auto-shutdown (to prevent JVM termination during headless testing).
+* Prevents the test database initializer from clearing database records on startup, allowing you to persist and reuse populated stress data.
+
+### 7.2. Data Populator
+
+The `DataPopulator` is a test utility that populates the database with massive amounts of mock data (~500,000 records) to stress test UI rendering and database queries.
+* **Volume**: 100 shareholders, 1,000 bookings per shareholder per year, spanning 5 years.
+* **Idempotency**: Skips insertion if the shareholders already exist in the database.
+* **How to run**:
+  ```bash
+  mvn test -Dtest=DataPopulator -Dspring.profiles.active=stress
+  ```
+
+### 7.3. Running stress tests
+
+* **How to run against the stress database**:
+  ```bash
+  mvn verify -Dspring.profiles.active=stress
+  ```
