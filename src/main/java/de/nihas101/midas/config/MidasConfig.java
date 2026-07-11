@@ -1,5 +1,6 @@
 package de.nihas101.midas.config;
 
+import de.nihas101.midas.cleanup.CleanupConfig;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -17,6 +18,7 @@ public class MidasConfig {
     private UIConfig ui;
     private I18nConfig i18n;
     private DesktopConfig desktop;
+    private CleanupConfig cleanup;
 
     public MidasConfig() {
         this(
@@ -24,7 +26,8 @@ public class MidasConfig {
                 new ThemeConfig(),
                 new UIConfig(),
                 new I18nConfig(),
-                new DesktopConfig()
+                new DesktopConfig(),
+                new CleanupConfig()
         );
     }
 
@@ -32,9 +35,17 @@ public class MidasConfig {
             final ThemeConfig theme,
             final UIConfig ui,
             final I18nConfig i18n,
-            final DesktopConfig desktop
+            final DesktopConfig desktop,
+            final CleanupConfig cleanup
     ) {
-        this("Midas", theme, ui, i18n, desktop);
+        this(
+                "Midas",
+                theme,
+                ui,
+                i18n,
+                desktop,
+                cleanup
+        );
     }
 
     @Bean

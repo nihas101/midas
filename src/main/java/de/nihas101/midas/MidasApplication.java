@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,6 +17,7 @@ import java.util.Properties;
 @Slf4j
 @Push
 @Theme("midas-theme") // TODO: Update
+@EnableScheduling
 @SpringBootApplication(scanBasePackages = "de.nihas101.midas")
 @EnableConfigurationProperties
 public class MidasApplication implements AppShellConfigurator {
