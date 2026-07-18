@@ -6,6 +6,7 @@ import de.nihas101.midas.config.I18nConfig;
 import de.nihas101.midas.config.MidasConfig;
 import de.nihas101.midas.config.ThemeConfig;
 import de.nihas101.midas.config.UIConfig;
+import de.nihas101.midas.sqlite.SqliteConfig;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -46,7 +47,8 @@ class DefaultLanguageMidasLocaleResolverTest {
                                 new UIConfig(),
                                 new I18nConfig(),
                                 new DesktopConfig(),
-                                new CleanupConfig()
+                                new CleanupConfig(),
+                                new SqliteConfig()
                         ), Locale.ENGLISH
                 ),
                 Arguments.of(
@@ -55,7 +57,8 @@ class DefaultLanguageMidasLocaleResolverTest {
                                 new UIConfig(),
                                 new I18nConfig("", false),
                                 new DesktopConfig(),
-                                new CleanupConfig()
+                                new CleanupConfig(),
+                                new SqliteConfig()
                         ), null
                 ),
                 Arguments.of(
@@ -64,7 +67,8 @@ class DefaultLanguageMidasLocaleResolverTest {
                                 new UIConfig(),
                                 new I18nConfig("        ", false),
                                 new DesktopConfig(),
-                                new CleanupConfig()
+                                new CleanupConfig(),
+                                new SqliteConfig()
                         ), null
                 ),
                 Arguments.of(
@@ -73,7 +77,8 @@ class DefaultLanguageMidasLocaleResolverTest {
                                 new UIConfig(),
                                 new I18nConfig("notAValidLocale", false),
                                 new DesktopConfig(),
-                                new CleanupConfig()
+                                new CleanupConfig(),
+                                new SqliteConfig()
                         ), null
                 ),
                 Arguments.of(
@@ -82,7 +87,8 @@ class DefaultLanguageMidasLocaleResolverTest {
                                 new UIConfig(),
                                 new I18nConfig("en", false),
                                 new DesktopConfig(),
-                                new CleanupConfig()
+                                new CleanupConfig(),
+                                new SqliteConfig()
                         ), Locale.ENGLISH
                 ),
                 Arguments.of(
@@ -91,7 +97,8 @@ class DefaultLanguageMidasLocaleResolverTest {
                                 new UIConfig(),
                                 new I18nConfig("de", false),
                                 new DesktopConfig(),
-                                new CleanupConfig()
+                                new CleanupConfig(),
+                                new SqliteConfig()
                         ), Locale.GERMAN
                 )
         );
