@@ -8,8 +8,9 @@ import lombok.Data;
 public class UIConfig {
     private boolean hideThemeToggle;
     private boolean hideLanguageSelector;
+    private boolean defaultAddAnotherCheckboxState;
 
     public UIConfig() {
-        this(false, false);
+        this(false, false, false);
     }
 }

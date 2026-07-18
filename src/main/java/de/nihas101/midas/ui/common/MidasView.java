@@ -35,6 +35,7 @@ public class MidasView extends AppLayout {
     public static final String QUERY_PARAM_SHAREHOLDER = "shareholder";
     public static final String QUERY_PARAM_YEAR = "year";
 
+    private final MidasConfig midasConfig;
     private final Locale locale;
 
     public MidasView(
@@ -45,7 +46,8 @@ public class MidasView extends AppLayout {
     ) {
         final UserConfig userConfig = getUserConfig(userConfigService);
         applyTheme(userConfig.getTheme(), config.getTheme().getDefaultTheme());
-        locale = midasLocaleResolver.resolve();
+        this.locale = midasLocaleResolver.resolve();
+        this.midasConfig = config;
 
         HorizontalLayout navbarContent = new HorizontalLayout();
         navbarContent.setWidthFull();

@@ -20,6 +20,7 @@ import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.bookings.entity.Source;
 import de.nihas101.midas.bookings.service.BookingsReader;
 import de.nihas101.midas.bookings.service.BookingsWriter;
+import de.nihas101.midas.config.UIConfig;
 import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersReader;
@@ -54,7 +55,8 @@ public class BookingFormDialog extends Dialog {
             final MessageSource messageSource,
             final Locale locale,
             final Shareholder initialShareholder,
-            final Consumer<Booking> onSave
+            final Consumer<Booking> onSave,
+            final UIConfig uiConfig
     ) {
         this(
                 shareholdersReader,
@@ -64,7 +66,8 @@ public class BookingFormDialog extends Dialog {
                 locale,
                 initialShareholder,
                 null,
-                onSave
+                onSave,
+                uiConfig
         );
     }
 
@@ -76,7 +79,8 @@ public class BookingFormDialog extends Dialog {
             final Locale locale,
             final Shareholder initialShareholder,
             final Booking bookingToEdit,
-            final Consumer<Booking> onSave
+            final Consumer<Booking> onSave,
+            final UIConfig uiConfig
     ) {
         this.bookingsWriter = bookingsWriter;
         this.messageSource = messageSource;
@@ -144,6 +148,7 @@ public class BookingFormDialog extends Dialog {
         add(formLayout);
 
         addAnotherCheckbox = new Checkbox(messageSource.getMessage("bookings.add-another", null, locale));
+        addAnotherCheckbox.setValue(uiConfig.isDefaultAddAnotherCheckboxState());
         final HorizontalLayout checkBoxLayout = setupCheckBoxes(isEditMode);
         final HorizontalLayout buttonLayout = setupButtons(messageSource, locale);
         setupFooter(checkBoxLayout, buttonLayout);
