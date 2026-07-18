@@ -2,6 +2,7 @@ package de.nihas101.midas.ui.common;
 
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.combobox.ComboBox;
+import de.nihas101.midas.config.MidasConfig;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -12,11 +13,24 @@ public class YearPicker extends ComboBox<Integer> {
 
     public YearPicker(
             final String label,
-            final ValueChangeListener<ComponentValueChangeEvent<ComboBox<Integer>, Integer>> changeListener
+            final ValueChangeListener<ComponentValueChangeEvent<ComboBox<Integer>, Integer>> changeListener,
+            final MidasConfig midasConfig
     ) {
         this(
                 label,
-                IntStream.rangeClosed(0, 99)
+                changeListener,
+                Math.max(1, midasConfig.getCleanup().getCutoff().getYears())
+        );
+    }
+
+    private YearPicker(
+            final String label,
+            final ValueChangeListener<ComponentValueChangeEvent<ComboBox<Integer>, Integer>> changeListener,
+            final int maxRange
+    ) {
+        this(
+                label,
+                IntStream.rangeClosed(0, maxRange)
                         .map(i -> LocalDate.now(ZoneId.systemDefault()).getYear() - i)
                         .boxed()
                         .toList(), changeListener

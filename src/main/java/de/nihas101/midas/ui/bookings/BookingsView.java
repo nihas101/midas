@@ -173,7 +173,8 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                     }
                     UI.getCurrent().navigate(BookingsView.class, queryParameters);
                     refreshGrid();
-                }
+                },
+                getMidasConfig()
         );
         actionRow = createActionRow();
         actionRow.setVisible(false);

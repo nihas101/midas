@@ -201,7 +201,8 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                     }
                     UI.getCurrent().navigate(AccountStatementView.class, queryParameters);
                     refreshContent();
-                }
+                },
+                getMidasConfig()
         );
     }
 
