@@ -47,6 +47,7 @@ The application can be configured using `application.properties`. Below are some
 * `midas.ui`
     * `hide-theme-toggle`: If `true`, hides the theme toggle button in the UI.
     * `hide-language-selector`: If `true`, hides the language selector in the UI.
+    * `default-add-another-checkbox-state`: sets the default of 'Add another' type checkboxes (default: `false`)
 * `midas.desktop`
     * `.auto-shutdown-enabled`: If `true`, the application will automatically shut down when no browser
       windows (and sessions) are active (default: `true`).

@@ -146,7 +146,8 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
         );
         yearPicker = new YearPicker(
                 messageSource.getMessage("bookings.year", null, getLocale()),
-                e -> recalculateInterestForDisplay()
+                e -> recalculateInterestForDisplay(),
+                getMidasConfig()
         );
 
         headerActionRow = createHeaderActionRow();
