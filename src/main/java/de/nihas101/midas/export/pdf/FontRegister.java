@@ -27,15 +27,22 @@ public class FontRegister {
             final String family,
             final int weight,
             final boolean italic
-    ) throws IOException {
-        try (InputStream is = new ClassPathResource(path).getInputStream()) {
-            builder.useFont(
-                    () -> is,
-                    family,
-                    weight,
-                    italic ? PdfRendererBuilder.FontStyle.ITALIC : PdfRendererBuilder.FontStyle.NORMAL,
-                    true
-            );
+    ) {
+        final ClassPathResource resource = new ClassPathResource(path);
+        builder.useFont(
+                () -> inputStream(resource),
+                family,
+                weight,
+                italic ? PdfRendererBuilder.FontStyle.ITALIC : PdfRendererBuilder.FontStyle.NORMAL,
+                true
+        );
+    }
+
+    private InputStream inputStream(final ClassPathResource resource) {
+        try {
+            return resource.getInputStream();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }
