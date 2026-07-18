@@ -1,6 +1,7 @@
 package de.nihas101.midas.config;
 
 import de.nihas101.midas.cleanup.CleanupConfig;
+import de.nihas101.midas.sqlite.SqliteConfig;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -19,6 +20,7 @@ public class MidasConfig {
     private I18nConfig i18n;
     private DesktopConfig desktop;
     private CleanupConfig cleanup;
+    private SqliteConfig sqlite;
 
     public MidasConfig() {
         this(
@@ -27,7 +29,8 @@ public class MidasConfig {
                 new UIConfig(),
                 new I18nConfig(),
                 new DesktopConfig(),
-                new CleanupConfig()
+                new CleanupConfig(),
+                new SqliteConfig()
         );
     }
 
@@ -36,7 +39,8 @@ public class MidasConfig {
             final UIConfig ui,
             final I18nConfig i18n,
             final DesktopConfig desktop,
-            final CleanupConfig cleanup
+            final CleanupConfig cleanup,
+            final SqliteConfig sqlite
     ) {
         this(
                 "Midas",
@@ -44,7 +48,8 @@ public class MidasConfig {
                 ui,
                 i18n,
                 desktop,
-                cleanup
+                cleanup,
+                sqlite
         );
     }
 

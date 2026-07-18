@@ -62,6 +62,8 @@ The application can be configured using `application.properties`. Below are some
   * `cutoff`: The period after which a booking is considered 'old' and eligible for cleanup (default: `PT10Y`).
   * `delayBetweenCleanups`: Defines the duration (in [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601#Durations)) between separate cleanup runs (default: `PT1H`).
   * `limit`: The maximum number of bookings deleted during the cleanup phase. Set to `-1` for no limit (default: `1000`).
+* `midas.sqlite.optimize`
+  * `enabled`: Whether `PRAGMA optimize` is run on startup and shutdown to keep the SQLite query planner statistics up to date (default: `true`).
 * `spring`
     * `datasource.url`: The JDBC URL for the SQLite database (e.g., `jdbc:sqlite:midas.db`).
     * `jpa.show-sql`: If `true`, Hibernate will log all SQL statements to the console.
