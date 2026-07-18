@@ -173,7 +173,8 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                     }
                     UI.getCurrent().navigate(BookingsView.class, queryParameters);
                     refreshGrid();
-                }
+                },
+                getMidasConfig()
         );
         actionRow = createActionRow();
         actionRow.setVisible(false);
@@ -206,7 +207,8 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                             messageSource,
                             getLocale(),
                             shareholderPicker.getValue(),
-                            booking -> refreshGrid()
+                            booking -> refreshGrid(),
+                            this.getMidasConfig().getUi()
                     );
                     bookingFormDialog.open();
                 }
@@ -305,7 +307,8 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                         getLocale(),
                         shareholderPicker.getValue(),
                         booking,
-                        b -> refreshGrid()
+                        b -> refreshGrid(),
+                        this.getMidasConfig().getUi()
                 ).open();
             }
         });

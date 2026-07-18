@@ -10,14 +10,12 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
+import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
-// TODO: Test
 @RequiredArgsConstructor
 public class DefaultBookingsToBookingRowConverter implements BookingsToBookingRowConverter {
 
@@ -42,41 +40,31 @@ public class DefaultBookingsToBookingRowConverter implements BookingsToBookingRo
 
     @Override
     public void generate() {
-        final Map<String, List<Booking>> groupedByEntry = monthBookings.bookings()
+        final List<Booking> sortedBookings = monthBookings.bookings()
                 .stream()
-                .collect(Collectors.groupingBy(b -> b.getDate().toString() + "_" + (b.getComment() != null ? b.getComment() : "")));
-
-        // Sort by date
-        final List<String> sortedEntryKeys = groupedByEntry.keySet().stream().sorted().toList();
-
-        final Map<BookingType, MoneyAmount> monthTotals = new EnumMap<>(BookingType.class);
-        Arrays.stream(BookingType.values()).forEach(t -> monthTotals.put(t, MoneyAmount.ZERO));
+                .sorted(Comparator.comparing(Booking::getDate))
+                .toList();
 
         MoneyAmount runningTotal = startingBalance;
-        for (String entryKey : sortedEntryKeys) {
-            List<Booking> entryBookings = groupedByEntry.get(entryKey);
-            Booking first = entryBookings.getFirst();
-
-            final Map<BookingType, MoneyAmount> entryAmounts = new EnumMap<>(BookingType.class);
-            MoneyAmount entryTotal = MoneyAmount.ZERO;
-
-            for (final Booking b : entryBookings) {
-                entryAmounts.put(b.getType(), b.getAmount());
-                entryTotal = entryTotal.plus(b.getAmount());
-                monthTotals.put(b.getType(), monthTotals.get(b.getType()).plus(b.getAmount()));
-            }
-
-            runningTotal = runningTotal.plus(entryTotal);
-            final BookingRow bookingRow = new DefaultBookingRow(
-                    String.valueOf(first.getDisplayId()),
-                    first.getDate().format(dateFormat),
-                    first.getComment(),
-                    new MonthlyTotalSum(entryAmounts),
-                    entryTotal,
-                    MoneyAmount.ZERO,
-                    entryBookings
+        for (final Booking booking : sortedBookings) {
+            runningTotal = runningTotal.plus(booking.getAmount());
+            consumer.accept(
+                    new DefaultBookingRow(
+                            String.valueOf(booking.getDisplayId()),
+                            booking.getDate().format(dateFormat),
+                            booking.getComment(),
+                            createMonthlyTotalSum(booking),
+                            booking.getAmount(),
+                            booking
+                    )
             );
-            consumer.accept(bookingRow);
         }
     }
+
+    private MonthlyTotalSum createMonthlyTotalSum(final Booking booking) {
+        final Map<BookingType, MoneyAmount> entryAmounts = new EnumMap<>(BookingType.class);
+        entryAmounts.put(booking.getType(), booking.getAmount());
+        return new MonthlyTotalSum(entryAmounts);
+    }
+
 }
