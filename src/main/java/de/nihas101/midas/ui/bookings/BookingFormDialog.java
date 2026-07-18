@@ -2,6 +2,7 @@ package de.nihas101.midas.ui.bookings;
 
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -40,6 +41,7 @@ import static de.nihas101.midas.ui.common.DatePickerI18nProvider.datePickerI18n;
 // TODO: Separate into edit and create variants
 public class BookingFormDialog extends Dialog {
 
+    private final BookingsReader bookingsReader;
     private final BookingsWriter bookingsWriter;
     private final Consumer<Booking> onSave;
 
@@ -82,6 +84,7 @@ public class BookingFormDialog extends Dialog {
             final Consumer<Booking> onSave,
             final UIConfig uiConfig
     ) {
+        this.bookingsReader = bookingsReader;
         this.bookingsWriter = bookingsWriter;
         this.messageSource = messageSource;
         this.locale = locale;
@@ -155,9 +158,6 @@ public class BookingFormDialog extends Dialog {
 
         if (isEditMode) {
             binder.setBean(bookingToEdit);
-            binder.withValidator((b, context) -> bookingsReader.exists(b)
-                    ? ValidationResult.error(messageSource.getMessage("bookings.identity.error", null, locale))
-                    : ValidationResult.ok());
         } else {
             Booking booking = new Booking();
             booking.setDate(LocalDate.now());
@@ -167,9 +167,6 @@ public class BookingFormDialog extends Dialog {
                 shareholderPicker.setValue(initialShareholder);
             }
             binder.setBean(booking);
-            binder.withValidator((b, context) -> bookingsReader.exists(b)
-                    ? ValidationResult.error(messageSource.getMessage("bookings.identity.error", null, locale))
-                    : ValidationResult.ok());
         }
     }
 
@@ -210,8 +207,23 @@ public class BookingFormDialog extends Dialog {
             return;
         }
 
+        Booking booking = binder.getBean();
+        if (bookingsReader.exists(booking)) {
+            ConfirmDialog confirmDialog = new ConfirmDialog();
+            confirmDialog.setHeader(messageSource.getMessage("bookings.dialog.doublebooking.warning.title", null, locale));
+            confirmDialog.setText(messageSource.getMessage("bookings.dialog.doublebooking.warning.message", null, locale));
+            confirmDialog.setCancelable(true);
+            confirmDialog.setCancelText(messageSource.getMessage("global.cancel", null, locale));
+            confirmDialog.setConfirmText(messageSource.getMessage("bookings.dialog.doublebooking.warning.confirm", null, locale));
+            confirmDialog.addConfirmListener(e -> persistAndClose(booking));
+            confirmDialog.open();
+        } else {
+            persistAndClose(booking);
+        }
+    }
+
+    private void persistAndClose(final Booking booking) {
         try {
-            Booking booking = binder.getBean();
             if (booking.getId() == null) {
                 bookingsWriter.create(booking);
             } else {
