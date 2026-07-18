@@ -1,5 +1,6 @@
 package de.nihas101.midas.openingbalance.dto;
 
+import de.nihas101.midas.bookings.entity.Source;
 import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.openingbalance.entity.OpeningBalanceEntity;
 import lombok.AllArgsConstructor;
@@ -19,12 +20,19 @@ public class OpeningBalance {
     private Integer shareholderId;
     private MoneyAmount openingBalance;
     private Year year;
+    private Source source;
 
     public OpeningBalance(final MoneyAmount moneyAmount) {
-        this(null, null, moneyAmount != null ? moneyAmount : MoneyAmount.ZERO, Year.now());
+        this(
+                null,
+                null,
+                moneyAmount != null ? moneyAmount : MoneyAmount.ZERO,
+                Year.now(),
+                Source.USER
+        );
     }
 
-    public static OpeningBalance fromEntity(OpeningBalanceEntity openingBalanceEntity) {
+    public static OpeningBalance fromEntity(final OpeningBalanceEntity openingBalanceEntity) {
         if (openingBalanceEntity == null) {
             return null;
         }
@@ -33,7 +41,8 @@ public class OpeningBalance {
                 openingBalanceEntity.getId(),
                 openingBalanceEntity.getShareholder().getId(),
                 openingBalanceEntity.getAmount(),
-                Year.from(openingBalanceEntity.getDate())
+                Year.from(openingBalanceEntity.getDate()),
+                openingBalanceEntity.getSource() != null ? openingBalanceEntity.getSource() : Source.USER
         );
     }
 }

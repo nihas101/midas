@@ -1,6 +1,7 @@
 package de.nihas101.midas.ui.bookings;
 
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
@@ -53,9 +54,12 @@ import java.math.BigDecimal;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
 
 import static com.vaadin.flow.component.button.ButtonVariant.LUMO_ERROR;
+import static java.math.BigDecimal.ZERO;
+import static java.util.Collections.emptyList;
 
 @Slf4j
 @Route("bookings")
@@ -73,6 +77,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
 
     private ComboBox<Shareholder> shareholderPicker;
     private ComboBox<Integer> yearPicker;
+    private Checkbox updateNextYearsBalanceAutomaticallyToggle;
     private BigDecimalField openingBalanceField;
     private HorizontalLayout actionRow;
     private Grid<BookingRow> grid;
@@ -157,7 +162,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                         queryParameters = queryParameters.excluding(QUERY_PARAM_SHAREHOLDER);
                     }
                     UI.getCurrent().navigate(BookingsView.class, queryParameters);
-                    refreshGrid();
+                    refreshGridForInitialDisplay();
                 }
         );
         yearPicker = new YearPicker(
@@ -172,7 +177,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                         queryParameters = queryParameters.excluding(QUERY_PARAM_YEAR);
                     }
                     UI.getCurrent().navigate(BookingsView.class, queryParameters);
-                    refreshGrid();
+                    refreshGridForInitialDisplay();
                 },
                 getMidasConfig()
         );
@@ -185,9 +190,10 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
     }
 
     private HorizontalLayout createActionRow() {
-        openingBalanceField = new BigDecimalField(messageSource.getMessage("bookings.type.opening-balance", null, getLocale()));
+        final Locale locale = getLocale();
+        openingBalanceField = new BigDecimalField(messageSource.getMessage("bookings.type.opening-balance", null, locale));
         openingBalanceField.setMaxWidth("9em");
-        openingBalanceField.setLocale(getLocale());
+        openingBalanceField.setLocale(locale);
         openingBalanceField.setSuffixComponent(new Span("€")); // TODO: Use currency from properties
         openingBalanceField.addValueChangeListener(e -> {
             if (e.isFromClient()) {
@@ -195,7 +201,47 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
             }
         });
 
-        final String addBookingMessage = messageSource.getMessage("bookings.add-booking", null, getLocale());
+        // TODO: When implementing the locking of years, check beforehand if the year is locked and if so, grey this check box out with a tooltip on why and what do to to re-enable it
+
+        updateNextYearsBalanceAutomaticallyToggle = new Checkbox(messageSource.getMessage("booking.update.automatically.toggle.label", null, locale));
+        updateNextYearsBalanceAutomaticallyToggle.addValueChangeListener(e -> {
+            if (!e.isFromClient()) {
+                return;
+            }
+
+            final Shareholder shareholder = shareholderPicker.getValue();
+            final Year nextYear = Year.of(yearPicker.getValue()).plusYears(1);
+
+            final OpeningBalance nextYearsOpeningBalance = openingBalanceService.openingBalance(
+                    shareholder.getId(),
+                    nextYear
+            );
+            if (nextYearsOpeningBalance != null && nextYearsOpeningBalance.getSource() == Source.USER) {
+                final ConfirmDialog confirmDialog = new ConfirmDialog();
+                confirmDialog.setHeader(messageSource.getMessage("bookings.dialog.opening-balance-exists.warning.title", null, locale));
+                confirmDialog.setText(
+                        messageSource.getMessage(
+                                "bookings.dialog.opening-balance-exists.warning.message",
+                                new Object[]{
+                                        shareholder.getFirstName() + " " + shareholder.getLastName(),
+                                        nextYearsOpeningBalance.getOpeningBalance().format(locale) + "€", // TODO: Define currency in properties
+                                        nextYear
+                                },
+                                locale
+                        )
+                );
+                confirmDialog.setCancelable(true);
+                confirmDialog.setCancelText(messageSource.getMessage("global.cancel", null, locale));
+                confirmDialog.setConfirmText(messageSource.getMessage("bookings.dialog.opening-balance-exists.warning.confirm", null, locale));
+                confirmDialog.addConfirmListener(confirmEvent -> refreshGrid());
+                confirmDialog.addCancelListener(cancelEvent -> e.getSource().setValue(e.getOldValue()));
+                confirmDialog.open();
+            } else {
+                refreshGrid();
+            }
+        });
+
+        final String addBookingMessage = messageSource.getMessage("bookings.add-booking", null, locale);
         final AddButton addBookingButton = new AddButton(
                 addBookingMessage,
                 addBookingMessage,
@@ -205,7 +251,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                             bookingsReader,
                             bookingsWriter,
                             messageSource,
-                            getLocale(),
+                            locale,
                             shareholderPicker.getValue(),
                             booking -> refreshGrid(),
                             this.getMidasConfig().getUi()
@@ -217,15 +263,15 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         final HorizontalLayout actions = new HorizontalLayout();
         actions.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
         actions.setAlignItems(FlexComponent.Alignment.BASELINE);
-        actions.add(openingBalanceField, addBookingButton);
+        actions.add(updateNextYearsBalanceAutomaticallyToggle, openingBalanceField, addBookingButton);
         actions.setWidthFull();
 
         return actions;
     }
 
     private void saveOpeningBalance() {
-        Shareholder shareholder = shareholderPicker.getValue();
-        Integer year = yearPicker.getValue();
+        final Shareholder shareholder = shareholderPicker.getValue();
+        final Integer year = yearPicker.getValue();
         if (shareholder == null || year == null) {
             return;
         }
@@ -233,9 +279,20 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         BigDecimal amount = openingBalanceField.getValue();
         final OpeningBalance openingBalance = openingBalanceService.openingBalance(shareholder.getId(), Year.of(year));
         if (openingBalance == null) {
-            openingBalanceService.create(new OpeningBalance(null, shareholder.getId(), MoneyAmount.of(amount), Year.of(year)));
+            openingBalanceService.create(
+                    new OpeningBalance(
+                            null,
+                            shareholder.getId(),
+                            MoneyAmount.of(amount),
+                            Year.of(year),
+                            Source.USER
+                    )
+            );
         } else {
             openingBalance.setOpeningBalance(MoneyAmount.of(amount));
+            // The user may overwrite the system generated value
+            // at that point we shouldn't consider it system generated anymore
+            openingBalance.setSource(Source.USER);
             openingBalanceService.update(openingBalance);
         }
         refreshGrid();
@@ -376,9 +433,9 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                 .setHeader(header);
     }
 
-    private void refreshGrid() {
-        Shareholder shareholder = shareholderPicker.getValue();
-        Integer yearValue = yearPicker.getValue();
+    private void refreshGridForInitialDisplay() {
+        final Shareholder shareholder = shareholderPicker.getValue();
+        final Integer yearValue = yearPicker.getValue();
 
         final boolean hasSelection = shareholder != null && yearValue != null;
         actionRow.setVisible(hasSelection);
@@ -390,19 +447,105 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         }
 
         final Year year = Year.of(yearValue);
-        OpeningBalance openingBalance = openingBalanceService.openingBalance(shareholder.getId(), year);
+        final OpeningBalance openingBalance = openingBalanceService.openingBalance(shareholder.getId(), year);
         if (openingBalance != null) {
             openingBalanceField.setValue(openingBalance.getOpeningBalance().toBigDecimalForInput());
         } else {
-            openingBalanceField.setValue(BigDecimal.ZERO);
+            openingBalanceField.setValue(ZERO);
         }
 
-        Bookings bookings = bookingsReader.bookingsForShareholderAndYear(shareholder.getId(), year);
+        final OpeningBalance nextYearsOpeningBalance = openingBalanceService.openingBalance(shareholder.getId(), year.plusYears(1));
+        final boolean shouldUpdateNextYearsBalance = nextYearsOpeningBalance != null && nextYearsOpeningBalance.getSource() == Source.SYSTEM;
+        updateNextYearsBalanceAutomaticallyToggle.setValue(shouldUpdateNextYearsBalance);
+
+        final Bookings bookings = bookingsReader.bookingsForShareholderAndYear(shareholder.getId(), year);
         if (bookings.isEmpty()) {
-            grid.setItems(Collections.emptyList());
+            grid.setItems(emptyList());
             return;
         }
+
         grid.setItems(bookingRowService.generateRows(bookings, getLocale()));
+    }
+
+    private void refreshGrid() {
+        final Shareholder shareholder = shareholderPicker.getValue();
+        final Integer yearValue = yearPicker.getValue();
+
+        final boolean hasSelection = shareholder != null && yearValue != null;
+        actionRow.setVisible(hasSelection);
+
+        if (!hasSelection) {
+            openingBalanceField.setValue(null);
+            grid.setItems(new ArrayList<>());
+            return;
+        }
+
+        final Year year = Year.of(yearValue);
+        final OpeningBalance openingBalance = openingBalanceService.openingBalance(shareholder.getId(), year);
+        if (openingBalance != null) {
+            openingBalanceField.setValue(openingBalance.getOpeningBalance().toBigDecimalForInput());
+        } else {
+            openingBalanceField.setValue(ZERO);
+        }
+
+        final Bookings bookings = bookingsReader.bookingsForShareholderAndYear(shareholder.getId(), year);
+        if (bookings.isEmpty()) {
+            updateNextYearsBalanceIfNeeded(shareholder, year, emptyList());
+            grid.setItems(emptyList());
+            return;
+        }
+        // TODO: We currently mix two responsibilities here, the creation of the display rows and the logic for calculating them,
+        //       we should separate those concerns in the future, so that updateNextYearsBalance does not depend on ui related
+        //       classes for business logic
+        final List<BookingRow> bookingRows = bookingRowService.generateRows(bookings, getLocale());
+        updateNextYearsBalanceIfNeeded(shareholder, year, bookingRows);
+        grid.setItems(bookingRows);
+    }
+
+    private void updateNextYearsBalanceIfNeeded(
+            final Shareholder shareholder,
+            final Year year,
+            final List<BookingRow> bookings
+    ) {
+        final OpeningBalance nextYearsOpeningBalance = openingBalanceService.openingBalance(
+                shareholder.getId(),
+                year.plusYears(1)
+        );
+        if (!Boolean.TRUE.equals(updateNextYearsBalanceAutomaticallyToggle.getValue())) {
+            if (nextYearsOpeningBalance != null && nextYearsOpeningBalance.getSource() == Source.SYSTEM) {
+                // Set the source (back) to user, so that we won't update it anymore in the future
+                nextYearsOpeningBalance.setSource(Source.USER);
+                openingBalanceService.update(nextYearsOpeningBalance);
+            }
+            return;
+        }
+
+        // We only update the balance for next year.
+        // We DON'T trigger a chain here and recalculate all amounts of the next year,
+        // which would mean we would need to update the balance for the following year as well and so on.
+        MoneyAmount nextYearsOpening;
+        if (bookings.isEmpty()) {
+            nextYearsOpening = MoneyAmount.ZERO;
+        } else {
+            // TODO: This .getLast is a bad assumption, see comment in caller
+            nextYearsOpening = bookings.getLast().balance();
+        }
+
+        if (nextYearsOpeningBalance != null) {
+            nextYearsOpeningBalance.setOpeningBalance(nextYearsOpening);
+            // Possibly overwrites a user sources opening balance
+            // so make sure to set the source
+            nextYearsOpeningBalance.setSource(Source.SYSTEM);
+            openingBalanceService.update(nextYearsOpeningBalance);
+        } else {
+            final OpeningBalance openingBalance = OpeningBalance.builder()
+                    .shareholderId(shareholderPicker.getValue().getId())
+                    .openingBalance(nextYearsOpening)
+                    .year(Year.of(yearPicker.getValue()).plusYears(1))
+                    .source(Source.SYSTEM)
+                    .build();
+            openingBalanceService.create(openingBalance);
+        }
     }
 
     public static Icon icon() {

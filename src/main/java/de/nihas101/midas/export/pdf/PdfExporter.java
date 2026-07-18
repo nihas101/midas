@@ -56,6 +56,7 @@ public class PdfExporter implements Export {
         );
     }
 
+    // TODO: This fails to consider exports that go over multiple years and would require multiple PDFs even for a single shareholder and view
     private PdfExporter(
             final ExportRequest request,
             final OutputStream outputStream,

@@ -45,7 +45,7 @@ class DefaultRunningTotalAccountStatementsTest {
     @Test
     void calculationTest() {
         // Arrange
-        final OpeningBalance openingBalance = new OpeningBalance(null, null, MoneyAmount.ofCents(1000L), TEST_YEAR);
+        final OpeningBalance openingBalance = new OpeningBalance(null, null, MoneyAmount.ofCents(1000L), TEST_YEAR, Source.USER);
 
         final LabeledAccountStatement withdrawal = new DefaultAccountStatement(
                 1,
@@ -102,7 +102,7 @@ class DefaultRunningTotalAccountStatementsTest {
     @Test
     void verifyOrder() {
         // Arrange
-        final OpeningBalance openingBalance = new OpeningBalance(null, null, MoneyAmount.ZERO, TEST_YEAR);
+        final OpeningBalance openingBalance = new OpeningBalance(null, null, MoneyAmount.ZERO, TEST_YEAR, Source.USER);
         final AccountStatements accountStatements = mock(AccountStatements.class);
         when(accountStatements.openingBalance()).thenReturn(openingBalance);
 
@@ -148,7 +148,7 @@ class DefaultRunningTotalAccountStatementsTest {
     @Test
     void manualStatementsCalculationTest() {
         // Arrange
-        final OpeningBalance openingBalance = new OpeningBalance(null, null, MoneyAmount.ofCents(1000L), TEST_YEAR);
+        final OpeningBalance openingBalance = new OpeningBalance(null, null, MoneyAmount.ofCents(1000L), TEST_YEAR, Source.USER);
 
         final LabeledAccountStatement withdrawal = new DefaultAccountStatement(
                 1,

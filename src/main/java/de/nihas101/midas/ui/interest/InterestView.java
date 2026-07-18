@@ -142,11 +142,11 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
                 messageSource.getMessage("bookings.shareholder", null, getLocale()),
                 messageSource.getMessage("shareholder-picker.placeholder", null, getLocale()),
                 shareholdersService,
-                e -> recalculateInterestForDisplay()
+                e -> recalculateInterestForInitialDisplay()
         );
         yearPicker = new YearPicker(
                 messageSource.getMessage("bookings.year", null, getLocale()),
-                e -> recalculateInterestForDisplay(),
+                e -> recalculateInterestForInitialDisplay(),
                 getMidasConfig()
         );
 
@@ -260,7 +260,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
         return interestRate;
     }
 
-    private void recalculateInterestForDisplay() {
+    private void recalculateInterestForInitialDisplay() {
         final Shareholder shareholder = shareholderPicker.getValue();
         final Integer yearValue = yearPicker.getValue();
 
