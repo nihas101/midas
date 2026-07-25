@@ -107,4 +107,5 @@ public class BookingsService implements BookingsWriter, BookingsReader {
                 .orElseThrow(() -> new IllegalArgumentException("Shareholder not found"));
         bookingsRepository.delete(BookingEntity.fromDto(booking, shareholder));
     }
+
 }

@@ -1,10 +1,12 @@
 package de.nihas101.midas.ui.accountstatement;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
@@ -36,6 +38,9 @@ import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.service.BookingsReader;
 import de.nihas101.midas.bookings.service.BookingsService;
 import de.nihas101.midas.config.MidasConfig;
+import de.nihas101.midas.lock.ShareholderLock;
+import de.nihas101.midas.lock.service.LockService;
+import de.nihas101.midas.lock.service.LockWriter;
 import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersService;
@@ -45,6 +50,9 @@ import de.nihas101.midas.ui.common.MidasView;
 import de.nihas101.midas.ui.common.ShareholderPicker;
 import de.nihas101.midas.ui.common.YearPicker;
 import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
+import de.nihas101.midas.ui.common.lock.LockDialog;
+import de.nihas101.midas.ui.common.lock.LockUnlockButton;
+import de.nihas101.midas.ui.common.lock.UnlockDialog;
 import de.nihas101.midas.userconfig.service.UserConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -54,6 +62,7 @@ import java.math.BigDecimal;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -72,6 +81,8 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
     private final MessageSource messageSource;
     private final AccountStatementRowService accountStatementRowService;
     private final BookingsReader bookingsReader;
+    private final LockWriter lockWriter;
+    private final ShareholderLock shareholderLock;
 
     private ComboBox<Shareholder> shareholderPicker;
     private ComboBox<Integer> yearPicker;
@@ -83,6 +94,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
     private Checkbox displayHiddenEntriesCheckbox;
     private AccountStatementRow draggedRow;
     private List<AccountStatementRow> currentRows;
+    private LockUnlockButton lockUnlockButton;
 
     public AccountStatementView(
             final ShareholdersService shareholdersService,
@@ -93,7 +105,9 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
             final UserConfigService userConfigService,
             final MidasLocaleResolver midasLocaleResolver,
             final AccountStatementRowService accountStatementRowService,
-            final BookingsService bookingsReader
+            final BookingsService bookingsReader,
+            final LockService lockWriter,
+            final ShareholderLock shareholderLock
     ) {
         super(config, userConfigService, messageSource, midasLocaleResolver);
         this.shareholdersService = shareholdersService;
@@ -102,6 +116,8 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         this.messageSource = messageSource;
         this.accountStatementRowService = accountStatementRowService;
         this.bookingsReader = bookingsReader;
+        this.lockWriter = lockWriter;
+        this.shareholderLock = shareholderLock;
 
         VerticalLayout content = new VerticalLayout();
         content.setSizeFull();
@@ -156,12 +172,21 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
 
         shareholderPicker = createShareholderPicker();
         yearPicker = createYearPicker();
+
+        lockUnlockButton = new LockUnlockButton(
+                messageSource,
+                getLocale(),
+                e -> onLockUnlockClicked()
+        );
+        lockUnlockButton.setVisible(false);
+
         actionRow = createActionRow();
         actionRow.setVisible(false);
 
         header.add(
                 shareholderPicker,
                 yearPicker,
+                lockUnlockButton,
                 actionRow
         );
         content.add(header);
@@ -204,6 +229,57 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                 },
                 getMidasConfig()
         );
+    }
+
+    private void onLockUnlockClicked() {
+        final Shareholder shareholder = shareholderPicker.getValue();
+        final Integer yearValue = yearPicker.getValue();
+        if (shareholder == null || yearValue == null) {
+            return;
+        }
+
+        final Year year = Year.of(yearValue);
+        lockUnlockDialog(
+                shareholderLock.isLocked(shareholder, year),
+                getLocale(),
+                year,
+                shareholder
+        ).open();
+    }
+
+    private ConfirmDialog lockUnlockDialog(
+            final boolean isCurrentlyLocked,
+            final Locale locale,
+            final Year year,
+            final Shareholder shareholder
+    ) {
+        final ConfirmDialog dialog;
+        if (isCurrentlyLocked) {
+            dialog = new UnlockDialog(
+                    messageSource,
+                    locale,
+                    year,
+                    shareholder,
+                    e -> {
+                        lockWriter.unlock(shareholder, year);
+                        lockUnlockButton.unlock();
+                        refreshContent();
+                    }
+            );
+        } else {
+            dialog = new LockDialog(
+                    messageSource,
+                    locale,
+                    year,
+                    shareholder,
+                    e -> {
+                        lockWriter.lock(shareholder, year);
+                        lockUnlockButton.lock();
+                        refreshContent();
+                    }
+            );
+        }
+        return dialog;
     }
 
     private HorizontalLayout createActionRow() {
@@ -265,14 +341,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         accountStatementGrid = new Grid<>();
         // Drag‑handle column – shows a grip icon for rows that can be moved
         // Opening‑balance rows get an empty placeholder so they cannot be dragged
-        Grid.Column<AccountStatementRow> dragHandleColumn = accountStatementGrid.addComponentColumn(row -> {
-            if (row.isOpeningBalance()) {
-                return new Span();
-            }
-            final Icon icon = new Icon(VaadinIcon.MENU);
-            icon.addClassName("drag-handle");
-            return icon;
-        });
+        Grid.Column<AccountStatementRow> dragHandleColumn = accountStatementGrid.addComponentColumn(this::dragHandle);
         dragHandleColumn.setHeader("");
         dragHandleColumn.setFlexGrow(0);
         dragHandleColumn.setWidth("40px");
@@ -375,57 +444,14 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         balanceColumn.setPartNameGenerator(r -> "separator-column");
         setupColumn(balanceColumn, "account-statements.table.balance", ColumnTextAlign.END);
 
-        accountStatementGrid.addComponentColumn(row -> {
-            HorizontalLayout actions = new HorizontalLayout();
-            actions.setSpacing(true);
-
-            if (row.isOpeningBalance()) {
-                final Button editBtn = new Button(new Icon(VaadinIcon.EDIT));
-                editBtn.setTooltipText(messageSource.getMessage("global.edit", null, getLocale()));
-                editBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
-                editBtn.addClickListener(e -> {
-                    QueryParameters queryParameters = new QueryParameters(Map.of(
-                            QUERY_PARAM_SHAREHOLDER, List.of(String.valueOf(shareholderPicker.getValue().getId())),
-                            QUERY_PARAM_YEAR, List.of(String.valueOf(yearPicker.getValue()))
-                    ));
-                    UI.getCurrent().navigate(BookingsView.class, queryParameters);
-                });
-                actions.add(editBtn);
-            } else {
-                if (row.isManualExtra()) {
-                    final Button editButton = new Button(new Icon(VaadinIcon.EDIT));
-                    editButton.setTooltipText(messageSource.getMessage("global.edit", null, getLocale()));
-                    editButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
-                    editButton.addClickListener(e -> openOverrideDialog(row));
-                    actions.add(editButton);
-                } else {
-                    Button hideButton;
-                    if (row.isHidden()) {
-                        hideButton = new Button(new Icon(VaadinIcon.EYE));
-                        hideButton.setTooltipText(messageSource.getMessage("global.include", null, getLocale()));
-                        hideButton.addClickListener(e -> toggleExclude(row, false));
-                    } else {
-                        hideButton = new Button(new Icon(VaadinIcon.EYE_SLASH));
-                        hideButton.setTooltipText(messageSource.getMessage("global.exclude", null, getLocale()));
-                        hideButton.addClickListener(e -> toggleExclude(row, true));
-                    }
-                    hideButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
-                    actions.add(hideButton);
-                }
-
-                if (row.isManualExtra()) {
-                    final Button revertBtn = new Button(new Icon(VaadinIcon.TRASH));
-                    revertBtn.setTooltipText(messageSource.getMessage("account-statements.delete", null, getLocale()));
-                    revertBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE, ButtonVariant.LUMO_ERROR);
-                    revertBtn.addClickListener(e -> {
-                        accountStatementService.deleteOverride(row.displayId());
-                        refreshContent();
-                    });
-                    actions.add(revertBtn);
-                }
-            }
-            return actions;
-        }).setHeader(messageSource.getMessage("shareholders.table.actions", null, getLocale())).setAutoWidth(true);
+        accountStatementGrid.addComponentColumn(this::accountStatementEditBar)
+                .setHeader(
+                        messageSource.getMessage(
+                                "shareholders.table.actions",
+                                null,
+                                getLocale()
+                        )
+                ).setAutoWidth(true);
 
         content.add(accountStatementGrid);
 
@@ -434,6 +460,98 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         headerRow.getCell(debitColumn).setPartName("separator-column");
         headerRow.getCell(creditColumn).setPartName("separator-column");
         headerRow.getCell(balanceColumn).setPartName("separator-column");
+    }
+
+    private Component dragHandle(final AccountStatementRow row) {
+        final Shareholder currentShareholder = shareholderPicker.getValue();
+        final Integer currentYear = yearPicker.getValue();
+        final boolean isLocked = currentShareholder != null
+                && currentYear != null
+                && shareholderLock.isLocked(currentShareholder, Year.of(currentYear));
+
+        if (row.isOpeningBalance() || isLocked) {
+            return new Span();
+        }
+        final Icon icon = new Icon(VaadinIcon.MENU);
+        icon.addClassName("drag-handle");
+        return icon;
+    }
+
+    private HorizontalLayout accountStatementEditBar(final AccountStatementRow row) {
+        final HorizontalLayout actions = new HorizontalLayout();
+        actions.setSpacing(true);
+
+        final Shareholder shareholder = shareholderPicker.getValue();
+        final Integer yearValue = yearPicker.getValue();
+        final boolean isLocked = shareholder != null
+                && yearValue != null
+                && shareholderLock.isLocked(shareholder, Year.of(yearValue));
+        if (row.isOpeningBalance()) {
+            actions.add(openingBalanceEditButton(isLocked));
+        } else {
+            if (row.isManualExtra()) {
+                actions.add(manualExtraEditButton(row, isLocked));
+            } else {
+                actions.add(hideButton(row, isLocked));
+            }
+
+            if (row.isManualExtra()) {
+                actions.add(revertButton(row, isLocked));
+            }
+        }
+        return actions;
+    }
+
+    private Button revertButton(final AccountStatementRow row, final boolean isLocked) {
+        final Button button = new Button(new Icon(VaadinIcon.TRASH));
+        button.setTooltipText(messageSource.getMessage("account-statements.delete", null, getLocale()));
+        button.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE, ButtonVariant.LUMO_ERROR);
+        button.addClickListener(e -> {
+            accountStatementService.deleteOverride(row.displayId());
+            refreshContent();
+        });
+        button.setEnabled(!isLocked);
+        return button;
+    }
+
+    private Button hideButton(final AccountStatementRow row, final boolean isLocked) {
+        Button button;
+        if (row.isHidden()) {
+            button = new Button(VaadinIcon.EYE.create());
+            button.setTooltipText(messageSource.getMessage("global.include", null, getLocale()));
+            button.addClickListener(e -> toggleExclude(row, false));
+        } else {
+            button = new Button(VaadinIcon.EYE_SLASH.create());
+            button.setTooltipText(messageSource.getMessage("global.exclude", null, getLocale()));
+            button.addClickListener(e -> toggleExclude(row, true));
+        }
+        button.setEnabled(!isLocked);
+        button.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
+        return button;
+    }
+
+    private Button manualExtraEditButton(final AccountStatementRow row, final boolean isLocked) {
+        final Button button = new Button(new Icon(VaadinIcon.EDIT));
+        button.setTooltipText(messageSource.getMessage("global.edit", null, getLocale()));
+        button.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
+        button.addClickListener(e -> openOverrideDialog(row));
+        button.setEnabled(!isLocked);
+        return button;
+    }
+
+    private Button openingBalanceEditButton(final boolean isLocked) {
+        final Button button = new Button(new Icon(VaadinIcon.EDIT));
+        button.setTooltipText(messageSource.getMessage("global.edit", null, getLocale()));
+        button.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
+        button.addClickListener(e -> {
+            QueryParameters queryParameters = new QueryParameters(Map.of(
+                    QUERY_PARAM_SHAREHOLDER, List.of(String.valueOf(shareholderPicker.getValue().getId())),
+                    QUERY_PARAM_YEAR, List.of(String.valueOf(yearPicker.getValue()))
+            ));
+            UI.getCurrent().navigate(BookingsView.class, queryParameters);
+        });
+        button.setEnabled(!isLocked);
+        return button;
     }
 
     private void setupClosingStatementGrid(final VerticalLayout content) {
@@ -562,19 +680,23 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         final Integer yearValue = yearPicker.getValue();
 
         final boolean hasSelection = shareholder != null && yearValue != null;
+        actionRow.setVisible(hasSelection);
+        lockUnlockButton.setVisible(hasSelection);
+
         if (!hasSelection) {
             accountStatementGrid.setItems(new ArrayList<>());
             closingStatementGrid.setItems(new ArrayList<>());
             warningBanner.setVisible(false);
-            actionRow.setVisible(false);
             return;
-        } else {
-            actionRow.setVisible(true);
         }
+
+        final Year year = Year.of(yearValue);
+        final boolean isLocked = shareholderLock.isLocked(shareholder, year);
+        applyLockState(isLocked);
 
         final RunningTotalAccountStatements accountStatements = runningTotalAccountStatementService.runningTotalAccountStatements(
                 shareholder,
-                Year.of(yearValue),
+                year,
                 messageSource,
                 getLocale()
         );
@@ -590,6 +712,22 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         accountStatementGrid.setItems(rows);
         closingStatementGrid.setItems(accountStatementRowService.generateClosingRow(accountStatements, getLocale()));
         checkForDivergence(shareholder, yearValue, rows);
+    }
+
+    private void applyLockState(final boolean isLocked) {
+        if (isLocked) {
+            lockUnlockButton.lock();
+        } else {
+            lockUnlockButton.unlock();
+        }
+
+        accountStatementGrid.setRowsDraggable(!isLocked);
+
+        // Disable add booking button when locked
+        actionRow.getChildren()
+                .filter(c -> c instanceof AddButton)
+                .map(c -> (AddButton) c)
+                .forEach(c -> c.setEnabled(!isLocked));
     }
 
     private void checkForDivergence(

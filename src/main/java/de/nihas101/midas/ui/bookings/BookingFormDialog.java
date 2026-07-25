@@ -73,6 +73,8 @@ public class BookingFormDialog extends Dialog {
         );
     }
 
+    // TODO: Consider locked years here and disable the save button when a locked year is chosen
+
     public BookingFormDialog(
             final ShareholdersReader shareholdersReader,
             final BookingsReader bookingsReader,

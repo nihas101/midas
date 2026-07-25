@@ -8,6 +8,7 @@ import de.nihas101.midas.bookings.entity.Source;
 import de.nihas101.midas.bookings.service.BookingsWriter;
 import de.nihas101.midas.interest.entity.InterestRateEntity;
 import de.nihas101.midas.interest.repository.InterestRateRepository;
+import de.nihas101.midas.interest.service.bookingupdate.DefaultInterestUpdatingBookingsService;
 import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.openingbalance.dto.OpeningBalance;
 import de.nihas101.midas.shareholders.dto.Shareholder;
@@ -44,7 +45,7 @@ class InterestUpdatingBookingsServiceTest {
     @Mock
     private InterestRateRepository interestRateRepository;
 
-    private InterestUpdatingBookingsService service;
+    private DefaultInterestUpdatingBookingsService service;
 
     private Booking booking;
     private Booking interestBooking;
@@ -113,7 +114,7 @@ class InterestUpdatingBookingsServiceTest {
                 5L
         );
 
-        service = new InterestUpdatingBookingsService(
+        service = new DefaultInterestUpdatingBookingsService(
                 delegate,
                 bookingsReader,
                 shareholdersRepository,

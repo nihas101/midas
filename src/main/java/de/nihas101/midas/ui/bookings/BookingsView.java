@@ -30,8 +30,11 @@ import de.nihas101.midas.bookings.service.BookingsReader;
 import de.nihas101.midas.bookings.service.BookingsService;
 import de.nihas101.midas.bookings.service.BookingsWriter;
 import de.nihas101.midas.config.MidasConfig;
-import de.nihas101.midas.interest.service.InterestUpdatingBookingsService;
-import de.nihas101.midas.interest.service.InterestUpdatingOpeningBalanceService;
+import de.nihas101.midas.interest.service.bookingupdate.InterestUpdatingBookingsService;
+import de.nihas101.midas.interest.service.openingbalanceupdate.InterestUpdatingOpeningBalanceService;
+import de.nihas101.midas.lock.ShareholderLock;
+import de.nihas101.midas.lock.service.LockService;
+import de.nihas101.midas.lock.service.LockWriter;
 import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.openingbalance.dto.OpeningBalance;
 import de.nihas101.midas.openingbalance.service.OpeningBalanceService;
@@ -44,6 +47,9 @@ import de.nihas101.midas.ui.common.MidasView;
 import de.nihas101.midas.ui.common.ShareholderPicker;
 import de.nihas101.midas.ui.common.YearPicker;
 import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
+import de.nihas101.midas.ui.common.lock.LockDialog;
+import de.nihas101.midas.ui.common.lock.LockUnlockButton;
+import de.nihas101.midas.ui.common.lock.UnlockDialog;
 import de.nihas101.midas.ui.interest.InterestView;
 import de.nihas101.midas.userconfig.service.UserConfigService;
 import lombok.extern.slf4j.Slf4j;
@@ -74,6 +80,8 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
     private final OpeningBalanceService openingBalanceService;
     private final MessageSource messageSource;
     private final BookingRowService bookingRowService;
+    private final LockWriter lockWriter;
+    private final ShareholderLock shareholderLock;
 
     private ComboBox<Shareholder> shareholderPicker;
     private ComboBox<Integer> yearPicker;
@@ -81,6 +89,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
     private BigDecimalField openingBalanceField;
     private HorizontalLayout actionRow;
     private Grid<BookingRow> grid;
+    private LockUnlockButton lockUnlockButton;
 
     public BookingsView(
             final ShareholdersService shareholdersService,
@@ -91,7 +100,9 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
             final MessageSource messageSource,
             final UserConfigService userConfigService,
             final MidasLocaleResolver midasLocaleResolver,
-            final BookingRowService bookingRowService
+            final BookingRowService bookingRowService,
+            final LockService lockWriter,
+            final ShareholderLock shareholderLock
     ) {
         super(config, userConfigService, messageSource, midasLocaleResolver);
         this.shareholdersService = shareholdersService;
@@ -100,6 +111,8 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         this.openingBalanceService = openingBalanceService;
         this.messageSource = messageSource;
         this.bookingRowService = bookingRowService;
+        this.lockWriter = lockWriter;
+        this.shareholderLock = shareholderLock;
 
         VerticalLayout content = new VerticalLayout();
         content.setSizeFull();
@@ -181,12 +194,76 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                 },
                 getMidasConfig()
         );
+
+        lockUnlockButton = new LockUnlockButton(
+                messageSource,
+                getLocale(),
+                e -> onLockUnlockClicked()
+        );
+        lockUnlockButton.setVisible(false);
+
         actionRow = createActionRow();
         actionRow.setVisible(false);
 
-        header.add(shareholderPicker, yearPicker, actionRow);
+        header.add(
+                shareholderPicker,
+                yearPicker,
+                lockUnlockButton,
+                actionRow
+        );
         header.setFlexGrow(1, actionRow);
         content.add(header);
+    }
+
+    private void onLockUnlockClicked() {
+        final Shareholder shareholder = shareholderPicker.getValue();
+        final Integer yearValue = yearPicker.getValue();
+        if (shareholder == null || yearValue == null) {
+            return;
+        }
+
+        final Year year = Year.of(yearValue);
+        lockUnlockDialog(
+                shareholderLock.isLocked(shareholder, year),
+                getLocale(),
+                year,
+                shareholder
+        ).open();
+    }
+
+    private ConfirmDialog lockUnlockDialog(
+            final boolean isCurrentlyLocked,
+            final Locale locale,
+            final Year year,
+            final Shareholder shareholder
+    ) {
+        final ConfirmDialog dialog;
+        if (isCurrentlyLocked) {
+            dialog = new UnlockDialog(
+                    messageSource,
+                    locale,
+                    year,
+                    shareholder,
+                    e -> {
+                        lockWriter.unlock(shareholder, year);
+                        lockUnlockButton.unlock();
+                        refreshGridForInitialDisplay();
+                    }
+            );
+        } else {
+            dialog = new LockDialog(
+                    messageSource,
+                    locale,
+                    year,
+                    shareholder,
+                    e -> {
+                        lockWriter.lock(shareholder, year);
+                        lockUnlockButton.lock();
+                        refreshGridForInitialDisplay();
+                    }
+            );
+        }
+        return dialog;
     }
 
     private HorizontalLayout createActionRow() {
@@ -276,7 +353,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
             return;
         }
 
-        BigDecimal amount = openingBalanceField.getValue();
+        final BigDecimal amount = openingBalanceField.getValue();
         final OpeningBalance openingBalance = openingBalanceService.openingBalance(shareholder.getId(), Year.of(year));
         if (openingBalance == null) {
             openingBalanceService.create(
@@ -328,13 +405,19 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
             actionsContainer.setPadding(false);
             actionsContainer.setSpacing(false);
 
+            final Shareholder currentShareholder = shareholderPicker.getValue();
+            final Integer currentYear = yearPicker.getValue();
+            final boolean isLocked = currentShareholder != null
+                    && currentYear != null
+                    && shareholderLock.isLocked(currentShareholder, Year.of(currentYear));
+
             for (final Booking booking : row.bookings()) {
                 final HorizontalLayout actionRow = new HorizontalLayout();
                 actionRow.setPadding(false);
                 actionRow.setSpacing(true);
 
-                final EditButton editButton = createEditBookingButton(booking);
-                final DeleteButton deleteButton = createDeleteBookingButton(booking);
+                final EditButton editButton = createEditBookingButton(booking, isLocked);
+                final DeleteButton deleteButton = createDeleteBookingButton(booking, isLocked);
 
                 actionRow.add(editButton, deleteButton);
                 actionsContainer.add(actionRow);
@@ -349,8 +432,8 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         grid.getHeaderRows().getFirst().getCell(balanceColumn).setPartName("balance-column");
     }
 
-    private EditButton createEditBookingButton(final Booking booking) {
-        return new EditButton(
+    private EditButton createEditBookingButton(final Booking booking, final boolean isLocked) {
+        final EditButton editButton = new EditButton(
                 messageSource.getMessage("global.edit", null, getLocale()), e -> {
             if (BookingType.INTEREST.equals(booking.getType()) && Source.SYSTEM == booking.getSource()) {
                 final QueryParameters queryParameters = UI.getCurrent().getActiveViewLocation().getQueryParameters();
@@ -369,9 +452,11 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                 ).open();
             }
         });
+        editButton.setEnabled(!isLocked);
+        return editButton;
     }
 
-    private DeleteButton createDeleteBookingButton(final Booking booking) {
+    private DeleteButton createDeleteBookingButton(final Booking booking, final boolean isLocked) {
         final DeleteButton deleteButton = new DeleteButton(
                 messageSource.getMessage("global.delete", null, getLocale()),
                 e -> {
@@ -379,6 +464,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                     dialog.open();
                 });
         deleteButton.addThemeVariants(LUMO_ERROR);
+        deleteButton.setEnabled(!isLocked);
         return deleteButton;
     }
 
@@ -439,6 +525,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
 
         final boolean hasSelection = shareholder != null && yearValue != null;
         actionRow.setVisible(hasSelection);
+        lockUnlockButton.setVisible(hasSelection);
 
         if (!hasSelection) {
             openingBalanceField.setValue(null);
@@ -447,6 +534,9 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         }
 
         final Year year = Year.of(yearValue);
+        final boolean isLocked = shareholderLock.isLocked(shareholder, year);
+        applyLockState(shareholder, year, isLocked);
+
         final OpeningBalance openingBalance = openingBalanceService.openingBalance(shareholder.getId(), year);
         if (openingBalance != null) {
             openingBalanceField.setValue(openingBalance.getOpeningBalance().toBigDecimalForInput());
@@ -473,6 +563,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
 
         final boolean hasSelection = shareholder != null && yearValue != null;
         actionRow.setVisible(hasSelection);
+        lockUnlockButton.setVisible(hasSelection);
 
         if (!hasSelection) {
             openingBalanceField.setValue(null);
@@ -481,6 +572,9 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         }
 
         final Year year = Year.of(yearValue);
+        final boolean isLocked = shareholderLock.isLocked(shareholder, year);
+        applyLockState(shareholder, year, isLocked);
+
         final OpeningBalance openingBalance = openingBalanceService.openingBalance(shareholder.getId(), year);
         if (openingBalance != null) {
             openingBalanceField.setValue(openingBalance.getOpeningBalance().toBigDecimalForInput());
@@ -490,7 +584,9 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
 
         final Bookings bookings = bookingsReader.bookingsForShareholderAndYear(shareholder.getId(), year);
         if (bookings.isEmpty()) {
-            updateNextYearsBalanceIfNeeded(shareholder, year, emptyList());
+            if (!isLocked) {
+                updateNextYearsBalanceIfNeeded(shareholder, year, emptyList());
+            }
             grid.setItems(emptyList());
             return;
         }
@@ -498,8 +594,47 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         //       we should separate those concerns in the future, so that updateNextYearsBalance does not depend on ui related
         //       classes for business logic
         final List<BookingRow> bookingRows = bookingRowService.generateRows(bookings, getLocale());
-        updateNextYearsBalanceIfNeeded(shareholder, year, bookingRows);
+        if (!isLocked) {
+            updateNextYearsBalanceIfNeeded(shareholder, year, bookingRows);
+        }
         grid.setItems(bookingRows);
+    }
+
+    private void applyLockState(
+            final Shareholder shareholder,
+            final Year year,
+            final boolean isLocked
+    ) {
+        if (isLocked) {
+            lockUnlockButton.lock();
+        } else {
+            lockUnlockButton.unlock();
+        }
+
+        // Disable interactive edit elements when locked
+        openingBalanceField.setReadOnly(isLocked);
+
+        // Disable auto-update toggle: locked current year OR locked next year prevents updating
+        final boolean nextYearLocked = shareholderLock.isLocked(shareholder, year.plusYears(1));
+        final boolean toggleDisabled = isLocked || nextYearLocked;
+        updateNextYearsBalanceAutomaticallyToggle.setEnabled(!toggleDisabled);
+        if (nextYearLocked && !isLocked) {
+            updateNextYearsBalanceAutomaticallyToggle.setTooltipText(
+                    messageSource.getMessage(
+                            "bookings.lock.tooltip.next-year-locked",
+                            null,
+                            getLocale()
+                    )
+            );
+        } else {
+            updateNextYearsBalanceAutomaticallyToggle.setTooltipText(null);
+        }
+
+        // Disable add booking button when locked
+        actionRow.getChildren()
+                .filter(c -> c instanceof AddButton)
+                .map(c -> (AddButton) c)
+                .forEach(c -> c.setEnabled(!isLocked));
     }
 
     private void updateNextYearsBalanceIfNeeded(
@@ -523,13 +658,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         // We only update the balance for next year.
         // We DON'T trigger a chain here and recalculate all amounts of the next year,
         // which would mean we would need to update the balance for the following year as well and so on.
-        MoneyAmount nextYearsOpening;
-        if (bookings.isEmpty()) {
-            nextYearsOpening = MoneyAmount.ZERO;
-        } else {
-            // TODO: This .getLast is a bad assumption, see comment in caller
-            nextYearsOpening = bookings.getLast().balance();
-        }
+        final MoneyAmount nextYearsOpening = getNextYearsOpening(bookings);
 
         if (nextYearsOpeningBalance != null) {
             nextYearsOpeningBalance.setOpeningBalance(nextYearsOpening);
@@ -546,6 +675,11 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                     .build();
             openingBalanceService.create(openingBalance);
         }
+    }
+
+    private MoneyAmount getNextYearsOpening(final List<BookingRow> bookings) {
+        // TODO: This .getLast is a bad assumption, see comment in caller
+        return bookings.isEmpty() ? MoneyAmount.ZERO : bookings.getLast().balance();
     }
 
     public static Icon icon() {

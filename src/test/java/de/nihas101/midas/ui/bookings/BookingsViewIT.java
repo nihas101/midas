@@ -16,7 +16,7 @@ import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.bookings.entity.Source;
 import de.nihas101.midas.bookings.row.BookingRow;
 import de.nihas101.midas.bookings.service.BookingsService;
-import de.nihas101.midas.interest.service.InterestUpdatingOpeningBalanceService;
+import de.nihas101.midas.interest.service.openingbalanceupdate.DefaultInterestUpdatingOpeningBalanceService;
 import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.openingbalance.dto.OpeningBalance;
 import de.nihas101.midas.shareholders.dto.Shareholder;
@@ -47,7 +47,7 @@ public class BookingsViewIT extends AbstractKaribuTest {
     private BookingsService bookingsService;
 
     @Autowired
-    private InterestUpdatingOpeningBalanceService openingBalanceService;
+    private DefaultInterestUpdatingOpeningBalanceService openingBalanceService;
 
     @Test
     void testBookingsWorkflow() {

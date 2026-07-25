@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+
+    <changeSet id="011-create-locked-years-table" author="midas">
+        <createTable tableName="locked_years">
+            <column name="id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="shareholder_id" type="INTEGER">
+                <constraints nullable="false" foreignKeyName="fk_locked_year_shareholder" referencedTableName="shareholders" referencedColumnNames="id" deleteCascade="true"/>
+            </column>
+            <column name="year" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <sql dbms="sqlite">
+            CREATE UNIQUE INDEX uq_locked_year_shareholder_year ON locked_years (shareholder_id, year);
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
