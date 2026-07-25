@@ -1,7 +1,6 @@
 package de.nihas101.midas.openingbalance.service;
 
 import de.nihas101.midas.openingbalance.dto.OpeningBalance;
-import de.nihas101.midas.shareholders.dto.Shareholder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Year;
