@@ -1,5 +1,6 @@
 package de.nihas101.midas.openingbalance.entity;
 
+import de.nihas101.midas.bookings.entity.Source;
 import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.openingbalance.dto.OpeningBalance;
 import de.nihas101.midas.shareholders.entity.ShareholderEntity;
@@ -41,7 +42,13 @@ public class OpeningBalanceEntity {
     @Column(name = "amount", nullable = false)
     private MoneyAmount amount = MoneyAmount.ZERO;
 
-    public static OpeningBalanceEntity fromDto(final OpeningBalance openingBalance, final ShareholderEntity shareholderEntity) {
+    @Column(name = "source", nullable = false)
+    private Source source = Source.USER;
+
+    public static OpeningBalanceEntity fromDto(
+            final OpeningBalance openingBalance,
+            final ShareholderEntity shareholderEntity
+    ) {
         if (openingBalance == null) {
             return new OpeningBalanceEntity();
         }
@@ -50,7 +57,8 @@ public class OpeningBalanceEntity {
                 openingBalance.getId(),
                 shareholderEntity,
                 openingBalance.getYear().atDay(1),
-                openingBalance.getOpeningBalance()
+                openingBalance.getOpeningBalance(),
+                openingBalance.getSource() != null ? openingBalance.getSource() : Source.USER
         );
     }
 }

@@ -209,7 +209,7 @@ public class BookingFormDialog extends Dialog {
 
         Booking booking = binder.getBean();
         if (bookingsReader.exists(booking)) {
-            ConfirmDialog confirmDialog = new ConfirmDialog();
+            final ConfirmDialog confirmDialog = new ConfirmDialog();
             confirmDialog.setHeader(messageSource.getMessage("bookings.dialog.doublebooking.warning.title", null, locale));
             confirmDialog.setText(messageSource.getMessage("bookings.dialog.doublebooking.warning.message", null, locale));
             confirmDialog.setCancelable(true);

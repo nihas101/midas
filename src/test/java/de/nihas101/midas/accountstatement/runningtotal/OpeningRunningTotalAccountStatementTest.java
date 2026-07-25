@@ -1,5 +1,6 @@
 package de.nihas101.midas.accountstatement.runningtotal;
 
+import de.nihas101.midas.bookings.entity.Source;
 import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.openingbalance.dto.OpeningBalance;
 import org.junit.jupiter.api.Assertions;
@@ -55,9 +56,9 @@ class OpeningRunningTotalAccountStatementTest {
 
     public static Stream<Arguments> openingBalanceArguments() {
         return Stream.of(
-                Arguments.of(new OpeningBalance(null, 1, MoneyAmount.ofCents(100L), TEST_YEAR)),
-                Arguments.of(new OpeningBalance(null, 2, MoneyAmount.ZERO, TEST_YEAR)),
-                Arguments.of(new OpeningBalance(null, 3, MoneyAmount.ofCents(-50L), TEST_YEAR.plusYears(1)))
+                Arguments.of(new OpeningBalance(null, 1, MoneyAmount.ofCents(100L), TEST_YEAR, Source.USER)),
+                Arguments.of(new OpeningBalance(null, 2, MoneyAmount.ZERO, TEST_YEAR, Source.USER)),
+                Arguments.of(new OpeningBalance(null, 3, MoneyAmount.ofCents(-50L), TEST_YEAR.plusYears(1), Source.USER))
         );
     }
 }

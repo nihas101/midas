@@ -92,7 +92,8 @@ class DefaultAccountStatementServiceTest {
                 1,
                 ShareholderEntity.fromDto(shareholder),
                 LocalDate.of(2026, 1, 1),
-                MoneyAmount.ofCents(1000L)
+                MoneyAmount.ofCents(1000L),
+                Source.USER
         );
         Mockito.when(
                 openingBalanceRepository.findByShareholderAndDate(

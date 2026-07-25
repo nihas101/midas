@@ -4,6 +4,7 @@ import de.nihas101.midas.bookings.dto.Booking;
 import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.dto.FilteredBookings;
 import de.nihas101.midas.bookings.entity.BookingType;
+import de.nihas101.midas.bookings.entity.Source;
 import de.nihas101.midas.bookings.service.BookingsReader;
 import de.nihas101.midas.export.bookings.BookingsExportDataSource;
 import de.nihas101.midas.export.bookings.BookingsRowExtractor;
@@ -78,7 +79,7 @@ class BookingsExportDataSourceTest {
     void export_callsTargetWithCorrectData() {
         // Given
         // Alice: 1 Opening Balance, 1 Booking
-        OpeningBalance aliceOb = new OpeningBalance(1, 1, MoneyAmount.of(new BigDecimal("1000.00")), Year.of(2023));
+        OpeningBalance aliceOb = new OpeningBalance(1, 1, MoneyAmount.of(new BigDecimal("1000.00")), Year.of(2023), Source.USER);
         when(openingBalanceService.openingBalance(eq(1), eq(Year.of(2023)))).thenReturn(aliceOb);
 
         Bookings aliceBookings = mock(Bookings.class);
@@ -141,7 +142,7 @@ class BookingsExportDataSourceTest {
         );
 
         // OB is 01.01.2023 -> should be excluded
-        OpeningBalance ob = new OpeningBalance(1, 1, MoneyAmount.of(new BigDecimal("100.00")), Year.of(2023));
+        OpeningBalance ob = new OpeningBalance(1, 1, MoneyAmount.of(new BigDecimal("100.00")), Year.of(2023), Source.USER);
         when(openingBalanceService.openingBalance(any(), any())).thenReturn(ob);
 
         Bookings bookings = mock(Bookings.class);

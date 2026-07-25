@@ -23,15 +23,20 @@ public class SqliteOptimizer implements SmartLifecycle {
     // See: https://sqlite.org/lang_analyze.html#periodically_run_pragma_optimize_
     @Override
     public void start() {
-        log.info("Running PRAGMA optimize=0x10002 (initial analysis)");
+        log.info("Running PRAGMA optimize=0x10002");
         jdbcTemplate.execute("PRAGMA optimize=0x10002;");
         running = true;
     }
 
     @Override
     public void stop() {
-        log.info("Running PRAGMA optimize (shutdown optimization)");
+        log.info("Running PRAGMA optimize");
         jdbcTemplate.execute("PRAGMA optimize;");
+
+        // TODO: Only run vacuum when the last execution of vacuum is at least 30 days ago
+        //log.info("Running VACUUM");
+        //jdbcTemplate.execute("VACUUM");
+
         running = false;
     }
 

@@ -15,4 +15,5 @@
     <include file="db/changelog/007-create-account-statement-overrides-table.xml"/>
     <include file="db/changelog/008-create-account-statement-orders-table.xml"/>
     <include file="db/changelog/009-add-performance-indices.xml"/>
+    <include file="db/changelog/010-add-source-to-opening-balance.xml"/>
 </databaseChangeLog>

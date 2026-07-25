@@ -7,8 +7,9 @@ import java.time.Year;
 
 // TODO: Split into reader and writer
 public interface OpeningBalanceService {
+
     @Transactional
-    OpeningBalance openingBalance(Integer shareholderId, Year year);
+    OpeningBalance openingBalance(final Integer shareholderId, final Year year);
 
     @Transactional
     void create(OpeningBalance openingBalance);

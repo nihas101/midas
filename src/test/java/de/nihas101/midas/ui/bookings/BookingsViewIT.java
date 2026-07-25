@@ -3,6 +3,7 @@ package de.nihas101.midas.ui.bookings;
 import com.github.mvysny.kaributesting.v10.GridKt;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.datepicker.DatePicker;
@@ -12,9 +13,11 @@ import com.vaadin.flow.component.textfield.TextField;
 import de.nihas101.midas.bookings.dto.Booking;
 import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.entity.BookingType;
+import de.nihas101.midas.bookings.entity.Source;
 import de.nihas101.midas.bookings.row.BookingRow;
 import de.nihas101.midas.bookings.service.BookingsService;
 import de.nihas101.midas.interest.service.InterestUpdatingOpeningBalanceService;
+import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.openingbalance.dto.OpeningBalance;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersService;
@@ -32,6 +35,7 @@ import java.time.Year;
 import static com.github.mvysny.kaributesting.v10.LocatorJ._click;
 import static com.github.mvysny.kaributesting.v10.LocatorJ._get;
 import static com.github.mvysny.kaributesting.v10.LocatorJ._setValue;
+import static com.github.mvysny.kaributesting.v10.pro.ConfirmDialogKt._fireCancel;
 import static com.github.mvysny.kaributesting.v10.pro.ConfirmDialogKt._fireConfirm;
 
 public class BookingsViewIT extends AbstractKaribuTest {
@@ -182,5 +186,262 @@ public class BookingsViewIT extends AbstractKaribuTest {
         // 8. Verify both bookings are now saved
         bookings = bookingsService.bookingsForShareholderAndYear(savedSh.getId(), Year.of(2026));
         Assertions.assertEquals(2, bookings.filter(b -> true).bookings().size());
+    }
+
+    @Test
+    void testCarryOverToNextYear() {
+        // 1. Prepopulate a shareholder in the DB
+        final Shareholder sh = new Shareholder(null, 201, "Alice", "Carry");
+        shareholdersService.create(sh);
+        final Shareholder savedSh = shareholdersService.shareholders().toList().stream()
+                .filter(s -> "Alice".equals(s.getFirstName()) && "Carry".equals(s.getLastName()))
+                .findFirst()
+                .orElseThrow();
+
+        // 2. Prepopulate a booking in 2026
+        final Booking booking = Booking.builder()
+                .shareholderId(savedSh.getId())
+                .date(LocalDate.of(2026, 6, 1))
+                .type(BookingType.COMPENSATION)
+                .amount(MoneyAmount.of(new BigDecimal("50.00")))
+                .comment("Deposit in 2026")
+                .build();
+        bookingsService.create(booking);
+
+        // 3. Navigate and select
+        UI.getCurrent().navigate(BookingsView.class);
+        _setValue(_get(ShareholderPicker.class), savedSh);
+        _setValue(_get(YearPicker.class), 2026);
+
+        // Set opening balance of 2026 to 100.00
+        _setValue(_get(BigDecimalField.class), new BigDecimal("100.00"));
+
+        // Verify no opening balance for 2027 yet
+        Assertions.assertNull(openingBalanceService.openingBalance(savedSh.getId(), Year.of(2027)));
+
+        // Toggle automatic carry over
+        final Checkbox toggle = _get(Checkbox.class);
+        _setValue(toggle, true);
+
+        // Verify opening balance for 2027 is now saved and has Source.SYSTEM
+        final OpeningBalance nextYearBalance = openingBalanceService.openingBalance(savedSh.getId(), Year.of(2027));
+        Assertions.assertNotNull(nextYearBalance);
+        Assertions.assertEquals(0, new BigDecimal("150.00").compareTo(nextYearBalance.getOpeningBalance().toBigDecimalForInput()));
+        Assertions.assertEquals(Source.SYSTEM, nextYearBalance.getSource());
+    }
+
+    @Test
+    void testCarryOverWhenNextYearHasOpeningBalanceConfirm() {
+        // 1. Prepopulate a shareholder in the DB
+        final Shareholder sh = new Shareholder(null, 202, "Alice", "Conflict");
+        shareholdersService.create(sh);
+        final Shareholder savedSh = shareholdersService.shareholders().toList().stream()
+                .filter(s -> "Alice".equals(s.getFirstName()) && "Conflict".equals(s.getLastName()))
+                .findFirst()
+                .orElseThrow();
+
+        // 2. Prepopulate opening balance for next year (2027) with USER source
+        openingBalanceService.create(new OpeningBalance(
+                null,
+                savedSh.getId(),
+                MoneyAmount.of(new BigDecimal("300.00")),
+                Year.of(2027),
+                Source.USER
+        ));
+
+        // 3. Prepopulate booking in 2026
+        final Booking booking = Booking.builder()
+                .shareholderId(savedSh.getId())
+                .date(LocalDate.of(2026, 6, 1))
+                .type(BookingType.COMPENSATION)
+                .amount(MoneyAmount.of(new BigDecimal("50.00")))
+                .comment("Deposit in 2026")
+                .build();
+        bookingsService.create(booking);
+
+        // 4. Navigate and select
+        UI.getCurrent().navigate(BookingsView.class);
+        _setValue(_get(ShareholderPicker.class), savedSh);
+        _setValue(_get(YearPicker.class), 2026);
+
+        // Set opening balance of 2026 to 100.00
+        _setValue(_get(BigDecimalField.class), new BigDecimal("100.00"));
+
+        // Toggle automatic carry over
+        final Checkbox toggle = _get(Checkbox.class);
+        _setValue(toggle, true);
+
+        // Verify warning ConfirmDialog is shown
+        final ConfirmDialog confirmDialog = _get(ConfirmDialog.class);
+        Assertions.assertNotNull(confirmDialog);
+
+        // Confirm overwrite
+        _fireConfirm(confirmDialog);
+
+        // Verify opening balance of 2027 is overwritten to 150.00 with Source.SYSTEM
+        final OpeningBalance nextYearBalance = openingBalanceService.openingBalance(savedSh.getId(), Year.of(2027));
+        Assertions.assertNotNull(nextYearBalance);
+        Assertions.assertEquals(0, new BigDecimal("150.00").compareTo(nextYearBalance.getOpeningBalance().toBigDecimalForInput()));
+        Assertions.assertEquals(Source.SYSTEM, nextYearBalance.getSource());
+    }
+
+    @Test
+    void testCarryOverWhenNextYearHasOpeningBalanceCancel() {
+        // 1. Prepopulate a shareholder in the DB
+        final Shareholder sh = new Shareholder(null, 203, "Alice", "Cancel");
+        shareholdersService.create(sh);
+        final Shareholder savedSh = shareholdersService.shareholders().toList().stream()
+                .filter(s -> "Alice".equals(s.getFirstName()) && "Cancel".equals(s.getLastName()))
+                .findFirst()
+                .orElseThrow();
+
+        // 2. Prepopulate opening balance for next year (2027) with USER source
+        openingBalanceService.create(new OpeningBalance(
+                null,
+                savedSh.getId(),
+                MoneyAmount.of(new BigDecimal("300.00")),
+                Year.of(2027),
+                Source.USER
+        ));
+
+        // 3. Prepopulate booking in 2026
+        final Booking booking = Booking.builder()
+                .shareholderId(savedSh.getId())
+                .date(LocalDate.of(2026, 6, 1))
+                .type(BookingType.COMPENSATION)
+                .amount(MoneyAmount.of(new BigDecimal("50.00")))
+                .comment("Deposit in 2026")
+                .build();
+        bookingsService.create(booking);
+
+        // 4. Navigate and select
+        UI.getCurrent().navigate(BookingsView.class);
+        _setValue(_get(ShareholderPicker.class), savedSh);
+        _setValue(_get(YearPicker.class), 2026);
+
+        // Set opening balance of 2026 to 100.00
+        _setValue(_get(BigDecimalField.class), new BigDecimal("100.00"));
+
+        // Toggle automatic carry over
+        final Checkbox toggle = _get(Checkbox.class);
+        _setValue(toggle, true);
+
+        // Verify warning ConfirmDialog is shown
+        final ConfirmDialog confirmDialog = _get(ConfirmDialog.class);
+        Assertions.assertNotNull(confirmDialog);
+
+        // Cancel overwrite
+        _fireCancel(confirmDialog);
+
+        // Verify opening balance of 2027 is still 300.00 and remains Source.USER
+        final OpeningBalance nextYearBalance = openingBalanceService.openingBalance(savedSh.getId(), Year.of(2027));
+        Assertions.assertNotNull(nextYearBalance);
+        Assertions.assertEquals(0, new BigDecimal("300.00").compareTo(nextYearBalance.getOpeningBalance().toBigDecimalForInput()));
+        Assertions.assertEquals(Source.USER, nextYearBalance.getSource());
+
+        // Verify checkbox is unchecked again
+        Assertions.assertFalse(toggle.getValue());
+    }
+
+    @Test
+    void testCarryOverAndThenUncheck() {
+        // 1. Prepopulate a shareholder in the DB
+        final Shareholder sh = new Shareholder(null, 204, "Alice", "Uncheck");
+        shareholdersService.create(sh);
+        final Shareholder savedSh = shareholdersService.shareholders().toList().stream()
+                .filter(s -> "Alice".equals(s.getFirstName()) && "Uncheck".equals(s.getLastName()))
+                .findFirst()
+                .orElseThrow();
+
+        // 2. Prepopulate booking in 2026
+        final Booking booking = Booking.builder()
+                .shareholderId(savedSh.getId())
+                .date(LocalDate.of(2026, 6, 1))
+                .type(BookingType.COMPENSATION)
+                .amount(MoneyAmount.of(new BigDecimal("50.00")))
+                .comment("Deposit in 2026")
+                .build();
+        bookingsService.create(booking);
+
+        // 3. Navigate and select
+        UI.getCurrent().navigate(BookingsView.class);
+        _setValue(_get(ShareholderPicker.class), savedSh);
+        _setValue(_get(YearPicker.class), 2026);
+
+        // Set opening balance of 2026 to 100.00
+        _setValue(_get(BigDecimalField.class), new BigDecimal("100.00"));
+
+        // Toggle automatic carry over to true
+        final Checkbox toggle = _get(Checkbox.class);
+        _setValue(toggle, true);
+
+        // Verify next year's opening balance has Source.SYSTEM
+        OpeningBalance nextYearBalance = openingBalanceService.openingBalance(savedSh.getId(), Year.of(2027));
+        Assertions.assertNotNull(nextYearBalance);
+        Assertions.assertEquals(Source.SYSTEM, nextYearBalance.getSource());
+
+        // Toggle automatic carry over back to false
+        _setValue(toggle, false);
+
+        // Verify opening balance of 2027 still exists, has value 150.00 but source is now Source.USER
+        nextYearBalance = openingBalanceService.openingBalance(savedSh.getId(), Year.of(2027));
+        Assertions.assertNotNull(nextYearBalance);
+        Assertions.assertEquals(0, new BigDecimal("150.00").compareTo(nextYearBalance.getOpeningBalance().toBigDecimalForInput()));
+        Assertions.assertEquals(Source.USER, nextYearBalance.getSource());
+    }
+
+    @Test
+    void testCarryOverWhenNoBookingsExistWithOpeningBalance() {
+        // 1. Prepopulate a shareholder in the DB
+        final Shareholder sh = new Shareholder(null, 205, "Alice", "Empty");
+        shareholdersService.create(sh);
+        final Shareholder savedSh = shareholdersService.shareholders().toList().stream()
+                .filter(s -> "Alice".equals(s.getFirstName()) && "Empty".equals(s.getLastName()))
+                .findFirst()
+                .orElseThrow();
+
+        // 2. Navigate and select (no bookings)
+        UI.getCurrent().navigate(BookingsView.class);
+        _setValue(_get(ShareholderPicker.class), savedSh);
+        _setValue(_get(YearPicker.class), 2026);
+
+        // Set opening balance of 2026 to 100.00
+        _setValue(_get(BigDecimalField.class), new BigDecimal("100.00"));
+
+        // Toggle automatic carry over
+        final Checkbox toggle = _get(Checkbox.class);
+        _setValue(toggle, true);
+
+        // Verify next year's opening balance is saved as 100.00 (the opening/closing balance of the year) with Source.SYSTEM
+        final OpeningBalance nextYearBalance = openingBalanceService.openingBalance(savedSh.getId(), Year.of(2027));
+        Assertions.assertNotNull(nextYearBalance);
+        Assertions.assertEquals(0, new BigDecimal("100.00").compareTo(nextYearBalance.getOpeningBalance().toBigDecimalForInput()));
+        Assertions.assertEquals(Source.SYSTEM, nextYearBalance.getSource());
+    }
+
+    @Test
+    void testCarryOverWhenNoBookingsExistWithoutOpeningBalance() {
+        // 1. Prepopulate a shareholder in the DB
+        final Shareholder sh = new Shareholder(null, 206, "Alice", "EmptyNoBal");
+        shareholdersService.create(sh);
+        final Shareholder savedSh = shareholdersService.shareholders().toList().stream()
+                .filter(s -> "Alice".equals(s.getFirstName()) && "EmptyNoBal".equals(s.getLastName()))
+                .findFirst()
+                .orElseThrow();
+
+        // 2. Navigate and select (no bookings, no opening balance)
+        UI.getCurrent().navigate(BookingsView.class);
+        _setValue(_get(ShareholderPicker.class), savedSh);
+        _setValue(_get(YearPicker.class), 2026);
+
+        // Toggle automatic carry over
+        final Checkbox toggle = _get(Checkbox.class);
+        _setValue(toggle, true);
+
+        // Verify next year's opening balance is saved as ZERO with Source.SYSTEM
+        final OpeningBalance nextYearBalance = openingBalanceService.openingBalance(savedSh.getId(), Year.of(2027));
+        Assertions.assertNotNull(nextYearBalance);
+        Assertions.assertEquals(0, BigDecimal.ZERO.compareTo(nextYearBalance.getOpeningBalance().toBigDecimalForInput()));
+        Assertions.assertEquals(Source.SYSTEM, nextYearBalance.getSource());
     }
 }
