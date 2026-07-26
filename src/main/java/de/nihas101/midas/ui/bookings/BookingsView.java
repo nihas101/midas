@@ -2,7 +2,6 @@ package de.nihas101.midas.ui.bookings;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
@@ -43,13 +42,9 @@ import de.nihas101.midas.shareholders.service.ShareholdersService;
 import de.nihas101.midas.ui.common.AddButton;
 import de.nihas101.midas.ui.common.DeleteButton;
 import de.nihas101.midas.ui.common.EditButton;
+import de.nihas101.midas.ui.common.HeaderActionBar;
 import de.nihas101.midas.ui.common.MidasView;
-import de.nihas101.midas.ui.common.ShareholderPicker;
-import de.nihas101.midas.ui.common.YearPicker;
 import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
-import de.nihas101.midas.ui.common.lock.LockDialog;
-import de.nihas101.midas.ui.common.lock.LockUnlockButton;
-import de.nihas101.midas.ui.common.lock.UnlockDialog;
 import de.nihas101.midas.ui.interest.InterestView;
 import de.nihas101.midas.userconfig.service.UserConfigService;
 import lombok.extern.slf4j.Slf4j;
@@ -83,13 +78,11 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
     private final LockWriter lockWriter;
     private final ShareholderLock shareholderLock;
 
-    private ComboBox<Shareholder> shareholderPicker;
-    private ComboBox<Integer> yearPicker;
     private Checkbox updateNextYearsBalanceAutomaticallyToggle;
     private BigDecimalField openingBalanceField;
     private HorizontalLayout actionRow;
     private Grid<BookingRow> grid;
-    private LockUnlockButton lockUnlockButton;
+    private HeaderActionBar<BookingsView> headerActionBar;
 
     public BookingsView(
             final ShareholdersService shareholdersService,
@@ -138,7 +131,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                             log.warn("Unknown shareholderId: {}. Ignoring parameter.", shareholderId);
                             return;
                         }
-                        shareholderPicker.setValue(shareholder);
+                        headerActionBar.setSelectedShareholder(shareholder);
                     } catch (NumberFormatException e) {
                         log.warn("Unparsable shareholderId in query parameter: {}. Ignoring parameter.", shareholderId);
                     }
@@ -149,7 +142,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                         return;
                     }
                     try {
-                        yearPicker.setValue(Integer.parseInt(year));
+                        headerActionBar.setSelectedYear(Integer.parseInt(year));
                     } catch (NumberFormatException e) {
                         log.warn("Unparsable year in query parameter: {}. Ignoring parameter.", year);
                     }
@@ -157,117 +150,24 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
     }
 
     private void setupHeader(final VerticalLayout content) {
-        HorizontalLayout header = new HorizontalLayout();
-        header.setWidthFull();
-        header.setAlignItems(FlexComponent.Alignment.END);
-
-        shareholderPicker = new ShareholderPicker(
-                messageSource.getMessage("bookings.shareholder", null, getLocale()),
-                messageSource.getMessage("shareholder-picker.placeholder", null, getLocale()),
-                shareholdersService,
-                e -> {
-                    final Shareholder shareholder = e.getValue();
-
-                    QueryParameters queryParameters = UI.getCurrent().getActiveViewLocation().getQueryParameters();
-                    if (shareholder != null) {
-                        queryParameters = queryParameters.merging(QUERY_PARAM_SHAREHOLDER, String.valueOf(shareholder.getId()));
-                    } else {
-                        queryParameters = queryParameters.excluding(QUERY_PARAM_SHAREHOLDER);
-                    }
-                    UI.getCurrent().navigate(BookingsView.class, queryParameters);
-                    refreshGridForInitialDisplay();
-                }
-        );
-        yearPicker = new YearPicker(
-                messageSource.getMessage("bookings.year", null, getLocale()),
-                e -> {
-                    final Integer year = e.getValue();
-
-                    QueryParameters queryParameters = UI.getCurrent().getActiveViewLocation().getQueryParameters();
-                    if (year != null) {
-                        queryParameters = queryParameters.merging(QUERY_PARAM_YEAR, String.valueOf(String.valueOf(year)));
-                    } else {
-                        queryParameters = queryParameters.excluding(QUERY_PARAM_YEAR);
-                    }
-                    UI.getCurrent().navigate(BookingsView.class, queryParameters);
-                    refreshGridForInitialDisplay();
-                },
-                getMidasConfig()
-        );
-
-        lockUnlockButton = new LockUnlockButton(
-                messageSource,
-                getLocale(),
-                e -> onLockUnlockClicked()
-        );
-        lockUnlockButton.setVisible(false);
-
-        actionRow = createActionRow();
-        actionRow.setVisible(false);
-
-        header.add(
-                shareholderPicker,
-                yearPicker,
-                lockUnlockButton,
-                actionRow
-        );
-        header.setFlexGrow(1, actionRow);
-        content.add(header);
-    }
-
-    private void onLockUnlockClicked() {
-        final Shareholder shareholder = shareholderPicker.getValue();
-        final Integer yearValue = yearPicker.getValue();
-        if (shareholder == null || yearValue == null) {
-            return;
-        }
-
-        final Year year = Year.of(yearValue);
-        lockUnlockDialog(
-                shareholderLock.isLocked(shareholder, year),
-                getLocale(),
-                year,
-                shareholder
-        ).open();
-    }
-
-    private ConfirmDialog lockUnlockDialog(
-            final boolean isCurrentlyLocked,
-            final Locale locale,
-            final Year year,
-            final Shareholder shareholder
-    ) {
-        final ConfirmDialog dialog;
-        if (isCurrentlyLocked) {
-            dialog = new UnlockDialog(
-                    messageSource,
-                    locale,
-                    year,
-                    shareholder,
-                    e -> {
-                        lockWriter.unlock(shareholder, year);
-                        lockUnlockButton.unlock();
-                        refreshGridForInitialDisplay();
-                    }
-            );
-        } else {
-            dialog = new LockDialog(
-                    messageSource,
-                    locale,
-                    year,
-                    shareholder,
-                    e -> {
-                        lockWriter.lock(shareholder, year);
-                        lockUnlockButton.lock();
-                        refreshGridForInitialDisplay();
-                    }
-            );
-        }
-        return dialog;
-    }
-
-    private HorizontalLayout createActionRow() {
         final Locale locale = getLocale();
+
+        actionRow = createActionRow(locale);
+        headerActionBar = new HeaderActionBar<>(
+                messageSource,
+                locale,
+                shareholdersService,
+                getMidasConfig(),
+                BookingsView.class,
+                actionRow,
+                this::refreshGridForInitialDisplay,
+                lockWriter,
+                shareholderLock
+        );
+        content.add(headerActionBar);
+    }
+
+    private HorizontalLayout createActionRow(final Locale locale) {
         openingBalanceField = new BigDecimalField(messageSource.getMessage("bookings.type.opening-balance", null, locale));
         openingBalanceField.setMaxWidth("9em");
         openingBalanceField.setLocale(locale);
@@ -286,8 +186,8 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                 return;
             }
 
-            final Shareholder shareholder = shareholderPicker.getValue();
-            final Year nextYear = Year.of(yearPicker.getValue()).plusYears(1);
+            final Shareholder shareholder = headerActionBar.getSelectedShareholder();
+            final Year nextYear = Year.of(headerActionBar.getSelectedYear().getValue()).plusYears(1);
 
             final OpeningBalance nextYearsOpeningBalance = openingBalanceService.openingBalance(
                     shareholder.getId(),
@@ -329,7 +229,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                             bookingsWriter,
                             messageSource,
                             locale,
-                            shareholderPicker.getValue(),
+                            headerActionBar.getSelectedShareholder(),
                             booking -> refreshGrid(),
                             this.getMidasConfig().getUi()
                     );
@@ -347,21 +247,21 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
     }
 
     private void saveOpeningBalance() {
-        final Shareholder shareholder = shareholderPicker.getValue();
-        final Integer year = yearPicker.getValue();
+        final Shareholder shareholder = headerActionBar.getSelectedShareholder();
+        final Year year = headerActionBar.getSelectedYear();
         if (shareholder == null || year == null) {
             return;
         }
 
         final BigDecimal amount = openingBalanceField.getValue();
-        final OpeningBalance openingBalance = openingBalanceService.openingBalance(shareholder.getId(), Year.of(year));
+        final OpeningBalance openingBalance = openingBalanceService.openingBalance(shareholder.getId(), year);
         if (openingBalance == null) {
             openingBalanceService.create(
                     new OpeningBalance(
                             null,
                             shareholder.getId(),
                             MoneyAmount.of(amount),
-                            Year.of(year),
+                            year,
                             Source.USER
                     )
             );
@@ -405,11 +305,11 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
             actionsContainer.setPadding(false);
             actionsContainer.setSpacing(false);
 
-            final Shareholder currentShareholder = shareholderPicker.getValue();
-            final Integer currentYear = yearPicker.getValue();
+            final Shareholder currentShareholder = headerActionBar.getSelectedShareholder();
+            final Year currentYear = headerActionBar.getSelectedYear();
             final boolean isLocked = currentShareholder != null
                     && currentYear != null
-                    && shareholderLock.isLocked(currentShareholder, Year.of(currentYear));
+                    && shareholderLock.isLocked(currentShareholder, currentYear);
 
             for (final Booking booking : row.bookings()) {
                 final HorizontalLayout actionRow = new HorizontalLayout();
@@ -445,7 +345,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                         bookingsWriter,
                         messageSource,
                         getLocale(),
-                        shareholderPicker.getValue(),
+                        headerActionBar.getSelectedShareholder(),
                         booking,
                         b -> refreshGrid(),
                         this.getMidasConfig().getUi()
@@ -520,12 +420,11 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
     }
 
     private void refreshGridForInitialDisplay() {
-        final Shareholder shareholder = shareholderPicker.getValue();
-        final Integer yearValue = yearPicker.getValue();
+        final Shareholder shareholder = headerActionBar.getSelectedShareholder();
+        final Year year = headerActionBar.getSelectedYear();
 
-        final boolean hasSelection = shareholder != null && yearValue != null;
-        actionRow.setVisible(hasSelection);
-        lockUnlockButton.setVisible(hasSelection);
+        final boolean hasSelection = shareholder != null && year != null;
+        headerActionBar.setActionButtonsVisible(hasSelection);
 
         if (!hasSelection) {
             openingBalanceField.setValue(null);
@@ -533,7 +432,6 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
             return;
         }
 
-        final Year year = Year.of(yearValue);
         final boolean isLocked = shareholderLock.isLocked(shareholder, year);
         applyLockState(shareholder, year, isLocked);
 
@@ -558,12 +456,11 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
     }
 
     private void refreshGrid() {
-        final Shareholder shareholder = shareholderPicker.getValue();
-        final Integer yearValue = yearPicker.getValue();
+        final Shareholder shareholder = headerActionBar.getSelectedShareholder();
+        final Year year = headerActionBar.getSelectedYear();
 
-        final boolean hasSelection = shareholder != null && yearValue != null;
-        actionRow.setVisible(hasSelection);
-        lockUnlockButton.setVisible(hasSelection);
+        final boolean hasSelection = shareholder != null && year != null;
+        headerActionBar.setActionButtonsVisible(hasSelection);
 
         if (!hasSelection) {
             openingBalanceField.setValue(null);
@@ -571,7 +468,6 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
             return;
         }
 
-        final Year year = Year.of(yearValue);
         final boolean isLocked = shareholderLock.isLocked(shareholder, year);
         applyLockState(shareholder, year, isLocked);
 
@@ -606,9 +502,9 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
             final boolean isLocked
     ) {
         if (isLocked) {
-            lockUnlockButton.lock();
+            headerActionBar.lockLockUnlockButton();
         } else {
-            lockUnlockButton.unlock();
+            headerActionBar.unlockLockUnlockButton();
         }
 
         // Disable interactive edit elements when locked
@@ -668,9 +564,9 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
             openingBalanceService.update(nextYearsOpeningBalance);
         } else {
             final OpeningBalance openingBalance = OpeningBalance.builder()
-                    .shareholderId(shareholderPicker.getValue().getId())
+                    .shareholderId(headerActionBar.getSelectedShareholder().getId())
                     .openingBalance(nextYearsOpening)
-                    .year(Year.of(yearPicker.getValue()).plusYears(1))
+                    .year(headerActionBar.getSelectedYear().plusYears(1))
                     .source(Source.SYSTEM)
                     .build();
             openingBalanceService.create(openingBalance);

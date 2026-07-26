@@ -1,8 +1,6 @@
 package de.nihas101.midas.ui.interest;
 
 import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
@@ -39,13 +37,9 @@ import de.nihas101.midas.lock.service.LockWriter;
 import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersService;
+import de.nihas101.midas.ui.common.HeaderActionBar;
 import de.nihas101.midas.ui.common.MidasView;
-import de.nihas101.midas.ui.common.ShareholderPicker;
-import de.nihas101.midas.ui.common.YearPicker;
 import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
-import de.nihas101.midas.ui.common.lock.LockDialog;
-import de.nihas101.midas.ui.common.lock.LockUnlockButton;
-import de.nihas101.midas.ui.common.lock.UnlockDialog;
 import de.nihas101.midas.userconfig.service.UserConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -55,9 +49,11 @@ import java.math.BigDecimal;
 import java.time.Month;
 import java.time.Year;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Locale;
 import java.util.Optional;
+
+import static java.math.BigDecimal.ZERO;
+import static java.util.Collections.emptyList;
 
 @Slf4j
 @Route("interest-calculation")
@@ -74,13 +70,12 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
     private final InterestRowService interestRowService;
     private final LockWriter lockWriter;
     private final ShareholderLock shareholderLock;
-    private ComboBox<Shareholder> shareholderPicker; // TODO: Store the selected shareholder somewhere so that we can use that in the same filter when switching views
-    private ComboBox<Integer> yearPicker; // TODO: Store the selected shareholder somewhere so that we can use that in the same filter when switching views
+
     private BigDecimalField interestRateField;
     private HorizontalLayout actionRow;
     private Grid<InterestCalculationRow> interestCalculationGrid;
     private Checkbox updateInterestAutomaticallyToggle;
-    private LockUnlockButton lockUnlockButton;
+    private HeaderActionBar<InterestView> headerActionBar;
 
     public InterestView(
             final ShareholdersService shareholdersService,
@@ -129,7 +124,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
                             log.warn("Unknown shareholderId: {}. Ignoring parameter.", shareholderId);
                             return;
                         }
-                        shareholderPicker.setValue(shareholder);
+                        headerActionBar.setSelectedShareholder(shareholder);
                     } catch (NumberFormatException e) {
                         log.warn("Unparsable shareholderId in query parameter: {}. Ignoring parameter.", shareholderId);
                     }
@@ -140,50 +135,36 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
                         return;
                     }
                     try {
-                        yearPicker.setValue(Integer.parseInt(year));
+                        headerActionBar.setSelectedYear(Integer.parseInt(year));
                     } catch (NumberFormatException e) {
                         log.warn("Unparsable year in query parameter: {}. Ignoring parameter.", year);
                     }
                 });
     }
 
-    // TODO: All of this is straight from BookingsView, extract that code into its own class
     private void setupHeader(final VerticalLayout content) {
-        HorizontalLayout header = new HorizontalLayout();
-        header.setWidthFull();
-        header.setAlignItems(FlexComponent.Alignment.END);
+        final Locale locale = getLocale();
 
-        shareholderPicker = new ShareholderPicker(
-                messageSource.getMessage("bookings.shareholder", null, getLocale()),
-                messageSource.getMessage("shareholder-picker.placeholder", null, getLocale()),
-                shareholdersService,
-                e -> recalculateInterestForInitialDisplay()
-        );
-        yearPicker = new YearPicker(
-                messageSource.getMessage("bookings.year", null, getLocale()),
-                e -> recalculateInterestForInitialDisplay(),
-                getMidasConfig()
-        );
-
-        lockUnlockButton = new LockUnlockButton(
+        actionRow = createHeaderActionRow(locale);
+        headerActionBar = new HeaderActionBar<>(
                 messageSource,
-                getLocale(),
-                e -> onLockUnlockClicked()
+                locale,
+                shareholdersService,
+                getMidasConfig(),
+                InterestView.class,
+                actionRow,
+                this::recalculateInterestForInitialDisplay,
+                lockWriter,
+                shareholderLock
         );
-        lockUnlockButton.setVisible(false);
 
-        actionRow = createHeaderActionRow();
-        actionRow.setVisible(false);
-
-        header.add(shareholderPicker, yearPicker, lockUnlockButton, actionRow);
-        header.setFlexGrow(1, actionRow);
-        content.add(header);
+        content.add(headerActionBar);
     }
 
-    private HorizontalLayout createHeaderActionRow() {
-        interestRateField = new BigDecimalField(messageSource.getMessage("interest.rate.label", null, getLocale()));
+    private HorizontalLayout createHeaderActionRow(final Locale locale) {
+        interestRateField = new BigDecimalField(messageSource.getMessage("interest.rate.label", null, locale));
         interestRateField.setMaxWidth("5em");
-        interestRateField.setLocale(getLocale());
+        interestRateField.setLocale(locale);
         interestRateField.setSuffixComponent(new Span("%"));
         interestRateField.addValueChangeListener(e -> {
             if (e.isFromClient()) {
@@ -191,7 +172,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
             }
         });
 
-        updateInterestAutomaticallyToggle = new Checkbox(messageSource.getMessage("interest.update.automatically.toggle.label", null, getLocale()));
+        updateInterestAutomaticallyToggle = new Checkbox(messageSource.getMessage("interest.update.automatically.toggle.label", null, locale));
         updateInterestAutomaticallyToggle.addValueChangeListener(e -> {
             if (e.isFromClient()) {
                 recalculateInterest();
@@ -209,16 +190,15 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
 
     // TODO: This and recalculateInterestForDisplay duplicate a lot of code and logic
     private void recalculateInterest() {
-        final Shareholder shareholder = shareholderPicker.getValue();
-        final Integer yearValue = yearPicker.getValue();
+        final Shareholder shareholder = headerActionBar.getSelectedShareholder();
+        final Year year = headerActionBar.getSelectedYear();
         final BigDecimal rate = interestRateField.getValue();
-        if (shareholder == null || yearValue == null) {
+        if (shareholder == null || year == null) {
             return;
         }
 
-        final Year year = Year.of(yearValue);
         // TODO: Updating of these two fields should be handled in a transaction
-        final InterestRate interestRate = updateInterestRate(shareholder, yearValue, rate);
+        final InterestRate interestRate = updateInterestRate(shareholder, year, rate);
         final Bookings bookings = bookingsReader.interestRelatedBookingsForShareholderAndYear(shareholder.getId(), year);
         final InterestCalculation interestCalculation = new InterestCalculation(
                 bookings,
@@ -270,25 +250,28 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
         }
     }
 
-    private InterestRate updateInterestRate(final Shareholder shareholder, final Integer year, final BigDecimal rate) {
-        InterestRate interestRate = interestRateService.interestRate(shareholder.getId(), Year.of(year));
+    private InterestRate updateInterestRate(
+            final Shareholder shareholder,
+            final Year year,
+            final BigDecimal rate
+    ) {
+        InterestRate interestRate = interestRateService.interestRate(shareholder.getId(), year);
         if (interestRate != null) {
             interestRate.setInterestRate(rate); // TODO: This mutates the object! Do it differently
             interestRateService.update(interestRate);
         } else {
-            interestRate = new InterestRate(null, shareholder.getId(), rate, Year.of(year));
+            interestRate = new InterestRate(null, shareholder.getId(), rate, year);
             interestRateService.create(interestRate);
         }
         return interestRate;
     }
 
     private void recalculateInterestForInitialDisplay() {
-        final Shareholder shareholder = shareholderPicker.getValue();
-        final Integer yearValue = yearPicker.getValue();
+        final Shareholder shareholder = headerActionBar.getSelectedShareholder();
+        final Year year = headerActionBar.getSelectedYear();
 
-        final boolean hasSelection = shareholder != null && yearValue != null;
-        actionRow.setVisible(hasSelection);
-        lockUnlockButton.setVisible(hasSelection);
+        final boolean hasSelection = shareholder != null && year != null;
+        headerActionBar.setActionButtonsVisible(hasSelection);
 
         if (!hasSelection) {
             interestRateField.setValue(null);
@@ -296,7 +279,6 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
             return;
         }
 
-        final Year year = Year.of(yearValue);
         final boolean isLocked = shareholderLock.isLocked(shareholder, year);
 
         applyLockState(isLocked);
@@ -310,7 +292,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
 
         final Bookings bookings = bookingsReader.interestRelatedBookingsForShareholderAndYear(shareholder.getId(), year);
         if (bookings.isEmpty()) {
-            interestCalculationGrid.setItems(Collections.emptyList());
+            interestCalculationGrid.setItems(emptyList());
             return;
         }
         final InterestCalculation interestCalculation = new InterestCalculation(
@@ -331,9 +313,9 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
 
     private void applyLockState(final boolean isLocked) {
         if (isLocked) {
-            lockUnlockButton.lock();
+            headerActionBar.lockLockUnlockButton();
         } else {
-            lockUnlockButton.unlock();
+            headerActionBar.unlockLockUnlockButton();
         }
 
         // Disable inputs when locked
@@ -344,60 +326,9 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
     private InterestRate interestRate(final Shareholder shareholder, final Year year) {
         InterestRate rate = interestRateService.interestRate(shareholder.getId(), year);
         if (rate == null) {
-            return new InterestRate(null, shareholder.getId(), BigDecimal.ZERO, year);
+            return new InterestRate(null, shareholder.getId(), ZERO, year);
         }
         return rate;
-    }
-
-    private void onLockUnlockClicked() {
-        final Shareholder shareholder = shareholderPicker.getValue();
-        final Integer yearValue = yearPicker.getValue();
-        if (shareholder == null || yearValue == null) {
-            return;
-        }
-
-        final Year year = Year.of(yearValue);
-        lockUnlockDialog(
-                shareholderLock.isLocked(shareholder, year),
-                getLocale(),
-                year,
-                shareholder
-        ).open();
-    }
-
-    private ConfirmDialog lockUnlockDialog(
-            final boolean isCurrentlyLocked,
-            final Locale locale,
-            final Year year,
-            final Shareholder shareholder
-    ) {
-        final ConfirmDialog dialog;
-        if (isCurrentlyLocked) {
-            dialog = new UnlockDialog(
-                    messageSource,
-                    locale,
-                    year,
-                    shareholder,
-                    e -> {
-                        lockWriter.unlock(shareholder, year);
-                        lockUnlockButton.unlock();
-                        recalculateInterestForInitialDisplay();
-                    }
-            );
-        } else {
-            dialog = new LockDialog(
-                    messageSource,
-                    locale,
-                    year,
-                    shareholder,
-                    e -> {
-                        lockWriter.lock(shareholder, year);
-                        lockUnlockButton.lock();
-                        recalculateInterestForInitialDisplay();
-                    }
-            );
-        }
-        return dialog;
     }
 
     private void setupInterestGrid(final VerticalLayout content) {
