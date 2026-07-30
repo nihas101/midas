@@ -39,6 +39,9 @@ import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersService;
 import de.nihas101.midas.ui.common.HeaderActionBar;
 import de.nihas101.midas.ui.common.MidasView;
+import de.nihas101.midas.ui.common.QueryParameter;
+import de.nihas101.midas.ui.common.ShareholderPicker;
+import de.nihas101.midas.ui.common.YearPicker;
 import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
 import de.nihas101.midas.userconfig.service.UserConfigService;
 import lombok.extern.slf4j.Slf4j;
@@ -75,7 +78,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
     private HorizontalLayout actionRow;
     private Grid<InterestCalculationRow> interestCalculationGrid;
     private Checkbox updateInterestAutomaticallyToggle;
-    private HeaderActionBar<InterestView> headerActionBar;
+    private HeaderActionBar headerActionBar;
 
     public InterestView(
             final ShareholdersService shareholdersService,
@@ -110,10 +113,12 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
         setContent(content);
     }
 
+
     // TODO: Also add these to local storage
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
-        event.getLocation().getQueryParameters().getSingleParameter(QUERY_PARAM_SHAREHOLDER)
+        // TODO: Move this logic into the query parameter?
+        event.getLocation().getQueryParameters().getSingleParameter(QueryParameter.QUERY_PARAM_SHAREHOLDER)
                 .ifPresent(shareholderId -> {
                     try {
                         if (StringUtils.isBlank(shareholderId)) {
@@ -129,7 +134,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
                         log.warn("Unparsable shareholderId in query parameter: {}. Ignoring parameter.", shareholderId);
                     }
                 });
-        event.getLocation().getQueryParameters().getSingleParameter(QUERY_PARAM_YEAR)
+        event.getLocation().getQueryParameters().getSingleParameter(QueryParameter.QUERY_PARAM_YEAR)
                 .ifPresent(year -> {
                     if (StringUtils.isBlank(year)) {
                         return;
@@ -146,16 +151,34 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
         final Locale locale = getLocale();
 
         actionRow = createHeaderActionRow(locale);
-        headerActionBar = new HeaderActionBar<>(
+
+        final Class<InterestView> viewClass = InterestView.class;
+        final Runnable onUpdate = this::recalculateInterestForInitialDisplay;
+        headerActionBar = new HeaderActionBar(
                 messageSource,
                 locale,
-                shareholdersService,
-                getMidasConfig(),
-                InterestView.class,
+                new ShareholderPicker(
+                        messageSource,
+                        locale,
+                        shareholdersService,
+                        QueryParameter.shareholderParameter(
+                                viewClass,
+                                onUpdate
+                        )
+                ),
+                new YearPicker(
+                        messageSource,
+                        locale,
+                        QueryParameter.yearParameter(
+                                viewClass,
+                                onUpdate
+                        ),
+                        getMidasConfig()
+                ),
                 actionRow,
-                this::recalculateInterestForInitialDisplay,
+                shareholderLock,
                 lockWriter,
-                shareholderLock
+                onUpdate
         );
 
         content.add(headerActionBar);

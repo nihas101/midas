@@ -46,6 +46,9 @@ import de.nihas101.midas.ui.bookings.BookingsView;
 import de.nihas101.midas.ui.common.AddButton;
 import de.nihas101.midas.ui.common.HeaderActionBar;
 import de.nihas101.midas.ui.common.MidasView;
+import de.nihas101.midas.ui.common.QueryParameter;
+import de.nihas101.midas.ui.common.ShareholderPicker;
+import de.nihas101.midas.ui.common.YearPicker;
 import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
 import de.nihas101.midas.userconfig.service.UserConfigService;
 import lombok.extern.slf4j.Slf4j;
@@ -86,7 +89,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
     private Checkbox displayHiddenEntriesCheckbox;
     private AccountStatementRow draggedRow;
     private List<AccountStatementRow> currentRows;
-    private HeaderActionBar<AccountStatementView> headerActionBar;
+    private HeaderActionBar headerActionBar;
 
     public AccountStatementView(
             final ShareholdersService shareholdersService,
@@ -128,7 +131,8 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
     // TODO: Also add these to local storage
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
-        event.getLocation().getQueryParameters().getSingleParameter(QUERY_PARAM_SHAREHOLDER)
+        // TODO: Move this logic into the query parameter?
+        event.getLocation().getQueryParameters().getSingleParameter(QueryParameter.QUERY_PARAM_SHAREHOLDER)
                 .ifPresent(shareholderId -> {
                     try {
                         if (StringUtils.isBlank(shareholderId)) {
@@ -144,7 +148,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                         log.warn("Unparsable shareholderId in query parameter: {}. Ignoring parameter.", shareholderId);
                     }
                 });
-        event.getLocation().getQueryParameters().getSingleParameter(QUERY_PARAM_YEAR)
+        event.getLocation().getQueryParameters().getSingleParameter(QueryParameter.QUERY_PARAM_YEAR)
                 .ifPresent(year -> {
                     if (StringUtils.isBlank(year)) {
                         return;
@@ -161,16 +165,33 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         final Locale locale = getLocale();
 
         actionRow = createActionRow(locale);
-        headerActionBar = new HeaderActionBar<>(
+        final Class<AccountStatementView> viewClass = AccountStatementView.class;
+        final Runnable onUpdate = this::refreshContent;
+        headerActionBar = new HeaderActionBar(
                 messageSource,
                 locale,
-                shareholdersService,
-                getMidasConfig(),
-                AccountStatementView.class,
+                new ShareholderPicker(
+                        messageSource,
+                        locale,
+                        shareholdersService,
+                        QueryParameter.shareholderParameter(
+                                viewClass,
+                                onUpdate
+                        )
+                ),
+                new YearPicker(
+                        messageSource,
+                        locale,
+                        QueryParameter.yearParameter(
+                                viewClass,
+                                onUpdate
+                        ),
+                        getMidasConfig()
+                ),
                 actionRow,
-                this::refreshContent,
+                shareholderLock,
                 lockWriter,
-                shareholderLock
+                onUpdate
         );
 
         content.add(headerActionBar);
@@ -439,8 +460,8 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         button.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
         button.addClickListener(e -> {
             QueryParameters queryParameters = new QueryParameters(Map.of(
-                    QUERY_PARAM_SHAREHOLDER, List.of(String.valueOf(headerActionBar.getSelectedShareholder().getId())),
-                    QUERY_PARAM_YEAR, List.of(String.valueOf(headerActionBar.getSelectedYear().getValue()))
+                    QueryParameter.QUERY_PARAM_SHAREHOLDER, List.of(String.valueOf(headerActionBar.getSelectedShareholder().getId())),
+                    QueryParameter.QUERY_PARAM_YEAR, List.of(String.valueOf(headerActionBar.getSelectedYear().getValue()))
             ));
             UI.getCurrent().navigate(BookingsView.class, queryParameters);
         });

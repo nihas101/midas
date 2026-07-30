@@ -44,6 +44,9 @@ import de.nihas101.midas.ui.common.DeleteButton;
 import de.nihas101.midas.ui.common.EditButton;
 import de.nihas101.midas.ui.common.HeaderActionBar;
 import de.nihas101.midas.ui.common.MidasView;
+import de.nihas101.midas.ui.common.QueryParameter;
+import de.nihas101.midas.ui.common.ShareholderPicker;
+import de.nihas101.midas.ui.common.YearPicker;
 import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
 import de.nihas101.midas.ui.interest.InterestView;
 import de.nihas101.midas.userconfig.service.UserConfigService;
@@ -82,7 +85,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
     private BigDecimalField openingBalanceField;
     private HorizontalLayout actionRow;
     private Grid<BookingRow> grid;
-    private HeaderActionBar<BookingsView> headerActionBar;
+    private HeaderActionBar headerActionBar;
 
     public BookingsView(
             final ShareholdersService shareholdersService,
@@ -120,7 +123,8 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
 
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
-        event.getLocation().getQueryParameters().getSingleParameter(QUERY_PARAM_SHAREHOLDER)
+        // TODO: Move this logic into the query parameter?
+        event.getLocation().getQueryParameters().getSingleParameter(QueryParameter.QUERY_PARAM_SHAREHOLDER)
                 .ifPresent(shareholderId -> {
                     try {
                         if (StringUtils.isBlank(shareholderId)) {
@@ -136,7 +140,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                         log.warn("Unparsable shareholderId in query parameter: {}. Ignoring parameter.", shareholderId);
                     }
                 });
-        event.getLocation().getQueryParameters().getSingleParameter(QUERY_PARAM_YEAR)
+        event.getLocation().getQueryParameters().getSingleParameter(QueryParameter.QUERY_PARAM_YEAR)
                 .ifPresent(year -> {
                     if (StringUtils.isBlank(year)) {
                         return;
@@ -153,16 +157,33 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         final Locale locale = getLocale();
 
         actionRow = createActionRow(locale);
-        headerActionBar = new HeaderActionBar<>(
+        final Class<BookingsView> viewClass = BookingsView.class;
+        final Runnable onUpdate = this::refreshGridForInitialDisplay;
+        headerActionBar = new HeaderActionBar(
                 messageSource,
                 locale,
-                shareholdersService,
-                getMidasConfig(),
-                BookingsView.class,
+                new ShareholderPicker(
+                        messageSource,
+                        locale,
+                        shareholdersService,
+                        QueryParameter.shareholderParameter(
+                                viewClass,
+                                onUpdate
+                        )
+                ),
+                new YearPicker(
+                        messageSource,
+                        locale,
+                        QueryParameter.yearParameter(
+                                viewClass,
+                                onUpdate
+                        ),
+                        getMidasConfig()
+                ),
                 actionRow,
-                this::refreshGridForInitialDisplay,
+                shareholderLock,
                 lockWriter,
-                shareholderLock
+                onUpdate
         );
         content.add(headerActionBar);
     }
