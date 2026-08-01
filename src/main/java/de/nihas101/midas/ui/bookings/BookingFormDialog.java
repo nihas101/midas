@@ -22,6 +22,7 @@ import de.nihas101.midas.bookings.entity.Source;
 import de.nihas101.midas.bookings.service.BookingsReader;
 import de.nihas101.midas.bookings.service.BookingsWriter;
 import de.nihas101.midas.config.UIConfig;
+import de.nihas101.midas.lock.ShareholderLock;
 import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersReader;
@@ -32,6 +33,7 @@ import org.springframework.context.MessageSource;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.Year;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
@@ -43,12 +45,15 @@ public class BookingFormDialog extends Dialog {
 
     private final BookingsReader bookingsReader;
     private final BookingsWriter bookingsWriter;
+    private final ShareholderLock shareholderLock;
     private final Consumer<Booking> onSave;
 
     private final Binder<Booking> binder = new Binder<>(Booking.class);
     private final Checkbox addAnotherCheckbox;
     private final MessageSource messageSource;
     private final Locale locale;
+    private final ComboBox<Shareholder> shareholderPicker;
+    private final DatePicker datePicker;
 
     public BookingFormDialog(
             final ShareholdersReader shareholdersReader,
@@ -68,12 +73,36 @@ public class BookingFormDialog extends Dialog {
                 locale,
                 initialShareholder,
                 null,
+                null,
                 onSave,
                 uiConfig
         );
     }
 
-    // TODO: Consider locked years here and disable the save button when a locked year is chosen
+    public BookingFormDialog(
+            final ShareholdersReader shareholdersReader,
+            final BookingsReader bookingsReader,
+            final BookingsWriter bookingsWriter,
+            final MessageSource messageSource,
+            final Locale locale,
+            final Shareholder initialShareholder,
+            final ShareholderLock shareholderLock,
+            final Consumer<Booking> onSave,
+            final UIConfig uiConfig
+    ) {
+        this(
+                shareholdersReader,
+                bookingsReader,
+                bookingsWriter,
+                messageSource,
+                locale,
+                initialShareholder,
+                null,
+                shareholderLock,
+                onSave,
+                uiConfig
+        );
+    }
 
     public BookingFormDialog(
             final ShareholdersReader shareholdersReader,
@@ -86,8 +115,35 @@ public class BookingFormDialog extends Dialog {
             final Consumer<Booking> onSave,
             final UIConfig uiConfig
     ) {
+        this(
+                shareholdersReader,
+                bookingsReader,
+                bookingsWriter,
+                messageSource,
+                locale,
+                initialShareholder,
+                bookingToEdit,
+                null,
+                onSave,
+                uiConfig
+        );
+    }
+
+    public BookingFormDialog(
+            final ShareholdersReader shareholdersReader,
+            final BookingsReader bookingsReader,
+            final BookingsWriter bookingsWriter,
+            final MessageSource messageSource,
+            final Locale locale,
+            final Shareholder initialShareholder,
+            final Booking bookingToEdit,
+            final ShareholderLock shareholderLock,
+            final Consumer<Booking> onSave,
+            final UIConfig uiConfig
+    ) {
         this.bookingsReader = bookingsReader;
         this.bookingsWriter = bookingsWriter;
+        this.shareholderLock = shareholderLock;
         this.messageSource = messageSource;
         this.locale = locale;
         this.onSave = onSave;
@@ -96,9 +152,9 @@ public class BookingFormDialog extends Dialog {
         final String titleKey = isEditMode ? "bookings.dialog.title.edit" : "bookings.dialog.title.add";
         setHeaderTitle(messageSource.getMessage(titleKey, null, locale));
 
-        FormLayout formLayout = new FormLayout();
+        final FormLayout formLayout = new FormLayout();
 
-        ComboBox<Shareholder> shareholderPicker = new ComboBox<>(messageSource.getMessage("bookings.shareholder", null, locale));
+        shareholderPicker = new ComboBox<>(messageSource.getMessage("bookings.shareholder", null, locale));
         final List<Shareholder> shareholders = shareholdersReader.shareholders().toList();
         shareholderPicker.setItems(shareholders);
         shareholderPicker.setItemLabelGenerator(s -> s.getFirstName() + " " + s.getLastName() + " (" + s.getDisplayId() + ")");
@@ -113,41 +169,10 @@ public class BookingFormDialog extends Dialog {
                         (b, s) -> b.setShareholderId(s != null ? s.getId() : null)
                 );
 
-        // TODO: Extract into class, so we dont have to set the local everywhere
-        DatePicker datePicker = new DatePicker(messageSource.getMessage("bookings.date", null, locale));
-        datePicker.setLocale(locale);
-        datePicker.setI18n(datePickerI18n(messageSource, locale));
-        datePicker.setRequired(true);
-        binder.forField(datePicker)
-                .asRequired()
-                .bind(Booking::getDate, Booking::setDate);
-
-        ComboBox<BookingType> typePicker = new ComboBox<>(messageSource.getMessage("bookings.type", null, locale));
-        typePicker.setItems(BookingType.creatableByUser());
-        typePicker.setItemLabelGenerator(t -> messageSource.getMessage(t.getI18nKey(), null, locale) + " (" + t.getId() + ")");
-        typePicker.setRequired(true);
-        binder.forField(typePicker)
-                .asRequired()
-                .bind(Booking::getType, Booking::setType);
-
-        TextField commentField = new TextField(messageSource.getMessage("bookings.comment", null, locale));
-        binder.forField(commentField)
-                .bind(Booking::getComment, Booking::setComment);
-
-        // TODO: Extract into class, so we dont have to set the local everywhere
-        BigDecimalField amountField = new BigDecimalField(messageSource.getMessage("bookings.amount", null, locale));
-        amountField.setLocale(locale);
-        amountField.setSuffixComponent(new Span("€")); // TODO: currency from config?
-        binder.forField(amountField)
-                .asRequired()
-                .withValidator((Validator<BigDecimal>) (value, context) -> value.longValue() != 0L
-                        ? ValidationResult.ok()
-                        : ValidationResult.error(messageSource.getMessage("bookings.amount.error", null, locale)))
-                .withConverter(
-                        MoneyAmount::of,
-                        m -> m != null ? m.toBigDecimalForInput() : null
-                )
-                .bind(Booking::getAmount, Booking::setAmount);
+        datePicker = datePicker(messageSource, locale, shareholderLock);
+        final ComboBox<BookingType> typePicker = typePicker(messageSource, locale);
+        final TextField commentField = commentField(messageSource, locale);
+        final BigDecimalField amountField = amountField(messageSource, locale);
 
         formLayout.add(shareholderPicker, datePicker, typePicker, commentField, amountField);
         add(formLayout);
@@ -161,7 +186,7 @@ public class BookingFormDialog extends Dialog {
         if (isEditMode) {
             binder.setBean(bookingToEdit);
         } else {
-            Booking booking = new Booking();
+            final Booking booking = new Booking();
             booking.setDate(LocalDate.now());
             booking.setSource(Source.USER);
             if (initialShareholder != null) {
@@ -170,6 +195,77 @@ public class BookingFormDialog extends Dialog {
             }
             binder.setBean(booking);
         }
+    }
+
+    private BigDecimalField amountField(final MessageSource messageSource, final Locale locale) {
+        // TODO: Extract into class, so we dont have to set the local everywhere
+        BigDecimalField amountField = new BigDecimalField(messageSource.getMessage("bookings.amount", null, locale));
+        amountField.setLocale(locale);
+        amountField.setSuffixComponent(new Span("€")); // TODO: currency from config?
+        binder.forField(amountField)
+                .asRequired()
+                .withValidator((Validator<BigDecimal>) (value, context) -> value.longValue() != 0L
+                                ? ValidationResult.ok()
+                                : ValidationResult.error(
+                                messageSource.getMessage(
+                                        "bookings.amount.error",
+                                        null,
+                                        locale
+                                )
+                        )
+                ).withConverter(
+                        MoneyAmount::of,
+                        m -> m != null ? m.toBigDecimalForInput() : null
+                )
+                .bind(Booking::getAmount, Booking::setAmount);
+        return amountField;
+    }
+
+    private TextField commentField(final MessageSource messageSource, final Locale locale) {
+        final TextField commentField = new TextField(messageSource.getMessage("bookings.comment", null, locale));
+        binder.forField(commentField)
+                .bind(Booking::getComment, Booking::setComment);
+        return commentField;
+    }
+
+    private ComboBox<BookingType> typePicker(final MessageSource messageSource, final Locale locale) {
+        final ComboBox<BookingType> typePicker = new ComboBox<>(messageSource.getMessage("bookings.type", null, locale));
+        typePicker.setItems(BookingType.creatableByUser());
+        typePicker.setItemLabelGenerator(t -> messageSource.getMessage(t.getI18nKey(), null, locale) + " (" + t.getId() + ")");
+        typePicker.setRequired(true);
+        binder.forField(typePicker)
+                .asRequired()
+                .bind(Booking::getType, Booking::setType);
+        return typePicker;
+    }
+
+    private DatePicker datePicker(final MessageSource messageSource, final Locale locale, final ShareholderLock shareholderLock) {
+        final DatePicker datePicker;
+        // TODO: Extract into class, so we dont have to set the local everywhere
+        datePicker = new DatePicker(messageSource.getMessage("bookings.date", null, locale));
+        datePicker.setLocale(locale);
+        datePicker.setI18n(datePickerI18n(messageSource, locale));
+        datePicker.setRequired(true);
+        binder.forField(datePicker)
+                .asRequired()
+                .withValidator((Validator<LocalDate>) (value, context) -> {
+                    final Shareholder shareholder = shareholderPicker.getValue();
+                    final Year year = Year.of(this.datePicker.getValue().getYear());
+                    final boolean isLocked = shareholderLock.isLocked(shareholder, year);
+                    return isLocked ? ValidationResult.error(
+                            messageSource.getMessage(
+                                    "bookings.lock.error.year-locked",
+                                    new Object[]{
+                                            year.toString(),
+                                            shareholder.getFirstName(),
+                                            shareholder.getLastName()
+                                    },
+                                    locale
+                            ))
+                            : ValidationResult.ok();
+                })
+                .bind(Booking::getDate, Booking::setDate);
+        return datePicker;
     }
 
     private HorizontalLayout setupButtons(final MessageSource messageSource, final Locale locale) {
@@ -209,7 +305,15 @@ public class BookingFormDialog extends Dialog {
             return;
         }
 
-        Booking booking = binder.getBean();
+        final Booking booking = binder.getBean();
+        final Shareholder selectedShareholder = shareholderPicker.getValue();
+        if (shareholderLock != null && selectedShareholder != null && booking != null && booking.getDate() != null) {
+            if (shareholderLock.isLocked(selectedShareholder, Year.of(booking.getDate().getYear()))) {
+                Notification.show(messageSource.getMessage("bookings.save.error", new Object[]{"Year is locked"}, locale));
+                return;
+            }
+        }
+
         if (bookingsReader.exists(booking)) {
             final ConfirmDialog confirmDialog = new ConfirmDialog();
             confirmDialog.setHeader(messageSource.getMessage("bookings.dialog.doublebooking.warning.title", null, locale));

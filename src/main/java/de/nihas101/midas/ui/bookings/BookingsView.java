@@ -42,6 +42,7 @@ import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersService;
 import de.nihas101.midas.ui.common.AddButton;
 import de.nihas101.midas.ui.common.DeleteButton;
+import de.nihas101.midas.ui.common.DownloadTrigger;
 import de.nihas101.midas.ui.common.EditButton;
 import de.nihas101.midas.ui.common.HeaderActionBar;
 import de.nihas101.midas.ui.common.MidasView;
@@ -49,7 +50,6 @@ import de.nihas101.midas.ui.common.QueryParameter;
 import de.nihas101.midas.ui.common.ShareholderPicker;
 import de.nihas101.midas.ui.common.YearPicker;
 import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
-import de.nihas101.midas.ui.common.DownloadTrigger;
 import de.nihas101.midas.ui.interest.InterestView;
 import de.nihas101.midas.userconfig.service.UserConfigService;
 import lombok.extern.slf4j.Slf4j;
@@ -263,6 +263,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                             messageSource,
                             locale,
                             headerActionBar.getSelectedShareholder(),
+                            shareholderLock,
                             booking -> refreshGrid(),
                             this.getMidasConfig().getUi()
                     );
@@ -380,6 +381,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                         getLocale(),
                         headerActionBar.getSelectedShareholder(),
                         booking,
+                        shareholderLock,
                         b -> refreshGrid(),
                         this.getMidasConfig().getUi()
                 ).open();
