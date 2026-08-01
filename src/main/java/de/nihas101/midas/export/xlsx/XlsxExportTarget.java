@@ -22,6 +22,7 @@ public class XlsxExportTarget implements ExportTarget, AutoCloseable {
     private final XSSFWorkbook workbook;
     private final CellStyle dateStyle;
     private final CellStyle headerStyle;
+    private final CellStyle amountStyle;
 
     public XlsxExportTarget() {
         this(new XSSFWorkbook());
@@ -29,18 +30,28 @@ public class XlsxExportTarget implements ExportTarget, AutoCloseable {
 
     public XlsxExportTarget(final XSSFWorkbook workbook) {
         this.workbook = workbook;
-        dateStyle = createDateStyle(workbook);
-        headerStyle = createHeaderStyle(workbook);
+        this.dateStyle = dateStyle(workbook);
+        this.amountStyle = amountStyle(workbook);
+        this.headerStyle = headerStyle(workbook);
     }
 
-    private CellStyle createDateStyle(final Workbook workbook) {
+    private CellStyle amountStyle(final Workbook workbook) {
+        final CellStyle style = workbook.createCellStyle();
+        final CreationHelper createHelper = workbook.getCreationHelper();
+        // 2 decimal places and decimal separator
+        // the decimal separator displayed depends on Excel settings
+        style.setDataFormat(createHelper.createDataFormat().getFormat("#,##0.00"));
+        return style;
+    }
+
+    private CellStyle dateStyle(final Workbook workbook) {
         final CellStyle style = workbook.createCellStyle();
         final CreationHelper createHelper = workbook.getCreationHelper();
         style.setDataFormat(createHelper.createDataFormat().getFormat("dd.mm.yyyy"));
         return style;
     }
 
-    private CellStyle createHeaderStyle(final Workbook workbook) {
+    private CellStyle headerStyle(final Workbook workbook) {
         final CellStyle style = workbook.createCellStyle();
         final Font font = workbook.createFont();
         font.setBold(true);
@@ -110,15 +121,24 @@ public class XlsxExportTarget implements ExportTarget, AutoCloseable {
         final Object value = rowData.get(column);
 
         if (value instanceof LocalDate localDate) {
-            cell.setCellValue(localDate);
-            cell.setCellStyle(dateStyle);
+            writeDate(localDate, cell);
         } else if (value instanceof BigDecimal bigDecimal) {
-            cell.setCellValue(bigDecimal.doubleValue());
+            writeAmount(cell, bigDecimal.doubleValue());
         } else if (value instanceof Number number) {
-            cell.setCellValue(number.doubleValue());
+            writeAmount(cell, number.doubleValue());
         } else if (value != null) {
             cell.setCellValue(value.toString());
         }
+    }
+
+    private void writeDate(final LocalDate localDate, final Cell cell) {
+        cell.setCellValue(localDate);
+        cell.setCellStyle(dateStyle);
+    }
+
+    private void writeAmount(final Cell cell, final double bigDecimal) {
+        cell.setCellValue(bigDecimal);
+        cell.setCellStyle(amountStyle);
     }
 
 }
