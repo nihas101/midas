@@ -22,12 +22,6 @@ import java.util.Properties;
 @EnableConfigurationProperties
 public class MidasApplication implements AppShellConfigurator {
 
-    // TODO: Implement clean up of 10 year old bookings etc
-
-    // TODO: Create a private repository that defines mappings specific to the client
-    //       i.e. rename midas -> Geselschafterbuchhaltung
-    //       Set everything necessary in the application properties etc.
-
     public static void main(String[] args) {
         try {
             SpringApplication.run(MidasApplication.class, args);

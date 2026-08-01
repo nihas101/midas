@@ -7,6 +7,7 @@ import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.row.BookingRowService;
 import de.nihas101.midas.bookings.service.BookingsReader;
 import de.nihas101.midas.export.ExportRequest;
+import de.nihas101.midas.export.ExportViewName;
 import de.nihas101.midas.interest.InterestCalculation;
 import de.nihas101.midas.interest.dto.InterestRate;
 import de.nihas101.midas.interest.row.InterestRowService;
@@ -40,16 +41,16 @@ public class PdfViewDataExtractor {
 
     public PdfViewData extractData(
             final Shareholder shareholder,
-            final String view
+            final ExportViewName view
     ) {
         switch (view) {
-            case "bookings" -> {
+            case BOOKINGS -> {
                 return extractBookingsData(shareholder);
             }
-            case "account-statements" -> {
+            case ACCOUNT_STATEMENTS -> {
                 return extractAccountStatementsData(shareholder);
             }
-            case "interest" -> {
+            case INTEREST -> {
                 return extractInterestData(shareholder);
             }
             case null, default -> {
@@ -82,7 +83,7 @@ public class PdfViewDataExtractor {
         );
 
         return new PdfViewData(
-                "bookings",
+                ExportViewName.BOOKINGS,
                 shareholder.getFirstName() + " " + shareholder.getLastName(),
                 shareholder,
                 Year.of(request.startDate().getYear()).getValue(),
@@ -124,7 +125,7 @@ public class PdfViewDataExtractor {
         rows.add(accountStatementRowService.generateClosingRow(statements, locale));
 
         return new PdfViewData(
-                "account-statements",
+                ExportViewName.ACCOUNT_STATEMENTS,
                 shareholder.getFirstName() + " " + shareholder.getLastName(),
                 shareholder,
                 year.getValue(),
@@ -155,7 +156,7 @@ public class PdfViewDataExtractor {
         final List<Object> rows = new ArrayList<>(interestRowService.generateRows(year, bookings, interestRate, interestCalculation, locale));
 
         return new PdfViewData(
-                "interest",
+                ExportViewName.INTEREST,
                 shareholder.getFirstName() + " " + shareholder.getLastName(),
                 shareholder,
                 year.getValue(),

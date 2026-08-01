@@ -13,23 +13,23 @@ import java.util.stream.Collectors;
 public class ExportViews {
 
     private final Set<LocalizedExportView> localizedExportViews;
-    private final Set<String> containsView;
+    private final Set<ExportViewName> views;
 
-    public ExportViews(final Collection<String> views) {
+    public ExportViews(final Collection<ExportViewName> views) {
         this(views, null, null);
     }
 
     public ExportViews(
-            final Collection<String> views,
+            final Collection<ExportViewName> views,
             final MessageSource messageSource,
             final Locale locale
     ) {
         this.localizedExportViews = views.stream()
                 .map(view -> new LocalizedExportView(
                         view,
-                        getLocalizedName(messageSource, locale, view)
+                        getLocalizedName(messageSource, locale, view.getName())
                 )).collect(Collectors.toCollection(LinkedHashSet::new));
-        this.containsView = localizedExportViews.stream()
+        this.views = localizedExportViews.stream()
                 .map(LocalizedExportView::internalName)
                 .collect(Collectors.toSet());
     }
@@ -48,8 +48,8 @@ public class ExportViews {
         return messageSource.getMessage("export.view." + view, null, locale);
     }
 
-    public boolean contains(final String view) {
-        return containsView.contains(view);
+    public boolean contains(final ExportViewName view) {
+        return views.contains(view);
     }
 
     public LocalizedExportView[] iterator() {

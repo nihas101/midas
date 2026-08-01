@@ -6,7 +6,6 @@ import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.checkbox.CheckboxGroupVariant;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
-import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -16,26 +15,26 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.streams.DownloadHandler;
-import com.vaadin.flow.server.streams.DownloadResponse;
 import de.nihas101.midas.config.MidasConfig;
 import de.nihas101.midas.export.Export;
 import de.nihas101.midas.export.ExportFactory;
 import de.nihas101.midas.export.ExportRequest;
+import de.nihas101.midas.export.ExportViewName;
 import de.nihas101.midas.export.ExportViews;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersService;
 import de.nihas101.midas.ui.common.DatePickerI18nProvider;
+import de.nihas101.midas.ui.common.DownloadTrigger;
 import de.nihas101.midas.ui.common.MidasView;
 import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
 import de.nihas101.midas.userconfig.service.UserConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
 import java.time.Year;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -49,10 +48,11 @@ public class ExportView extends MidasView {
     private final ShareholdersService shareholdersService;
     private final MessageSource messageSource;
     private final ExportFactory exportFactory;
+    private final DownloadTrigger downloadTrigger;
 
     private MultiSelectComboBox<Shareholder> shareholderPicker;
     private Checkbox selectAllCheckbox;
-    private CheckboxGroup<String> viewPicker;
+    private CheckboxGroup<ExportViewName> viewPicker;
     private DatePicker startDatePicker;
     private DatePicker endDatePicker;
     private CheckboxGroup<String> formatPicker;
@@ -79,6 +79,8 @@ public class ExportView extends MidasView {
         mainContent.setAlignItems(FlexComponent.Alignment.START);
 
         mainContent.add(new H2(messageSource.getMessage("export", null, getLocale())));
+
+        this.downloadTrigger = new DownloadTrigger(mainContent);
 
         // Form container to keep elements left-aligned but centered as a group
         VerticalLayout formContainer = new VerticalLayout();
@@ -166,11 +168,11 @@ public class ExportView extends MidasView {
     }
 
     private void setupViewSelection(VerticalLayout content) {
-        final List<String> allViews = List.of("bookings", "interest", "account-statements");
+        final List<ExportViewName> allViews = Arrays.stream(ExportViewName.values()).toList();
 
         viewPicker = new CheckboxGroup<>(messageSource.getMessage("export.views.label", null, getLocale()));
         viewPicker.setItems(allViews);
-        viewPicker.setItemLabelGenerator(key -> messageSource.getMessage("export.view." + key, null, getLocale()));
+        viewPicker.setItemLabelGenerator(key -> messageSource.getMessage("export.view." + key.getName(), null, getLocale()));
         viewPicker.addThemeVariants(CheckboxGroupVariant.LUMO_VERTICAL);
         viewPicker.addValueChangeListener(e -> updateExportButtonState());
 
@@ -181,7 +183,7 @@ public class ExportView extends MidasView {
     }
 
     private void setupDateSelection(VerticalLayout content) {
-        HorizontalLayout dateLayout = new HorizontalLayout();
+        final HorizontalLayout dateLayout = new HorizontalLayout();
         dateLayout.setSpacing(true);
         dateLayout.setWidthFull();
         dateLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
@@ -207,7 +209,7 @@ public class ExportView extends MidasView {
     }
 
     private void setupFormatSelection(VerticalLayout content) {
-        HorizontalLayout layout = new HorizontalLayout();
+        final HorizontalLayout layout = new HorizontalLayout();
         layout.setWidthFull();
         layout.setAlignItems(FlexComponent.Alignment.END);
 
@@ -238,7 +240,7 @@ public class ExportView extends MidasView {
         try {
             final LocalDate from = startDatePicker.getValue();
             final LocalDate to = endDatePicker.getValue();
-            final Set<String> views = viewPicker.getValue();
+            final Set<ExportViewName> views = viewPicker.getValue();
             final ExportRequest request = new ExportRequest(
                     List.copyOf(shareholderPicker.getValue()),
                     new ExportViews(views, messageSource, getLocale()),
@@ -267,7 +269,7 @@ public class ExportView extends MidasView {
         xlsxExport.trigger();
 
         final byte[] data = out.toByteArray();
-        triggerDownload(data, xlsxExport.fileName(), xlsxExport.mimeType());
+        downloadTrigger.triggerDownload(data, xlsxExport.fileName(), xlsxExport.mimeType());
     }
 
     private void runPdfExport(final ExportRequest request) {
@@ -275,28 +277,7 @@ public class ExportView extends MidasView {
         final Export pdfExport = exportFactory.createPdfExport(request, out, getLocale());
         pdfExport.trigger();
         final byte[] data = out.toByteArray();
-        triggerDownload(data, pdfExport.fileName(), pdfExport.mimeType());
-    }
-
-    private void triggerDownload(
-            final byte[] data,
-            final String fileName,
-            final String mimeType
-    ) {
-        final Anchor downloadAnchor = new Anchor(
-                DownloadHandler.fromInputStream(event -> new DownloadResponse(
-                        new ByteArrayInputStream(data),
-                        fileName,
-                        mimeType,
-                        data.length
-                )),
-                ""
-        );
-        downloadAnchor.getElement().setAttribute("download", true);
-        downloadAnchor.getElement().getStyle().set("display", "none");
-        mainContent.add(downloadAnchor);
-
-        downloadAnchor.getElement().executeJs("this.click();");
+        downloadTrigger.triggerDownload(data, pdfExport.fileName(), pdfExport.mimeType());
     }
 
     public static Icon icon() {

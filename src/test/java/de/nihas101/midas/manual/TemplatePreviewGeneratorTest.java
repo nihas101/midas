@@ -7,6 +7,7 @@ import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.row.BookingRow;
 import de.nihas101.midas.bookings.row.BookingRowService;
 import de.nihas101.midas.bookings.service.BookingsReader;
+import de.nihas101.midas.export.ExportViewName;
 import de.nihas101.midas.export.pdf.PdfViewData;
 import de.nihas101.midas.interest.InterestCalculation;
 import de.nihas101.midas.interest.dto.InterestRate;
@@ -15,6 +16,7 @@ import de.nihas101.midas.interest.service.InterestBookingsReader;
 import de.nihas101.midas.interest.service.InterestRateService;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersService;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+@Slf4j
 @Disabled("For generating previews and debugging templates quickly")
 @SpringBootTest
 public class TemplatePreviewGeneratorTest {
@@ -72,7 +75,7 @@ public class TemplatePreviewGeneratorTest {
     public void generatePreviews() throws IOException {
         final List<Shareholder> shareholders = shareholdersService.shareholders().toList();
         if (shareholders.isEmpty()) {
-            System.out.println("No shareholders found in midas.db. Please add some data first.");
+            log.info("No shareholders found in midas.db. Please add some data first.");
             return;
         }
 
@@ -83,43 +86,58 @@ public class TemplatePreviewGeneratorTest {
         final LocalDate startDate = LocalDate.of(2026, 1, 1); // Sample date
 
         for (Shareholder sh : shareholders) {
-            System.out.println("Generating previews for: " + sh.getFirstName() + " " + sh.getLastName());
-            generatePreview(sh, "bookings", startDate, locale, outputDir);
-            generatePreview(sh, "account-statements", startDate, locale, outputDir);
-            generatePreview(sh, "interest", startDate, locale, outputDir);
+            log.info("Generating previews for: {} {}", sh.getFirstName(), sh.getLastName());
+            generatePreview(sh, ExportViewName.BOOKINGS, startDate, locale, outputDir);
+            generatePreview(sh, ExportViewName.ACCOUNT_STATEMENTS, startDate, locale, outputDir);
+            generatePreview(sh, ExportViewName.INTEREST, startDate, locale, outputDir);
         }
 
-        System.out.println("Previews generated in: " + outputDir.toAbsolutePath());
+        log.info("Previews generated in: {}", outputDir.toAbsolutePath());
     }
 
-    private void generatePreview(Shareholder sh, String view, LocalDate startDate, Locale locale, Path outputDir) throws IOException {
-        final PdfViewData data = extractData(sh, view, startDate, locale);
+    private void generatePreview(
+            final Shareholder shareholder,
+            final ExportViewName view,
+            final LocalDate startDate,
+            final Locale locale,
+            final Path outputDir
+    ) throws IOException {
+        final PdfViewData data = extractData(shareholder, view, startDate, locale);
 
-        Context context = new Context(locale);
+        final Context context = new Context(locale);
         context.setVariable("data", data);
         context.setVariable("content", data.viewName());
 
-        String html = pdfTemplateEngine.process("base-layout", context);
+        final String html = pdfTemplateEngine.process("base-layout", context);
 
-        String filename = String.format("%s_%s_%s.html",
+        final String filename = String.format("%s_%s_%s.html",
                 view,
-                (sh.getFirstName() + "_" + sh.getLastName()).replace(" ", "_"),
+                (shareholder.getFirstName() + "_" + shareholder.getLastName()).replace(" ", "_"),
                 startDate.getYear());
 
         Files.writeString(outputDir.resolve(filename), html);
     }
 
-    private PdfViewData extractData(Shareholder shareholder, String view, LocalDate startDate, Locale locale) {
-        if ("bookings".equals(view)) {
-            return extractBookingsData(shareholder, startDate, locale);
-        }
-        if ("account-statements".equals(view)) {
-            return extractAccountStatementsData(shareholder, startDate, locale);
-        }
-        if ("interest".equals(view)) {
-            return extractInterestData(shareholder, startDate, locale);
-        }
-        return new PdfViewData(view, shareholder.getFirstName() + " " + shareholder.getLastName(), shareholder, startDate.getYear(), null, List.of(), List.of());
+    private PdfViewData extractData(
+            final Shareholder shareholder,
+            final ExportViewName viewName,
+            final LocalDate startDate,
+            final Locale locale
+    ) {
+        return switch (viewName) {
+            case BOOKINGS -> extractBookingsData(shareholder, startDate, locale);
+            case ACCOUNT_STATEMENTS -> extractAccountStatementsData(shareholder, startDate, locale);
+            case INTEREST -> extractInterestData(shareholder, startDate, locale);
+            case null -> new PdfViewData(
+                    null,
+                    shareholder.getFirstName() + " " + shareholder.getLastName(),
+                    shareholder,
+                    startDate.getYear(),
+                    null,
+                    List.of(),
+                    List.of()
+            );
+        };
     }
 
     private PdfViewData extractBookingsData(Shareholder shareholder, LocalDate startDate, Locale locale) {
@@ -141,7 +159,7 @@ public class TemplatePreviewGeneratorTest {
         final List<BookingRow> rows = bookingRowService.generateRows(bookings, locale);
 
         return new PdfViewData(
-                "bookings",
+                ExportViewName.BOOKINGS,
                 shareholder.getFirstName() + " " + shareholder.getLastName(),
                 shareholder,
                 year.getValue(),
@@ -173,7 +191,7 @@ public class TemplatePreviewGeneratorTest {
         rows.add(accountStatementRowService.generateClosingRow(statements, locale));
 
         return new PdfViewData(
-                "account-statements",
+                ExportViewName.ACCOUNT_STATEMENTS,
                 shareholder.getFirstName() + " " + shareholder.getLastName(),
                 shareholder,
                 year.getValue(),
@@ -184,7 +202,7 @@ public class TemplatePreviewGeneratorTest {
     }
 
     private PdfViewData extractInterestData(Shareholder shareholder, LocalDate startDate, Locale locale) {
-        List<String> headers = List.of(
+        final List<String> headers = List.of(
                 messageSource.getMessage("interest.table.month", null, locale),
                 messageSource.getMessage("interest.table.transactions", null, locale),
                 messageSource.getMessage("interest.table.sh", null, locale),
@@ -204,7 +222,7 @@ public class TemplatePreviewGeneratorTest {
         final List<Object> rows = new ArrayList<>(interestRowService.generateRows(year, bookings, interestRate, interestCalculation, locale));
 
         return new PdfViewData(
-                "interest",
+                ExportViewName.INTEREST,
                 shareholder.getFirstName() + " " + shareholder.getLastName(),
                 shareholder,
                 year.getValue(),

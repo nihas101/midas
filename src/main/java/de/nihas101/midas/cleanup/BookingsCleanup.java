@@ -2,6 +2,7 @@ package de.nihas101.midas.cleanup;
 
 import de.nihas101.midas.bookings.repository.BookingsRepository;
 import de.nihas101.midas.config.MidasConfig;
+import de.nihas101.midas.lock.repository.LockRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,15 +16,18 @@ import java.time.LocalDate;
 public class BookingsCleanup {
 
     private final BookingsRepository bookingsRepository;
+    private final LockRepository lockRepository;
     private final CleanupConfig cleanupConfig;
 
     @Autowired
     public BookingsCleanup(
             final BookingsRepository bookingsRepository,
+            final LockRepository lockRepository,
             final MidasConfig midasConfig
     ) {
         this(
                 bookingsRepository,
+                lockRepository,
                 midasConfig.getCleanup()
         );
     }
@@ -35,6 +39,9 @@ public class BookingsCleanup {
         final int deletedBookingsCount = deletedBookings(limit, cutoff);
         log.info("Removed {} bookings (limit: {}), because they were made before the cutoff ({})",
                 deletedBookingsCount, limit, cutoff);
+
+        final int deletedLocksCount = lockRepository.deleteOrphanedLocks(cutoff.getYear());
+        log.info("Removed {} orphaned year locks", deletedLocksCount);
     }
 
     private int deletedBookings(final int limit, final LocalDate cutoff) {

@@ -70,8 +70,8 @@ public interface BookingsRepository extends JpaRepository<BookingEntity, Integer
     @Transactional
     @Query(
             value = """
-                    DELETE from bookings b
-                    WHERE b.date < :cutoff
+                    DELETE FROM bookings
+                    WHERE date < :cutoff
                     """,
             nativeQuery = true
     )

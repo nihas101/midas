@@ -23,7 +23,7 @@ public class PdfService {
     ) {
         final TemplateContext context = new TemplateContext(locale);
         context.setVariable("data", data);
-        context.setVariable("content", data.viewName()); // This will be used in base-layout.html
+        context.setVariable("content", data.viewName().getName()); // This will be used in base-layout.html
 
         try {
             final String html = htmlTemplateEngine.generateHtml(data, context);

@@ -1,5 +1,6 @@
 package de.nihas101.midas.export.pdf;
 
+import de.nihas101.midas.export.ExportViewName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -34,7 +35,7 @@ class PdfServiceTest {
 
     private PdfViewData sampleData() {
         return new PdfViewData(
-                "sample-view",
+                ExportViewName.BOOKINGS,
                 "Sample Shareholder",
                 null,
                 2023,

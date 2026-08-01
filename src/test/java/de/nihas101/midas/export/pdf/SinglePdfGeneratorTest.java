@@ -1,6 +1,7 @@
 package de.nihas101.midas.export.pdf;
 
 import de.nihas101.midas.export.ExportRequest;
+import de.nihas101.midas.export.ExportViewName;
 import de.nihas101.midas.export.ExportViews;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import org.junit.jupiter.api.Test;
@@ -48,8 +49,8 @@ class SinglePdfGeneratorTest {
     void generate_callsPdfServiceWithExtractedData() {
         // Setup request mock
         when(request.shareholders()).thenReturn(Collections.singletonList(shareholder));
-        when(request.views()).thenReturn(new ExportViews(Set.of("sample-view")));
-        when(pdfViewDataExtractor.extractData(eq(shareholder), eq("sample-view"))).thenReturn(pdfViewData);
+        when(request.views()).thenReturn(new ExportViews(Set.of(ExportViewName.BOOKINGS)));
+        when(pdfViewDataExtractor.extractData(eq(shareholder), eq(ExportViewName.BOOKINGS))).thenReturn(pdfViewData);
 
         new SinglePdfGenerator(
                 request,
@@ -60,14 +61,14 @@ class SinglePdfGeneratorTest {
         ).generate();
 
         // Verify interactions
-        verify(pdfViewDataExtractor).extractData(eq(shareholder), eq("sample-view"));
+        verify(pdfViewDataExtractor).extractData(eq(shareholder), eq(ExportViewName.BOOKINGS));
         verify(pdfService).generatePdf(eq(pdfViewData), eq(locale), eq(outputStream));
     }
 
     @Test
     void generate_propagatesPdfExportException() {
         when(request.shareholders()).thenReturn(Collections.singletonList(shareholder));
-        when(request.views()).thenReturn(new ExportViews(Set.of("view")));
+        when(request.views()).thenReturn(new ExportViews(Set.of(ExportViewName.BOOKINGS)));
         when(pdfViewDataExtractor.extractData(any(), any())).thenReturn(pdfViewData);
         doThrow(new PdfExportException("dummy exception", new RuntimeException()))
                 .when(pdfService).generatePdf(any(), any(), any());

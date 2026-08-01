@@ -10,6 +10,7 @@ import de.nihas101.midas.bookings.row.BookingRow;
 import de.nihas101.midas.bookings.row.BookingRowService;
 import de.nihas101.midas.bookings.service.BookingsReader;
 import de.nihas101.midas.export.ExportRequest;
+import de.nihas101.midas.export.ExportViewName;
 import de.nihas101.midas.interest.dto.InterestRate;
 import de.nihas101.midas.interest.row.InterestCalculationRow;
 import de.nihas101.midas.interest.row.InterestRowService;
@@ -98,8 +99,8 @@ class PdfViewDataExtractorTest {
         when(bookingRowService.generateRows(any(Bookings.class), eq(locale)))
                 .thenReturn(List.of(mock(BookingRow.class), mock(BookingRow.class)));
 
-        final PdfViewData result = extractor.extractData(shareholder, "bookings");
-        assertEquals("bookings", result.viewName());
+        final PdfViewData result = extractor.extractData(shareholder, ExportViewName.BOOKINGS);
+        assertEquals(ExportViewName.BOOKINGS, result.viewName());
         assertEquals("John Doe", result.shareholderName());
         assertEquals(2026, result.year());
         assertNotNull(result.headers());
@@ -126,8 +127,8 @@ class PdfViewDataExtractorTest {
         when(accountStatementRowService.generateRows(mockRunningTotal, false)).thenReturn(List.of(mock(AccountStatementRow.class)));
         when(accountStatementRowService.generateClosingRow(mockRunningTotal, locale)).thenReturn(mock(AccountStatementRow.class));
 
-        final PdfViewData result = extractor.extractData(shareholder, "account-statements");
-        assertEquals("account-statements", result.viewName());
+        final PdfViewData result = extractor.extractData(shareholder, ExportViewName.ACCOUNT_STATEMENTS);
+        assertEquals(ExportViewName.ACCOUNT_STATEMENTS, result.viewName());
         assertEquals(6, result.headers().size());
         assertEquals(2, result.rows().size());
     }
@@ -156,8 +157,8 @@ class PdfViewDataExtractorTest {
         when(interestRowService.generateRows(any(Year.class), eq(bookings), any(BigDecimal.class), any(), eq(locale)))
                 .thenReturn(List.of(mock(InterestCalculationRow.class)));
 
-        final PdfViewData result = extractor.extractData(shareholder, "interest");
-        assertEquals("interest", result.viewName());
+        final PdfViewData result = extractor.extractData(shareholder, ExportViewName.INTEREST);
+        assertEquals(ExportViewName.INTEREST, result.viewName());
         assertEquals(new BigDecimal("5.0"), result.interestRate());
         assertEquals(7, result.headers().size());
         assertEquals(1, result.rows().size());
@@ -169,8 +170,8 @@ class PdfViewDataExtractorTest {
         when(shareholder.getFirstName()).thenReturn("John");
         when(shareholder.getLastName()).thenReturn("Doe");
 
-        final PdfViewData result = extractor.extractData(shareholder, "unknown");
-        assertEquals("unknown", result.viewName());
+        final PdfViewData result = extractor.extractData(shareholder, null);
+        assertEquals(null, result.viewName());
         assertEquals(2026, result.year());
         assertNull(result.interestRate());
         assertTrue(result.headers().isEmpty());
