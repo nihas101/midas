@@ -31,8 +31,7 @@ public class DownloadTrigger implements Serializable {
         );
         downloadAnchor.getElement().setAttribute("download", true);
         downloadAnchor.getElement().getStyle().set("display", "none");
-        content.add(downloadAnchor); // TODO: Does this need to be removed afterwards?
-
+        content.add(downloadAnchor);
         downloadAnchor.getElement().executeJs("this.click();");
     }
 }
