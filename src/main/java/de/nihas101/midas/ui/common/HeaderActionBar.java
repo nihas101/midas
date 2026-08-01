@@ -3,6 +3,7 @@ package de.nihas101.midas.ui.common;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import de.nihas101.midas.export.ExportFactory;
+import de.nihas101.midas.export.ExportViewName;
 import de.nihas101.midas.lock.ShareholderLock;
 import de.nihas101.midas.lock.service.LockWriter;
 import de.nihas101.midas.shareholders.dto.Shareholder;
@@ -34,7 +35,7 @@ public class HeaderActionBar extends HorizontalLayout {
             final Runnable onUpdate,
             final DownloadTrigger downloadTrigger,
             final ExportFactory exportFactory,
-            final Set<String> viewsToExport
+            final Set<ExportViewName> viewsToExport
     ) {
         this(
                 shareholderPicker,

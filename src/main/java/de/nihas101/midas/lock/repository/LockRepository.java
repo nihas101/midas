@@ -25,7 +25,7 @@ public interface LockRepository extends JpaRepository<LockEntity, Integer> {
                     DELETE FROM locked_years
                     WHERE id IN (
                         SELECT ly.id FROM locked_years ly
-                        WHERE ly.year < (:cutoffYear + 1)
+                        WHERE ly.year < (:cutoffYear - 1)
                     )
                     """,
             nativeQuery = true

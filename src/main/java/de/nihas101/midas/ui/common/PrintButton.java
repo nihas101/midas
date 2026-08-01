@@ -5,6 +5,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import de.nihas101.midas.export.Export;
 import de.nihas101.midas.export.ExportFactory;
 import de.nihas101.midas.export.ExportRequest;
+import de.nihas101.midas.export.ExportViewName;
 import de.nihas101.midas.export.ExportViews;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import org.springframework.context.MessageSource;
@@ -25,7 +26,7 @@ public class PrintButton extends Button { // TODO: test
             final YearPicker yearPicker,
             final DownloadTrigger downloadTrigger,
             final ExportFactory exportFactory,
-            final Set<String> viewsToExport
+            final Set<ExportViewName> viewsToExport
     ) {
         super(
                 VaadinIcon.PRINT.create(),

@@ -37,6 +37,7 @@ import de.nihas101.midas.bookings.service.BookingsReader;
 import de.nihas101.midas.bookings.service.BookingsService;
 import de.nihas101.midas.config.MidasConfig;
 import de.nihas101.midas.export.ExportFactory;
+import de.nihas101.midas.export.ExportViewName;
 import de.nihas101.midas.lock.ShareholderLock;
 import de.nihas101.midas.lock.service.LockService;
 import de.nihas101.midas.lock.service.LockWriter;
@@ -203,7 +204,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                 onUpdate,
                 downloadTrigger,
                 exportFactory,
-                Set.of("account-statements")
+                Set.of(ExportViewName.ACCOUNT_STATEMENTS)
         );
 
         content.add(headerActionBar);

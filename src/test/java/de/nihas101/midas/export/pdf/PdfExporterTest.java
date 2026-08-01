@@ -2,13 +2,17 @@ package de.nihas101.midas.export.pdf;
 
 import de.nihas101.midas.accountstatement.row.AccountStatementRowService;
 import de.nihas101.midas.accountstatement.service.RunningTotalAccountStatementService;
+import de.nihas101.midas.bookings.dto.DefaultBookings;
 import de.nihas101.midas.bookings.row.BookingRowService;
 import de.nihas101.midas.bookings.service.BookingsReader;
 import de.nihas101.midas.export.ExportRequest;
+import de.nihas101.midas.export.ExportViewName;
 import de.nihas101.midas.export.ExportViews;
 import de.nihas101.midas.interest.row.InterestRowService;
 import de.nihas101.midas.interest.service.InterestBookingsReader;
 import de.nihas101.midas.interest.service.InterestRateService;
+import de.nihas101.midas.money.MoneyAmount;
+import de.nihas101.midas.openingbalance.dto.OpeningBalance;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -24,12 +28,14 @@ import java.io.OutputStream;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -76,7 +82,7 @@ class PdfExporterTest {
 
     @ParameterizedTest
     @MethodSource("noFileCases")
-    void constructor_noFile_triggersException(final List<Shareholder> shareholders, final Set<String> views) {
+    void constructor_noFile_triggersException(final List<Shareholder> shareholders, final Set<ExportViewName> views) {
         when(request.shareholders()).thenReturn(shareholders);
         when(request.views()).thenReturn(new ExportViews(views));
 
@@ -98,7 +104,7 @@ class PdfExporterTest {
 
     public static Stream<Arguments> noFileCases() {
         return Stream.of(
-                Arguments.of(List.of(), Set.of("view1")),
+                Arguments.of(List.of(), Set.of(ExportViewName.BOOKINGS)),
                 Arguments.of(List.of(new Shareholder()), Set.of()),
                 Arguments.of(List.of(), Set.of())
         );
@@ -107,34 +113,56 @@ class PdfExporterTest {
     @Test
     void trigger_singleFile_usesSinglePdfGeneratorAndCallsPdfServiceOnce() {
         when(request.shareholders()).thenReturn(List.of(shareholder));
-        when(request.views()).thenReturn(new ExportViews(Set.of("view1")));
+        when(request.views()).thenReturn(new ExportViews(Set.of(ExportViewName.BOOKINGS)));
         when(request.startDate()).thenReturn(LocalDate.now());
-        PdfExporter exporter = new PdfExporter(
-                request, outputStream, Locale.GERMAN, pdfService,
-                bookingsReader, interestBookingsReader, interestRateService,
-                runningTotalAccountStatementService, messageSource, bookingRowService,
-                accountStatementRowService, interestRowService);
-        exporter.trigger();
+        when(messageSource.getMessage(any(), any(), any())).thenReturn("dummy");
+        new PdfExporter(
+                request,
+                outputStream,
+                Locale.GERMAN,
+                pdfService,
+                bookingsReader,
+                interestBookingsReader,
+                interestRateService,
+                runningTotalAccountStatementService,
+                messageSource,
+                bookingRowService,
+                accountStatementRowService,
+                interestRowService
+        ).trigger();
         verify(pdfService, times(1)).generatePdf(any(), any(), any());
     }
 
     @Test
     void trigger_multiFile_usesMultiPdfGeneratorAndCallsPdfServiceForEachFile() {
-        Shareholder shareholder2 = mock(Shareholder.class);
+        final Shareholder shareholder2 = mock(Shareholder.class);
         when(request.shareholders()).thenReturn(List.of(shareholder, shareholder2));
-        when(request.views()).thenReturn(new ExportViews(Set.of("viewA", "viewB")));
+        when(request.views()).thenReturn(new ExportViews(Set.of(ExportViewName.BOOKINGS, ExportViewName.INTEREST)));
         when(request.startDate()).thenReturn(Year.of(2026).atMonth(Month.JANUARY).atDay(1));
         when(request.endDate()).thenReturn(Year.of(2026).atMonth(Month.DECEMBER).atEndOfMonth());
         when(shareholder.getFirstName()).thenReturn("John");
         when(shareholder.getLastName()).thenReturn("Doe");
         when(shareholder2.getFirstName()).thenReturn("Jane");
         when(shareholder2.getLastName()).thenReturn("Smith");
-        PdfExporter exporter = new PdfExporter(
-                request, outputStream, Locale.US, pdfService,
-                bookingsReader, interestBookingsReader, interestRateService,
-                runningTotalAccountStatementService, messageSource, bookingRowService,
-                accountStatementRowService, interestRowService);
-        exporter.trigger();
+        when(messageSource.getMessage(any(), any(), any())).thenReturn("dummy");
+        when(interestBookingsReader.interestRelatedBookingsForShareholderAndYear(anyInt(), any()))
+                .thenReturn(new DefaultBookings(Collections.emptyList(), new OpeningBalance(MoneyAmount.ZERO)));
+
+        new PdfExporter(
+                request,
+                outputStream,
+                Locale.US,
+                pdfService,
+                bookingsReader,
+                interestBookingsReader,
+                interestRateService,
+                runningTotalAccountStatementService,
+                messageSource,
+                bookingRowService,
+                accountStatementRowService,
+                interestRowService
+        ).trigger();
+
         verify(pdfService, times(4)).generatePdf(any(), any(), any());
     }
 }

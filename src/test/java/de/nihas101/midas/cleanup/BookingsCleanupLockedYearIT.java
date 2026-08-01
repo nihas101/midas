@@ -51,17 +51,18 @@ class BookingsCleanupLockedYearIT {
         );
         final Shareholder shareholder = Shareholder.fromEntity(shareholderEntity);
 
-        // 2.1. Lock the year 2014 for this shareholder
-        final Year year2014 = Year.of(2014);
-        lockWriter.lock(shareholder, year2014);
+        // 2.1. Lock the year seven years ago for this shareholder (a year that cannot be edited anymore)
+        final Year sevenYearsAgo = Year.now().minusYears(7);
+        lockWriter.lock(shareholder, sevenYearsAgo);
 
-        // 2.2. Lock the year 2015 for this shareholder
-        final Year year2015 = Year.of(2015);
-        lockWriter.lock(shareholder, year2015);
-        Assertions.assertTrue(lockReader.isLocked(shareholder, year2015), "Year 2015 should be locked before cleanup");
+        // 2.2. Lock the year five years ago for this shareholder
+        final Year fiveYearsAgo = Year.now().minusYears(5);
+        lockWriter.lock(shareholder, fiveYearsAgo);
+        Assertions.assertTrue(lockReader.isLocked(shareholder, fiveYearsAgo), "The year 5 years ago should be locked before cleanup");
+        Assertions.assertTrue(lockReader.isLocked(shareholder, sevenYearsAgo), "The year 6 years ago should be locked before cleanup");
 
-        // 3. Create a booking directly in the DB in year 2015 (before 10 year cutoff)
-        final LocalDate oldDate = LocalDate.of(2015, 3, 10);
+        // 3. Create a booking directly in the DB five years ago
+        final LocalDate oldDate = LocalDate.of(fiveYearsAgo.getValue(), 3, 10);
         final BookingEntity oldBooking = new BookingEntity(
                 null,
                 1,
@@ -76,14 +77,14 @@ class BookingsCleanupLockedYearIT {
 
         Assertions.assertFalse(bookingsRepository.findAll().isEmpty(), "Old booking should exist before cleanup");
 
-        // 4. Configure cleanup with cutoff of 5 years (which includes 2015)
+        // 4. Configure cleanup with cutoff of 5 years
         final CleanupConfig cleanupConfig = new CleanupConfig();
         cleanupConfig.setCutoff(Period.ofYears(5));
         cleanupConfig.setLimit(-1);
 
         final BookingsCleanup cleanup = new BookingsCleanup(bookingsRepository, lockRepository, cleanupConfig);
 
-        // 5. Execute cleanup and verify it succeeds despite year 2015 being locked
+        // 5. Execute cleanup and verify it succeeds despite the year being locked
         Assertions.assertDoesNotThrow(cleanup::cleanUp);
 
         // 6. Verify the booking was cleaned up
@@ -92,16 +93,16 @@ class BookingsCleanupLockedYearIT {
                 "Old booking in locked year should have been cleaned up"
         );
 
-        // 7. Verify the lock for year 2015 was not removed
-        Assertions.assertFalse(
-                lockReader.isLocked(shareholder, year2015),
-                "Lock for year 2015 should have been removed after all bookings for that year were cleaned up"
+        // 7. Verify the lock for five years ago was not removed
+        Assertions.assertTrue(
+                lockReader.isLocked(shareholder, fiveYearsAgo),
+                "Lock five years ago should stay"
         );
 
-        // 8. Verify the lock for year 2014 was removed
+        // 8. Verify the lock for seven years ago was removed
         Assertions.assertFalse(
-                lockReader.isLocked(shareholder, year2014),
-                "Lock for year 2015 should have been removed after all bookings for that year were cleaned up"
+                lockReader.isLocked(shareholder, sevenYearsAgo),
+                "Lock six years ago should be removed"
         );
     }
 }

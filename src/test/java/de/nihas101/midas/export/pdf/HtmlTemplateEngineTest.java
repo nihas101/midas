@@ -1,5 +1,6 @@
 package de.nihas101.midas.export.pdf;
 
+import de.nihas101.midas.export.ExportViewName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -43,7 +44,7 @@ class HtmlTemplateEngineTest {
         // Arrange
         final TemplateContext context = new TemplateContext(Locale.ENGLISH);
         final PdfViewData data = mock(PdfViewData.class);
-        when(data.viewName()).thenReturn("test-view");
+        when(data.viewName()).thenReturn(ExportViewName.INTEREST);
         when(templateEngine.process(eq("base-layout"), eq(context)))
                 .thenThrow(new RuntimeException("template error"));
 

@@ -22,6 +22,7 @@ import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.bookings.entity.Source;
 import de.nihas101.midas.config.MidasConfig;
 import de.nihas101.midas.export.ExportFactory;
+import de.nihas101.midas.export.ExportViewName;
 import de.nihas101.midas.interest.InterestCalculation;
 import de.nihas101.midas.interest.dto.InterestRate;
 import de.nihas101.midas.interest.row.InterestCalculationRow;
@@ -190,7 +191,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
                 onUpdate,
                 downloadTrigger,
                 exportFactory,
-                Set.of("interest")
+                Set.of(ExportViewName.INTEREST)
         );
 
         content.add(headerActionBar);

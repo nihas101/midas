@@ -19,6 +19,7 @@ import de.nihas101.midas.config.MidasConfig;
 import de.nihas101.midas.export.Export;
 import de.nihas101.midas.export.ExportFactory;
 import de.nihas101.midas.export.ExportRequest;
+import de.nihas101.midas.export.ExportViewName;
 import de.nihas101.midas.export.ExportViews;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersService;
@@ -33,6 +34,7 @@ import org.springframework.context.MessageSource;
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
 import java.time.Year;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -50,7 +52,7 @@ public class ExportView extends MidasView {
 
     private MultiSelectComboBox<Shareholder> shareholderPicker;
     private Checkbox selectAllCheckbox;
-    private CheckboxGroup<String> viewPicker;
+    private CheckboxGroup<ExportViewName> viewPicker;
     private DatePicker startDatePicker;
     private DatePicker endDatePicker;
     private CheckboxGroup<String> formatPicker;
@@ -166,11 +168,11 @@ public class ExportView extends MidasView {
     }
 
     private void setupViewSelection(VerticalLayout content) {
-        final List<String> allViews = List.of("bookings", "interest", "account-statements"); // TODO: Handle this via enum, not string!
+        final List<ExportViewName> allViews = Arrays.stream(ExportViewName.values()).toList();
 
         viewPicker = new CheckboxGroup<>(messageSource.getMessage("export.views.label", null, getLocale()));
         viewPicker.setItems(allViews);
-        viewPicker.setItemLabelGenerator(key -> messageSource.getMessage("export.view." + key, null, getLocale()));
+        viewPicker.setItemLabelGenerator(key -> messageSource.getMessage("export.view." + key.getName(), null, getLocale()));
         viewPicker.addThemeVariants(CheckboxGroupVariant.LUMO_VERTICAL);
         viewPicker.addValueChangeListener(e -> updateExportButtonState());
 
@@ -238,7 +240,7 @@ public class ExportView extends MidasView {
         try {
             final LocalDate from = startDatePicker.getValue();
             final LocalDate to = endDatePicker.getValue();
-            final Set<String> views = viewPicker.getValue();
+            final Set<ExportViewName> views = viewPicker.getValue();
             final ExportRequest request = new ExportRequest(
                     List.copyOf(shareholderPicker.getValue()),
                     new ExportViews(views, messageSource, getLocale()),

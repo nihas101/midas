@@ -1,6 +1,7 @@
 package de.nihas101.midas.export.pdf;
 
 import de.nihas101.midas.export.ExportRequest;
+import de.nihas101.midas.export.ExportViewName;
 import de.nihas101.midas.export.ExportViews;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import org.junit.jupiter.api.Test;
@@ -56,12 +57,12 @@ class MultiPdfGeneratorTest {
     @Test
     void generate_createsZipWithCorrectEntries() throws Exception {
         when(request.shareholders()).thenReturn(Collections.singletonList(shareholder));
-        when(request.views()).thenReturn(new ExportViews(Set.of("sampleView")));
+        when(request.views()).thenReturn(new ExportViews(Set.of(ExportViewName.BOOKINGS)));
         when(request.startDate()).thenReturn(Year.of(2026).atMonth(Month.JANUARY).atDay(1));
         when(request.endDate()).thenReturn(Year.of(2026).atMonth(Month.DECEMBER).atEndOfMonth());
         when(shareholder.getFirstName()).thenReturn("John");
         when(shareholder.getLastName()).thenReturn("Doe");
-        when(pdfViewDataExtractor.extractData(eq(shareholder), eq("sampleView"))).thenReturn(pdfViewData);
+        when(pdfViewDataExtractor.extractData(eq(shareholder), eq(ExportViewName.BOOKINGS))).thenReturn(pdfViewData);
         // Mock pdfService to write dummy bytes
         doAnswer(invocation -> {
             final ByteArrayOutputStream baos = invocation.getArgument(2);
@@ -83,14 +84,14 @@ class MultiPdfGeneratorTest {
         generator.generate();
 
         // Verify service interactions
-        verify(pdfViewDataExtractor).extractData(eq(shareholder), eq("sampleView"));
+        verify(pdfViewDataExtractor).extractData(eq(shareholder), eq(ExportViewName.BOOKINGS));
         verify(pdfService).generatePdf(eq(pdfViewData), any(Locale.class), any(ByteArrayOutputStream.class));
 
         // Read the zip content and verify entry name and content
         try (final ZipInputStream zipIn = new ZipInputStream(new ByteArrayInputStream(zipOut.toByteArray()))) {
             final ZipEntry entry = zipIn.getNextEntry();
             assertNotNull(entry, "Zip should contain an entry");
-            final String expectedName = "John_Doe_(0-0)_sampleView_2026-01-01_2026-12-31.pdf";
+            final String expectedName = "John_Doe_(0-0)_bookings_2026-01-01_2026-12-31.pdf";
             assertEquals(expectedName, entry.getName());
             // Ensure there is data inside the entry
             byte[] buffer = new byte[10];
@@ -103,7 +104,7 @@ class MultiPdfGeneratorTest {
     @Test
     void generate_propagatesPdfExportException() {
         when(request.shareholders()).thenReturn(Collections.singletonList(shareholder));
-        when(request.views()).thenReturn(new ExportViews(Set.of("view")));
+        when(request.views()).thenReturn(new ExportViews(Set.of(ExportViewName.BOOKINGS)));
         when(request.startDate()).thenReturn(LocalDate.now());
         when(request.endDate()).thenReturn(LocalDate.now().plusDays(1));
         when(pdfViewDataExtractor.extractData(any(), any())).thenReturn(pdfViewData);

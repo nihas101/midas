@@ -49,8 +49,7 @@ public class ExportFactory {
     ) {
         final List<ExportDataSource> dataSources = new ArrayList<>();
 
-        // TODO: Don't do this via strings
-        if (request.views().contains("bookings")) {
+        if (request.views().contains(ExportViewName.BOOKINGS)) {
             dataSources.add(
                     new BookingsExportDataSource(
                             new BookingsRowExtractor(
@@ -68,7 +67,7 @@ public class ExportFactory {
             );
         }
 
-        if (request.views().contains("interest")) {
+        if (request.views().contains(ExportViewName.INTEREST)) {
             dataSources.add(
                     new InterestExportDataSource(
                             new InterestRowExtractor(
@@ -84,7 +83,7 @@ public class ExportFactory {
             );
         }
 
-        if (request.views().contains("account-statements")) {
+        if (request.views().contains(ExportViewName.ACCOUNT_STATEMENTS)) {
             dataSources.add(
                     new AccountStatementExportDataSource(
                             new AccountStatementsRowExtractor(
