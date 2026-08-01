@@ -35,7 +35,7 @@ public class DefaultLockService implements LockService {
     }
 
     @Override
-    public void lock(final Shareholder shareholder, final Year year) { // TODO: Use Lock instead?
+    public void lock(final Shareholder shareholder, final Year year) {
         final ShareholderEntity shareholderEntity = ShareholderEntity.fromDto(shareholder);
         if (lockRepository.existsByShareholderAndYear(shareholderEntity, year.getValue())) {
             return;
@@ -44,7 +44,7 @@ public class DefaultLockService implements LockService {
     }
 
     @Override
-    public void unlock(final Shareholder shareholder, final Year year) { // TODO: Use Lock instead?
+    public void unlock(final Shareholder shareholder, final Year year) {
         lockRepository.findByShareholderAndYear(ShareholderEntity.fromDto(shareholder), year.getValue())
                 .ifPresent(lockRepository::delete);
     }
