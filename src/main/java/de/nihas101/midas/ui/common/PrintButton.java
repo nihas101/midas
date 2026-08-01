@@ -49,6 +49,6 @@ public class PrintButton extends Button { // TODO: test
                     downloadTrigger.triggerDownload(data, pdfExport.fileName(), pdfExport.mimeType());
                 }
         );
-        setTooltipText("TODO"); // TODO
+        setTooltipText(messageSource.getMessage("printbutton.tooltip", null, locale));
     }
 }
