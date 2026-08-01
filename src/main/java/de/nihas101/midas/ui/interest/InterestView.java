@@ -21,6 +21,7 @@ import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.entity.BookingType;
 import de.nihas101.midas.bookings.entity.Source;
 import de.nihas101.midas.config.MidasConfig;
+import de.nihas101.midas.export.ExportFactory;
 import de.nihas101.midas.interest.InterestCalculation;
 import de.nihas101.midas.interest.dto.InterestRate;
 import de.nihas101.midas.interest.row.InterestCalculationRow;
@@ -37,6 +38,7 @@ import de.nihas101.midas.lock.service.LockWriter;
 import de.nihas101.midas.money.MoneyAmount;
 import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersService;
+import de.nihas101.midas.ui.common.DownloadTrigger;
 import de.nihas101.midas.ui.common.HeaderActionBar;
 import de.nihas101.midas.ui.common.MidasView;
 import de.nihas101.midas.ui.common.QueryParameter;
@@ -54,6 +56,7 @@ import java.time.Year;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 
 import static java.math.BigDecimal.ZERO;
 import static java.util.Collections.emptyList;
@@ -73,12 +76,14 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
     private final InterestRowService interestRowService;
     private final LockWriter lockWriter;
     private final ShareholderLock shareholderLock;
+    private final ExportFactory exportFactory;
 
     private BigDecimalField interestRateField;
     private HorizontalLayout actionRow;
     private Grid<InterestCalculationRow> interestCalculationGrid;
     private Checkbox updateInterestAutomaticallyToggle;
     private HeaderActionBar headerActionBar;
+    private final DownloadTrigger downloadTrigger;
 
     public InterestView(
             final ShareholdersService shareholdersService,
@@ -90,7 +95,8 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
             final MidasLocaleResolver midasLocaleResolver,
             final InterestRowService interestRowService,
             final LockService lockWriter,
-            final ShareholderLock shareholderLock
+            final ShareholderLock shareholderLock,
+            final ExportFactory exportFactory
     ) {
         super(config, userConfigService, messageSource, midasLocaleResolver);
         this.shareholdersService = shareholdersService;
@@ -101,11 +107,14 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
         this.interestRowService = interestRowService;
         this.lockWriter = lockWriter;
         this.shareholderLock = shareholderLock;
+        this.exportFactory = exportFactory;
 
         VerticalLayout content = new VerticalLayout();
         content.setSizeFull();
 
         content.add(new H2(messageSource.getMessage("interest-calculation", null, getLocale())));
+
+        this.downloadTrigger = new DownloadTrigger(content);
 
         setupHeader(content);
         setupInterestGrid(content);
@@ -178,7 +187,10 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
                 actionRow,
                 shareholderLock,
                 lockWriter,
-                onUpdate
+                onUpdate,
+                downloadTrigger,
+                exportFactory,
+                Set.of("interest")
         );
 
         content.add(headerActionBar);

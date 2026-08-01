@@ -29,6 +29,7 @@ import de.nihas101.midas.bookings.service.BookingsReader;
 import de.nihas101.midas.bookings.service.BookingsService;
 import de.nihas101.midas.bookings.service.BookingsWriter;
 import de.nihas101.midas.config.MidasConfig;
+import de.nihas101.midas.export.ExportFactory;
 import de.nihas101.midas.interest.service.bookingupdate.InterestUpdatingBookingsService;
 import de.nihas101.midas.interest.service.openingbalanceupdate.InterestUpdatingOpeningBalanceService;
 import de.nihas101.midas.lock.ShareholderLock;
@@ -48,6 +49,7 @@ import de.nihas101.midas.ui.common.QueryParameter;
 import de.nihas101.midas.ui.common.ShareholderPicker;
 import de.nihas101.midas.ui.common.YearPicker;
 import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
+import de.nihas101.midas.ui.common.DownloadTrigger;
 import de.nihas101.midas.ui.interest.InterestView;
 import de.nihas101.midas.userconfig.service.UserConfigService;
 import lombok.extern.slf4j.Slf4j;
@@ -60,6 +62,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import static com.vaadin.flow.component.button.ButtonVariant.LUMO_ERROR;
 import static java.math.BigDecimal.ZERO;
@@ -80,12 +83,14 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
     private final BookingRowService bookingRowService;
     private final LockWriter lockWriter;
     private final ShareholderLock shareholderLock;
+    private final ExportFactory exportFactory;
 
     private Checkbox updateNextYearsBalanceAutomaticallyToggle;
     private BigDecimalField openingBalanceField;
     private HorizontalLayout actionRow;
     private Grid<BookingRow> grid;
     private HeaderActionBar headerActionBar;
+    private DownloadTrigger downloadTrigger;
 
     public BookingsView(
             final ShareholdersService shareholdersService,
@@ -98,7 +103,8 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
             final MidasLocaleResolver midasLocaleResolver,
             final BookingRowService bookingRowService,
             final LockService lockWriter,
-            final ShareholderLock shareholderLock
+            final ShareholderLock shareholderLock,
+            final ExportFactory exportFactory
     ) {
         super(config, userConfigService, messageSource, midasLocaleResolver);
         this.shareholdersService = shareholdersService;
@@ -109,11 +115,14 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         this.bookingRowService = bookingRowService;
         this.lockWriter = lockWriter;
         this.shareholderLock = shareholderLock;
+        this.exportFactory = exportFactory;
 
         VerticalLayout content = new VerticalLayout();
         content.setSizeFull();
 
         content.add(new H2(messageSource.getMessage("bookings", null, getLocale())));
+
+        this.downloadTrigger = new DownloadTrigger(content);
 
         setupHeader(content);
         setupGrid(content);
@@ -183,7 +192,10 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                 actionRow,
                 shareholderLock,
                 lockWriter,
-                onUpdate
+                onUpdate,
+                downloadTrigger,
+                exportFactory,
+                Set.of("bookings")
         );
         content.add(headerActionBar);
     }

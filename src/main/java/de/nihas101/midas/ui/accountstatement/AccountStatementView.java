@@ -36,6 +36,7 @@ import de.nihas101.midas.bookings.dto.Bookings;
 import de.nihas101.midas.bookings.service.BookingsReader;
 import de.nihas101.midas.bookings.service.BookingsService;
 import de.nihas101.midas.config.MidasConfig;
+import de.nihas101.midas.export.ExportFactory;
 import de.nihas101.midas.lock.ShareholderLock;
 import de.nihas101.midas.lock.service.LockService;
 import de.nihas101.midas.lock.service.LockWriter;
@@ -44,6 +45,7 @@ import de.nihas101.midas.shareholders.dto.Shareholder;
 import de.nihas101.midas.shareholders.service.ShareholdersService;
 import de.nihas101.midas.ui.bookings.BookingsView;
 import de.nihas101.midas.ui.common.AddButton;
+import de.nihas101.midas.ui.common.DownloadTrigger;
 import de.nihas101.midas.ui.common.HeaderActionBar;
 import de.nihas101.midas.ui.common.MidasView;
 import de.nihas101.midas.ui.common.QueryParameter;
@@ -62,6 +64,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static java.util.Collections.emptyList;
 
@@ -80,6 +83,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
     private final BookingsReader bookingsReader;
     private final LockWriter lockWriter;
     private final ShareholderLock shareholderLock;
+    private final ExportFactory exportFactory;
 
     private HorizontalLayout warningBanner;
     private Span warningText;
@@ -90,6 +94,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
     private AccountStatementRow draggedRow;
     private List<AccountStatementRow> currentRows;
     private HeaderActionBar headerActionBar;
+    private final DownloadTrigger downloadTrigger;
 
     public AccountStatementView(
             final ShareholdersService shareholdersService,
@@ -102,7 +107,8 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
             final AccountStatementRowService accountStatementRowService,
             final BookingsService bookingsReader,
             final LockService lockWriter,
-            final ShareholderLock shareholderLock
+            final ShareholderLock shareholderLock,
+            final ExportFactory exportFactory
     ) {
         super(config, userConfigService, messageSource, midasLocaleResolver);
         this.shareholdersService = shareholdersService;
@@ -113,12 +119,15 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         this.bookingsReader = bookingsReader;
         this.lockWriter = lockWriter;
         this.shareholderLock = shareholderLock;
+        this.exportFactory = exportFactory;
 
         VerticalLayout content = new VerticalLayout();
         content.setSizeFull();
         addClassName("account-statement-view");
 
         content.add(new H2(messageSource.getMessage("account-statements", null, getLocale())));
+
+        this.downloadTrigger = new DownloadTrigger(content);
 
         setupHeader(content);
         setupWarningBanner(content);
@@ -191,7 +200,10 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                 actionRow,
                 shareholderLock,
                 lockWriter,
-                onUpdate
+                onUpdate,
+                downloadTrigger,
+                exportFactory,
+                Set.of("account-statements")
         );
 
         content.add(headerActionBar);
