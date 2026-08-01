@@ -40,6 +40,7 @@ import java.util.function.Consumer;
 
 import static de.nihas101.midas.ui.common.DatePickerI18nProvider.datePickerI18n;
 
+// TODO: Add tests
 // TODO: Separate into edit and create variants
 public class BookingFormDialog extends Dialog {
 
@@ -240,9 +241,8 @@ public class BookingFormDialog extends Dialog {
     }
 
     private DatePicker datePicker(final MessageSource messageSource, final Locale locale, final ShareholderLock shareholderLock) {
-        final DatePicker datePicker;
         // TODO: Extract into class, so we dont have to set the local everywhere
-        datePicker = new DatePicker(messageSource.getMessage("bookings.date", null, locale));
+        final DatePicker datePicker = new DatePicker(messageSource.getMessage("bookings.date", null, locale));
         datePicker.setLocale(locale);
         datePicker.setI18n(datePickerI18n(messageSource, locale));
         datePicker.setRequired(true);
@@ -278,7 +278,7 @@ public class BookingFormDialog extends Dialog {
     }
 
     private void setupFooter(final HorizontalLayout checkBoxLayout, final HorizontalLayout buttonLayout) {
-        HorizontalLayout footer = new HorizontalLayout();
+        final HorizontalLayout footer = new HorizontalLayout();
         footer.setWidthFull();
         footer.setFlexGrow(1, addAnotherCheckbox);
         footer.add(checkBoxLayout, buttonLayout);
@@ -348,8 +348,8 @@ public class BookingFormDialog extends Dialog {
     }
 
     private void resetForm() {
-        Booking current = binder.getBean();
-        Booking next = new Booking();
+        final Booking current = binder.getBean();
+        final Booking next = new Booking();
         next.setShareholderId(current.getShareholderId());
         next.setDate(current.getDate());
         binder.setBean(next);
