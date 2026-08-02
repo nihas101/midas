@@ -19,28 +19,30 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
-import de.nihas101.midas.core.bookings.dto.Booking;
-import de.nihas101.midas.core.bookings.dto.Bookings;
-import de.nihas101.midas.core.bookings.entity.BookingType;
-import de.nihas101.midas.core.bookings.entity.Source;
+import de.nihas101.midas.api.bookings.Booking;
+import de.nihas101.midas.api.bookings.BookingType;
+import de.nihas101.midas.api.bookings.Bookings;
+import de.nihas101.midas.api.bookings.BookingsReader;
+import de.nihas101.midas.api.bookings.BookingsWriter;
+import de.nihas101.midas.api.bookings.Source;
+import de.nihas101.midas.api.interest.InterestUpdatingBookingsService;
+import de.nihas101.midas.api.interest.InterestUpdatingOpeningBalanceService;
+import de.nihas101.midas.api.lock.LockService;
+import de.nihas101.midas.api.lock.LockWriter;
+import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.api.openingbalance.OpeningBalance;
+import de.nihas101.midas.api.openingbalance.OpeningBalanceService;
+import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.core.bookings.row.BookingRow;
 import de.nihas101.midas.core.bookings.row.BookingRowService;
-import de.nihas101.midas.core.bookings.service.BookingsReader;
 import de.nihas101.midas.core.bookings.service.BookingsService;
-import de.nihas101.midas.core.bookings.service.BookingsWriter;
 import de.nihas101.midas.core.config.MidasConfig;
 import de.nihas101.midas.core.export.ExportFactory;
 import de.nihas101.midas.core.export.ExportViewName;
-import de.nihas101.midas.core.interest.service.bookingupdate.InterestUpdatingBookingsService;
-import de.nihas101.midas.core.interest.service.openingbalanceupdate.InterestUpdatingOpeningBalanceService;
 import de.nihas101.midas.core.lock.ShareholderLock;
-import de.nihas101.midas.core.lock.service.LockService;
-import de.nihas101.midas.core.lock.service.LockWriter;
-import de.nihas101.midas.core.money.MoneyAmount;
-import de.nihas101.midas.core.openingbalance.dto.OpeningBalance;
-import de.nihas101.midas.core.openingbalance.service.OpeningBalanceService;
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
+import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
 import de.nihas101.midas.core.shareholders.service.ShareholdersService;
+import de.nihas101.midas.core.userconfig.service.UserConfigService;
 import de.nihas101.midas.ui.common.AddButton;
 import de.nihas101.midas.ui.common.DeleteButton;
 import de.nihas101.midas.ui.common.DownloadTrigger;
@@ -52,7 +54,6 @@ import de.nihas101.midas.ui.common.ShareholderPicker;
 import de.nihas101.midas.ui.common.YearPicker;
 import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
 import de.nihas101.midas.ui.interest.InterestView;
-import de.nihas101.midas.core.userconfig.service.UserConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.MessageSource;
@@ -292,7 +293,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         final OpeningBalance openingBalance = openingBalanceService.openingBalance(shareholder.getId(), year);
         if (openingBalance == null) {
             openingBalanceService.create(
-                    new OpeningBalance(
+                    new DefaultOpeningBalance(
                             null,
                             shareholder.getId(),
                             MoneyAmount.of(amount),
@@ -599,7 +600,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
             nextYearsOpeningBalance.setSource(Source.SYSTEM);
             openingBalanceService.update(nextYearsOpeningBalance);
         } else {
-            final OpeningBalance openingBalance = OpeningBalance.builder()
+            final OpeningBalance openingBalance = DefaultOpeningBalance.builder()
                     .shareholderId(headerActionBar.getSelectedShareholder().getId())
                     .openingBalance(nextYearsOpening)
                     .year(headerActionBar.getSelectedYear().plusYears(1))

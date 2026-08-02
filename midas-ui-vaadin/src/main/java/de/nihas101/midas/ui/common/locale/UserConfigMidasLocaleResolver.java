@@ -1,7 +1,7 @@
 package de.nihas101.midas.ui.common.locale;
 
-import de.nihas101.midas.core.userconfig.entity.UserConfig;
-import de.nihas101.midas.core.userconfig.service.UserConfigReader;
+import de.nihas101.midas.api.userconfig.UserConfig;
+import de.nihas101.midas.api.userconfig.UserConfigReader;
 import de.nihas101.midas.core.userconfig.service.UserConfigService;
 import lombok.RequiredArgsConstructor;
 

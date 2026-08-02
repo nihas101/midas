@@ -1,6 +1,6 @@
 package de.nihas101.midas.core.openingbalance.repository;
 
-import de.nihas101.midas.core.bookings.entity.Source;
+import de.nihas101.midas.api.bookings.Source;
 import de.nihas101.midas.core.openingbalance.entity.OpeningBalanceEntity;
 import de.nihas101.midas.core.shareholders.entity.ShareholderEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,9 +1,9 @@
 package de.nihas101.midas.core.export.pdf;
 
+import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.core.export.ExportRequest;
 import de.nihas101.midas.core.export.ExportViewName;
 import de.nihas101.midas.core.export.ExportViews;
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;

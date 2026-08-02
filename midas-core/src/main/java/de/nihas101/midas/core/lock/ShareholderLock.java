@@ -1,8 +1,8 @@
 package de.nihas101.midas.core.lock;
 
-import de.nihas101.midas.core.lock.service.LockReader;
+import de.nihas101.midas.api.lock.LockReader;
+import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.core.lock.service.LockedException;
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

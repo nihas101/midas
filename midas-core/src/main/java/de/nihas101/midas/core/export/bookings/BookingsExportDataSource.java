@@ -1,8 +1,8 @@
 package de.nihas101.midas.core.export.bookings;
 
-import de.nihas101.midas.core.bookings.entity.BookingType;
-import de.nihas101.midas.core.export.ExportDataSource;
-import de.nihas101.midas.core.export.ExportTarget;
+import de.nihas101.midas.api.bookings.BookingType;
+import de.nihas101.midas.api.export.ExportDataSource;
+import de.nihas101.midas.api.export.ExportTarget;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 

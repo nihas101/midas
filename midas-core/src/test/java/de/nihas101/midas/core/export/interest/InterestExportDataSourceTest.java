@@ -1,6 +1,6 @@
 package de.nihas101.midas.core.export.interest;
 
-import de.nihas101.midas.core.export.ExportTarget;
+import de.nihas101.midas.api.export.ExportTarget;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

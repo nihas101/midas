@@ -1,9 +1,12 @@
 package de.nihas101.midas.core.bookings.dto;
 
-import de.nihas101.midas.core.bookings.entity.BookingType;
-import de.nihas101.midas.core.bookings.entity.Source;
-import de.nihas101.midas.core.money.MoneyAmount;
-import de.nihas101.midas.core.openingbalance.dto.OpeningBalance;
+import de.nihas101.midas.api.bookings.Booking;
+import de.nihas101.midas.api.bookings.BookingType;
+import de.nihas101.midas.api.bookings.Bookings;
+import de.nihas101.midas.api.bookings.FilteredBookings;
+import de.nihas101.midas.api.bookings.Source;
+import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -24,13 +27,13 @@ class DefaultBookingsTest {
         List<Booking> bookings = List.of(
                 createBooking(BookingType.WITHDRAWAL, 2000L, Month.JANUARY)
         );
-        DefaultBookings defaultBookings = new DefaultBookings(bookings, new OpeningBalance(1, 2, MoneyAmount.ofCents(1500L), Year.of(2026), Source.USER));
+        Bookings defaultBookings = new DefaultBookings(bookings, new DefaultOpeningBalance(1, 2, MoneyAmount.ofCents(1500L), Year.of(2026), Source.USER));
         assertEquals(MoneyAmount.ofCents(1500L), defaultBookings.openingBalance().getOpeningBalance());
     }
 
     @Test
     void openingBalance_emptyReturnsZero() {
-        DefaultBookings defaultBookings = new DefaultBookings(List.of(), null);
+        Bookings defaultBookings = new DefaultBookings(List.of(), null);
         assertEquals(MoneyAmount.ZERO, defaultBookings.openingBalance().getOpeningBalance());
     }
 
@@ -41,7 +44,7 @@ class DefaultBookingsTest {
         Month otherMonth = (month == Month.DECEMBER) ? Month.JANUARY : month.plus(1);
         Booking wrongMonth = createBooking(BookingType.WITHDRAWAL, 2000L, otherMonth);
 
-        DefaultBookings defaultBookings = new DefaultBookings(List.of(correctMonth, wrongMonth), new OpeningBalance(1, 2, MoneyAmount.ofCents(5000L), Year.of(2026), Source.USER));
+        Bookings defaultBookings = new DefaultBookings(List.of(correctMonth, wrongMonth), new DefaultOpeningBalance(1, 2, MoneyAmount.ofCents(5000L), Year.of(2026), Source.USER));
 
         FilteredBookings result = defaultBookings.bookingsInMonth(month);
 
@@ -50,8 +53,8 @@ class DefaultBookingsTest {
         assertFalse(result.bookings().contains(wrongMonth));
     }
 
-    private Booking createBooking(BookingType type, long cents, Month month) {
-        return Booking.builder()
+    private Booking createBooking(final BookingType type, final long cents, final Month month) {
+        return DefaultBooking.builder()
                 .type(type)
                 .amount(MoneyAmount.ofCents(cents))
                 .date(LocalDate.of(2026, month, 1))

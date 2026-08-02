@@ -1,10 +1,11 @@
 package de.nihas101.midas.core.bookings.monthlytotal;
 
-import de.nihas101.midas.core.bookings.dto.Booking;
-import de.nihas101.midas.core.bookings.dto.Bookings;
-import de.nihas101.midas.core.bookings.dto.FilteredBookings;
-import de.nihas101.midas.core.bookings.entity.BookingType;
-import de.nihas101.midas.core.money.MoneyAmount;
+import de.nihas101.midas.api.bookings.Booking;
+import de.nihas101.midas.api.bookings.BookingType;
+import de.nihas101.midas.api.bookings.Bookings;
+import de.nihas101.midas.api.bookings.FilteredBookings;
+import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.core.bookings.dto.DefaultBooking;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -52,16 +53,16 @@ class MonthlyCumulativeSumTest {
         final Bookings bookings = mock(Bookings.class);
 
         // Jan: Withdrawal 100
-        final Booking janW = Booking.builder().type(BookingType.WITHDRAWAL).amount(MoneyAmount.ofCents(100L)).build();
+        final Booking janW = DefaultBooking.builder().type(BookingType.WITHDRAWAL).amount(MoneyAmount.ofCents(100L)).build();
         when(bookings.bookingsInMonth(Month.JANUARY)).thenReturn(new FilteredBookings(List.of(janW)));
 
         // Feb: Interest 50
-        final Booking febI = Booking.builder().type(BookingType.INTEREST).amount(MoneyAmount.ofCents(50L)).build();
+        final Booking febI = DefaultBooking.builder().type(BookingType.INTEREST).amount(MoneyAmount.ofCents(50L)).build();
         when(bookings.bookingsInMonth(Month.FEBRUARY)).thenReturn(new FilteredBookings(List.of(febI)));
 
         // Mar: Withdrawal 200, Compensation 300
-        final Booking marW = Booking.builder().type(BookingType.WITHDRAWAL).amount(MoneyAmount.ofCents(200L)).build();
-        final Booking marC = Booking.builder().type(BookingType.COMPENSATION).amount(MoneyAmount.ofCents(300L)).build();
+        final Booking marW = DefaultBooking.builder().type(BookingType.WITHDRAWAL).amount(MoneyAmount.ofCents(200L)).build();
+        final Booking marC = DefaultBooking.builder().type(BookingType.COMPENSATION).amount(MoneyAmount.ofCents(300L)).build();
         when(bookings.bookingsInMonth(Month.MARCH)).thenReturn(new FilteredBookings(List.of(marW, marC)));
 
         // Rest empty

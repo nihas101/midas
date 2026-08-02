@@ -1,12 +1,14 @@
 package de.nihas101.midas.core.export;
 
+import de.nihas101.midas.api.export.ExportTarget;
+import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.core.accountstatement.runningtotal.RunningTotalAccountStatement;
 import de.nihas101.midas.core.accountstatement.runningtotal.RunningTotalAccountStatements;
 import de.nihas101.midas.core.accountstatement.service.RunningTotalAccountStatementService;
 import de.nihas101.midas.core.export.accountstatement.AccountStatementExportDataSource;
 import de.nihas101.midas.core.export.accountstatement.AccountStatementsRowExtractor;
-import de.nihas101.midas.core.money.MoneyAmount;
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
+import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,8 +48,8 @@ class AccountStatementExportDataSourceTest {
     private final Locale locale = Locale.GERMAN;
     private final LocalDate startDate = LocalDate.of(2023, 1, 1);
     private final LocalDate endDate = LocalDate.of(2023, 12, 31);
-    private final Shareholder alice = new Shareholder(1, 1, "Alice", "A");
-    private final Shareholder bob = new Shareholder(2, 2, "Bob", "B");
+    private final Shareholder alice = new DefaultShareholder(1, 1, "Alice", "A");
+    private final Shareholder bob = new DefaultShareholder(2, 2, "Bob", "B");
 
     @BeforeEach
     void setUp() {

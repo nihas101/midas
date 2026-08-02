@@ -1,14 +1,15 @@
 package de.nihas101.midas.core.cleanup;
 
+import de.nihas101.midas.api.bookings.BookingType;
+import de.nihas101.midas.api.bookings.Source;
+import de.nihas101.midas.api.lock.LockReader;
+import de.nihas101.midas.api.lock.LockWriter;
+import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.core.bookings.entity.BookingEntity;
-import de.nihas101.midas.core.bookings.entity.BookingType;
-import de.nihas101.midas.core.bookings.entity.Source;
 import de.nihas101.midas.core.bookings.repository.BookingsRepository;
 import de.nihas101.midas.core.lock.repository.LockRepository;
-import de.nihas101.midas.core.lock.service.LockReader;
-import de.nihas101.midas.core.lock.service.LockWriter;
-import de.nihas101.midas.core.money.MoneyAmount;
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
+import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
 import de.nihas101.midas.core.shareholders.entity.ShareholderEntity;
 import de.nihas101.midas.core.shareholders.repository.ShareholdersRepository;
 import org.junit.jupiter.api.Assertions;
@@ -49,7 +50,7 @@ class BookingsCleanupLockedYearIT { // TODO: Figure out a way to move this into 
         final ShareholderEntity shareholderEntity = shareholdersRepository.save(
                 new ShareholderEntity(null, 888, "Cleanup", "Test")
         );
-        final Shareholder shareholder = Shareholder.fromEntity(shareholderEntity);
+        final Shareholder shareholder = DefaultShareholder.fromEntity(shareholderEntity);
 
         // 2.1. Lock the year seven years ago for this shareholder (a year that cannot be edited anymore)
         final Year sevenYearsAgo = Year.now().minusYears(7);

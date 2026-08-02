@@ -1,6 +1,6 @@
 package de.nihas101.midas.core.export.xlsx;
 
-import de.nihas101.midas.core.export.ExportDataSource;
+import de.nihas101.midas.api.export.ExportDataSource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;

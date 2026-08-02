@@ -25,6 +25,7 @@
         <module>midas-core</module>
         <module>midas-ui-vaadin</module>
         <module>midas-i18n</module>
+        <module>midas-api</module>
     </modules>
     <scm>
         <connection/>

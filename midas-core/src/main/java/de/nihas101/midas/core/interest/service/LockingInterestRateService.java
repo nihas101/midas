@@ -1,10 +1,11 @@
 package de.nihas101.midas.core.interest.service;
 
-import de.nihas101.midas.core.bookings.dto.Booking;
-import de.nihas101.midas.core.bookings.dto.Bookings;
+import de.nihas101.midas.api.bookings.Booking;
+import de.nihas101.midas.api.bookings.Bookings;
+import de.nihas101.midas.api.interest.InterestBookingsService;
+import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.core.lock.BookingLock;
 import de.nihas101.midas.core.lock.ShareholderLock;
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;

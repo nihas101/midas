@@ -1,8 +1,10 @@
 package de.nihas101.midas.core.lock.service;
 
+import de.nihas101.midas.api.lock.LockService;
+import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.core.lock.entity.LockEntity;
 import de.nihas101.midas.core.lock.repository.LockRepository;
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
+import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
 import de.nihas101.midas.core.shareholders.entity.ShareholderEntity;
 import de.nihas101.midas.core.shareholders.repository.ShareholdersRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +22,7 @@ public class DefaultLockService implements LockService {
     @Override
     public boolean isLocked(final Integer shareholderId, final Year year) {
         final Shareholder shareholder = shareholdersRepository.findById(shareholderId)
-                .map(Shareholder::fromEntity)
+                .map(DefaultShareholder::fromEntity)
                 .orElse(null);
         if (shareholder == null) {
             throw new IllegalArgumentException("No shareholder with id " + shareholderId + " exists");

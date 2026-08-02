@@ -16,16 +16,17 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.binder.Validator;
-import de.nihas101.midas.core.bookings.dto.Booking;
-import de.nihas101.midas.core.bookings.entity.BookingType;
-import de.nihas101.midas.core.bookings.entity.Source;
-import de.nihas101.midas.core.bookings.service.BookingsReader;
-import de.nihas101.midas.core.bookings.service.BookingsWriter;
+import de.nihas101.midas.api.bookings.Booking;
+import de.nihas101.midas.api.bookings.BookingType;
+import de.nihas101.midas.api.bookings.BookingsReader;
+import de.nihas101.midas.api.bookings.BookingsWriter;
+import de.nihas101.midas.api.bookings.Source;
+import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.api.shareholder.Shareholder;
+import de.nihas101.midas.api.shareholder.ShareholdersReader;
+import de.nihas101.midas.core.bookings.dto.DefaultBooking;
 import de.nihas101.midas.core.config.UIConfig;
 import de.nihas101.midas.core.lock.ShareholderLock;
-import de.nihas101.midas.core.money.MoneyAmount;
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
-import de.nihas101.midas.core.shareholders.service.ShareholdersReader;
 import de.nihas101.midas.ui.common.CancelButton;
 import de.nihas101.midas.ui.common.SaveButton;
 import org.apache.commons.lang3.StringUtils;
@@ -187,7 +188,7 @@ public class BookingFormDialog extends Dialog {
         if (isEditMode) {
             binder.setBean(bookingToEdit);
         } else {
-            final Booking booking = new Booking();
+            final Booking booking = new DefaultBooking();
             booking.setDate(LocalDate.now());
             booking.setSource(Source.USER);
             if (initialShareholder != null) {
@@ -349,7 +350,7 @@ public class BookingFormDialog extends Dialog {
 
     private void resetForm() {
         final Booking current = binder.getBean();
-        final Booking next = new Booking();
+        final Booking next = new DefaultBooking();
         next.setShareholderId(current.getShareholderId());
         next.setDate(current.getDate());
         binder.setBean(next);

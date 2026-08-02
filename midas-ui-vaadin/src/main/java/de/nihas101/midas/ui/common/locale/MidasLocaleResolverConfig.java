@@ -1,8 +1,8 @@
 package de.nihas101.midas.ui.common.locale;
 
 import com.vaadin.flow.component.UI;
+import de.nihas101.midas.api.userconfig.UserConfigReader;
 import de.nihas101.midas.core.config.MidasConfig;
-import de.nihas101.midas.core.userconfig.service.UserConfigReader;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

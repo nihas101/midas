@@ -1,6 +1,6 @@
 package de.nihas101.midas.core.lock;
 
-import de.nihas101.midas.core.openingbalance.dto.OpeningBalance;
+import de.nihas101.midas.api.openingbalance.OpeningBalance;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

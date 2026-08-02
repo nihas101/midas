@@ -1,6 +1,11 @@
 package de.nihas101.midas.core.accountstatement.service;
 
-import de.nihas101.midas.core.accountstatement.dto.AccountStatements;
+import de.nihas101.midas.api.accountstatement.AccountStatementService;
+import de.nihas101.midas.api.accountstatement.AccountStatements;
+import de.nihas101.midas.api.bookings.BookingType;
+import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.api.openingbalance.OpeningBalance;
+import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.core.accountstatement.dto.DefaultAccountStatements;
 import de.nihas101.midas.core.accountstatement.repository.AccountStatementEntity;
 import de.nihas101.midas.core.accountstatement.repository.AccountStatementOrderEntity;
@@ -8,11 +13,8 @@ import de.nihas101.midas.core.accountstatement.repository.AccountStatementOrders
 import de.nihas101.midas.core.accountstatement.repository.AccountStatementOverrideEntity;
 import de.nihas101.midas.core.accountstatement.repository.AccountStatementOverridesRepository;
 import de.nihas101.midas.core.accountstatement.repository.AccountStatementsRepository;
-import de.nihas101.midas.core.bookings.entity.BookingType;
-import de.nihas101.midas.core.money.MoneyAmount;
-import de.nihas101.midas.core.openingbalance.dto.OpeningBalance;
+import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
 import de.nihas101.midas.core.openingbalance.repository.OpeningBalanceRepository;
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
 import de.nihas101.midas.core.shareholders.entity.ShareholderEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,13 +31,14 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class DefaultAccountStatementService {
+public class DefaultAccountStatementService implements AccountStatementService {
 
     private final AccountStatementsRepository accountStatementsRepository;
     private final AccountStatementOverridesRepository accountStatementOverridesRepository;
     private final OpeningBalanceRepository openingBalanceRepository;
     private final AccountStatementOrdersRepository accountStatementOrdersRepository;
 
+    @Override
     public AccountStatements accountStatements(
             final Shareholder shareholder,
             final Year year,
@@ -57,7 +60,7 @@ public class DefaultAccountStatementService {
                         ShareholderEntity.fromDto(shareholder),
                         year.atDay(1)
                 )
-                .map(OpeningBalance::fromEntity)
+                .map(DefaultOpeningBalance::fromEntity)
                 .orElse(null);
 
         return new DefaultAccountStatements(
@@ -71,6 +74,7 @@ public class DefaultAccountStatementService {
     }
 
     @Transactional
+    @Override
     public void saveOverride(
             final Shareholder shareholder,
             final Year year,
@@ -119,6 +123,7 @@ public class DefaultAccountStatementService {
     }
 
     @Transactional
+    @Override
     public void saveManualExtra(
             final Integer id,
             final Shareholder shareholder,
@@ -170,11 +175,13 @@ public class DefaultAccountStatementService {
     }
 
     @Transactional
+    @Override
     public void deleteOverride(final Integer id) {
         accountStatementOverridesRepository.deleteById(id);
     }
 
     @Transactional
+    @Override
     public void saveOrder(
             final Shareholder shareholder,
             final Year year,

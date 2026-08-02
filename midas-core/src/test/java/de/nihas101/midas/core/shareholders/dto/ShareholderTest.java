@@ -1,5 +1,6 @@
 package de.nihas101.midas.core.shareholders.dto;
 
+import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.core.shareholders.entity.ShareholderEntity;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +16,7 @@ class ShareholderTest {
         entity.setFirstName("Max");
         entity.setLastName("Mustermann");
 
-        Shareholder dto = Shareholder.fromEntity(entity);
+        Shareholder dto = DefaultShareholder.fromEntity(entity);
 
         assertEquals(1, dto.getId());
         assertEquals(100, dto.getDisplayId());
@@ -31,7 +32,7 @@ class ShareholderTest {
         entity.setFirstName("Erika");
         entity.setLastName("Musterfrau");
 
-        Shareholder dto = Shareholder.fromEntity(entity);
+        Shareholder dto = DefaultShareholder.fromEntity(entity);
 
         assertEquals(42, dto.getId());
         assertEquals(42, dto.getDisplayId());

@@ -16,10 +16,17 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import de.nihas101.midas.core.bookings.dto.Booking;
-import de.nihas101.midas.core.bookings.dto.Bookings;
-import de.nihas101.midas.core.bookings.entity.BookingType;
-import de.nihas101.midas.core.bookings.entity.Source;
+import de.nihas101.midas.api.bookings.Booking;
+import de.nihas101.midas.api.bookings.BookingType;
+import de.nihas101.midas.api.bookings.Bookings;
+import de.nihas101.midas.api.bookings.Source;
+import de.nihas101.midas.api.interest.InterestBookingsReader;
+import de.nihas101.midas.api.interest.InterestBookingsWriter;
+import de.nihas101.midas.api.lock.LockService;
+import de.nihas101.midas.api.lock.LockWriter;
+import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.api.shareholder.Shareholder;
+import de.nihas101.midas.core.bookings.dto.DefaultBooking;
 import de.nihas101.midas.core.config.MidasConfig;
 import de.nihas101.midas.core.export.ExportFactory;
 import de.nihas101.midas.core.export.ExportViewName;
@@ -30,15 +37,10 @@ import de.nihas101.midas.core.interest.row.InterestRowService;
 import de.nihas101.midas.core.interest.row.Transaction;
 import de.nihas101.midas.core.interest.row.TransactionType;
 import de.nihas101.midas.core.interest.service.DefaultInterestBookingsService;
-import de.nihas101.midas.core.interest.service.InterestBookingsReader;
-import de.nihas101.midas.core.interest.service.InterestBookingsWriter;
 import de.nihas101.midas.core.interest.service.InterestRateService;
 import de.nihas101.midas.core.lock.ShareholderLock;
-import de.nihas101.midas.core.lock.service.LockService;
-import de.nihas101.midas.core.lock.service.LockWriter;
-import de.nihas101.midas.core.money.MoneyAmount;
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
 import de.nihas101.midas.core.shareholders.service.ShareholdersService;
+import de.nihas101.midas.core.userconfig.service.UserConfigService;
 import de.nihas101.midas.ui.common.DownloadTrigger;
 import de.nihas101.midas.ui.common.HeaderActionBar;
 import de.nihas101.midas.ui.common.MidasView;
@@ -46,7 +48,6 @@ import de.nihas101.midas.ui.common.QueryParameter;
 import de.nihas101.midas.ui.common.ShareholderPicker;
 import de.nihas101.midas.ui.common.YearPicker;
 import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
-import de.nihas101.midas.core.userconfig.service.UserConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.MessageSource;
@@ -272,7 +273,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
             booking.setAmount(interestCalculation.interest());
             bookingsWriter.update(booking);
         } else {
-            final Booking newBooking = new Booking(
+            final Booking newBooking = new DefaultBooking(
                     null,
                     null,
                     shareholder.getId(),

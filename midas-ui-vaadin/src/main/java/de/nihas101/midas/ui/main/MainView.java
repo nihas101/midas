@@ -12,6 +12,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import de.nihas101.midas.core.config.MidasConfig;
+import de.nihas101.midas.core.userconfig.service.UserConfigService;
 import de.nihas101.midas.ui.accountstatement.AccountStatementView;
 import de.nihas101.midas.ui.backup.BackupView;
 import de.nihas101.midas.ui.bookings.BookingsView;
@@ -20,7 +21,6 @@ import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
 import de.nihas101.midas.ui.export.ExportView;
 import de.nihas101.midas.ui.interest.InterestView;
 import de.nihas101.midas.ui.shareholders.ShareholdersView;
-import de.nihas101.midas.core.userconfig.service.UserConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 

@@ -1,11 +1,15 @@
 package de.nihas101.midas.core.bookings.service;
 
-import de.nihas101.midas.core.bookings.dto.Booking;
-import de.nihas101.midas.core.bookings.dto.Bookings;
+import de.nihas101.midas.api.bookings.Booking;
+import de.nihas101.midas.api.bookings.Bookings;
+import de.nihas101.midas.api.bookings.BookingsReader;
+import de.nihas101.midas.api.bookings.BookingsWriter;
+import de.nihas101.midas.api.openingbalance.OpeningBalance;
+import de.nihas101.midas.core.bookings.dto.DefaultBooking;
 import de.nihas101.midas.core.bookings.dto.DefaultBookings;
 import de.nihas101.midas.core.bookings.entity.BookingEntity;
 import de.nihas101.midas.core.bookings.repository.BookingsRepository;
-import de.nihas101.midas.core.openingbalance.dto.OpeningBalance;
+import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
 import de.nihas101.midas.core.openingbalance.repository.OpeningBalanceRepository;
 import de.nihas101.midas.core.shareholders.entity.ShareholderEntity;
 import de.nihas101.midas.core.shareholders.repository.ShareholdersRepository;
@@ -46,14 +50,14 @@ public class BookingsService implements BookingsWriter, BookingsReader {
 
         final List<Booking> bookings = bookingsRepository.findByShareholderAndDateBetweenOrderByDateAsc(shareholder, startDate, endDate)
                 .stream()
-                .map(Booking::fromEntity)
+                .map(DefaultBooking::fromEntity)
                 .toList();
 
         final OpeningBalance openingBalance = openingBalanceRepository.findByShareholderAndDate(
                         shareholder,
                         Year.of(startDate.getYear()).atMonth(Month.JANUARY).atDay(1)
                 )
-                .map(OpeningBalance::fromEntity)
+                .map(DefaultOpeningBalance::fromEntity)
                 .orElse(null);
 
         return new DefaultBookings(

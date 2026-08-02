@@ -1,8 +1,8 @@
 package de.nihas101.midas.ui.common;
 
 import com.vaadin.flow.component.combobox.ComboBox;
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
-import de.nihas101.midas.core.shareholders.dto.Shareholders;
+import de.nihas101.midas.api.shareholder.Shareholder;
+import de.nihas101.midas.api.shareholder.Shareholders;
 import de.nihas101.midas.core.shareholders.service.ShareholdersService;
 import org.springframework.context.MessageSource;
 

@@ -9,9 +9,9 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.nihas101.midas.core.config.MidasConfig;
 import de.nihas101.midas.core.shareholders.service.ShareholdersService;
+import de.nihas101.midas.core.userconfig.service.UserConfigService;
 import de.nihas101.midas.ui.common.MidasView;
 import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
-import de.nihas101.midas.core.userconfig.service.UserConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 

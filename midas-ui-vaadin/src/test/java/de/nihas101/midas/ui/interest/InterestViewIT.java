@@ -5,14 +5,14 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.textfield.BigDecimalField;
-import de.nihas101.midas.core.bookings.dto.Booking;
-import de.nihas101.midas.core.bookings.dto.Bookings;
-import de.nihas101.midas.core.bookings.entity.BookingType;
+import de.nihas101.midas.api.bookings.BookingType;
+import de.nihas101.midas.api.bookings.Bookings;
+import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.core.bookings.service.BookingsService;
 import de.nihas101.midas.core.interest.dto.InterestRate;
 import de.nihas101.midas.core.interest.row.InterestCalculationRow;
 import de.nihas101.midas.core.interest.service.InterestRateService;
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
+import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
 import de.nihas101.midas.core.shareholders.service.ShareholdersService;
 import de.nihas101.midas.ui.AbstractKaribuTest;
 import de.nihas101.midas.ui.common.ShareholderPicker;
@@ -41,7 +41,7 @@ public class InterestViewIT extends AbstractKaribuTest {
     @Test
     void testInterestCalculationWorkflow() {
         // 1. Prepopulate a shareholder in the DB
-        final Shareholder sh = new Shareholder(null, 103, "Charlie", "Brown");
+        final Shareholder sh = new DefaultShareholder(null, 103, "Charlie", "Brown");
         shareholdersService.create(sh);
 
         final Shareholder savedSh = shareholdersService.shareholders().toList().stream()
@@ -74,7 +74,7 @@ public class InterestViewIT extends AbstractKaribuTest {
 
         // 6. Verify that an interest booking is generated/updated
         final Bookings bookings = bookingsService.bookingsForShareholderAndYear(savedSh.getId(), Year.of(2026));
-        final Booking interestBooking = bookings.filter(b -> true).bookings().stream()
+        bookings.filter(b -> true).bookings().stream()
                 .filter(b -> BookingType.INTEREST.equals(b.getType()))
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("Expected interest booking not found in DB"));

@@ -1,6 +1,6 @@
 package de.nihas101.midas.core.interest.row;
 
-import de.nihas101.midas.core.bookings.dto.Bookings;
+import de.nihas101.midas.api.bookings.Bookings;
 import de.nihas101.midas.core.interest.interestamount.Interest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;

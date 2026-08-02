@@ -1,10 +1,10 @@
 package de.nihas101.midas.core.interest.row;
 
-import de.nihas101.midas.core.bookings.dto.Bookings;
+import de.nihas101.midas.api.bookings.Bookings;
+import de.nihas101.midas.api.money.MoneyAmount;
 import de.nihas101.midas.core.bookings.row.BookingRow;
 import de.nihas101.midas.core.bookings.row.DefaultBookingsToBookingRowConverter;
 import de.nihas101.midas.core.interest.InterestCalculation;
-import de.nihas101.midas.core.money.MoneyAmount;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;

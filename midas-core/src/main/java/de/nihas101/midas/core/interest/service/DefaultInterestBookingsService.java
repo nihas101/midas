@@ -1,16 +1,19 @@
 package de.nihas101.midas.core.interest.service;
 
-import de.nihas101.midas.core.bookings.dto.Booking;
-import de.nihas101.midas.core.bookings.dto.Bookings;
+import de.nihas101.midas.api.bookings.Booking;
+import de.nihas101.midas.api.bookings.BookingType;
+import de.nihas101.midas.api.bookings.Bookings;
+import de.nihas101.midas.api.bookings.Source;
+import de.nihas101.midas.api.interest.InterestBookingsService;
+import de.nihas101.midas.api.openingbalance.OpeningBalance;
+import de.nihas101.midas.api.shareholder.Shareholder;
+import de.nihas101.midas.core.bookings.dto.DefaultBooking;
 import de.nihas101.midas.core.bookings.dto.DefaultBookings;
 import de.nihas101.midas.core.bookings.entity.BookingEntity;
-import de.nihas101.midas.core.bookings.entity.BookingType;
-import de.nihas101.midas.core.bookings.entity.Source;
 import de.nihas101.midas.core.bookings.repository.BookingsRepository;
 import de.nihas101.midas.core.bookings.service.BookingsService;
-import de.nihas101.midas.core.openingbalance.dto.OpeningBalance;
+import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
 import de.nihas101.midas.core.openingbalance.repository.OpeningBalanceRepository;
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
 import de.nihas101.midas.core.shareholders.entity.ShareholderEntity;
 import de.nihas101.midas.core.shareholders.repository.ShareholdersRepository;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +38,7 @@ public class DefaultInterestBookingsService implements InterestBookingsService {
     public Booking systemGeneratedInterestForShareholderAndYear(final Shareholder shareholder, final Year year) {
         final LocalDate endOfYear = year.atMonth(Month.DECEMBER).atDay(31);
 
-        return Booking.fromEntity(
+        return DefaultBooking.fromEntity(
                 bookingsRepository.findFirstByShareholderAndDateAndTypeAndSource(
                         ShareholderEntity.fromDto(shareholder),
                         endOfYear,
@@ -56,11 +59,11 @@ public class DefaultInterestBookingsService implements InterestBookingsService {
         final List<Booking> bookings = bookingsRepository.findByShareholderAndDateBetweenOrderByDateAsc(shareholder, startOfYear, endOfYear)
                 .stream()
                 .filter(bookingsAddedByUser()) // Exclude system generated interest, because that is what we will calculate
-                .map(Booking::fromEntity)
+                .map(DefaultBooking::fromEntity)
                 .toList();
 
         final OpeningBalance openingBalance = openingBalanceRepository.findByShareholderAndDate(shareholder, year.atDay(1))
-                .map(OpeningBalance::fromEntity)
+                .map(DefaultOpeningBalance::fromEntity)
                 .orElse(null);
 
         return new DefaultBookings(

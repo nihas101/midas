@@ -2,12 +2,12 @@ package de.nihas101.midas.ui.common;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import de.nihas101.midas.core.export.Export;
+import de.nihas101.midas.api.export.Export;
+import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.core.export.ExportFactory;
 import de.nihas101.midas.core.export.ExportRequest;
 import de.nihas101.midas.core.export.ExportViewName;
 import de.nihas101.midas.core.export.ExportViews;
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
 import org.springframework.context.MessageSource;
 
 import java.io.ByteArrayOutputStream;

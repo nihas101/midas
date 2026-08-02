@@ -1,9 +1,9 @@
 package de.nihas101.midas.core.accountstatement.runningtotal;
 
+import de.nihas101.midas.api.accountstatement.LabeledAccountStatement;
+import de.nihas101.midas.api.bookings.BookingType;
+import de.nihas101.midas.api.money.MoneyAmount;
 import de.nihas101.midas.core.accountstatement.dto.DefaultAccountStatement;
-import de.nihas101.midas.core.accountstatement.dto.LabeledAccountStatement;
-import de.nihas101.midas.core.bookings.entity.BookingType;
-import de.nihas101.midas.core.money.MoneyAmount;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

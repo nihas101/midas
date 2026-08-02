@@ -1,9 +1,10 @@
 package de.nihas101.midas.core.accountstatement.dto;
 
+import de.nihas101.midas.api.accountstatement.LabeledAccountStatement;
+import de.nihas101.midas.api.bookings.BookingType;
+import de.nihas101.midas.api.bookings.Source;
+import de.nihas101.midas.api.money.MoneyAmount;
 import de.nihas101.midas.core.accountstatement.repository.AccountStatementEntity;
-import de.nihas101.midas.core.bookings.entity.BookingType;
-import de.nihas101.midas.core.bookings.entity.Source;
-import de.nihas101.midas.core.money.MoneyAmount;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;

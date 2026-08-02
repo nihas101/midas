@@ -6,7 +6,7 @@ import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.router.QueryParameters;
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
+import de.nihas101.midas.api.shareholder.Shareholder;
 
 import java.util.function.Function;
 

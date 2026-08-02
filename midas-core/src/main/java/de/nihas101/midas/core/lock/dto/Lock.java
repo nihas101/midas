@@ -10,7 +10,7 @@ import java.time.Year;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Lock {
+public class Lock { // TODO: Make an interface
 
     private Integer id;
     private Integer shareholderId;

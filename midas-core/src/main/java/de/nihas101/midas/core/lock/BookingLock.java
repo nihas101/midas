@@ -1,6 +1,6 @@
 package de.nihas101.midas.core.lock;
 
-import de.nihas101.midas.core.bookings.dto.Booking;
+import de.nihas101.midas.api.bookings.Booking;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

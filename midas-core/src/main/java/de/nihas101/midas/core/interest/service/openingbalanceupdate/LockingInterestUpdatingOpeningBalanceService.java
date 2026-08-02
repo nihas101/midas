@@ -1,7 +1,8 @@
 package de.nihas101.midas.core.interest.service.openingbalanceupdate;
 
+import de.nihas101.midas.api.interest.InterestUpdatingOpeningBalanceService;
+import de.nihas101.midas.api.openingbalance.OpeningBalance;
 import de.nihas101.midas.core.lock.OpeningBalanceLock;
-import de.nihas101.midas.core.openingbalance.dto.OpeningBalance;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;

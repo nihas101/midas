@@ -1,8 +1,9 @@
 package de.nihas101.midas.core.accountstatement.runningtotal;
 
-import de.nihas101.midas.core.bookings.entity.Source;
-import de.nihas101.midas.core.money.MoneyAmount;
-import de.nihas101.midas.core.openingbalance.dto.OpeningBalance;
+import de.nihas101.midas.api.bookings.Source;
+import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.api.openingbalance.OpeningBalance;
+import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -56,9 +57,9 @@ class OpeningRunningTotalAccountStatementTest {
 
     public static Stream<Arguments> openingBalanceArguments() {
         return Stream.of(
-                Arguments.of(new OpeningBalance(null, 1, MoneyAmount.ofCents(100L), TEST_YEAR, Source.USER)),
-                Arguments.of(new OpeningBalance(null, 2, MoneyAmount.ZERO, TEST_YEAR, Source.USER)),
-                Arguments.of(new OpeningBalance(null, 3, MoneyAmount.ofCents(-50L), TEST_YEAR.plusYears(1), Source.USER))
+                Arguments.of(new DefaultOpeningBalance(null, 1, MoneyAmount.ofCents(100L), TEST_YEAR, Source.USER)),
+                Arguments.of(new DefaultOpeningBalance(null, 2, MoneyAmount.ZERO, TEST_YEAR, Source.USER)),
+                Arguments.of(new DefaultOpeningBalance(null, 3, MoneyAmount.ofCents(-50L), TEST_YEAR.plusYears(1), Source.USER))
         );
     }
 }

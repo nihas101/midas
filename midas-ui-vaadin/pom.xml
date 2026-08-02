@@ -28,6 +28,11 @@
             <artifactId>midas-i18n</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>de.nihas101</groupId>
+            <artifactId>midas-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

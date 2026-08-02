@@ -1,9 +1,9 @@
 package de.nihas101.midas.core.export.pdf;
 
+import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.core.export.ExportRequest;
 import de.nihas101.midas.core.export.ExportViews;
 import de.nihas101.midas.core.export.LocalizedExportView;
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

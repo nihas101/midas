@@ -1,8 +1,9 @@
 package de.nihas101.midas.core.openingbalance.service;
 
-import de.nihas101.midas.core.lock.service.LockReader;
+import de.nihas101.midas.api.lock.LockReader;
+import de.nihas101.midas.api.openingbalance.OpeningBalance;
+import de.nihas101.midas.api.openingbalance.OpeningBalanceService;
 import de.nihas101.midas.core.lock.service.LockedException;
-import de.nihas101.midas.core.openingbalance.dto.OpeningBalance;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;

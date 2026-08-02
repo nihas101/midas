@@ -1,5 +1,7 @@
 package de.nihas101.midas.core.backup.service;
 
+import de.nihas101.midas.api.backup.BackupStatusReader;
+import de.nihas101.midas.api.backup.BackupStatusWriter;
 import de.nihas101.midas.core.backup.entity.BackupStatusEntity;
 import de.nihas101.midas.core.backup.repository.BackupStatusRepository;
 import lombok.RequiredArgsConstructor;

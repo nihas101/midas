@@ -1,14 +1,15 @@
 package de.nihas101.midas.core.interest.service.bookingupdate;
 
-import de.nihas101.midas.core.bookings.dto.Booking;
-import de.nihas101.midas.core.bookings.dto.Bookings;
+import de.nihas101.midas.api.bookings.Booking;
+import de.nihas101.midas.api.bookings.Bookings;
+import de.nihas101.midas.api.bookings.BookingsWriter;
+import de.nihas101.midas.api.interest.InterestBookingsReader;
+import de.nihas101.midas.api.interest.InterestUpdatingBookingsService;
 import de.nihas101.midas.core.bookings.service.BookingsService;
-import de.nihas101.midas.core.bookings.service.BookingsWriter;
 import de.nihas101.midas.core.interest.InterestCalculation;
 import de.nihas101.midas.core.interest.dto.InterestRate;
 import de.nihas101.midas.core.interest.repository.InterestRateRepository;
-import de.nihas101.midas.core.interest.service.InterestBookingsReader;
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
+import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
 import de.nihas101.midas.core.shareholders.entity.ShareholderEntity;
 import de.nihas101.midas.core.shareholders.repository.ShareholdersRepository;
 import lombok.RequiredArgsConstructor;
@@ -64,7 +65,7 @@ public class DefaultInterestUpdatingBookingsService implements InterestUpdatingB
     private void updateInterest(final Booking booking) {
         final Year year = Year.of(booking.getDate().getYear());
         final ShareholderEntity shareholder = shareholdersRepository.getReferenceById(booking.getShareholderId());
-        final Booking interestBooking = bookingsReader.systemGeneratedInterestForShareholderAndYear(Shareholder.fromEntity(shareholder), year);
+        final Booking interestBooking = bookingsReader.systemGeneratedInterestForShareholderAndYear(DefaultShareholder.fromEntity(shareholder), year);
         if (interestBooking == null) {
             // We only want to update the interest here, not create it
             return;

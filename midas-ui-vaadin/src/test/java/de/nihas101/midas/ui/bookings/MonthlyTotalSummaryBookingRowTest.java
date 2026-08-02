@@ -1,14 +1,16 @@
 package de.nihas101.midas.ui.bookings;
 
-import de.nihas101.midas.core.bookings.dto.Booking;
-import de.nihas101.midas.core.bookings.dto.Bookings;
-import de.nihas101.midas.core.bookings.dto.FilteredBookings;
-import de.nihas101.midas.core.bookings.entity.BookingType;
-import de.nihas101.midas.core.bookings.entity.Source;
+import de.nihas101.midas.api.bookings.Booking;
+import de.nihas101.midas.api.bookings.BookingType;
+import de.nihas101.midas.api.bookings.Bookings;
+import de.nihas101.midas.api.bookings.FilteredBookings;
+import de.nihas101.midas.api.bookings.Source;
+import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.api.openingbalance.OpeningBalance;
+import de.nihas101.midas.core.bookings.dto.DefaultBooking;
 import de.nihas101.midas.core.bookings.monthlytotal.MonthlyTotalSum;
 import de.nihas101.midas.core.bookings.row.MonthlySummaryBookingRow;
-import de.nihas101.midas.core.money.MoneyAmount;
-import de.nihas101.midas.core.openingbalance.dto.OpeningBalance;
+import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,11 +26,11 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import static de.nihas101.midas.core.bookings.entity.BookingType.COMPENSATION;
-import static de.nihas101.midas.core.bookings.entity.BookingType.INTEREST;
-import static de.nihas101.midas.core.bookings.entity.BookingType.TAX_CREDIT;
-import static de.nihas101.midas.core.bookings.entity.BookingType.TAX_PREVIOUS_YEAR;
-import static de.nihas101.midas.core.bookings.entity.BookingType.WITHDRAWAL;
+import static de.nihas101.midas.api.bookings.BookingType.COMPENSATION;
+import static de.nihas101.midas.api.bookings.BookingType.INTEREST;
+import static de.nihas101.midas.api.bookings.BookingType.TAX_CREDIT;
+import static de.nihas101.midas.api.bookings.BookingType.TAX_PREVIOUS_YEAR;
+import static de.nihas101.midas.api.bookings.BookingType.WITHDRAWAL;
 
 class MonthlyTotalSummaryBookingRowTest {
 
@@ -75,7 +77,7 @@ class MonthlyTotalSummaryBookingRowTest {
                 Arguments.of(createBookings(null, Collections.emptyList()), MoneyAmount.ZERO),
                 Arguments.of(createBookings(null,
                         List.of(
-                                new Booking(1,
+                                new DefaultBooking(1,
                                         1,
                                         1,
                                         LocalDate.of(2026, 3, 14),
@@ -87,7 +89,7 @@ class MonthlyTotalSummaryBookingRowTest {
                         )), MoneyAmount.ofCents(100L)),
                 Arguments.of(createBookings(null,
                         List.of(
-                                new Booking(1,
+                                new DefaultBooking(1,
                                         1,
                                         1,
                                         LocalDate.of(2026, 3, 14),
@@ -96,7 +98,7 @@ class MonthlyTotalSummaryBookingRowTest {
                                         "comment",
                                         Source.USER
                                 ),
-                                new Booking(2,
+                                new DefaultBooking(2,
                                         2,
                                         1,
                                         LocalDate.of(2026, 3, 14),
@@ -108,7 +110,7 @@ class MonthlyTotalSummaryBookingRowTest {
                         )), MoneyAmount.ofCents(110L)),
                 Arguments.of(createBookings(null,
                         List.of(
-                                new Booking(1,
+                                new DefaultBooking(1,
                                         1,
                                         1,
                                         LocalDate.of(2026, 3, 14),
@@ -117,7 +119,7 @@ class MonthlyTotalSummaryBookingRowTest {
                                         "comment",
                                         Source.USER
                                 ),
-                                new Booking(2,
+                                new DefaultBooking(2,
                                         2,
                                         1,
                                         LocalDate.of(2026, 3, 15),
@@ -129,7 +131,7 @@ class MonthlyTotalSummaryBookingRowTest {
                         )), MoneyAmount.ofCents(90L)),
                 Arguments.of(createBookings(MoneyAmount.ofCents(1000L),
                         List.of(
-                                new Booking(1,
+                                new DefaultBooking(1,
                                         1,
                                         1,
                                         LocalDate.of(2026, 3, 14),
@@ -138,7 +140,7 @@ class MonthlyTotalSummaryBookingRowTest {
                                         "comment",
                                         Source.USER
                                 ),
-                                new Booking(2,
+                                new DefaultBooking(2,
                                         2,
                                         1,
                                         LocalDate.of(2026, 3, 15),
@@ -188,7 +190,7 @@ class MonthlyTotalSummaryBookingRowTest {
                 Arguments.of(
                         createBookings(null,
                                 List.of(
-                                        new Booking(1,
+                                        new DefaultBooking(1,
                                                 1,
                                                 1,
                                                 LocalDate.of(2026, 3, 14),
@@ -208,7 +210,7 @@ class MonthlyTotalSummaryBookingRowTest {
                 Arguments.of(
                         createBookings(null,
                                 List.of(
-                                        new Booking(1,
+                                        new DefaultBooking(1,
                                                 1,
                                                 1,
                                                 LocalDate.of(2026, 3, 14),
@@ -217,7 +219,7 @@ class MonthlyTotalSummaryBookingRowTest {
                                                 "comment",
                                                 Source.USER
                                         ),
-                                        new Booking(2,
+                                        new DefaultBooking(2,
                                                 2,
                                                 1,
                                                 LocalDate.of(2026, 3, 14),
@@ -238,7 +240,7 @@ class MonthlyTotalSummaryBookingRowTest {
                 Arguments.of(
                         createBookings(null,
                                 List.of(
-                                        new Booking(1,
+                                        new DefaultBooking(1,
                                                 1,
                                                 1,
                                                 LocalDate.of(2026, 3, 14),
@@ -247,7 +249,7 @@ class MonthlyTotalSummaryBookingRowTest {
                                                 "comment",
                                                 Source.USER
                                         ),
-                                        new Booking(2,
+                                        new DefaultBooking(2,
                                                 2,
                                                 1,
                                                 LocalDate.of(2026, 3, 15),
@@ -268,7 +270,7 @@ class MonthlyTotalSummaryBookingRowTest {
                 Arguments.of(
                         createBookings(MoneyAmount.ofCents(1000L),
                                 List.of(
-                                        new Booking(1,
+                                        new DefaultBooking(1,
                                                 1,
                                                 1,
                                                 LocalDate.of(2026, 3, 14),
@@ -277,7 +279,7 @@ class MonthlyTotalSummaryBookingRowTest {
                                                 "comment",
                                                 Source.USER
                                         ),
-                                        new Booking(2,
+                                        new DefaultBooking(2,
                                                 2,
                                                 1,
                                                 LocalDate.of(2026, 3, 15),
@@ -302,7 +304,7 @@ class MonthlyTotalSummaryBookingRowTest {
         return new Bookings() {
             @Override
             public OpeningBalance openingBalance() {
-                return new OpeningBalance(initialBalance);
+                return new DefaultOpeningBalance(initialBalance);
             }
 
             @Override

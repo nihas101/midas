@@ -1,17 +1,20 @@
 package de.nihas101.midas.core.interest.service;
 
-import de.nihas101.midas.core.bookings.dto.Booking;
-import de.nihas101.midas.core.bookings.dto.Bookings;
-import de.nihas101.midas.core.bookings.dto.FilteredBookings;
-import de.nihas101.midas.core.bookings.entity.BookingType;
-import de.nihas101.midas.core.bookings.entity.Source;
-import de.nihas101.midas.core.bookings.service.BookingsWriter;
+import de.nihas101.midas.api.bookings.Booking;
+import de.nihas101.midas.api.bookings.BookingType;
+import de.nihas101.midas.api.bookings.Bookings;
+import de.nihas101.midas.api.bookings.BookingsWriter;
+import de.nihas101.midas.api.bookings.FilteredBookings;
+import de.nihas101.midas.api.bookings.Source;
+import de.nihas101.midas.api.interest.InterestBookingsReader;
+import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.api.openingbalance.OpeningBalance;
+import de.nihas101.midas.api.shareholder.Shareholder;
+import de.nihas101.midas.core.bookings.dto.DefaultBooking;
 import de.nihas101.midas.core.interest.entity.InterestRateEntity;
 import de.nihas101.midas.core.interest.repository.InterestRateRepository;
 import de.nihas101.midas.core.interest.service.bookingupdate.DefaultInterestUpdatingBookingsService;
-import de.nihas101.midas.core.money.MoneyAmount;
-import de.nihas101.midas.core.openingbalance.dto.OpeningBalance;
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
+import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
 import de.nihas101.midas.core.shareholders.entity.ShareholderEntity;
 import de.nihas101.midas.core.shareholders.repository.ShareholdersRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -62,7 +65,7 @@ class InterestUpdatingBookingsServiceTest {
                 "Doe"
         );
 
-        booking = new Booking(
+        booking = new DefaultBooking(
                 1,
                 1,
                 shareholderEntity.getId(),
@@ -75,7 +78,7 @@ class InterestUpdatingBookingsServiceTest {
         bookings = new Bookings() {
             @Override
             public OpeningBalance openingBalance() {
-                return new OpeningBalance(MoneyAmount.ofCents(100L));
+                return new DefaultOpeningBalance(MoneyAmount.ofCents(100L));
             }
 
             @Override
@@ -96,7 +99,7 @@ class InterestUpdatingBookingsServiceTest {
 
         when(shareholdersRepository.getReferenceById(shareholderEntity.getId()))
                 .thenReturn(shareholderEntity);
-        interestBooking = new Booking(
+        interestBooking = new DefaultBooking(
                 2,
                 2,
                 1,

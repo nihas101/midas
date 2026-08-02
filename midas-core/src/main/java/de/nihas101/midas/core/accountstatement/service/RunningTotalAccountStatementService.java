@@ -1,13 +1,13 @@
 package de.nihas101.midas.core.accountstatement.service;
 
-import de.nihas101.midas.core.accountstatement.dto.AccountStatements;
-import de.nihas101.midas.core.accountstatement.dto.LabeledAccountStatement;
+import de.nihas101.midas.api.accountstatement.AccountStatements;
+import de.nihas101.midas.api.accountstatement.LabeledAccountStatement;
+import de.nihas101.midas.api.bookings.BookingType;
+import de.nihas101.midas.api.openingbalance.OpeningBalance;
+import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.core.accountstatement.runningtotal.DefaultRunningTotalAccountStatements;
 import de.nihas101.midas.core.accountstatement.runningtotal.OpeningRunningTotalAccountStatement;
 import de.nihas101.midas.core.accountstatement.runningtotal.RunningTotalAccountStatements;
-import de.nihas101.midas.core.bookings.entity.BookingType;
-import de.nihas101.midas.core.openingbalance.dto.OpeningBalance;
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;

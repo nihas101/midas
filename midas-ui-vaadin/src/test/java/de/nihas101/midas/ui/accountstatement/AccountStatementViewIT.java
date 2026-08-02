@@ -6,11 +6,12 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.TextField;
+import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.core.accountstatement.repository.AccountStatementOverrideEntity;
 import de.nihas101.midas.core.accountstatement.repository.AccountStatementOverridesRepository;
 import de.nihas101.midas.core.accountstatement.row.AccountStatementRow;
 import de.nihas101.midas.core.accountstatement.service.DefaultAccountStatementService;
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
+import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
 import de.nihas101.midas.core.shareholders.service.ShareholdersService;
 import de.nihas101.midas.ui.AbstractKaribuTest;
 import de.nihas101.midas.ui.common.ShareholderPicker;
@@ -41,7 +42,7 @@ public class AccountStatementViewIT extends AbstractKaribuTest {
     @Test
     void testAccountStatementWorkflow() {
         // 1. Prepopulate a shareholder in the DB
-        final Shareholder sh = new Shareholder(null, 102, "Bob", "Jones");
+        final Shareholder sh = new DefaultShareholder(null, 102, "Bob", "Jones");
         shareholdersService.create(sh);
 
         final Shareholder savedSh = shareholdersService.shareholders().toList().stream()

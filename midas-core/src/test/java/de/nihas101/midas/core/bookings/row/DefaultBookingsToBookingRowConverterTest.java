@@ -1,9 +1,10 @@
 package de.nihas101.midas.core.bookings.row;
 
-import de.nihas101.midas.core.bookings.dto.Booking;
-import de.nihas101.midas.core.bookings.dto.FilteredBookings;
-import de.nihas101.midas.core.bookings.entity.BookingType;
-import de.nihas101.midas.core.money.MoneyAmount;
+import de.nihas101.midas.api.bookings.Booking;
+import de.nihas101.midas.api.bookings.BookingType;
+import de.nihas101.midas.api.bookings.FilteredBookings;
+import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.core.bookings.dto.DefaultBooking;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -20,7 +21,7 @@ class DefaultBookingsToBookingRowConverterTest {
 
     @Test
     void generate_withSingleBooking_producesOneRow() {
-        final Booking booking = Booking.builder()
+        final Booking booking = DefaultBooking.builder()
                 .id(1)
                 .displayId(1)
                 .date(LocalDate.of(2025, 3, 15))
@@ -50,7 +51,7 @@ class DefaultBookingsToBookingRowConverterTest {
 
     @Test
     void generate_withMultipleBookings_producesOneRowPerBooking() {
-        final Booking booking1 = Booking.builder()
+        final Booking booking1 = DefaultBooking.builder()
                 .id(1)
                 .displayId(1)
                 .date(LocalDate.of(2025, 3, 5))
@@ -59,7 +60,7 @@ class DefaultBookingsToBookingRowConverterTest {
                 .comment("Interest")
                 .build();
 
-        final Booking booking2 = Booking.builder()
+        final Booking booking2 = DefaultBooking.builder()
                 .id(2)
                 .displayId(2)
                 .date(LocalDate.of(2025, 3, 20))
@@ -85,7 +86,7 @@ class DefaultBookingsToBookingRowConverterTest {
 
     @Test
     void generate_bookingsOutOfDateOrder_areEmittedSortedByDate() {
-        final Booking laterBooking = Booking.builder()
+        final Booking laterBooking = DefaultBooking.builder()
                 .id(2)
                 .displayId(2)
                 .date(LocalDate.of(2025, 3, 20))
@@ -94,7 +95,7 @@ class DefaultBookingsToBookingRowConverterTest {
                 .comment("Later")
                 .build();
 
-        final Booking earlierBooking = Booking.builder()
+        final Booking earlierBooking = DefaultBooking.builder()
                 .id(1)
                 .displayId(1)
                 .date(LocalDate.of(2025, 3, 5))
@@ -141,7 +142,7 @@ class DefaultBookingsToBookingRowConverterTest {
     @Test
     void generate_rowAmountsReflectBookingTypeAndAmount() {
         final MoneyAmount bookingAmount = MoneyAmount.ofCents(300L);
-        final Booking booking = Booking.builder()
+        final Booking booking = DefaultBooking.builder()
                 .id(1)
                 .displayId(1)
                 .date(LocalDate.of(2025, 3, 10))
@@ -170,7 +171,7 @@ class DefaultBookingsToBookingRowConverterTest {
 
     @Test
     void generate_displayIdMatchesBookingDisplayId() {
-        final Booking booking = Booking.builder()
+        final Booking booking = DefaultBooking.builder()
                 .id(99)
                 .displayId(42)
                 .date(LocalDate.of(2025, 3, 1))
@@ -196,7 +197,7 @@ class DefaultBookingsToBookingRowConverterTest {
 
     @Test
     void generate_bookingReferenceIsPreserved() {
-        final Booking booking = Booking.builder()
+        final Booking booking = DefaultBooking.builder()
                 .id(5)
                 .displayId(5)
                 .date(LocalDate.of(2025, 6, 15))
@@ -223,7 +224,7 @@ class DefaultBookingsToBookingRowConverterTest {
     @Test
     void generate_withZeroStartingBalance_totalReflectsBookingAmount() {
         final MoneyAmount bookingAmount = MoneyAmount.ofCents(-750L);
-        final Booking booking = Booking.builder()
+        final Booking booking = DefaultBooking.builder()
                 .id(1)
                 .displayId(1)
                 .date(LocalDate.of(2025, 1, 1))

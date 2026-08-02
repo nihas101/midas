@@ -1,6 +1,8 @@
 package de.nihas101.midas.core.openingbalance.service;
 
-import de.nihas101.midas.core.openingbalance.dto.OpeningBalance;
+import de.nihas101.midas.api.openingbalance.OpeningBalance;
+import de.nihas101.midas.api.openingbalance.OpeningBalanceService;
+import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
 import de.nihas101.midas.core.openingbalance.entity.OpeningBalanceEntity;
 import de.nihas101.midas.core.openingbalance.repository.OpeningBalanceRepository;
 import de.nihas101.midas.core.shareholders.entity.ShareholderEntity;
@@ -18,12 +20,12 @@ public class DefaultOpeningBalanceService implements OpeningBalanceService { // 
     private final ShareholdersRepository shareholdersRepository;
 
     @Override
-    public OpeningBalance openingBalance(Integer shareholderId, Year year) {
+    public OpeningBalance openingBalance(final Integer shareholderId, final Year year) {
         ShareholderEntity shareholder = shareholdersRepository.findById(shareholderId)
                 .orElseThrow(() -> new IllegalArgumentException("Shareholder not found"));
 
         return openingBalanceRepository.findByShareholderAndDate(shareholder, year.atDay(1))
-                .map(OpeningBalance::fromEntity)
+                .map(DefaultOpeningBalance::fromEntity)
                 .orElse(null);
     }
 

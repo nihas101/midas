@@ -2,7 +2,7 @@ package de.nihas101.midas.ui.common.lock;
 
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
+import de.nihas101.midas.api.shareholder.Shareholder;
 import org.springframework.context.MessageSource;
 
 import java.time.Year;

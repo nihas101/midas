@@ -5,7 +5,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
+import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.core.shareholders.service.ShareholdersService;
 import de.nihas101.midas.ui.AbstractKaribuTest;
 import org.junit.jupiter.api.Assertions;

@@ -1,5 +1,6 @@
 package de.nihas101.midas.core.backup.service;
 
+import de.nihas101.midas.api.backup.BackupStatusWriter;
 import de.nihas101.midas.core.backup.service.snapshot.ApplicationPropertiesSnapshot;
 import de.nihas101.midas.core.backup.service.snapshot.JarSnapshot;
 import de.nihas101.midas.core.backup.service.snapshot.MidasSnapshot;

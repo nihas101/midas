@@ -1,7 +1,9 @@
 package de.nihas101.midas.core.export.interest;
 
-import de.nihas101.midas.core.bookings.dto.Bookings;
-import de.nihas101.midas.core.bookings.service.BookingsReader;
+import de.nihas101.midas.api.bookings.Bookings;
+import de.nihas101.midas.api.bookings.BookingsReader;
+import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.core.export.sort.DisplayIdExportRowSort;
 import de.nihas101.midas.core.export.sort.ExportRowSort;
 import de.nihas101.midas.core.interest.InterestCalculation;
@@ -9,8 +11,6 @@ import de.nihas101.midas.core.interest.dto.InterestRate;
 import de.nihas101.midas.core.interest.interestamount.Interest;
 import de.nihas101.midas.core.interest.row.TransactionType;
 import de.nihas101.midas.core.interest.service.InterestRateService;
-import de.nihas101.midas.core.money.MoneyAmount;
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;

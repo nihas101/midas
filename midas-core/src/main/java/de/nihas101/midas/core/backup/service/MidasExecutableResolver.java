@@ -1,5 +1,6 @@
 package de.nihas101.midas.core.backup.service;
 
+import de.nihas101.midas.api.backup.MidasSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

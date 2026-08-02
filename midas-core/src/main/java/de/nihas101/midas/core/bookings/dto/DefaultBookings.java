@@ -1,7 +1,10 @@
 package de.nihas101.midas.core.bookings.dto;
 
-import de.nihas101.midas.core.money.MoneyAmount;
-import de.nihas101.midas.core.openingbalance.dto.OpeningBalance;
+import de.nihas101.midas.api.bookings.Bookings;
+import de.nihas101.midas.api.bookings.FilteredBookings;
+import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.api.openingbalance.OpeningBalance;
+import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Month;
@@ -10,13 +13,13 @@ import java.util.function.Function;
 
 @RequiredArgsConstructor
 public class DefaultBookings implements Bookings {
-    private final List<Booking> bookings;
+    private final List<de.nihas101.midas.api.bookings.Booking> bookings;
     private final OpeningBalance openingBalance;
 
     @Override
     public OpeningBalance openingBalance() {
         if (openingBalance == null) {
-            return new OpeningBalance(MoneyAmount.ZERO);
+            return new DefaultOpeningBalance(MoneyAmount.ZERO);
         }
         return openingBalance;
     }
@@ -27,8 +30,8 @@ public class DefaultBookings implements Bookings {
     }
 
     @Override
-    public FilteredBookings filter(final Function<Booking, Boolean> condition) {
-        final List<Booking> filteredBookings = bookings.stream()
+    public FilteredBookings filter(final Function<de.nihas101.midas.api.bookings.Booking, Boolean> condition) {
+        final List<de.nihas101.midas.api.bookings.Booking> filteredBookings = bookings.stream()
                 .filter(condition::apply)
                 .toList();
         return new FilteredBookings(filteredBookings);

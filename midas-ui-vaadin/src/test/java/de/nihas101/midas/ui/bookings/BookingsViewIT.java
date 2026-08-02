@@ -10,16 +10,19 @@ import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.TextField;
-import de.nihas101.midas.core.bookings.dto.Booking;
-import de.nihas101.midas.core.bookings.dto.Bookings;
-import de.nihas101.midas.core.bookings.entity.BookingType;
-import de.nihas101.midas.core.bookings.entity.Source;
+import de.nihas101.midas.api.bookings.Booking;
+import de.nihas101.midas.api.bookings.BookingType;
+import de.nihas101.midas.api.bookings.Bookings;
+import de.nihas101.midas.api.bookings.Source;
+import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.api.openingbalance.OpeningBalance;
+import de.nihas101.midas.api.shareholder.Shareholder;
+import de.nihas101.midas.core.bookings.dto.DefaultBooking;
 import de.nihas101.midas.core.bookings.row.BookingRow;
 import de.nihas101.midas.core.bookings.service.BookingsService;
 import de.nihas101.midas.core.interest.service.openingbalanceupdate.DefaultInterestUpdatingOpeningBalanceService;
-import de.nihas101.midas.core.money.MoneyAmount;
-import de.nihas101.midas.core.openingbalance.dto.OpeningBalance;
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
+import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
+import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
 import de.nihas101.midas.core.shareholders.service.ShareholdersService;
 import de.nihas101.midas.ui.AbstractKaribuTest;
 import de.nihas101.midas.ui.common.ShareholderPicker;
@@ -52,7 +55,7 @@ public class BookingsViewIT extends AbstractKaribuTest {
     @Test
     void testBookingsWorkflow() {
         // 1. Prepopulate a shareholder in the DB
-        final Shareholder sh = new Shareholder(null, 101, "Alice", "Smith");
+        final Shareholder sh = new DefaultShareholder(null, 101, "Alice", "Smith");
         shareholdersService.create(sh);
 
         final Shareholder savedSh = shareholdersService.shareholders().toList().stream()
@@ -117,7 +120,7 @@ public class BookingsViewIT extends AbstractKaribuTest {
     @Test
     void testDoubleBookingWarningAndSave() {
         // 1. Prepopulate a shareholder in the DB
-        final Shareholder sh = new Shareholder(null, 102, "Bob", "Jones");
+        final Shareholder sh = new DefaultShareholder(null, 102, "Bob", "Jones");
         shareholdersService.create(sh);
 
         final Shareholder savedSh = shareholdersService.shareholders().toList().stream()
@@ -191,7 +194,7 @@ public class BookingsViewIT extends AbstractKaribuTest {
     @Test
     void testCarryOverToNextYear() {
         // 1. Prepopulate a shareholder in the DB
-        final Shareholder sh = new Shareholder(null, 201, "Alice", "Carry");
+        final Shareholder sh = new DefaultShareholder(null, 201, "Alice", "Carry");
         shareholdersService.create(sh);
         final Shareholder savedSh = shareholdersService.shareholders().toList().stream()
                 .filter(s -> "Alice".equals(s.getFirstName()) && "Carry".equals(s.getLastName()))
@@ -199,7 +202,7 @@ public class BookingsViewIT extends AbstractKaribuTest {
                 .orElseThrow();
 
         // 2. Prepopulate a booking in 2026
-        final Booking booking = Booking.builder()
+        final Booking booking = DefaultBooking.builder()
                 .shareholderId(savedSh.getId())
                 .date(LocalDate.of(2026, 6, 1))
                 .type(BookingType.COMPENSATION)
@@ -233,7 +236,7 @@ public class BookingsViewIT extends AbstractKaribuTest {
     @Test
     void testCarryOverWhenNextYearHasOpeningBalanceConfirm() {
         // 1. Prepopulate a shareholder in the DB
-        final Shareholder sh = new Shareholder(null, 202, "Alice", "Conflict");
+        final Shareholder sh = new DefaultShareholder(null, 202, "Alice", "Conflict");
         shareholdersService.create(sh);
         final Shareholder savedSh = shareholdersService.shareholders().toList().stream()
                 .filter(s -> "Alice".equals(s.getFirstName()) && "Conflict".equals(s.getLastName()))
@@ -241,7 +244,7 @@ public class BookingsViewIT extends AbstractKaribuTest {
                 .orElseThrow();
 
         // 2. Prepopulate opening balance for next year (2027) with USER source
-        openingBalanceService.create(new OpeningBalance(
+        openingBalanceService.create(new DefaultOpeningBalance(
                 null,
                 savedSh.getId(),
                 MoneyAmount.of(new BigDecimal("300.00")),
@@ -250,7 +253,7 @@ public class BookingsViewIT extends AbstractKaribuTest {
         ));
 
         // 3. Prepopulate booking in 2026
-        final Booking booking = Booking.builder()
+        final Booking booking = DefaultBooking.builder()
                 .shareholderId(savedSh.getId())
                 .date(LocalDate.of(2026, 6, 1))
                 .type(BookingType.COMPENSATION)
@@ -288,7 +291,7 @@ public class BookingsViewIT extends AbstractKaribuTest {
     @Test
     void testCarryOverWhenNextYearHasOpeningBalanceCancel() {
         // 1. Prepopulate a shareholder in the DB
-        final Shareholder sh = new Shareholder(null, 203, "Alice", "Cancel");
+        final Shareholder sh = new DefaultShareholder(null, 203, "Alice", "Cancel");
         shareholdersService.create(sh);
         final Shareholder savedSh = shareholdersService.shareholders().toList().stream()
                 .filter(s -> "Alice".equals(s.getFirstName()) && "Cancel".equals(s.getLastName()))
@@ -296,7 +299,7 @@ public class BookingsViewIT extends AbstractKaribuTest {
                 .orElseThrow();
 
         // 2. Prepopulate opening balance for next year (2027) with USER source
-        openingBalanceService.create(new OpeningBalance(
+        openingBalanceService.create(new DefaultOpeningBalance(
                 null,
                 savedSh.getId(),
                 MoneyAmount.of(new BigDecimal("300.00")),
@@ -305,7 +308,7 @@ public class BookingsViewIT extends AbstractKaribuTest {
         ));
 
         // 3. Prepopulate booking in 2026
-        final Booking booking = Booking.builder()
+        final Booking booking = DefaultBooking.builder()
                 .shareholderId(savedSh.getId())
                 .date(LocalDate.of(2026, 6, 1))
                 .type(BookingType.COMPENSATION)
@@ -346,7 +349,7 @@ public class BookingsViewIT extends AbstractKaribuTest {
     @Test
     void testCarryOverAndThenUncheck() {
         // 1. Prepopulate a shareholder in the DB
-        final Shareholder sh = new Shareholder(null, 204, "Alice", "Uncheck");
+        final Shareholder sh = new DefaultShareholder(null, 204, "Alice", "Uncheck");
         shareholdersService.create(sh);
         final Shareholder savedSh = shareholdersService.shareholders().toList().stream()
                 .filter(s -> "Alice".equals(s.getFirstName()) && "Uncheck".equals(s.getLastName()))
@@ -354,7 +357,7 @@ public class BookingsViewIT extends AbstractKaribuTest {
                 .orElseThrow();
 
         // 2. Prepopulate booking in 2026
-        final Booking booking = Booking.builder()
+        final Booking booking = DefaultBooking.builder()
                 .shareholderId(savedSh.getId())
                 .date(LocalDate.of(2026, 6, 1))
                 .type(BookingType.COMPENSATION)
@@ -393,7 +396,7 @@ public class BookingsViewIT extends AbstractKaribuTest {
     @Test
     void testCarryOverWhenNoBookingsExistWithOpeningBalance() {
         // 1. Prepopulate a shareholder in the DB
-        final Shareholder sh = new Shareholder(null, 205, "Alice", "Empty");
+        final Shareholder sh = new DefaultShareholder(null, 205, "Alice", "Empty");
         shareholdersService.create(sh);
         final Shareholder savedSh = shareholdersService.shareholders().toList().stream()
                 .filter(s -> "Alice".equals(s.getFirstName()) && "Empty".equals(s.getLastName()))
@@ -422,7 +425,7 @@ public class BookingsViewIT extends AbstractKaribuTest {
     @Test
     void testCarryOverWhenNoBookingsExistWithoutOpeningBalance() {
         // 1. Prepopulate a shareholder in the DB
-        final Shareholder sh = new Shareholder(null, 206, "Alice", "EmptyNoBal");
+        final Shareholder sh = new DefaultShareholder(null, 206, "Alice", "EmptyNoBal");
         shareholdersService.create(sh);
         final Shareholder savedSh = shareholdersService.shareholders().toList().stream()
                 .filter(s -> "Alice".equals(s.getFirstName()) && "EmptyNoBal".equals(s.getLastName()))

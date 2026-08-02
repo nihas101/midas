@@ -1,9 +1,12 @@
 package de.nihas101.midas.core.accountstatement.dto;
 
+import de.nihas101.midas.api.accountstatement.AccountStatements;
+import de.nihas101.midas.api.accountstatement.LabeledAccountStatement;
+import de.nihas101.midas.api.bookings.BookingType;
+import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.api.openingbalance.OpeningBalance;
 import de.nihas101.midas.core.accountstatement.repository.AccountStatementEntity;
-import de.nihas101.midas.core.bookings.entity.BookingType;
-import de.nihas101.midas.core.money.MoneyAmount;
-import de.nihas101.midas.core.openingbalance.dto.OpeningBalance;
+import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -55,10 +58,10 @@ class DefaultAccountStatementsTest {
     public static Stream<Arguments> openingBalanceArguments() {
         return Stream.of(
                 Arguments.of((OpeningBalance) null),
-                Arguments.of(new OpeningBalance()),
-                Arguments.of(new OpeningBalance(MoneyAmount.ZERO)),
-                Arguments.of(new OpeningBalance(MoneyAmount.ofCents(10L))),
-                Arguments.of(new OpeningBalance(MoneyAmount.ofCents(-10L)))
+                Arguments.of(new DefaultOpeningBalance()),
+                Arguments.of(new DefaultOpeningBalance(MoneyAmount.ZERO)),
+                Arguments.of(new DefaultOpeningBalance(MoneyAmount.ofCents(10L))),
+                Arguments.of(new DefaultOpeningBalance(MoneyAmount.ofCents(-10L)))
         );
     }
 

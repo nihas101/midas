@@ -1,6 +1,6 @@
 package de.nihas101.midas.core.interest.interestamount;
 
-import de.nihas101.midas.core.money.MoneyAmount;
+import de.nihas101.midas.api.money.MoneyAmount;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 

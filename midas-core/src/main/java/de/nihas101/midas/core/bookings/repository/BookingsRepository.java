@@ -1,8 +1,8 @@
 package de.nihas101.midas.core.bookings.repository;
 
+import de.nihas101.midas.api.bookings.BookingType;
+import de.nihas101.midas.api.bookings.Source;
 import de.nihas101.midas.core.bookings.entity.BookingEntity;
-import de.nihas101.midas.core.bookings.entity.BookingType;
-import de.nihas101.midas.core.bookings.entity.Source;
 import de.nihas101.midas.core.shareholders.entity.ShareholderEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

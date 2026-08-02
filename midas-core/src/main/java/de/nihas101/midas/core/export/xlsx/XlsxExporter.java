@@ -1,7 +1,7 @@
 package de.nihas101.midas.core.export.xlsx;
 
-import de.nihas101.midas.core.export.Export;
-import de.nihas101.midas.core.export.ExportDataSource;
+import de.nihas101.midas.api.export.Export;
+import de.nihas101.midas.api.export.ExportDataSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

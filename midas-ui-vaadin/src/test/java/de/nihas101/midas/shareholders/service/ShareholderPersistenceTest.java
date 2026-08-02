@@ -1,6 +1,7 @@
 package de.nihas101.midas.shareholders.service;
 
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
+import de.nihas101.midas.api.shareholder.Shareholder;
+import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
 import de.nihas101.midas.core.shareholders.repository.ShareholdersRepository;
 import de.nihas101.midas.core.shareholders.service.ShareholdersService;
 import org.junit.jupiter.api.Test;
@@ -25,7 +26,7 @@ class ShareholderPersistenceTest { // TODO: Figure out a way to move this into t
     void create_withDisplayId_shouldPersistDisplayId() {
         // Given
         int customDisplayId = 999;
-        Shareholder dto = new Shareholder(null, customDisplayId, "John", "Doe");
+        Shareholder dto = new DefaultShareholder(null, customDisplayId, "John", "Doe");
 
         // When
         service.create(dto);
@@ -43,7 +44,7 @@ class ShareholderPersistenceTest { // TODO: Figure out a way to move this into t
     @Test
     void update_withDisplayId_shouldPersistDisplayId() {
         // Given
-        Shareholder dto = new Shareholder(null, null, "Jane", "Doe");
+        Shareholder dto = new DefaultShareholder(null, null, "Jane", "Doe");
         service.create(dto);
 
         Shareholder saved = service.shareholders().toList().stream()

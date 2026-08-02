@@ -2,11 +2,11 @@ package de.nihas101.midas.ui.common;
 
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import de.nihas101.midas.api.lock.LockWriter;
+import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.core.export.ExportFactory;
 import de.nihas101.midas.core.export.ExportViewName;
 import de.nihas101.midas.core.lock.ShareholderLock;
-import de.nihas101.midas.core.lock.service.LockWriter;
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
 import de.nihas101.midas.ui.common.lock.LockUnlockButton;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;

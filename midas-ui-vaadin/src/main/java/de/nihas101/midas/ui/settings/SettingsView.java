@@ -9,9 +9,9 @@ import com.vaadin.flow.i18n.I18NProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.nihas101.midas.core.config.MidasConfig;
+import de.nihas101.midas.core.userconfig.service.UserConfigService;
 import de.nihas101.midas.ui.common.MidasView;
 import de.nihas101.midas.ui.common.locale.MidasLocaleResolver;
-import de.nihas101.midas.core.userconfig.service.UserConfigService;
 import org.springframework.context.MessageSource;
 
 // TODO: Add descriptions to the settings

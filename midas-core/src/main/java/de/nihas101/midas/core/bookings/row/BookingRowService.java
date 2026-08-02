@@ -1,7 +1,7 @@
 package de.nihas101.midas.core.bookings.row;
 
-import de.nihas101.midas.core.bookings.dto.Bookings;
-import de.nihas101.midas.core.money.MoneyAmount;
+import de.nihas101.midas.api.bookings.Bookings;
+import de.nihas101.midas.api.money.MoneyAmount;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;

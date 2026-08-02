@@ -1,6 +1,10 @@
 package de.nihas101.midas.core.accountstatement.service;
 
-import de.nihas101.midas.core.accountstatement.dto.AccountStatements;
+import de.nihas101.midas.api.accountstatement.AccountStatements;
+import de.nihas101.midas.api.bookings.BookingType;
+import de.nihas101.midas.api.bookings.Source;
+import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.core.accountstatement.dto.DefaultAccountStatement;
 import de.nihas101.midas.core.accountstatement.repository.AccountStatementEntity;
 import de.nihas101.midas.core.accountstatement.repository.AccountStatementOrdersRepository;
@@ -10,13 +14,10 @@ import de.nihas101.midas.core.accountstatement.repository.AccountStatementsRepos
 import de.nihas101.midas.core.accountstatement.row.AccountStatementRow;
 import de.nihas101.midas.core.accountstatement.row.RunningTotalAccountStatementRow;
 import de.nihas101.midas.core.accountstatement.runningtotal.DefaultRunningTotalAccountStatement;
-import de.nihas101.midas.core.bookings.entity.BookingType;
-import de.nihas101.midas.core.bookings.entity.Source;
-import de.nihas101.midas.core.money.MoneyAmount;
-import de.nihas101.midas.core.openingbalance.dto.OpeningBalance;
+import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
 import de.nihas101.midas.core.openingbalance.entity.OpeningBalanceEntity;
 import de.nihas101.midas.core.openingbalance.repository.OpeningBalanceRepository;
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
+import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
 import de.nihas101.midas.core.shareholders.entity.ShareholderEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -55,7 +56,7 @@ class DefaultAccountStatementServiceTest {
 
     @Test
     void accountStatements() {
-        final Shareholder shareholder = new Shareholder(1, 1, "first", "last");
+        final Shareholder shareholder = new DefaultShareholder(1, 1, "first", "last");
         final Year year = Year.of(2026);
         final AccountStatementEntity withdrawal = new AccountStatementEntity(
                 1,
@@ -111,7 +112,7 @@ class DefaultAccountStatementServiceTest {
                 locale
         );
 
-        Assertions.assertEquals(OpeningBalance.fromEntity(openingBalance), accountStatements.openingBalance());
+        Assertions.assertEquals(DefaultOpeningBalance.fromEntity(openingBalance), accountStatements.openingBalance());
         Assertions.assertEquals(List.of(), accountStatements.manualStatements());
         Assertions.assertEquals(
                 new DefaultAccountStatement(withdrawal, messageSource, locale),
@@ -153,7 +154,7 @@ class DefaultAccountStatementServiceTest {
 
     @Test
     void createOverride() {
-        final Shareholder shareholder = new Shareholder(1, 1, "first", "last");
+        final Shareholder shareholder = new DefaultShareholder(1, 1, "first", "last");
         final Year year = Year.of(2026);
         final BookingType withdrawal = BookingType.WITHDRAWAL;
         Mockito.when(
@@ -186,7 +187,7 @@ class DefaultAccountStatementServiceTest {
 
     @Test
     void updateOverride() {
-        final Shareholder shareholder = new Shareholder(1, 1, "first", "last");
+        final Shareholder shareholder = new DefaultShareholder(1, 1, "first", "last");
         final Year year = Year.of(2026);
         final BookingType withdrawal = BookingType.WITHDRAWAL;
         Mockito.when(
@@ -232,7 +233,7 @@ class DefaultAccountStatementServiceTest {
 
     @Test
     void saveManualExtra() {
-        final Shareholder shareholder = new Shareholder(1, 1, "first", "last");
+        final Shareholder shareholder = new DefaultShareholder(1, 1, "first", "last");
         final Year year = Year.of(2026);
 
         final MoneyAmount amount = MoneyAmount.ofCents(1234L);
@@ -254,7 +255,7 @@ class DefaultAccountStatementServiceTest {
 
     @Test
     void updateManualExtra() {
-        final Shareholder shareholder = new Shareholder(1, 1, "first", "last");
+        final Shareholder shareholder = new DefaultShareholder(1, 1, "first", "last");
         final Year year = Year.of(2026);
 
         Mockito.when(accountStatementOverridesRepository.findById(1))
@@ -295,7 +296,7 @@ class DefaultAccountStatementServiceTest {
 
     @Test
     void saveOrder() {
-        final Shareholder shareholder = new Shareholder(1, 1, "first", "last");
+        final Shareholder shareholder = new DefaultShareholder(1, 1, "first", "last");
         final Year year = Year.of(2026);
 
         final List<String> rowKeys = Stream.of(

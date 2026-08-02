@@ -11,6 +11,14 @@
 
     <artifactId>midas-core</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>de.nihas101</groupId>
+            <artifactId>midas-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
     <properties>
         <maven.compiler.source>25</maven.compiler.source>
         <maven.compiler.target>25</maven.compiler.target>

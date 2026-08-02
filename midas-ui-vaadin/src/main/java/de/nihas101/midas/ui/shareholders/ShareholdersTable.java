@@ -9,9 +9,10 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
-import de.nihas101.midas.core.shareholders.service.ShareholdersReader;
-import de.nihas101.midas.core.shareholders.service.ShareholdersWriter;
+import de.nihas101.midas.api.shareholder.Shareholder;
+import de.nihas101.midas.api.shareholder.ShareholdersReader;
+import de.nihas101.midas.api.shareholder.ShareholdersWriter;
+import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
 import de.nihas101.midas.ui.common.AddButton;
 import de.nihas101.midas.ui.common.CancelButton;
 import de.nihas101.midas.ui.common.DeleteButton;
@@ -233,7 +234,7 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
         final List<Shareholder> shareholders = shareholdersReader.shareholders().toList();
 
         // Add permanent empty row for new shareholder
-        Shareholder dummy = new Shareholder();
+        Shareholder dummy = new DefaultShareholder();
         shareholders.add(dummy);
 
         this.setItems(shareholders);

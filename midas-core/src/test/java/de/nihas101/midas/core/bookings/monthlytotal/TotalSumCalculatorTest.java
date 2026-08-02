@@ -1,11 +1,13 @@
 package de.nihas101.midas.core.bookings.monthlytotal;
 
-import de.nihas101.midas.core.bookings.dto.Booking;
-import de.nihas101.midas.core.bookings.dto.Bookings;
-import de.nihas101.midas.core.bookings.dto.FilteredBookings;
-import de.nihas101.midas.core.bookings.entity.BookingType;
-import de.nihas101.midas.core.money.MoneyAmount;
-import de.nihas101.midas.core.openingbalance.dto.OpeningBalance;
+import de.nihas101.midas.api.bookings.Booking;
+import de.nihas101.midas.api.bookings.BookingType;
+import de.nihas101.midas.api.bookings.Bookings;
+import de.nihas101.midas.api.bookings.FilteredBookings;
+import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.api.openingbalance.OpeningBalance;
+import de.nihas101.midas.core.bookings.dto.DefaultBooking;
+import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -44,7 +46,7 @@ class TotalSumCalculatorTest {
         Bookings mockBookings = new Bookings() {
             @Override
             public OpeningBalance openingBalance() {
-                return new OpeningBalance(MoneyAmount.ZERO);
+                return new DefaultOpeningBalance(MoneyAmount.ZERO);
             }
 
             @Override
@@ -99,7 +101,7 @@ class TotalSumCalculatorTest {
         final Bookings bookings = new Bookings() {
             @Override
             public OpeningBalance openingBalance() {
-                return new OpeningBalance(MoneyAmount.ZERO);
+                return new DefaultOpeningBalance(MoneyAmount.ZERO);
             }
 
             @Override
@@ -121,8 +123,13 @@ class TotalSumCalculatorTest {
         return new MonthlyTotalSum.MonthlySumTotalCalculator(bookings, Month.MARCH);
     }
 
-    private Booking createBooking(BookingType type, long cents, Month month, String comment) {
-        return Booking.builder()
+    private Booking createBooking(
+            final BookingType type,
+            final long cents,
+            final Month month,
+            final String comment
+    ) {
+        return DefaultBooking.builder()
                 .type(type)
                 .amount(MoneyAmount.ofCents(cents))
                 .date(LocalDate.of(2026, month, 1))

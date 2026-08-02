@@ -1,6 +1,6 @@
 package de.nihas101.midas.core.bookings.dto.money;
 
-import de.nihas101.midas.core.money.MoneyAmount;
+import de.nihas101.midas.api.money.MoneyAmount;
 import de.nihas101.midas.core.money.MoneyAmountConverter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;

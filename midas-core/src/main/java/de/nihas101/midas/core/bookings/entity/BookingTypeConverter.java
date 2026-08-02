@@ -1,5 +1,6 @@
 package de.nihas101.midas.core.bookings.entity;
 
+import de.nihas101.midas.api.bookings.BookingType;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 

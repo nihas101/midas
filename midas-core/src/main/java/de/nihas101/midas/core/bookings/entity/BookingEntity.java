@@ -1,7 +1,9 @@
 package de.nihas101.midas.core.bookings.entity;
 
-import de.nihas101.midas.core.bookings.dto.Booking;
-import de.nihas101.midas.core.money.MoneyAmount;
+import de.nihas101.midas.api.bookings.Booking;
+import de.nihas101.midas.api.bookings.BookingType;
+import de.nihas101.midas.api.bookings.Source;
+import de.nihas101.midas.api.money.MoneyAmount;
 import de.nihas101.midas.core.shareholders.entity.ShareholderEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

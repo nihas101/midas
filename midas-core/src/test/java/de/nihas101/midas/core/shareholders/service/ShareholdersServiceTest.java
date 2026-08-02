@@ -1,7 +1,8 @@
 package de.nihas101.midas.core.shareholders.service;
 
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
-import de.nihas101.midas.core.shareholders.dto.Shareholders;
+import de.nihas101.midas.api.shareholder.Shareholder;
+import de.nihas101.midas.api.shareholder.Shareholders;
+import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
 import de.nihas101.midas.core.shareholders.entity.ShareholderEntity;
 import de.nihas101.midas.core.shareholders.repository.ShareholdersRepository;
 import org.junit.jupiter.api.Test;
@@ -44,7 +45,7 @@ class ShareholdersServiceTest {
 
     @Test
     void create_success() {
-        Shareholder dto = new Shareholder(null, 0, "Max", "Mustermann");
+        Shareholder dto = new DefaultShareholder(null, 0, "Max", "Mustermann");
 
         service.create(dto);
 
@@ -62,13 +63,13 @@ class ShareholdersServiceTest {
 
     @Test
     void create_withIdFails() {
-        Shareholder dto = new Shareholder(1, 0, "Max", "Mustermann");
+        Shareholder dto = new DefaultShareholder(1, 0, "Max", "Mustermann");
         assertThrows(IllegalArgumentException.class, () -> service.create(dto));
     }
 
     @Test
     void update_success() {
-        Shareholder dto = new Shareholder(1, 100, "Max", "Mustermann");
+        Shareholder dto = new DefaultShareholder(1, 100, "Max", "Mustermann");
 
         service.update(dto);
 
@@ -86,13 +87,13 @@ class ShareholdersServiceTest {
 
     @Test
     void update_withoutIdFails() {
-        Shareholder dto = new Shareholder(null, 0, "Max", "Mustermann");
+        Shareholder dto = new DefaultShareholder(null, 0, "Max", "Mustermann");
         assertThrows(IllegalArgumentException.class, () -> service.update(dto));
     }
 
     @Test
     void delete() {
-        Shareholder dto = new Shareholder(1, 100, "Max", "Mustermann");
+        Shareholder dto = new DefaultShareholder(1, 100, "Max", "Mustermann");
 
         service.delete(dto);
 

@@ -1,19 +1,20 @@
 package de.nihas101.midas.core.export.pdf;
 
+import de.nihas101.midas.api.bookings.BookingsReader;
+import de.nihas101.midas.api.interest.InterestBookingsReader;
+import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.core.accountstatement.row.AccountStatementRowService;
 import de.nihas101.midas.core.accountstatement.service.RunningTotalAccountStatementService;
 import de.nihas101.midas.core.bookings.dto.DefaultBookings;
 import de.nihas101.midas.core.bookings.row.BookingRowService;
-import de.nihas101.midas.core.bookings.service.BookingsReader;
 import de.nihas101.midas.core.export.ExportRequest;
 import de.nihas101.midas.core.export.ExportViewName;
 import de.nihas101.midas.core.export.ExportViews;
 import de.nihas101.midas.core.interest.row.InterestRowService;
-import de.nihas101.midas.core.interest.service.InterestBookingsReader;
 import de.nihas101.midas.core.interest.service.InterestRateService;
-import de.nihas101.midas.core.money.MoneyAmount;
-import de.nihas101.midas.core.openingbalance.dto.OpeningBalance;
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
+import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
+import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -105,7 +106,7 @@ class PdfExporterTest {
     public static Stream<Arguments> noFileCases() {
         return Stream.of(
                 Arguments.of(List.of(), Set.of(ExportViewName.BOOKINGS)),
-                Arguments.of(List.of(new Shareholder()), Set.of()),
+                Arguments.of(List.of(new DefaultShareholder()), Set.of()),
                 Arguments.of(List.of(), Set.of())
         );
     }
@@ -135,7 +136,7 @@ class PdfExporterTest {
 
     @Test
     void trigger_multiFile_usesMultiPdfGeneratorAndCallsPdfServiceForEachFile() {
-        final Shareholder shareholder2 = mock(Shareholder.class);
+        final Shareholder shareholder2 = mock(DefaultShareholder.class);
         when(request.shareholders()).thenReturn(List.of(shareholder, shareholder2));
         when(request.views()).thenReturn(new ExportViews(Set.of(ExportViewName.BOOKINGS, ExportViewName.INTEREST)));
         when(request.startDate()).thenReturn(Year.of(2026).atMonth(Month.JANUARY).atDay(1));
@@ -146,7 +147,7 @@ class PdfExporterTest {
         when(shareholder2.getLastName()).thenReturn("Smith");
         when(messageSource.getMessage(any(), any(), any())).thenReturn("dummy");
         when(interestBookingsReader.interestRelatedBookingsForShareholderAndYear(anyInt(), any()))
-                .thenReturn(new DefaultBookings(Collections.emptyList(), new OpeningBalance(MoneyAmount.ZERO)));
+                .thenReturn(new DefaultBookings(Collections.emptyList(), new DefaultOpeningBalance(MoneyAmount.ZERO)));
 
         new PdfExporter(
                 request,

@@ -1,6 +1,6 @@
 package de.nihas101.midas.core.accountstatement.repository;
 
-import de.nihas101.midas.core.bookings.entity.BookingType;
+import de.nihas101.midas.api.bookings.BookingType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

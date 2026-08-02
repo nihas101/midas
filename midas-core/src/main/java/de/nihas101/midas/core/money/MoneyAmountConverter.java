@@ -1,5 +1,6 @@
 package de.nihas101.midas.core.money;
 
+import de.nihas101.midas.api.money.MoneyAmount;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 

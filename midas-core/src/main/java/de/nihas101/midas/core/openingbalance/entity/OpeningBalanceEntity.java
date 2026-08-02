@@ -1,8 +1,8 @@
 package de.nihas101.midas.core.openingbalance.entity;
 
-import de.nihas101.midas.core.bookings.entity.Source;
-import de.nihas101.midas.core.money.MoneyAmount;
-import de.nihas101.midas.core.openingbalance.dto.OpeningBalance;
+import de.nihas101.midas.api.bookings.Source;
+import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.api.openingbalance.OpeningBalance;
 import de.nihas101.midas.core.shareholders.entity.ShareholderEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

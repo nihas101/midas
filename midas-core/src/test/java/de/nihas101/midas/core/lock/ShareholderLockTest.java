@@ -1,8 +1,9 @@
 package de.nihas101.midas.core.lock;
 
-import de.nihas101.midas.core.lock.service.LockReader;
+import de.nihas101.midas.api.lock.LockReader;
+import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.core.lock.service.LockedException;
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
+import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,7 +30,7 @@ class ShareholderLockTest {
     void isLocked(final boolean expected) {
         final ShareholderLock shareholderLock = new ShareholderLock(lock);
 
-        final Shareholder shareholder = new Shareholder(1, 1, "first", "last");
+        final Shareholder shareholder = new DefaultShareholder(1, 1, "first", "last");
         final Year year = Year.of(2026);
         Mockito.when(lock.isLocked(shareholder, year))
                 .thenReturn(expected);
@@ -49,7 +50,7 @@ class ShareholderLockTest {
     void assertUnlocked_unlocked() {
         final ShareholderLock shareholderLock = new ShareholderLock(lock);
 
-        final Shareholder shareholder = new Shareholder(1, 1, "first", "last");
+        final Shareholder shareholder = new DefaultShareholder(1, 1, "first", "last");
         final Year year = Year.of(2026);
         Mockito.when(lock.isLocked(shareholder.getId(), year))
                 .thenReturn(false);
@@ -62,7 +63,7 @@ class ShareholderLockTest {
     void assertUnlocked_locked() {
         final ShareholderLock shareholderLock = new ShareholderLock(lock);
 
-        final Shareholder shareholder = new Shareholder(1, 1, "first", "last");
+        final Shareholder shareholder = new DefaultShareholder(1, 1, "first", "last");
         final Year year = Year.of(2026);
         Mockito.when(lock.isLocked(shareholder.getId(), year))
                 .thenReturn(true);
@@ -84,7 +85,7 @@ class ShareholderLockTest {
         return Stream.of(
                 Arguments.of(null, null),
                 Arguments.of(null, Year.of(2026)),
-                Arguments.of(new Shareholder(), null)
+                Arguments.of(new DefaultShareholder(), null)
         );
     }
 

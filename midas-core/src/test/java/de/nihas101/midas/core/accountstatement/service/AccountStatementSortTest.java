@@ -1,12 +1,13 @@
 package de.nihas101.midas.core.accountstatement.service;
 
-import de.nihas101.midas.core.accountstatement.dto.LabeledAccountStatement;
-import de.nihas101.midas.core.accountstatement.dto.RowKey;
+import de.nihas101.midas.api.accountstatement.LabeledAccountStatement;
+import de.nihas101.midas.api.accountstatement.RowKey;
+import de.nihas101.midas.api.bookings.BookingType;
+import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.core.accountstatement.repository.AccountStatementOrderEntity;
 import de.nihas101.midas.core.accountstatement.repository.AccountStatementOrdersRepository;
-import de.nihas101.midas.core.bookings.entity.BookingType;
-import de.nihas101.midas.core.money.MoneyAmount;
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
+import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
 import de.nihas101.midas.core.shareholders.entity.ShareholderEntity;
 import lombok.EqualsAndHashCode;
 import org.junit.jupiter.api.Assertions;
@@ -40,7 +41,7 @@ class AccountStatementSortTest {
 
         final List<LabeledAccountStatement> allStatements = sort.sort(
                 List.of(),
-                new Shareholder(1, null, null, null),
+                new DefaultShareholder(1, null, null, null),
                 Year.of(2026)
         );
 
@@ -60,7 +61,7 @@ class AccountStatementSortTest {
                         new TestLabeledAccountStatement(BookingType.TAX_CREDIT),
                         new TestLabeledAccountStatement(BookingType.TAX_PREVIOUS_YEAR)
                 ),
-                new Shareholder(1, null, null, null),
+                new DefaultShareholder(1, null, null, null),
                 Year.of(2026)
         );
 
@@ -78,7 +79,7 @@ class AccountStatementSortTest {
 
     @Test
     void sortBookingTypesReordered() {
-        final Shareholder shareholder = new Shareholder(1, null, null, null);
+        final Shareholder shareholder = new DefaultShareholder(1, null, null, null);
         Mockito.when(accountStatementOrdersRepository.findByShareholderIdAndYearOrderByPositionAsc(shareholder.getId(), 2026))
                 .thenReturn(
                         List.of(
@@ -116,7 +117,7 @@ class AccountStatementSortTest {
 
     @Test
     void sortBookingTypesAndManualReordered() {
-        final Shareholder shareholder = new Shareholder(1, null, null, null);
+        final Shareholder shareholder = new DefaultShareholder(1, null, null, null);
         Mockito.when(accountStatementOrdersRepository.findByShareholderIdAndYearOrderByPositionAsc(shareholder.getId(), 2026))
                 .thenReturn(
                         List.of(
@@ -160,7 +161,7 @@ class AccountStatementSortTest {
 
     @Test
     void sortDoesntBreakWithNegativeAndHugeNumbers() {
-        final Shareholder shareholder = new Shareholder(1, null, null, null);
+        final Shareholder shareholder = new DefaultShareholder(1, null, null, null);
         Mockito.when(accountStatementOrdersRepository.findByShareholderIdAndYearOrderByPositionAsc(shareholder.getId(), 2026))
                 .thenReturn(
                         List.of(
@@ -204,7 +205,7 @@ class AccountStatementSortTest {
 
     @Test
     void sortIsStableForSamePositions() {
-        final Shareholder shareholder = new Shareholder(1, null, null, null);
+        final Shareholder shareholder = new DefaultShareholder(1, null, null, null);
         Mockito.when(accountStatementOrdersRepository.findByShareholderIdAndYearOrderByPositionAsc(shareholder.getId(), 2026))
                 .thenReturn(
                         List.of(

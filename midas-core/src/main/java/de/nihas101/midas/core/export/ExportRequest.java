@@ -1,6 +1,6 @@
 package de.nihas101.midas.core.export;
 
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
+import de.nihas101.midas.api.shareholder.Shareholder;
 
 import java.time.LocalDate;
 import java.util.List;

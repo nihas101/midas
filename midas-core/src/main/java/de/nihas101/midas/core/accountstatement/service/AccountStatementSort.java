@@ -1,9 +1,9 @@
 package de.nihas101.midas.core.accountstatement.service;
 
-import de.nihas101.midas.core.accountstatement.dto.LabeledAccountStatement;
+import de.nihas101.midas.api.accountstatement.LabeledAccountStatement;
+import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.core.accountstatement.repository.AccountStatementOrderEntity;
 import de.nihas101.midas.core.accountstatement.repository.AccountStatementOrdersRepository;
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

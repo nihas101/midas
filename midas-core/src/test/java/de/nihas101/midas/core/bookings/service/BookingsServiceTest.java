@@ -1,12 +1,13 @@
 package de.nihas101.midas.core.bookings.service;
 
-import de.nihas101.midas.core.bookings.dto.Booking;
-import de.nihas101.midas.core.bookings.dto.Bookings;
+import de.nihas101.midas.api.bookings.Booking;
+import de.nihas101.midas.api.bookings.BookingType;
+import de.nihas101.midas.api.bookings.Bookings;
+import de.nihas101.midas.api.bookings.Source;
+import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.core.bookings.dto.DefaultBooking;
 import de.nihas101.midas.core.bookings.entity.BookingEntity;
-import de.nihas101.midas.core.bookings.entity.BookingType;
-import de.nihas101.midas.core.bookings.entity.Source;
 import de.nihas101.midas.core.bookings.repository.BookingsRepository;
-import de.nihas101.midas.core.money.MoneyAmount;
 import de.nihas101.midas.core.openingbalance.repository.OpeningBalanceRepository;
 import de.nihas101.midas.core.shareholders.entity.ShareholderEntity;
 import de.nihas101.midas.core.shareholders.repository.ShareholdersRepository;
@@ -96,7 +97,7 @@ class BookingsServiceTest {
     @Test
     void create_success() {
         // Arrange
-        Booking dto = Booking.builder()
+        Booking dto = DefaultBooking.builder()
                 .shareholderId(1)
                 .date(LocalDate.now())
                 .type(BookingType.WITHDRAWAL)
@@ -122,7 +123,7 @@ class BookingsServiceTest {
 
     @Test
     void create_withIdFails() {
-        Booking dto = Booking.builder().id(1).build();
+        Booking dto = DefaultBooking.builder().id(1).build();
         assertThrows(IllegalArgumentException.class, () -> bookingsService.create(dto));
     }
 
@@ -131,7 +132,7 @@ class BookingsServiceTest {
         // Arrange
         final LocalDate now = LocalDate.now();
         final MoneyAmount amount = MoneyAmount.ofCents(200L);
-        Booking dto = Booking.builder()
+        Booking dto = DefaultBooking.builder()
                 .id(10)
                 .shareholderId(1)
                 .date(now)
@@ -161,7 +162,7 @@ class BookingsServiceTest {
 
     @Test
     void update_withoutIdFails() {
-        Booking dto = Booking.builder().id(null).build();
+        Booking dto = DefaultBooking.builder().id(null).build();
         assertThrows(IllegalArgumentException.class, () -> bookingsService.update(dto));
     }
 }

@@ -11,7 +11,10 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.RouterLink;
+import de.nihas101.midas.api.userconfig.UserConfig;
 import de.nihas101.midas.core.config.MidasConfig;
+import de.nihas101.midas.core.userconfig.dto.DefaultUserConfig;
+import de.nihas101.midas.core.userconfig.service.UserConfigService;
 import de.nihas101.midas.ui.accountstatement.AccountStatementView;
 import de.nihas101.midas.ui.backup.BackupView;
 import de.nihas101.midas.ui.bookings.BookingsView;
@@ -21,8 +24,6 @@ import de.nihas101.midas.ui.interest.InterestView;
 import de.nihas101.midas.ui.main.MainView;
 import de.nihas101.midas.ui.settings.SettingsView;
 import de.nihas101.midas.ui.shareholders.ShareholdersView;
-import de.nihas101.midas.core.userconfig.entity.UserConfig;
-import de.nihas101.midas.core.userconfig.service.UserConfigService;
 import lombok.Getter;
 import org.springframework.context.MessageSource;
 
@@ -77,22 +78,25 @@ public class MidasView extends AppLayout {
             final String label,
             final Class<? extends Component> target
     ) {
-        icon.getStyle().set("margin-right", "var(--lumo-space-s)");
-        icon.getStyle().set("padding", "var(--lumo-space-xs)");
+        icon.getStyle()
+                .set("margin-right", "var(--lumo-space-s)")
+                .set("padding", "var(--lumo-space-xs)");
 
         final RouterLink link = new RouterLink(target);
         link.add(icon, new Span(label));
-        link.getStyle().set("display", "flex");
-        link.getStyle().set("align-items", "center");
-        link.getStyle().set("text-decoration", "none");
-        link.getStyle().set("color", "inherit");
+        link.getStyle()
+                .set("display", "flex")
+                .set("align-items", "center")
+                .set("text-decoration", "none")
+                .set("color", "inherit");
+
         return link;
     }
 
     private UserConfig getUserConfig(final UserConfigService userConfigService) {
         final Optional<UserConfig> userConfig = userConfigService.findByUserIdentifier(UserConfigService.DEFAULT_USER);
         if (userConfig.isEmpty()) {
-            UserConfig newUserConfig = new UserConfig(UserConfigService.DEFAULT_USER);
+            UserConfig newUserConfig = new DefaultUserConfig(UserConfigService.DEFAULT_USER);
             userConfigService.save(newUserConfig);
             return newUserConfig;
         } else {

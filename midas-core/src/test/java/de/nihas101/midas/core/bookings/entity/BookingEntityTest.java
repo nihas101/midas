@@ -1,7 +1,9 @@
 package de.nihas101.midas.core.bookings.entity;
 
-import de.nihas101.midas.core.bookings.dto.Booking;
-import de.nihas101.midas.core.money.MoneyAmount;
+import de.nihas101.midas.api.bookings.Booking;
+import de.nihas101.midas.api.bookings.BookingType;
+import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.core.bookings.dto.DefaultBooking;
 import de.nihas101.midas.core.shareholders.entity.ShareholderEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -10,6 +12,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.time.LocalDate;
 import java.util.stream.Stream;
+
+import static de.nihas101.midas.api.bookings.Source.USER;
 
 class BookingEntityTest {
 
@@ -24,7 +28,7 @@ class BookingEntityTest {
         return Stream.of(
                 Arguments.of(null, null, null),
                 Arguments.of(
-                        new Booking(),
+                        new DefaultBooking(),
                         null,
                         new BookingEntity(
                                 null,
@@ -39,7 +43,7 @@ class BookingEntityTest {
 
                 ),
                 Arguments.of(
-                        new Booking(),
+                        new DefaultBooking(),
                         new ShareholderEntity(),
                         new BookingEntity(
                                 null,
@@ -54,7 +58,7 @@ class BookingEntityTest {
 
                 ),
                 Arguments.of(
-                        new Booking(
+                        new DefaultBooking(
                                 1,
                                 2,
                                 3,
@@ -62,7 +66,7 @@ class BookingEntityTest {
                                 BookingType.COMPENSATION,
                                 MoneyAmount.ofCents(100L),
                                 "Test",
-                                Source.USER
+                                USER
                         ),
                         new ShareholderEntity(3, null, null, null),
                         new BookingEntity(
@@ -73,7 +77,7 @@ class BookingEntityTest {
                                 BookingType.COMPENSATION,
                                 MoneyAmount.ofCents(100L),
                                 "Test",
-                                Source.USER
+                                USER
                         )
                 )
         );

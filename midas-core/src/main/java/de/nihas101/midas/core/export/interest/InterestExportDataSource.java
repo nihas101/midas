@@ -1,7 +1,7 @@
 package de.nihas101.midas.core.export.interest;
 
-import de.nihas101.midas.core.export.ExportDataSource;
-import de.nihas101.midas.core.export.ExportTarget;
+import de.nihas101.midas.api.export.ExportDataSource;
+import de.nihas101.midas.api.export.ExportTarget;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 

@@ -1,12 +1,13 @@
 package de.nihas101.midas.core.accountstatement.runningtotal;
 
-import de.nihas101.midas.core.accountstatement.dto.AccountStatements;
+import de.nihas101.midas.api.accountstatement.AccountStatements;
+import de.nihas101.midas.api.accountstatement.LabeledAccountStatement;
+import de.nihas101.midas.api.bookings.BookingType;
+import de.nihas101.midas.api.bookings.Source;
+import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.api.openingbalance.OpeningBalance;
 import de.nihas101.midas.core.accountstatement.dto.DefaultAccountStatement;
-import de.nihas101.midas.core.accountstatement.dto.LabeledAccountStatement;
-import de.nihas101.midas.core.bookings.entity.BookingType;
-import de.nihas101.midas.core.bookings.entity.Source;
-import de.nihas101.midas.core.money.MoneyAmount;
-import de.nihas101.midas.core.openingbalance.dto.OpeningBalance;
+import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -45,7 +46,7 @@ class DefaultRunningTotalAccountStatementsTest {
     @Test
     void calculationTest() {
         // Arrange
-        final OpeningBalance openingBalance = new OpeningBalance(null, null, MoneyAmount.ofCents(1000L), TEST_YEAR, Source.USER);
+        final OpeningBalance openingBalance = new DefaultOpeningBalance(null, null, MoneyAmount.ofCents(1000L), TEST_YEAR, Source.USER);
 
         final LabeledAccountStatement withdrawal = new DefaultAccountStatement(
                 1,
@@ -102,7 +103,7 @@ class DefaultRunningTotalAccountStatementsTest {
     @Test
     void verifyOrder() {
         // Arrange
-        final OpeningBalance openingBalance = new OpeningBalance(null, null, MoneyAmount.ZERO, TEST_YEAR, Source.USER);
+        final OpeningBalance openingBalance = new DefaultOpeningBalance(null, null, MoneyAmount.ZERO, TEST_YEAR, Source.USER);
         final AccountStatements accountStatements = mock(AccountStatements.class);
         when(accountStatements.openingBalance()).thenReturn(openingBalance);
 
@@ -148,7 +149,7 @@ class DefaultRunningTotalAccountStatementsTest {
     @Test
     void manualStatementsCalculationTest() {
         // Arrange
-        final OpeningBalance openingBalance = new OpeningBalance(null, null, MoneyAmount.ofCents(1000L), TEST_YEAR, Source.USER);
+        final OpeningBalance openingBalance = new DefaultOpeningBalance(null, null, MoneyAmount.ofCents(1000L), TEST_YEAR, Source.USER);
 
         final LabeledAccountStatement withdrawal = new DefaultAccountStatement(
                 1,

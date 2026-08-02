@@ -1,6 +1,6 @@
 package de.nihas101.midas.core.export.xlsx;
 
-import de.nihas101.midas.core.export.ExportTarget;
+import de.nihas101.midas.api.export.ExportTarget;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;

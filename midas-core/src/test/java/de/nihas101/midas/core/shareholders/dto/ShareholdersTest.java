@@ -1,5 +1,7 @@
 package de.nihas101.midas.core.shareholders.dto;
 
+import de.nihas101.midas.api.shareholder.Shareholder;
+import de.nihas101.midas.api.shareholder.Shareholders;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,17 +26,17 @@ class ShareholdersTest {
 
     public static Stream<Arguments> toListValues() {
         return Stream.of(
-                Arguments.of(new Shareholders(null), Collections.emptyList()),
-                Arguments.of(new Shareholders(List.of(new Shareholder())), List.of(new Shareholder()))
+                Arguments.of(new DefaultShareholders(null), Collections.emptyList()),
+                Arguments.of(new DefaultShareholders(List.of(new DefaultShareholder())), List.of(new DefaultShareholder()))
         );
     }
 
     @Test
     void shareholdersIsImmutable() {
-        final Shareholders shareholders = new Shareholders(Collections.emptyList());
+        final Shareholders shareholders = new DefaultShareholders(Collections.emptyList());
 
         final List<Shareholder> list = shareholders.toList();
-        list.add(new Shareholder());
+        list.add(new DefaultShareholder());
 
         Assertions.assertEquals(0, shareholders.toList().size());
     }

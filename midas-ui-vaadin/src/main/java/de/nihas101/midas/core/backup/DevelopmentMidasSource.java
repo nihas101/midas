@@ -1,6 +1,6 @@
 package de.nihas101.midas.core.backup;
 
-import de.nihas101.midas.core.backup.service.MidasSource;
+import de.nihas101.midas.api.backup.MidasSource;
 
 import java.io.File;
 import java.nio.file.Paths;

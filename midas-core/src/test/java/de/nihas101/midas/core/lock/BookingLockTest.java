@@ -1,11 +1,12 @@
 package de.nihas101.midas.core.lock;
 
-import de.nihas101.midas.core.bookings.dto.Booking;
-import de.nihas101.midas.core.bookings.entity.BookingType;
-import de.nihas101.midas.core.bookings.entity.Source;
-import de.nihas101.midas.core.lock.service.LockReader;
+import de.nihas101.midas.api.bookings.Booking;
+import de.nihas101.midas.api.bookings.BookingType;
+import de.nihas101.midas.api.bookings.Source;
+import de.nihas101.midas.api.lock.LockReader;
+import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.core.bookings.dto.DefaultBooking;
 import de.nihas101.midas.core.lock.service.LockedException;
-import de.nihas101.midas.core.money.MoneyAmount;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,7 +27,7 @@ class BookingLockTest {
     void assertUnlocked_unlocked() {
         final BookingLock bookingLock = new BookingLock(new ShareholderLock(lock));
 
-        final Booking booking = new Booking(
+        final Booking booking = new DefaultBooking(
                 1,
                 2,
                 3,
@@ -47,7 +48,7 @@ class BookingLockTest {
     void assertUnlocked_locked() {
         final BookingLock bookingLock = new BookingLock(new ShareholderLock(lock));
 
-        final Booking booking = new Booking(
+        final Booking booking = new DefaultBooking(
                 1,
                 2,
                 3,
@@ -68,7 +69,7 @@ class BookingLockTest {
     void assertUnlocked_nullShareholderId() {
         final BookingLock bookingLock = new BookingLock(new ShareholderLock(lock));
 
-        final Booking booking = new Booking(
+        final Booking booking = new DefaultBooking(
                 1,
                 2,
                 null,
@@ -87,7 +88,7 @@ class BookingLockTest {
     void assertUnlocked_nullDate() {
         final BookingLock bookingLock = new BookingLock(new ShareholderLock(lock));
 
-        final Booking booking = new Booking(
+        final Booking booking = new DefaultBooking(
                 1,
                 2,
                 3,

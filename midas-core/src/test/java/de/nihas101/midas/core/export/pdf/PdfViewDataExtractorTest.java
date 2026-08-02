@@ -1,24 +1,25 @@
 package de.nihas101.midas.core.export.pdf;
 
+import de.nihas101.midas.api.bookings.Bookings;
+import de.nihas101.midas.api.bookings.BookingsReader;
+import de.nihas101.midas.api.bookings.FilteredBookings;
+import de.nihas101.midas.api.interest.InterestBookingsReader;
+import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.api.openingbalance.OpeningBalance;
+import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.core.accountstatement.row.AccountStatementRow;
 import de.nihas101.midas.core.accountstatement.row.AccountStatementRowService;
 import de.nihas101.midas.core.accountstatement.runningtotal.RunningTotalAccountStatements;
 import de.nihas101.midas.core.accountstatement.service.RunningTotalAccountStatementService;
-import de.nihas101.midas.core.bookings.dto.Bookings;
-import de.nihas101.midas.core.bookings.dto.FilteredBookings;
 import de.nihas101.midas.core.bookings.row.BookingRow;
 import de.nihas101.midas.core.bookings.row.BookingRowService;
-import de.nihas101.midas.core.bookings.service.BookingsReader;
 import de.nihas101.midas.core.export.ExportRequest;
 import de.nihas101.midas.core.export.ExportViewName;
 import de.nihas101.midas.core.interest.dto.InterestRate;
 import de.nihas101.midas.core.interest.row.InterestCalculationRow;
 import de.nihas101.midas.core.interest.row.InterestRowService;
-import de.nihas101.midas.core.interest.service.InterestBookingsReader;
 import de.nihas101.midas.core.interest.service.InterestRateService;
-import de.nihas101.midas.core.money.MoneyAmount;
-import de.nihas101.midas.core.openingbalance.dto.OpeningBalance;
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
+import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -141,7 +142,7 @@ class PdfViewDataExtractorTest {
         when(shareholder.getId()).thenReturn(1);
         when(messageSource.getMessage(anyString(), any(), eq(locale))).thenReturn("dummy");
 
-        final OpeningBalance openingBalance = mock(OpeningBalance.class);
+        final OpeningBalance openingBalance = mock(DefaultOpeningBalance.class);
         when(openingBalance.getOpeningBalance()).thenReturn(MoneyAmount.ZERO);
         when(bookings.openingBalance()).thenReturn(openingBalance);
 

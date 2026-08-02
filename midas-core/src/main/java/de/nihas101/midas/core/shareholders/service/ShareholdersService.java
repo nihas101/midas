@@ -1,7 +1,11 @@
 package de.nihas101.midas.core.shareholders.service;
 
-import de.nihas101.midas.core.shareholders.dto.Shareholder;
-import de.nihas101.midas.core.shareholders.dto.Shareholders;
+import de.nihas101.midas.api.shareholder.Shareholder;
+import de.nihas101.midas.api.shareholder.Shareholders;
+import de.nihas101.midas.api.shareholder.ShareholdersReader;
+import de.nihas101.midas.api.shareholder.ShareholdersWriter;
+import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
+import de.nihas101.midas.core.shareholders.dto.DefaultShareholders;
 import de.nihas101.midas.core.shareholders.entity.ShareholderEntity;
 import de.nihas101.midas.core.shareholders.repository.ShareholdersRepository;
 import org.springframework.stereotype.Service;
@@ -18,16 +22,16 @@ public class ShareholdersService implements ShareholdersReader, ShareholdersWrit
     @Override
     public Shareholder shareholder(final int shareholderId) {
         return repository.findById(shareholderId)
-                .map(Shareholder::fromEntity)
+                .map(DefaultShareholder::fromEntity)
                 .orElse(null);
     }
 
     @Override
     public Shareholders shareholders() {
-        return new Shareholders(
+        return new DefaultShareholders(
                 repository.findAll()
                         .stream()
-                        .map(Shareholder::fromEntity)
+                        .map(DefaultShareholder::fromEntity)
                         .toList()
         );
     }
