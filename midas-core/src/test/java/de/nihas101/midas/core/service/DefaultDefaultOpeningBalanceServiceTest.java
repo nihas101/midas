@@ -1,14 +1,14 @@
 package de.nihas101.midas.core.service;
 
-import de.nihas101.midas.api.bookings.Source;
-import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.commons.Source;
+import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.api.openingbalance.OpeningBalance;
 import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
-import de.nihas101.midas.core.openingbalance.entity.OpeningBalanceEntity;
-import de.nihas101.midas.core.openingbalance.repository.OpeningBalanceRepository;
 import de.nihas101.midas.core.openingbalance.service.DefaultOpeningBalanceService;
-import de.nihas101.midas.core.shareholders.entity.ShareholderEntity;
-import de.nihas101.midas.core.shareholders.repository.ShareholdersRepository;
+import de.nihas101.midas.persistance.openingbalance.OpeningBalanceEntity;
+import de.nihas101.midas.persistance.openingbalance.OpeningBalanceRepository;
+import de.nihas101.midas.persistance.shareholders.ShareholderEntity;
+import de.nihas101.midas.persistance.shareholders.ShareholdersRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

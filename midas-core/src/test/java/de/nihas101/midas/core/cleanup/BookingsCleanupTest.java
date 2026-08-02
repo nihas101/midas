@@ -1,8 +1,8 @@
 package de.nihas101.midas.core.cleanup;
 
-import de.nihas101.midas.core.bookings.repository.BookingsRepository;
 import de.nihas101.midas.core.config.MidasConfig;
-import de.nihas101.midas.core.lock.repository.LockRepository;
+import de.nihas101.midas.persistance.bookings.BookingsRepository;
+import de.nihas101.midas.persistance.lock.LockRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;

@@ -2,13 +2,12 @@ package de.nihas101.midas.core.accountstatement.service;
 
 import de.nihas101.midas.api.accountstatement.LabeledAccountStatement;
 import de.nihas101.midas.api.accountstatement.RowKey;
-import de.nihas101.midas.api.bookings.BookingType;
-import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.commons.BookingType;
+import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.api.shareholder.Shareholder;
-import de.nihas101.midas.core.accountstatement.repository.AccountStatementOrderEntity;
-import de.nihas101.midas.core.accountstatement.repository.AccountStatementOrdersRepository;
 import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
-import de.nihas101.midas.core.shareholders.entity.ShareholderEntity;
+import de.nihas101.midas.persistance.accountstatements.AccountStatementOrderEntity;
+import de.nihas101.midas.persistance.accountstatements.AccountStatementOrdersRepository;
 import lombok.EqualsAndHashCode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -254,7 +253,7 @@ class AccountStatementSortTest {
     ) {
         return new AccountStatementOrderEntity(
                 RANDOM.nextInt(),
-                ShareholderEntity.fromDto(shareholder),
+                DefaultShareholder.fromDto(shareholder),
                 2026,
                 new RowKey(interest, null).toString(),
                 position
@@ -268,7 +267,7 @@ class AccountStatementSortTest {
     ) {
         return new AccountStatementOrderEntity(
                 RANDOM.nextInt(),
-                ShareholderEntity.fromDto(shareholder),
+                DefaultShareholder.fromDto(shareholder),
                 2026,
                 new RowKey(null, id).toString(),
                 position

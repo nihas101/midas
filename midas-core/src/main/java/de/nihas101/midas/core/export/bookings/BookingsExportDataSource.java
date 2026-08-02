@@ -1,6 +1,6 @@
 package de.nihas101.midas.core.export.bookings;
 
-import de.nihas101.midas.api.bookings.BookingType;
+import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.api.export.ExportDataSource;
 import de.nihas101.midas.api.export.ExportTarget;
 import lombok.RequiredArgsConstructor;

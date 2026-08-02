@@ -23,9 +23,11 @@
     </developers>
     <modules>
         <module>midas-core</module>
-        <module>midas-ui-vaadin</module>
+        <module>midas-vaadin</module>
         <module>midas-i18n</module>
         <module>midas-api</module>
+        <module>midas-persistence</module>
+        <module>midas-commons</module>
     </modules>
     <scm>
         <connection/>

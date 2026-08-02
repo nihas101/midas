@@ -1,7 +1,7 @@
 package de.nihas101.midas.core.interest.row;
 
 import de.nihas101.midas.api.bookings.Bookings;
-import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.core.bookings.row.BookingRow;
 import de.nihas101.midas.core.bookings.row.DefaultBookingsToBookingRowConverter;
 import de.nihas101.midas.core.interest.InterestCalculation;

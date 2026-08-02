@@ -2,7 +2,7 @@ package de.nihas101.midas.core.export.pdf;
 
 import de.nihas101.midas.api.bookings.BookingsReader;
 import de.nihas101.midas.api.interest.InterestBookingsReader;
-import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.core.accountstatement.row.AccountStatementRowService;
 import de.nihas101.midas.core.accountstatement.service.RunningTotalAccountStatementService;

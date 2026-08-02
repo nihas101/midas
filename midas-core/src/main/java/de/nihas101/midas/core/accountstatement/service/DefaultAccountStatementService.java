@@ -2,20 +2,21 @@ package de.nihas101.midas.core.accountstatement.service;
 
 import de.nihas101.midas.api.accountstatement.AccountStatementService;
 import de.nihas101.midas.api.accountstatement.AccountStatements;
-import de.nihas101.midas.api.bookings.BookingType;
-import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.api.openingbalance.OpeningBalance;
 import de.nihas101.midas.api.shareholder.Shareholder;
+import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.core.accountstatement.dto.DefaultAccountStatements;
-import de.nihas101.midas.core.accountstatement.repository.AccountStatementEntity;
-import de.nihas101.midas.core.accountstatement.repository.AccountStatementOrderEntity;
-import de.nihas101.midas.core.accountstatement.repository.AccountStatementOrdersRepository;
-import de.nihas101.midas.core.accountstatement.repository.AccountStatementOverrideEntity;
-import de.nihas101.midas.core.accountstatement.repository.AccountStatementOverridesRepository;
-import de.nihas101.midas.core.accountstatement.repository.AccountStatementsRepository;
 import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
-import de.nihas101.midas.core.openingbalance.repository.OpeningBalanceRepository;
-import de.nihas101.midas.core.shareholders.entity.ShareholderEntity;
+import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
+import de.nihas101.midas.persistance.accountstatements.AccountStatementEntity;
+import de.nihas101.midas.persistance.accountstatements.AccountStatementOrderEntity;
+import de.nihas101.midas.persistance.accountstatements.AccountStatementOrdersRepository;
+import de.nihas101.midas.persistance.accountstatements.AccountStatementOverrideEntity;
+import de.nihas101.midas.persistance.accountstatements.AccountStatementOverridesRepository;
+import de.nihas101.midas.persistance.accountstatements.AccountStatementsRepository;
+import de.nihas101.midas.persistance.openingbalance.OpeningBalanceRepository;
+import de.nihas101.midas.persistance.shareholders.ShareholderEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -57,7 +58,7 @@ public class DefaultAccountStatementService implements AccountStatementService {
         );
 
         final OpeningBalance openingBalance = openingBalanceRepository.findByShareholderAndDate(
-                        ShareholderEntity.fromDto(shareholder),
+                        DefaultShareholder.fromDto(shareholder),
                         year.atDay(1)
                 )
                 .map(DefaultOpeningBalance::fromEntity)
@@ -113,7 +114,7 @@ public class DefaultAccountStatementService implements AccountStatementService {
             return entity;
         } else {
             return AccountStatementOverrideEntity.builder()
-                    .shareholder(ShareholderEntity.fromDto(shareholder))
+                    .shareholder(DefaultShareholder.fromDto(shareholder))
                     .year(year.getValue())
                     .bookingType(bookingType)
                     .amount(amount)
@@ -164,7 +165,7 @@ public class DefaultAccountStatementService implements AccountStatementService {
             return en;
         } else {
             return AccountStatementOverrideEntity.builder()
-                    .shareholder(ShareholderEntity.fromDto(shareholder))
+                    .shareholder(DefaultShareholder.fromDto(shareholder))
                     .year(year.getValue())
                     .bookingType(null)
                     .labelOverride(label)
@@ -190,7 +191,7 @@ public class DefaultAccountStatementService implements AccountStatementService {
         accountStatementOrdersRepository.deleteByShareholderIdAndYear(shareholder.getId(), year.getValue());
         accountStatementOrdersRepository.flush();
 
-        final ShareholderEntity shareholderEntity = ShareholderEntity.fromDto(shareholder);
+        final ShareholderEntity shareholderEntity = DefaultShareholder.fromDto(shareholder);
         for (int i = 0; i < rowKeys.size(); i++) {
             final AccountStatementOrderEntity entity = AccountStatementOrderEntity.builder()
                     .shareholder(shareholderEntity)

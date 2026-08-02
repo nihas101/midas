@@ -4,7 +4,7 @@
       <env name="spring_profiles_active" value="dev" />
     </envs>
     <option name="MAIN_CLASS_NAME" value="de.nihas101.midas.MidasApplication" />
-    <module name="midas-ui-vaadin" />
+    <module name="midas-vaadin" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="de.nihas101.midas.*" />

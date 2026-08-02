@@ -1,7 +1,7 @@
 package de.nihas101.midas.api.accountstatement;
 
-import de.nihas101.midas.api.bookings.BookingType;
-import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.commons.MoneyAmount;
+import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.api.shareholder.Shareholder;
 import org.springframework.context.MessageSource;
 import org.springframework.transaction.annotation.Transactional;

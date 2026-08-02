@@ -2,12 +2,12 @@ package de.nihas101.midas.core.accountstatement.dto;
 
 import de.nihas101.midas.api.accountstatement.AccountStatements;
 import de.nihas101.midas.api.accountstatement.LabeledAccountStatement;
-import de.nihas101.midas.api.bookings.BookingType;
-import de.nihas101.midas.api.bookings.Source;
-import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.commons.BookingType;
+import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.api.openingbalance.OpeningBalance;
-import de.nihas101.midas.core.accountstatement.repository.AccountStatementEntity;
-import de.nihas101.midas.core.accountstatement.repository.AccountStatementOverrideEntity;
+import de.nihas101.midas.commons.Source;
+import de.nihas101.midas.persistance.accountstatements.AccountStatementEntity;
+import de.nihas101.midas.persistance.accountstatements.AccountStatementOverrideEntity;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;

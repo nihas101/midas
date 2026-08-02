@@ -1,10 +1,9 @@
 package de.nihas101.midas.core.interest.service;
 
 import de.nihas101.midas.core.interest.dto.InterestRate;
-import de.nihas101.midas.core.interest.entity.InterestRateEntity;
-import de.nihas101.midas.core.interest.repository.InterestRateRepository;
-import de.nihas101.midas.core.shareholders.entity.ShareholderEntity;
-import de.nihas101.midas.core.shareholders.repository.ShareholdersRepository;
+import de.nihas101.midas.persistance.interest.InterestRateRepository;
+import de.nihas101.midas.persistance.shareholders.ShareholderEntity;
+import de.nihas101.midas.persistance.shareholders.ShareholdersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -45,6 +44,6 @@ public class InterestRateService {
     private void upsert(final InterestRate interestRate) {
         ShareholderEntity shareholder = shareholdersRepository.findById(interestRate.getShareholderId())
                 .orElseThrow(() -> new IllegalArgumentException("Shareholder not found"));
-        interestRateRepository.save(InterestRateEntity.fromDto(interestRate, shareholder));
+        interestRateRepository.save(InterestRate.fromDto(interestRate, shareholder));
     }
 }

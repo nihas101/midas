@@ -1,7 +1,7 @@
 package de.nihas101.midas.core.accountstatement.runningtotal;
 
-import de.nihas101.midas.api.bookings.Source;
-import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.commons.Source;
+import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.api.openingbalance.OpeningBalance;
 import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
 import org.junit.jupiter.api.Assertions;

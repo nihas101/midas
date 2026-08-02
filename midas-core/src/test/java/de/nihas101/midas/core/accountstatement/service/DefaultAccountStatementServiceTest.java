@@ -1,24 +1,24 @@
 package de.nihas101.midas.core.accountstatement.service;
 
 import de.nihas101.midas.api.accountstatement.AccountStatements;
-import de.nihas101.midas.api.bookings.BookingType;
-import de.nihas101.midas.api.bookings.Source;
-import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.api.shareholder.Shareholder;
+import de.nihas101.midas.commons.MoneyAmount;
+import de.nihas101.midas.commons.Source;
 import de.nihas101.midas.core.accountstatement.dto.DefaultAccountStatement;
-import de.nihas101.midas.core.accountstatement.repository.AccountStatementEntity;
-import de.nihas101.midas.core.accountstatement.repository.AccountStatementOrdersRepository;
-import de.nihas101.midas.core.accountstatement.repository.AccountStatementOverrideEntity;
-import de.nihas101.midas.core.accountstatement.repository.AccountStatementOverridesRepository;
-import de.nihas101.midas.core.accountstatement.repository.AccountStatementsRepository;
 import de.nihas101.midas.core.accountstatement.row.AccountStatementRow;
 import de.nihas101.midas.core.accountstatement.row.RunningTotalAccountStatementRow;
 import de.nihas101.midas.core.accountstatement.runningtotal.DefaultRunningTotalAccountStatement;
 import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
-import de.nihas101.midas.core.openingbalance.entity.OpeningBalanceEntity;
-import de.nihas101.midas.core.openingbalance.repository.OpeningBalanceRepository;
 import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
-import de.nihas101.midas.core.shareholders.entity.ShareholderEntity;
+import de.nihas101.midas.persistance.accountstatements.AccountStatementEntity;
+import de.nihas101.midas.persistance.accountstatements.AccountStatementOrdersRepository;
+import de.nihas101.midas.persistance.accountstatements.AccountStatementOverrideEntity;
+import de.nihas101.midas.persistance.accountstatements.AccountStatementOverridesRepository;
+import de.nihas101.midas.persistance.accountstatements.AccountStatementsRepository;
+import de.nihas101.midas.persistance.openingbalance.OpeningBalanceEntity;
+import de.nihas101.midas.persistance.openingbalance.OpeningBalanceRepository;
+import de.nihas101.midas.persistance.shareholders.ShareholderEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -91,14 +91,14 @@ class DefaultAccountStatementServiceTest {
         );
         final OpeningBalanceEntity openingBalance = new OpeningBalanceEntity(
                 1,
-                ShareholderEntity.fromDto(shareholder),
+                DefaultShareholder.fromDto(shareholder),
                 LocalDate.of(2026, 1, 1),
                 MoneyAmount.ofCents(1000L),
                 Source.USER
         );
         Mockito.when(
                 openingBalanceRepository.findByShareholderAndDate(
-                        ShareholderEntity.fromDto(shareholder),
+                        DefaultShareholder.fromDto(shareholder),
                         year.atDay(1)
                 )
         ).thenReturn(Optional.of(openingBalance));
@@ -172,7 +172,7 @@ class DefaultAccountStatementServiceTest {
 
         final AccountStatementOverrideEntity expected = new AccountStatementOverrideEntity(
                 null,
-                ShareholderEntity.fromDto(shareholder),
+                DefaultShareholder.fromDto(shareholder),
                 year.getValue(),
                 withdrawal,
                 null,
@@ -197,7 +197,7 @@ class DefaultAccountStatementServiceTest {
                 Optional.of(
                         new AccountStatementOverrideEntity(
                                 12,
-                                ShareholderEntity.fromDto(shareholder),
+                                DefaultShareholder.fromDto(shareholder),
                                 2026,
                                 BookingType.WITHDRAWAL,
                                 "label",
@@ -221,7 +221,7 @@ class DefaultAccountStatementServiceTest {
         ).save(Mockito.eq(
                 new AccountStatementOverrideEntity(
                         12,
-                        ShareholderEntity.fromDto(shareholder),
+                        DefaultShareholder.fromDto(shareholder),
                         year.getValue(),
                         withdrawal,
                         "label",
@@ -243,7 +243,7 @@ class DefaultAccountStatementServiceTest {
                 .save(Mockito.eq(
                         AccountStatementOverrideEntity.builder()
                                 .id(null)
-                                .shareholder(ShareholderEntity.fromDto(shareholder))
+                                .shareholder(DefaultShareholder.fromDto(shareholder))
                                 .year(year.getValue())
                                 .bookingType(null)
                                 .labelOverride("some-label")
@@ -262,7 +262,7 @@ class DefaultAccountStatementServiceTest {
                 .thenReturn(Optional.of(
                         new AccountStatementOverrideEntity(
                                 1,
-                                ShareholderEntity.fromDto(shareholder),
+                                DefaultShareholder.fromDto(shareholder),
                                 2026,
                                 null,
                                 "some-label",
@@ -278,7 +278,7 @@ class DefaultAccountStatementServiceTest {
                 .save(Mockito.eq(
                         AccountStatementOverrideEntity.builder()
                                 .id(1)
-                                .shareholder(ShareholderEntity.fromDto(shareholder))
+                                .shareholder(DefaultShareholder.fromDto(shareholder))
                                 .year(year.getValue())
                                 .bookingType(null)
                                 .labelOverride("overriden-label")

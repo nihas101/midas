@@ -1,7 +1,7 @@
 package de.nihas101.midas.core.lock.dto;
 
-import de.nihas101.midas.core.lock.entity.LockEntity;
-import de.nihas101.midas.core.shareholders.entity.ShareholderEntity;
+import de.nihas101.midas.persistance.lock.LockEntity;
+import de.nihas101.midas.persistance.shareholders.ShareholderEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;

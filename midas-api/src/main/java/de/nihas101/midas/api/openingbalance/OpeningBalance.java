@@ -1,7 +1,7 @@
 package de.nihas101.midas.api.openingbalance;
 
-import de.nihas101.midas.api.bookings.Source;
-import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.commons.MoneyAmount;
+import de.nihas101.midas.commons.Source;
 
 import java.time.Year;
 

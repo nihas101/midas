@@ -1,8 +1,8 @@
 package de.nihas101.midas.core.cleanup;
 
-import de.nihas101.midas.core.bookings.repository.BookingsRepository;
 import de.nihas101.midas.core.config.MidasConfig;
-import de.nihas101.midas.core.lock.repository.LockRepository;
+import de.nihas101.midas.persistance.bookings.BookingsRepository;
+import de.nihas101.midas.persistance.lock.LockRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

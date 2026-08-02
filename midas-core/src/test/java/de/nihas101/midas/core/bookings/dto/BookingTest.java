@@ -1,11 +1,11 @@
 package de.nihas101.midas.core.bookings.dto;
 
 import de.nihas101.midas.api.bookings.Booking;
-import de.nihas101.midas.api.bookings.BookingType;
-import de.nihas101.midas.api.bookings.Source;
-import de.nihas101.midas.api.money.MoneyAmount;
-import de.nihas101.midas.core.bookings.entity.BookingEntity;
-import de.nihas101.midas.core.shareholders.entity.ShareholderEntity;
+import de.nihas101.midas.commons.BookingType;
+import de.nihas101.midas.commons.Source;
+import de.nihas101.midas.commons.MoneyAmount;
+import de.nihas101.midas.persistance.bookings.BookingEntity;
+import de.nihas101.midas.persistance.shareholders.ShareholderEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;

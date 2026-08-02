@@ -1,7 +1,7 @@
 package de.nihas101.midas.core.interest;
 
 import de.nihas101.midas.api.bookings.Bookings;
-import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.core.bookings.monthlytotal.MonthlyCumulativeSum;
 import de.nihas101.midas.core.bookings.monthlytotal.MonthlyTotalSum;
 import de.nihas101.midas.core.interest.interestamount.Interest;

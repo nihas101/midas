@@ -1,8 +1,8 @@
 package de.nihas101.midas.core.lock;
 
-import de.nihas101.midas.api.bookings.Source;
+import de.nihas101.midas.commons.Source;
 import de.nihas101.midas.api.lock.LockReader;
-import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.api.openingbalance.OpeningBalance;
 import de.nihas101.midas.core.lock.service.LockedException;
 import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;

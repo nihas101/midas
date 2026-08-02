@@ -1,6 +1,6 @@
 package de.nihas101.midas.core.interest.row;
 
-import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.core.bookings.monthlytotal.MonthlyTotalSum;
 import de.nihas101.midas.core.interest.interestamount.Interest;
 import lombok.RequiredArgsConstructor;

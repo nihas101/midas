@@ -1,6 +1,6 @@
 package de.nihas101.midas.core.lock.dto;
 
-import de.nihas101.midas.core.lock.entity.LockEntity;
+import de.nihas101.midas.persistance.lock.LockEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -1,21 +1,22 @@
 package de.nihas101.midas.core.interest.service;
 
 import de.nihas101.midas.api.bookings.Booking;
-import de.nihas101.midas.api.bookings.BookingType;
+import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.api.bookings.Bookings;
-import de.nihas101.midas.api.bookings.Source;
 import de.nihas101.midas.api.interest.InterestBookingsService;
 import de.nihas101.midas.api.openingbalance.OpeningBalance;
 import de.nihas101.midas.api.shareholder.Shareholder;
+import de.nihas101.midas.commons.Source;
 import de.nihas101.midas.core.bookings.dto.DefaultBooking;
 import de.nihas101.midas.core.bookings.dto.DefaultBookings;
-import de.nihas101.midas.core.bookings.entity.BookingEntity;
-import de.nihas101.midas.core.bookings.repository.BookingsRepository;
 import de.nihas101.midas.core.bookings.service.BookingsService;
 import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
-import de.nihas101.midas.core.openingbalance.repository.OpeningBalanceRepository;
-import de.nihas101.midas.core.shareholders.entity.ShareholderEntity;
-import de.nihas101.midas.core.shareholders.repository.ShareholdersRepository;
+import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
+import de.nihas101.midas.persistance.bookings.BookingEntity;
+import de.nihas101.midas.persistance.bookings.BookingsRepository;
+import de.nihas101.midas.persistance.openingbalance.OpeningBalanceRepository;
+import de.nihas101.midas.persistance.shareholders.ShareholderEntity;
+import de.nihas101.midas.persistance.shareholders.ShareholdersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -40,7 +41,7 @@ public class DefaultInterestBookingsService implements InterestBookingsService {
 
         return DefaultBooking.fromEntity(
                 bookingsRepository.findFirstByShareholderAndDateAndTypeAndSource(
-                        ShareholderEntity.fromDto(shareholder),
+                        DefaultShareholder.fromDto(shareholder),
                         endOfYear,
                         BookingType.INTEREST,
                         Source.SYSTEM
@@ -90,7 +91,7 @@ public class DefaultInterestBookingsService implements InterestBookingsService {
     @Override
     public void deleteInterestBooking(final Shareholder shareholder, final Year year) {
         bookingsRepository.deleteByShareholderAndDateAndSource(
-                ShareholderEntity.fromDto(shareholder),
+                DefaultShareholder.fromDto(shareholder),
                 year.atMonth(Month.DECEMBER).atEndOfMonth(),
                 Source.SYSTEM
         );

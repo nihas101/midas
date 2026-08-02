@@ -2,11 +2,11 @@ package de.nihas101.midas.core.lock.service;
 
 import de.nihas101.midas.api.lock.LockService;
 import de.nihas101.midas.api.shareholder.Shareholder;
-import de.nihas101.midas.core.lock.entity.LockEntity;
-import de.nihas101.midas.core.lock.repository.LockRepository;
 import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
-import de.nihas101.midas.core.shareholders.entity.ShareholderEntity;
-import de.nihas101.midas.core.shareholders.repository.ShareholdersRepository;
+import de.nihas101.midas.persistance.lock.LockEntity;
+import de.nihas101.midas.persistance.lock.LockRepository;
+import de.nihas101.midas.persistance.shareholders.ShareholderEntity;
+import de.nihas101.midas.persistance.shareholders.ShareholdersRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -78,7 +78,7 @@ class DefaultLockServiceTest {
         final LockService lockService = new DefaultLockService(lockRepository, shareholdersRepository);
 
         final Shareholder shareholder = new DefaultShareholder(1, 1, "first", "last");
-        final ShareholderEntity shareholderEntity = ShareholderEntity.fromDto(shareholder);
+        final ShareholderEntity shareholderEntity = DefaultShareholder.fromDto(shareholder);
         final Year year = Year.of(2026);
         Mockito.when(lockRepository.existsByShareholderAndYear(shareholderEntity, year.getValue()))
                 .thenReturn(false);
@@ -94,7 +94,7 @@ class DefaultLockServiceTest {
         final LockService lockService = new DefaultLockService(lockRepository, shareholdersRepository);
 
         final Shareholder shareholder = new DefaultShareholder(1, 1, "first", "last");
-        final ShareholderEntity shareholderEntity = ShareholderEntity.fromDto(shareholder);
+        final ShareholderEntity shareholderEntity = DefaultShareholder.fromDto(shareholder);
         final Year year = Year.of(2026);
         Mockito.when(lockRepository.existsByShareholderAndYear(shareholderEntity, year.getValue()))
                 .thenReturn(true);
@@ -109,7 +109,7 @@ class DefaultLockServiceTest {
         final LockService lockService = new DefaultLockService(lockRepository, shareholdersRepository);
 
         final Shareholder shareholder = new DefaultShareholder(1, 1, "first", "last");
-        final ShareholderEntity shareholderEntity = ShareholderEntity.fromDto(shareholder);
+        final ShareholderEntity shareholderEntity = DefaultShareholder.fromDto(shareholder);
         final Year year = Year.of(2026);
         Mockito.when(lockRepository.findByShareholderAndYear(shareholderEntity, year.getValue()))
                 .thenReturn(Optional.empty());
@@ -125,7 +125,7 @@ class DefaultLockServiceTest {
         final LockService lockService = new DefaultLockService(lockRepository, shareholdersRepository);
 
         final Shareholder shareholder = new DefaultShareholder(1, 1, "first", "last");
-        final ShareholderEntity shareholderEntity = ShareholderEntity.fromDto(shareholder);
+        final ShareholderEntity shareholderEntity = DefaultShareholder.fromDto(shareholder);
         final Year year = Year.of(2026);
         final LockEntity lockEntity = new LockEntity(1, shareholderEntity, year.getValue());
         Mockito.when(lockRepository.findByShareholderAndYear(shareholderEntity, year.getValue()))

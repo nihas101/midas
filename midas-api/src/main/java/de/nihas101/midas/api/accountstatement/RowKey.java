@@ -1,6 +1,6 @@
 package de.nihas101.midas.api.accountstatement;
 
-import de.nihas101.midas.api.bookings.BookingType;
+import de.nihas101.midas.commons.BookingType;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

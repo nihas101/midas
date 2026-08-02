@@ -17,6 +17,16 @@
             <artifactId>midas-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>de.nihas101</groupId>
+            <artifactId>midas-commons</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>de.nihas101</groupId>
+            <artifactId>midas-persistence</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <properties>

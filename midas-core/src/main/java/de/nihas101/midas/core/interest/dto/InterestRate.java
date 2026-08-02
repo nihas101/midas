@@ -1,6 +1,7 @@
 package de.nihas101.midas.core.interest.dto;
 
-import de.nihas101.midas.core.interest.entity.InterestRateEntity;
+import de.nihas101.midas.persistance.interest.InterestRateEntity;
+import de.nihas101.midas.persistance.shareholders.ShareholderEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -33,6 +34,15 @@ public class InterestRate {
                 interestRateEntity.getShareholder().getId(),
                 scaleDownFromDatabase(interestRateEntity),
                 Year.from(interestRateEntity.getDate())
+        );
+    }
+
+    public static InterestRateEntity fromDto(final InterestRate interestRate, final ShareholderEntity shareholder) {
+        return new InterestRateEntity(
+                interestRate.getId(),
+                shareholder,
+                interestRate.getYear().atDay(1),
+                interestRate.toEntity()
         );
     }
 

@@ -1,6 +1,7 @@
 package de.nihas101.midas.core.bookings.entity;
 
-import de.nihas101.midas.api.bookings.BookingType;
+import de.nihas101.midas.commons.BookingType;
+import de.nihas101.midas.persistance.bookings.BookingTypeConverter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;

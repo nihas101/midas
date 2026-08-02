@@ -7,12 +7,11 @@ import de.nihas101.midas.api.bookings.BookingsWriter;
 import de.nihas101.midas.api.openingbalance.OpeningBalance;
 import de.nihas101.midas.core.bookings.dto.DefaultBooking;
 import de.nihas101.midas.core.bookings.dto.DefaultBookings;
-import de.nihas101.midas.core.bookings.entity.BookingEntity;
-import de.nihas101.midas.core.bookings.repository.BookingsRepository;
 import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
-import de.nihas101.midas.core.openingbalance.repository.OpeningBalanceRepository;
-import de.nihas101.midas.core.shareholders.entity.ShareholderEntity;
-import de.nihas101.midas.core.shareholders.repository.ShareholdersRepository;
+import de.nihas101.midas.persistance.bookings.BookingsRepository;
+import de.nihas101.midas.persistance.openingbalance.OpeningBalanceRepository;
+import de.nihas101.midas.persistance.shareholders.ShareholderEntity;
+import de.nihas101.midas.persistance.shareholders.ShareholdersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -103,13 +102,13 @@ public class BookingsService implements BookingsWriter, BookingsReader {
     private void upsertEntity(final Booking booking) {
         ShareholderEntity shareholder = shareholdersRepository.findById(booking.getShareholderId())
                 .orElseThrow(() -> new IllegalArgumentException("Shareholder not found"));
-        bookingsRepository.save(BookingEntity.fromDto(booking, shareholder));
+        bookingsRepository.save(DefaultBooking.fromDto(booking, shareholder));
     }
 
     public void delete(final Booking booking) {
         ShareholderEntity shareholder = shareholdersRepository.findById(booking.getShareholderId())
                 .orElseThrow(() -> new IllegalArgumentException("Shareholder not found"));
-        bookingsRepository.delete(BookingEntity.fromDto(booking, shareholder));
+        bookingsRepository.delete(DefaultBooking.fromDto(booking, shareholder));
     }
 
 }

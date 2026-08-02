@@ -2,6 +2,7 @@ package de.nihas101.midas.core.shareholders.entity;
 
 import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
+import de.nihas101.midas.persistance.shareholders.ShareholderEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -14,7 +15,7 @@ class ShareholderEntityTest {
     @ParameterizedTest
     @MethodSource("fromDtoValues")
     void fromDto(Shareholder shareholder, ShareholderEntity expected) {
-        Assertions.assertEquals(expected, ShareholderEntity.fromDto(shareholder));
+        Assertions.assertEquals(expected, DefaultShareholder.fromDto(shareholder));
     }
 
     public static Stream<Arguments> fromDtoValues() {

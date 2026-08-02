@@ -2,7 +2,7 @@ package de.nihas101.midas.core.bookings.dto;
 
 import de.nihas101.midas.api.bookings.Bookings;
 import de.nihas101.midas.api.bookings.FilteredBookings;
-import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.api.openingbalance.OpeningBalance;
 import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
 import lombok.RequiredArgsConstructor;

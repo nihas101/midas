@@ -2,11 +2,11 @@ package de.nihas101.midas.core.lock.service;
 
 import de.nihas101.midas.api.lock.LockService;
 import de.nihas101.midas.api.shareholder.Shareholder;
-import de.nihas101.midas.core.lock.entity.LockEntity;
-import de.nihas101.midas.core.lock.repository.LockRepository;
 import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
-import de.nihas101.midas.core.shareholders.entity.ShareholderEntity;
-import de.nihas101.midas.core.shareholders.repository.ShareholdersRepository;
+import de.nihas101.midas.persistance.lock.LockEntity;
+import de.nihas101.midas.persistance.lock.LockRepository;
+import de.nihas101.midas.persistance.shareholders.ShareholderEntity;
+import de.nihas101.midas.persistance.shareholders.ShareholdersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -33,12 +33,12 @@ public class DefaultLockService implements LockService {
 
     @Override
     public boolean isLocked(final Shareholder shareholder, final Year year) {
-        return lockRepository.existsByShareholderAndYear(ShareholderEntity.fromDto(shareholder), year.getValue());
+        return lockRepository.existsByShareholderAndYear(DefaultShareholder.fromDto(shareholder), year.getValue());
     }
 
     @Override
     public void lock(final Shareholder shareholder, final Year year) {
-        final ShareholderEntity shareholderEntity = ShareholderEntity.fromDto(shareholder);
+        final ShareholderEntity shareholderEntity = DefaultShareholder.fromDto(shareholder);
         if (lockRepository.existsByShareholderAndYear(shareholderEntity, year.getValue())) {
             return;
         }
@@ -47,7 +47,7 @@ public class DefaultLockService implements LockService {
 
     @Override
     public void unlock(final Shareholder shareholder, final Year year) {
-        lockRepository.findByShareholderAndYear(ShareholderEntity.fromDto(shareholder), year.getValue())
+        lockRepository.findByShareholderAndYear(DefaultShareholder.fromDto(shareholder), year.getValue())
                 .ifPresent(lockRepository::delete);
     }
 }

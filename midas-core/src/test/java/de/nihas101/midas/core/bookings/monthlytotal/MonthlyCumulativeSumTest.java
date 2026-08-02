@@ -1,10 +1,10 @@
 package de.nihas101.midas.core.bookings.monthlytotal;
 
 import de.nihas101.midas.api.bookings.Booking;
-import de.nihas101.midas.api.bookings.BookingType;
+import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.api.bookings.Bookings;
 import de.nihas101.midas.api.bookings.FilteredBookings;
-import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.core.bookings.dto.DefaultBooking;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

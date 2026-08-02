@@ -51,7 +51,7 @@ Always use the `MoneyAmount` class for financial values to avoid floating-point 
 
 ## 4. UI & Theme
 
-* **Theme**: Located in `midas-ui-vaadin/src/main/frontend/themes/midas-theme`
+* **Theme**: Located in `midas-vaadin/src/main/frontend/themes/midas-theme`
 * **Styling**: Use `styles.css` for custom CSS
 
 ## 5. Desktop Features

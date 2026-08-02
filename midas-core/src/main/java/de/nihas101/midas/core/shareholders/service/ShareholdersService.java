@@ -6,8 +6,7 @@ import de.nihas101.midas.api.shareholder.ShareholdersReader;
 import de.nihas101.midas.api.shareholder.ShareholdersWriter;
 import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
 import de.nihas101.midas.core.shareholders.dto.DefaultShareholders;
-import de.nihas101.midas.core.shareholders.entity.ShareholderEntity;
-import de.nihas101.midas.core.shareholders.repository.ShareholdersRepository;
+import de.nihas101.midas.persistance.shareholders.ShareholdersRepository;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -44,7 +43,7 @@ public class ShareholdersService implements ShareholdersReader, ShareholdersWrit
         if (shareholder.getId() != null) {
             throw new IllegalArgumentException("ShareholdersService#create with shareholder.getId() != null");
         }
-        repository.save(ShareholderEntity.fromDto(shareholder));
+        repository.save(DefaultShareholder.fromDto(shareholder));
     }
 
     @Override
@@ -55,7 +54,7 @@ public class ShareholdersService implements ShareholdersReader, ShareholdersWrit
         if (shareholder.getId() == null) {
             throw new IllegalArgumentException("ShareholdersService#update with shareholder.getId() == null");
         }
-        repository.save(ShareholderEntity.fromDto(shareholder));
+        repository.save(DefaultShareholder.fromDto(shareholder));
     }
 
     @Override
@@ -63,6 +62,6 @@ public class ShareholdersService implements ShareholdersReader, ShareholdersWrit
         if (shareholder == null) {
             throw new IllegalArgumentException("ShareholdersService#delete with shareholder == null");
         }
-        repository.delete(ShareholderEntity.fromDto(shareholder));
+        repository.delete(DefaultShareholder.fromDto(shareholder));
     }
 }

@@ -1,9 +1,9 @@
 package de.nihas101.midas.core.bookings.row;
 
 import de.nihas101.midas.api.bookings.Booking;
-import de.nihas101.midas.api.bookings.BookingType;
+import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.api.bookings.Bookings;
-import de.nihas101.midas.api.money.MoneyAmount;
+import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.core.bookings.monthlytotal.MonthlyTotal;
 import de.nihas101.midas.core.bookings.monthlytotal.MonthlyTotalSum;
 
