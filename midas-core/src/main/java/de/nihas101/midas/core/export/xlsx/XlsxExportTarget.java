@@ -1,0 +1,144 @@
+package de.nihas101.midas.core.export.xlsx;
+
+import de.nihas101.midas.core.export.ExportTarget;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+
+public class XlsxExportTarget implements ExportTarget, AutoCloseable {
+
+    private final XSSFWorkbook workbook;
+    private final CellStyle dateStyle;
+    private final CellStyle headerStyle;
+    private final CellStyle amountStyle;
+
+    public XlsxExportTarget() {
+        this(new XSSFWorkbook());
+    }
+
+    public XlsxExportTarget(final XSSFWorkbook workbook) {
+        this.workbook = workbook;
+        this.dateStyle = dateStyle(workbook);
+        this.amountStyle = amountStyle(workbook);
+        this.headerStyle = headerStyle(workbook);
+    }
+
+    private CellStyle amountStyle(final Workbook workbook) {
+        final CellStyle style = workbook.createCellStyle();
+        final CreationHelper createHelper = workbook.getCreationHelper();
+        // 2 decimal places and decimal separator
+        // the decimal separator displayed depends on Excel settings
+        style.setDataFormat(createHelper.createDataFormat().getFormat("#,##0.00"));
+        return style;
+    }
+
+    private CellStyle dateStyle(final Workbook workbook) {
+        final CellStyle style = workbook.createCellStyle();
+        final CreationHelper createHelper = workbook.getCreationHelper();
+        style.setDataFormat(createHelper.createDataFormat().getFormat("dd.mm.yyyy"));
+        return style;
+    }
+
+    private CellStyle headerStyle(final Workbook workbook) {
+        final CellStyle style = workbook.createCellStyle();
+        final Font font = workbook.createFont();
+        font.setBold(true);
+        style.setFont(font);
+        style.setBorderBottom(BorderStyle.THIN);
+        return style;
+    }
+
+    @Override
+    public void export(
+            final String sheetName,
+            final List<String> headers,
+            final List<List<Object>> rows
+    ) {
+        final Sheet sheet = createSheet(sheetName);
+        writeHeader(sheet, headers);
+        writeRows(sheet, rows);
+        autoSizeColumns(sheet, headers.size());
+    }
+
+    private void autoSizeColumns(final Sheet sheet, final int columnCount) {
+        for (int i = 0; i < columnCount; i++) {
+            sheet.autoSizeColumn(i);
+        }
+    }
+
+    @Override
+    public void close() throws Exception {
+        workbook.close();
+    }
+
+    @Override
+    public void write(final OutputStream outputStream) throws IOException {
+        workbook.write(outputStream);
+    }
+
+    private Sheet createSheet(final String sheetName) {
+        return workbook.createSheet(sheetName);
+    }
+
+    private void writeHeader(final Sheet sheet, final List<String> headers) {
+        final Row headerRow = sheet.createRow(0);
+        for (int i = 0; i < headers.size(); i++) {
+            final Cell cell = headerRow.createCell(i);
+            cell.setCellValue(headers.get(i));
+            cell.setCellStyle(headerStyle);
+        }
+    }
+
+    private void writeRows(final Sheet sheet, final List<List<Object>> rows) {
+        int rowNum = 1;
+        for (List<Object> rowData : rows) {
+            rowNum = writeRow(sheet, rowData, rowNum);
+        }
+    }
+
+    private int writeRow(final Sheet sheet, final List<Object> rowData, int rowNum) {
+        final Row row = sheet.createRow(rowNum++);
+        for (int i = 0; i < rowData.size(); i++) {
+            writeCell(rowData, row, i);
+        }
+        return rowNum;
+    }
+
+    private void writeCell(final List<Object> rowData, final Row row, final int column) {
+        final Cell cell = row.createCell(column);
+        final Object value = rowData.get(column);
+
+        if (value instanceof LocalDate localDate) {
+            writeDate(localDate, cell);
+        } else if (value instanceof BigDecimal bigDecimal) {
+            writeAmount(cell, bigDecimal.doubleValue());
+        } else if (value instanceof Number number) {
+            writeAmount(cell, number.doubleValue());
+        } else if (value != null) {
+            cell.setCellValue(value.toString());
+        }
+    }
+
+    private void writeDate(final LocalDate localDate, final Cell cell) {
+        cell.setCellValue(localDate);
+        cell.setCellStyle(dateStyle);
+    }
+
+    private void writeAmount(final Cell cell, final double bigDecimal) {
+        cell.setCellValue(bigDecimal);
+        cell.setCellStyle(amountStyle);
+    }
+
+}

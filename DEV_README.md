@@ -40,7 +40,7 @@ The app will be available at `http://localhost:8082`
 
 ### 3.2. Database Migrations
 
-Database schema changes are managed via Liquibase. Changelogs are located in `src/main/resources/db/changelog`
+Database schema changes are managed via Liquibase. Changelogs are located in `midas-core/src/main/resources/db/changelog`
 
 * **Never** modify an existing changelog file
 * Always create a new XML file for changes and register it in `db.changelog-master.xml`
@@ -51,7 +51,7 @@ Always use the `MoneyAmount` class for financial values to avoid floating-point 
 
 ## 4. UI & Theme
 
-* **Theme**: Located in `src/main/frontend/themes/midas-theme`
+* **Theme**: Located in `midas-ui-vaadin/src/main/frontend/themes/midas-theme`
 * **Styling**: Use `styles.css` for custom CSS
 
 ## 5. Desktop Features

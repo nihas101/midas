@@ -58,7 +58,7 @@ Eigenschaften aufgeführt:
       geschlossen wurde, bevor sie herunterfahren wird (Standard: `PT60S`).
 * `midas.export.pdf.template-path`: Pfad zu den HTML‑Templates, die über [Thymeleaf](https://www.thymeleaf.org/) für den
   PDF‑Export gerendert werden.
-    * Siehe `src/main/resources/templates/export` für die Standard‑Templates.
+    * Siehe `midas-core/src/main/resources/templates/export` für die Standard‑Templates.
     * Siehe `de.nihas101.midas.export.pdf.PdfViewData` für die Eingabedatenstruktur.
 * `midas.cleanup`
     * `enabled`: Gibt an, ob beim Start der Applikation eine Bereinigung alter Buchungen ausgelöst wird (Standard: `true`)

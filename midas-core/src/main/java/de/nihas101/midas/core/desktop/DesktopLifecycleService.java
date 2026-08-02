@@ -1,0 +1,95 @@
+package de.nihas101.midas.core.desktop;
+
+import de.nihas101.midas.core.browser.WebPage;
+import de.nihas101.midas.core.config.DesktopConfig;
+import de.nihas101.midas.core.config.MidasConfig;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
+@Slf4j
+@Service
+public class DesktopLifecycleService {
+
+    private final ApplicationContext context;
+    private final DesktopConfig config;
+    private final AtomicInteger activeUiCount = new AtomicInteger(0);
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledFuture<?> shutdownTask;
+
+    public DesktopLifecycleService(ApplicationContext context, MidasConfig config) {
+        this.context = context;
+        this.config = config.getDesktop();
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void onApplicationReady() {
+        if (config.isLaunchBrowser()) {
+            launchBrowser();
+        }
+
+        if (config.isAutoShutdownEnabled()) {
+            log.info("Auto-shutdown is enabled with a grace period of {}.", config.getGracePeriod());
+            checkAndScheduleShutdown();
+        }
+    }
+
+    private void launchBrowser() {
+        if (context instanceof ServletWebServerApplicationContext webServerContext) {
+            int port = webServerContext.getWebServer().getPort();
+            String url = "http://localhost:" + port;
+            log.info("Launching browser at {}", url);
+            try {
+                new WebPage(url).open();
+            } catch (IOException e) {
+                log.error("Failed to launch browser", e);
+            }
+        }
+    }
+
+    public void uiAttached() {
+        activeUiCount.incrementAndGet();
+        cancelShutdown();
+    }
+
+    public void uiDetached() {
+        if (activeUiCount.decrementAndGet() <= 0) {
+            checkAndScheduleShutdown();
+        }
+    }
+
+    private synchronized void checkAndScheduleShutdown() {
+        if (!config.isAutoShutdownEnabled()) {
+            return;
+        }
+
+        if (activeUiCount.get() <= 0 && (shutdownTask == null || shutdownTask.isDone())) {
+            log.info("No active UIs detected. Scheduling shutdown in {}.", config.getGracePeriod());
+            shutdownTask = scheduler.schedule(this::shutdown, config.getGracePeriod().getSeconds(), TimeUnit.SECONDS);
+        }
+    }
+
+    private synchronized void cancelShutdown() {
+        if (shutdownTask != null && !shutdownTask.isDone()) {
+            log.info("Active UI detected. Cancelling scheduled shutdown.");
+            shutdownTask.cancel(false);
+        }
+    }
+
+    private void shutdown() {
+        log.info("Grace period expired with 0 active UIs. Shutting down application...");
+        SpringApplication.exit(context, () -> 0);
+        System.exit(0);
+    }
+}

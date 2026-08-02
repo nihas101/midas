@@ -55,7 +55,7 @@ The application can be configured using `application.properties`. Below are some
       window is closed before shutting down (default: `PT60S`).
 * `midas.export.pdf.template-path`: The path to HTML templates to be rendered
   via [Thymeleaf](https://www.thymeleaf.org/) in the PDF export
-    * See `src/main/resources/templates/export` for the default templates
+    * See `midas-core/src/main/resources/templates/export` for the default templates
     * See `de.nihas101.midas.export.pdf.PdfViewData` for the data structure used as input
 * `midas.cleanup`
   * `enabled`: Whether a cleanup of old bookings is triggered on startup of the application (default: `true`).
