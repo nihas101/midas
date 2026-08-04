@@ -20,6 +20,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
 import de.nihas101.midas.api.bookings.Booking;
+import de.nihas101.midas.api.bookings.BookingFactory;
 import de.nihas101.midas.api.bookings.Bookings;
 import de.nihas101.midas.api.bookings.BookingsReader;
 import de.nihas101.midas.api.bookings.BookingsWriter;
@@ -86,13 +87,14 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
     private final LockWriter lockWriter;
     private final ShareholderLock shareholderLock;
     private final ExportFactory exportFactory;
+    private final DownloadTrigger downloadTrigger;
+    private final BookingFactory bookingFactory;
 
     private Checkbox updateNextYearsBalanceAutomaticallyToggle;
     private BigDecimalField openingBalanceField;
     private HorizontalLayout actionRow;
     private Grid<BookingRow> grid;
     private HeaderActionBar headerActionBar;
-    private DownloadTrigger downloadTrigger;
 
     public BookingsView(
             final ShareholdersService shareholdersService,
@@ -106,7 +108,8 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
             final BookingRowService bookingRowService,
             final LockService lockWriter,
             final ShareholderLock shareholderLock,
-            final ExportFactory exportFactory
+            final ExportFactory exportFactory,
+            final BookingFactory bookingFactory
     ) {
         super(config, userConfigService, messageSource, midasLocaleResolver);
         this.shareholdersService = shareholdersService;
@@ -118,6 +121,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         this.lockWriter = lockWriter;
         this.shareholderLock = shareholderLock;
         this.exportFactory = exportFactory;
+        this.bookingFactory = bookingFactory;
 
         VerticalLayout content = new VerticalLayout();
         content.setSizeFull();
@@ -267,7 +271,8 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                             headerActionBar.getSelectedShareholder(),
                             shareholderLock,
                             booking -> refreshGrid(),
-                            this.getMidasConfig().getUi()
+                            this.getMidasConfig().getUi(),
+                            bookingFactory
                     );
                     bookingFormDialog.open();
                 }
@@ -385,7 +390,8 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                         booking,
                         shareholderLock,
                         b -> refreshGrid(),
-                        this.getMidasConfig().getUi()
+                        this.getMidasConfig().getUi(),
+                        bookingFactory
                 ).open();
             }
         });

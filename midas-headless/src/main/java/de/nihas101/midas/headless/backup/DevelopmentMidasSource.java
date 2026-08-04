@@ -1,4 +1,4 @@
-package de.nihas101.midas.vaadin.backup;
+package de.nihas101.midas.headless.backup;
 
 import de.nihas101.midas.api.backup.MidasSource;
 
@@ -9,6 +9,6 @@ public class DevelopmentMidasSource implements MidasSource {
 
     @Override
     public File file() {
-        return Paths.get("midas-vaadin/target/midas-vaadin.jar").toFile();
+        return Paths.get("midas-headless/target/midas-headless.jar").toFile();
     }
 }

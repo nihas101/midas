@@ -17,6 +17,7 @@ import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.binder.Validator;
 import de.nihas101.midas.api.bookings.Booking;
+import de.nihas101.midas.api.bookings.BookingFactory;
 import de.nihas101.midas.api.bookings.BookingsReader;
 import de.nihas101.midas.api.bookings.BookingsWriter;
 import de.nihas101.midas.api.shareholder.Shareholder;
@@ -24,7 +25,6 @@ import de.nihas101.midas.api.shareholder.ShareholdersReader;
 import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.commons.Source;
-import de.nihas101.midas.core.bookings.dto.DefaultBooking;
 import de.nihas101.midas.core.config.UIConfig;
 import de.nihas101.midas.core.lock.ShareholderLock;
 import de.nihas101.midas.vaadin.ui.common.CancelButton;
@@ -56,6 +56,7 @@ public class BookingFormDialog extends Dialog {
     private final Locale locale;
     private final ComboBox<Shareholder> shareholderPicker;
     private final DatePicker datePicker;
+    private final BookingFactory bookingFactory;
 
     public BookingFormDialog(
             final ShareholdersReader shareholdersReader,
@@ -65,7 +66,8 @@ public class BookingFormDialog extends Dialog {
             final Locale locale,
             final Shareholder initialShareholder,
             final Consumer<Booking> onSave,
-            final UIConfig uiConfig
+            final UIConfig uiConfig,
+            final BookingFactory bookingFactory
     ) {
         this(
                 shareholdersReader,
@@ -77,7 +79,8 @@ public class BookingFormDialog extends Dialog {
                 null,
                 null,
                 onSave,
-                uiConfig
+                uiConfig,
+                bookingFactory
         );
     }
 
@@ -90,7 +93,8 @@ public class BookingFormDialog extends Dialog {
             final Shareholder initialShareholder,
             final ShareholderLock shareholderLock,
             final Consumer<Booking> onSave,
-            final UIConfig uiConfig
+            final UIConfig uiConfig,
+            final BookingFactory bookingFactory
     ) {
         this(
                 shareholdersReader,
@@ -102,7 +106,8 @@ public class BookingFormDialog extends Dialog {
                 null,
                 shareholderLock,
                 onSave,
-                uiConfig
+                uiConfig,
+                bookingFactory
         );
     }
 
@@ -115,7 +120,8 @@ public class BookingFormDialog extends Dialog {
             final Shareholder initialShareholder,
             final Booking bookingToEdit,
             final Consumer<Booking> onSave,
-            final UIConfig uiConfig
+            final UIConfig uiConfig,
+            final BookingFactory bookingFactory
     ) {
         this(
                 shareholdersReader,
@@ -127,7 +133,8 @@ public class BookingFormDialog extends Dialog {
                 bookingToEdit,
                 null,
                 onSave,
-                uiConfig
+                uiConfig,
+                bookingFactory
         );
     }
 
@@ -141,7 +148,8 @@ public class BookingFormDialog extends Dialog {
             final Booking bookingToEdit,
             final ShareholderLock shareholderLock,
             final Consumer<Booking> onSave,
-            final UIConfig uiConfig
+            final UIConfig uiConfig,
+            final BookingFactory bookingFactory
     ) {
         this.bookingsReader = bookingsReader;
         this.bookingsWriter = bookingsWriter;
@@ -149,6 +157,7 @@ public class BookingFormDialog extends Dialog {
         this.messageSource = messageSource;
         this.locale = locale;
         this.onSave = onSave;
+        this.bookingFactory = bookingFactory;
 
         final boolean isEditMode = bookingToEdit != null;
         final String titleKey = isEditMode ? "bookings.dialog.title.edit" : "bookings.dialog.title.add";
@@ -188,7 +197,7 @@ public class BookingFormDialog extends Dialog {
         if (isEditMode) {
             binder.setBean(bookingToEdit);
         } else {
-            final Booking booking = new DefaultBooking();
+            final Booking booking = bookingFactory.create();
             booking.setDate(LocalDate.now());
             booking.setSource(Source.USER);
             if (initialShareholder != null) {
@@ -350,7 +359,7 @@ public class BookingFormDialog extends Dialog {
 
     private void resetForm() {
         final Booking current = binder.getBean();
-        final Booking next = new DefaultBooking();
+        final Booking next = bookingFactory.create();
         next.setShareholderId(current.getShareholderId());
         next.setDate(current.getDate());
         binder.setBean(next);

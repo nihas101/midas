@@ -1,5 +1,6 @@
 package de.nihas101.midas.core.bookings.dto;
 
+import de.nihas101.midas.api.bookings.Booking;
 import de.nihas101.midas.api.bookings.Bookings;
 import de.nihas101.midas.api.bookings.FilteredBookings;
 import de.nihas101.midas.api.openingbalance.OpeningBalance;
@@ -13,7 +14,7 @@ import java.util.function.Function;
 
 @RequiredArgsConstructor
 public class DefaultBookings implements Bookings {
-    private final List<de.nihas101.midas.api.bookings.Booking> bookings;
+    private final List<Booking> bookings;
     private final OpeningBalance openingBalance;
 
     @Override
@@ -30,8 +31,8 @@ public class DefaultBookings implements Bookings {
     }
 
     @Override
-    public FilteredBookings filter(final Function<de.nihas101.midas.api.bookings.Booking, Boolean> condition) {
-        final List<de.nihas101.midas.api.bookings.Booking> filteredBookings = bookings.stream()
+    public FilteredBookings filter(final Function<Booking, Boolean> condition) {
+        final List<Booking> filteredBookings = bookings.stream()
                 .filter(condition::apply)
                 .toList();
         return new FilteredBookings(filteredBookings);
