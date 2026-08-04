@@ -13,6 +13,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class MidasApplication {
 
     // TODO: Add an API, once the project is stable
+    // TODO: Include this as artifact in the zip
     public static void main(String[] args) {
         SpringApplication.run(MidasApplication.class, args);
     }
