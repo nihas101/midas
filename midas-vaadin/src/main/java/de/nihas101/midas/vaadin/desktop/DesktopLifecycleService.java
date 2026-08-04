@@ -1,4 +1,4 @@
-package de.nihas101.midas.core.desktop;
+package de.nihas101.midas.vaadin.desktop;
 
 import de.nihas101.midas.core.browser.WebPage;
 import de.nihas101.midas.core.config.DesktopConfig;

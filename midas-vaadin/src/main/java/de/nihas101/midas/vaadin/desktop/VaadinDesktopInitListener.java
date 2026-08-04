@@ -1,4 +1,4 @@
-package de.nihas101.midas.core.desktop;
+package de.nihas101.midas.vaadin.desktop;
 
 import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.Component;
