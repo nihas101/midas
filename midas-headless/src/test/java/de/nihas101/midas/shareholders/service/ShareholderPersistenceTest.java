@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 @SpringBootTest
 @ActiveProfiles("test")
-class ShareholderPersistenceTest { // TODO: Figure out a way to move this into the core
+class ShareholderPersistenceTest {
 
     @Autowired
     private ShareholdersService service;

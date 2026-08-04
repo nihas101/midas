@@ -1,11 +1,13 @@
 package de.nihas101.midas.core.cleanup;
 
-import de.nihas101.midas.commons.BookingType;
-import de.nihas101.midas.commons.Source;
 import de.nihas101.midas.api.lock.LockReader;
 import de.nihas101.midas.api.lock.LockWriter;
-import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.api.shareholder.Shareholder;
+import de.nihas101.midas.commons.BookingType;
+import de.nihas101.midas.commons.MoneyAmount;
+import de.nihas101.midas.commons.Source;
+import de.nihas101.midas.core.cleanup.BookingsCleanup;
+import de.nihas101.midas.core.cleanup.CleanupConfig;
 import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
 import de.nihas101.midas.persistance.bookings.BookingEntity;
 import de.nihas101.midas.persistance.bookings.BookingsRepository;
@@ -27,7 +29,7 @@ import java.time.Year;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class BookingsCleanupLockedYearIT { // TODO: Figure out a way to move this into core
+class BookingsCleanupLockedYearIT {
 
     @Autowired
     private ShareholdersRepository shareholdersRepository;

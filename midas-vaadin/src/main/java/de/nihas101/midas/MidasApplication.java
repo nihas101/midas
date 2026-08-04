@@ -22,8 +22,6 @@ import java.util.Properties;
 @EnableConfigurationProperties
 public class MidasApplication implements AppShellConfigurator {
 
-    // TODO: Split into core and ui submodules?
-
     public static void main(String[] args) {
         try {
             SpringApplication.run(MidasApplication.class, args);

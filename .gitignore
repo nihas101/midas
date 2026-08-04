@@ -42,3 +42,4 @@ build/
 /midas-api/src/main/frontend/
 /midas-commons/src/main/frontend/
 /midas-persistence/src/main/frontend/
+/midas-headless/src/main/frontend/

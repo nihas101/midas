@@ -1,15 +1,15 @@
 package de.nihas101.midas.core.lock;
 
 import de.nihas101.midas.api.bookings.Booking;
-import de.nihas101.midas.commons.BookingType;
-import de.nihas101.midas.commons.Source;
 import de.nihas101.midas.api.interest.InterestBookingsService;
 import de.nihas101.midas.api.interest.InterestUpdatingBookingsService;
 import de.nihas101.midas.api.interest.InterestUpdatingOpeningBalanceService;
 import de.nihas101.midas.api.lock.LockWriter;
-import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.api.openingbalance.OpeningBalance;
 import de.nihas101.midas.api.shareholder.Shareholder;
+import de.nihas101.midas.commons.BookingType;
+import de.nihas101.midas.commons.MoneyAmount;
+import de.nihas101.midas.commons.Source;
 import de.nihas101.midas.core.bookings.dto.DefaultBooking;
 import de.nihas101.midas.core.lock.service.LockedException;
 import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
@@ -30,7 +30,7 @@ import java.time.Year;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class YearLockingIntegrationTest { // TODO: Figure out a way to move this into the core
+class YearLockingIntegrationTest {
 
     @Autowired
     private ShareholdersService shareholdersService;
