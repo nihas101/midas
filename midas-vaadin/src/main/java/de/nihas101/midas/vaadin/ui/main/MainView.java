@@ -11,7 +11,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
-import de.nihas101.midas.core.config.MidasConfig;
+import de.nihas101.midas.core.config.CoreConfig;
 import de.nihas101.midas.core.userconfig.service.UserConfigService;
 import de.nihas101.midas.vaadin.ui.accountstatement.AccountStatementView;
 import de.nihas101.midas.vaadin.ui.backup.BackupView;
@@ -36,7 +36,7 @@ public class MainView extends MidasView {
     public static final VaadinIcon icon = VaadinIcon.HOME;
 
     public MainView(
-            final MidasConfig config,
+            final CoreConfig config,
             final MessageSource messageSource,
             final UserConfigService userConfigService,
             final MidasLocaleResolver midasLocaleResolver

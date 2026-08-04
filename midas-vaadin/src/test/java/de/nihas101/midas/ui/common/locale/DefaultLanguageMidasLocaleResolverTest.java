@@ -1,10 +1,11 @@
 package de.nihas101.midas.ui.common.locale;
 
 import de.nihas101.midas.core.cleanup.CleanupConfig;
+import de.nihas101.midas.core.config.CoreConfig;
 import de.nihas101.midas.core.config.DesktopConfig;
 import de.nihas101.midas.core.config.I18nConfig;
-import de.nihas101.midas.core.config.MidasConfig;
 import de.nihas101.midas.core.config.ThemeConfig;
+import de.nihas101.midas.core.config.TitleConfig;
 import de.nihas101.midas.core.config.UIConfig;
 import de.nihas101.midas.core.sqlite.SqliteConfig;
 import de.nihas101.midas.vaadin.ui.common.locale.DefaultLanguageMidasLocaleResolver;
@@ -34,7 +35,7 @@ class DefaultLanguageMidasLocaleResolverTest {
 
     @ParameterizedTest
     @MethodSource("resolveFromSettingsValues")
-    void resolveFromSettings(final MidasConfig config, Locale expectedLocale) {
+    void resolveFromSettings(final CoreConfig config, Locale expectedLocale) {
         final DefaultLanguageMidasLocaleResolver localeResolver = new DefaultLanguageMidasLocaleResolver(config);
         Assertions.assertEquals(expectedLocale, localeResolver.resolve());
     }
@@ -43,61 +44,61 @@ class DefaultLanguageMidasLocaleResolverTest {
         return Stream.of(
                 Arguments.of(null, null),
                 Arguments.of(
-                        new MidasConfig(
+                        new CoreConfig(
+                                new TitleConfig(),
                                 new ThemeConfig(),
                                 new UIConfig(),
                                 new I18nConfig(),
-                                new DesktopConfig(),
                                 new CleanupConfig(),
                                 new SqliteConfig()
                         ), Locale.ENGLISH
                 ),
                 Arguments.of(
-                        new MidasConfig(
+                        new CoreConfig(
+                                new TitleConfig(),
                                 new ThemeConfig(),
                                 new UIConfig(),
                                 new I18nConfig("", false),
-                                new DesktopConfig(),
                                 new CleanupConfig(),
                                 new SqliteConfig()
                         ), null
                 ),
                 Arguments.of(
-                        new MidasConfig(
+                        new CoreConfig(
+                                new TitleConfig(),
                                 new ThemeConfig(),
                                 new UIConfig(),
                                 new I18nConfig("        ", false),
-                                new DesktopConfig(),
                                 new CleanupConfig(),
                                 new SqliteConfig()
                         ), null
                 ),
                 Arguments.of(
-                        new MidasConfig(
+                        new CoreConfig(
+                                new TitleConfig(),
                                 new ThemeConfig(),
                                 new UIConfig(),
                                 new I18nConfig("notAValidLocale", false),
-                                new DesktopConfig(),
                                 new CleanupConfig(),
                                 new SqliteConfig()
                         ), null
                 ),
                 Arguments.of(
-                        new MidasConfig(
+                        new CoreConfig(
+                                new TitleConfig(),
                                 new ThemeConfig(),
                                 new UIConfig(),
                                 new I18nConfig("en", false),
-                                new DesktopConfig(),
                                 new CleanupConfig(),
                                 new SqliteConfig()
                         ), Locale.ENGLISH
                 ),
                 Arguments.of(
-                        new MidasConfig(
+                        new CoreConfig(
+                                new TitleConfig(),
                                 new ThemeConfig(),
                                 new UIConfig(),
                                 new I18nConfig("de", false),
-                                new DesktopConfig(),
                                 new CleanupConfig(),
                                 new SqliteConfig()
                         ), Locale.GERMAN

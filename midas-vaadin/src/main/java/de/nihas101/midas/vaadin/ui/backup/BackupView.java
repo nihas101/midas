@@ -19,7 +19,7 @@ import com.vaadin.flow.server.streams.DownloadResponse;
 import de.nihas101.midas.core.backup.service.BackupFileNameProvider;
 import de.nihas101.midas.core.backup.service.BackupService;
 import de.nihas101.midas.core.backup.service.BackupStatusService;
-import de.nihas101.midas.core.config.MidasConfig;
+import de.nihas101.midas.core.config.CoreConfig;
 import de.nihas101.midas.core.userconfig.service.UserConfigService;
 import de.nihas101.midas.vaadin.ui.common.MidasView;
 import de.nihas101.midas.vaadin.ui.common.locale.MidasLocaleResolver;
@@ -49,7 +49,7 @@ public class BackupView extends MidasView {
     private final VerticalLayout content;
 
     public BackupView(
-            final MidasConfig midasConfig,
+            final CoreConfig midasConfig,
             final UserConfigService userConfigService,
             final MidasLocaleResolver midasLocaleResolver,
             final BackupService backupService,

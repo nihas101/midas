@@ -12,7 +12,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.RouterLink;
 import de.nihas101.midas.api.userconfig.UserConfig;
-import de.nihas101.midas.core.config.MidasConfig;
+import de.nihas101.midas.core.config.CoreConfig;
 import de.nihas101.midas.core.userconfig.dto.DefaultUserConfig;
 import de.nihas101.midas.core.userconfig.service.UserConfigService;
 import de.nihas101.midas.vaadin.ui.accountstatement.AccountStatementView;
@@ -33,11 +33,11 @@ import java.util.Optional;
 @Getter
 public class MidasView extends AppLayout {
 
-    private final MidasConfig midasConfig;
+    private final CoreConfig midasConfig;
     private final Locale locale;
 
     public MidasView(
-            final MidasConfig config,
+            final CoreConfig config,
             final UserConfigService userConfigService,
             final MessageSource messageSource,
             final MidasLocaleResolver midasLocaleResolver
@@ -52,7 +52,7 @@ public class MidasView extends AppLayout {
         navbarContent.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
         navbarContent.setAlignItems(FlexComponent.Alignment.CENTER);
 
-        final H1 title = new H1(config.getTitle());
+        final H1 title = new H1(config.getTitle().getName());
         title.getStyle().set("margin-left", "var(--lumo-space-m)");
 
         final Navbar navbar = new Navbar();

@@ -37,7 +37,7 @@ import de.nihas101.midas.commons.Source;
 import de.nihas101.midas.core.bookings.row.BookingRow;
 import de.nihas101.midas.core.bookings.row.BookingRowService;
 import de.nihas101.midas.core.bookings.service.BookingsService;
-import de.nihas101.midas.core.config.MidasConfig;
+import de.nihas101.midas.core.config.CoreConfig;
 import de.nihas101.midas.core.export.ExportFactory;
 import de.nihas101.midas.core.export.ExportViewName;
 import de.nihas101.midas.core.lock.ShareholderLock;
@@ -101,7 +101,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
             final BookingsService bookingsReader,
             final InterestUpdatingBookingsService bookingsWriter,
             final InterestUpdatingOpeningBalanceService openingBalanceService,
-            final MidasConfig config,
+            final CoreConfig config,
             final MessageSource messageSource,
             final UserConfigService userConfigService,
             final MidasLocaleResolver midasLocaleResolver,

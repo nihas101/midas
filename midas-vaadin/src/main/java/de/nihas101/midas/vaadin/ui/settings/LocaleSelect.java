@@ -3,7 +3,8 @@ package de.nihas101.midas.vaadin.ui.settings;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.i18n.I18NProvider;
-import de.nihas101.midas.core.config.MidasConfig;
+import de.nihas101.midas.core.config.CoreConfig;
+import de.nihas101.midas.core.config.UIConfig;
 import de.nihas101.midas.core.userconfig.service.UserConfigService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,7 +17,7 @@ public class LocaleSelect extends Select<Locale> {
     public LocaleSelect(
             final I18NProvider i18NProvider,
             final Locale locale,
-            final MidasConfig config,
+            final CoreConfig config,
             final UserConfigService userConfigService
     ) {
         final List<Locale> providedLocales = i18NProvider.getProvidedLocales();
@@ -39,7 +40,7 @@ public class LocaleSelect extends Select<Locale> {
         });
     }
 
-    private boolean isVisible(final MidasConfig config) {
+    private boolean isVisible(final CoreConfig config) {
         return !config.getUi().isHideLanguageSelector() && !config.getI18n().isForceDefaultLanguage();
     }
 }

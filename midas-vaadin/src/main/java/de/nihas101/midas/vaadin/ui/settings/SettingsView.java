@@ -8,7 +8,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.i18n.I18NProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import de.nihas101.midas.core.config.MidasConfig;
+import de.nihas101.midas.core.config.CoreConfig;
 import de.nihas101.midas.core.userconfig.service.UserConfigService;
 import de.nihas101.midas.vaadin.ui.common.MidasView;
 import de.nihas101.midas.vaadin.ui.common.locale.MidasLocaleResolver;
@@ -22,7 +22,7 @@ public class SettingsView extends MidasView {
     public static final VaadinIcon icon = VaadinIcon.COG;
 
     public SettingsView(
-            final MidasConfig config,
+            final CoreConfig config,
             final I18NProvider i18NProvider,
             final UserConfigService userConfigService,
             final MessageSource messageSource,

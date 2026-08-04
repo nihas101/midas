@@ -7,7 +7,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import de.nihas101.midas.core.config.MidasConfig;
+import de.nihas101.midas.core.config.CoreConfig;
 import de.nihas101.midas.core.shareholders.service.ShareholdersService;
 import de.nihas101.midas.core.userconfig.service.UserConfigService;
 import de.nihas101.midas.vaadin.ui.common.MidasView;
@@ -24,7 +24,7 @@ public class ShareholdersView extends MidasView {
 
     public ShareholdersView(
             final ShareholdersService shareholdersService,
-            final MidasConfig config,
+            final CoreConfig config,
             final MessageSource messageSource,
             final UserConfigService userConfigService,
             final MidasLocaleResolver midasLocaleResolver

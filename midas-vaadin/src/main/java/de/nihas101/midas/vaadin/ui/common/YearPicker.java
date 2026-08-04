@@ -2,7 +2,7 @@ package de.nihas101.midas.vaadin.ui.common;
 
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.combobox.ComboBox;
-import de.nihas101.midas.core.config.MidasConfig;
+import de.nihas101.midas.core.config.CoreConfig;
 import org.springframework.context.MessageSource;
 
 import java.time.LocalDate;
@@ -17,7 +17,7 @@ public class YearPicker extends ComboBox<Integer> {
             final MessageSource messageSource,
             final Locale locale,
             final QueryParameter<?, Integer> queryParameter,
-            final MidasConfig midasConfig
+            final CoreConfig midasConfig
     ) {
         this(
                 messageSource.getMessage("bookings.year", null, locale),
@@ -29,7 +29,7 @@ public class YearPicker extends ComboBox<Integer> {
     private YearPicker(
             final String label,
             final QueryParameter<?, Integer> queryParameter,
-            final MidasConfig midasConfig
+            final CoreConfig midasConfig
     ) {
         this(
                 label,

@@ -1,7 +1,7 @@
 package de.nihas101.midas.vaadin.ui.common.locale;
 
+import de.nihas101.midas.core.config.CoreConfig;
 import de.nihas101.midas.core.config.I18nConfig;
-import de.nihas101.midas.core.config.MidasConfig;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Locale;
@@ -12,14 +12,14 @@ public class DefaultLanguageMidasLocaleResolver implements MidasLocaleResolver {
 
     private final Locale locale;
 
-    public DefaultLanguageMidasLocaleResolver(final MidasConfig config) {
+    public DefaultLanguageMidasLocaleResolver(final CoreConfig config) {
         this(config, new InvalidLocale());
     }
 
-    public DefaultLanguageMidasLocaleResolver(final MidasConfig config, InvalidLocale invalidLocale) {
+    public DefaultLanguageMidasLocaleResolver(final CoreConfig config, InvalidLocale invalidLocale) {
         this(
                 Optional.ofNullable(config)
-                        .map(MidasConfig::getI18n)
+                        .map(CoreConfig::getI18n)
                         .map(I18nConfig::getDefaultLocale)
                         .map(Locale::forLanguageTag)
                         .filter(l -> !invalidLocale.corresponds(l))

@@ -2,7 +2,7 @@ package de.nihas101.midas.vaadin.desktop;
 
 import de.nihas101.midas.core.browser.WebPage;
 import de.nihas101.midas.core.config.DesktopConfig;
-import de.nihas101.midas.core.config.MidasConfig;
+import de.nihas101.midas.vaadin.config.MidasConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -28,7 +28,7 @@ public class DesktopLifecycleService {
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private ScheduledFuture<?> shutdownTask;
 
-    public DesktopLifecycleService(ApplicationContext context, MidasConfig config) {
+    public DesktopLifecycleService(final ApplicationContext context, final MidasConfig config) {
         this.context = context;
         this.config = config.getDesktop();
     }

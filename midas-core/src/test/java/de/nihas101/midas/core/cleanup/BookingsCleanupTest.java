@@ -1,6 +1,11 @@
 package de.nihas101.midas.core.cleanup;
 
-import de.nihas101.midas.core.config.MidasConfig;
+import de.nihas101.midas.core.config.CoreConfig;
+import de.nihas101.midas.core.config.I18nConfig;
+import de.nihas101.midas.core.config.ThemeConfig;
+import de.nihas101.midas.core.config.TitleConfig;
+import de.nihas101.midas.core.config.UIConfig;
+import de.nihas101.midas.core.sqlite.SqliteConfig;
 import de.nihas101.midas.persistance.bookings.BookingsRepository;
 import de.nihas101.midas.persistance.lock.LockRepository;
 import org.junit.jupiter.api.Test;
@@ -39,7 +44,14 @@ class BookingsCleanupTest {
 
     @Test
     void defaultCleanUpFromMidasConfig() {
-        final MidasConfig config = new MidasConfig();
+        final CoreConfig config = new CoreConfig(
+                new TitleConfig(),
+                new ThemeConfig(),
+                new UIConfig(),
+                new I18nConfig(),
+                new CleanupConfig(),
+                new SqliteConfig()
+        );
 
         final BookingsCleanup cleanup = new BookingsCleanup(bookingsRepository, lockRepository, config);
         cleanup.cleanUp();

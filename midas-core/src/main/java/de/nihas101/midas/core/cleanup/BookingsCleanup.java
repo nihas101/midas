@@ -1,6 +1,6 @@
 package de.nihas101.midas.core.cleanup;
 
-import de.nihas101.midas.core.config.MidasConfig;
+import de.nihas101.midas.core.config.CoreConfig;
 import de.nihas101.midas.persistance.bookings.BookingsRepository;
 import de.nihas101.midas.persistance.lock.LockRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class BookingsCleanup {
     public BookingsCleanup(
             final BookingsRepository bookingsRepository,
             final LockRepository lockRepository,
-            final MidasConfig midasConfig
+            final CoreConfig midasConfig
     ) {
         this(
                 bookingsRepository,

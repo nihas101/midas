@@ -2,7 +2,7 @@ package de.nihas101.midas.vaadin.ui.common.locale;
 
 import com.vaadin.flow.component.UI;
 import de.nihas101.midas.api.userconfig.UserConfigReader;
-import de.nihas101.midas.core.config.MidasConfig;
+import de.nihas101.midas.core.config.CoreConfig;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +12,7 @@ public class MidasLocaleResolverConfig {
 
     @Bean
     @ConditionalOnProperty(value = "midas.i18n.force-default-language", havingValue = "true")
-    public MidasLocaleResolver constantLanguageMidasLocaleResolver(final MidasConfig config) {
+    public MidasLocaleResolver constantLanguageMidasLocaleResolver(final CoreConfig config) {
         return new DefaultLanguageMidasLocaleResolver(config);
     }
 

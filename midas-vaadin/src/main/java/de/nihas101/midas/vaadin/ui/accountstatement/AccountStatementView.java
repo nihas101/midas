@@ -39,7 +39,8 @@ import de.nihas101.midas.core.accountstatement.runningtotal.RunningTotalAccountS
 import de.nihas101.midas.core.accountstatement.service.DefaultAccountStatementService;
 import de.nihas101.midas.core.accountstatement.service.RunningTotalAccountStatementService;
 import de.nihas101.midas.core.bookings.service.BookingsService;
-import de.nihas101.midas.core.config.MidasConfig;
+import de.nihas101.midas.core.config.CoreConfig;
+import de.nihas101.midas.core.config.ThemeConfig;
 import de.nihas101.midas.core.export.ExportFactory;
 import de.nihas101.midas.core.export.ExportViewName;
 import de.nihas101.midas.core.lock.ShareholderLock;
@@ -101,7 +102,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
             final ShareholdersService shareholdersService,
             final DefaultAccountStatementService accountStatementService,
             final RunningTotalAccountStatementService runningTotalAccountStatementService,
-            final MidasConfig config,
+            final CoreConfig config,
             final MessageSource messageSource,
             final UserConfigService userConfigService,
             final MidasLocaleResolver midasLocaleResolver,

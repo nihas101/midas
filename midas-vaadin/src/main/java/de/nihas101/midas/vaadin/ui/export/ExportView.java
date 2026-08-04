@@ -17,7 +17,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.nihas101.midas.api.export.Export;
 import de.nihas101.midas.api.shareholder.Shareholder;
-import de.nihas101.midas.core.config.MidasConfig;
+import de.nihas101.midas.core.config.CoreConfig;
 import de.nihas101.midas.core.export.ExportFactory;
 import de.nihas101.midas.core.export.ExportRequest;
 import de.nihas101.midas.core.export.ExportViewName;
@@ -61,7 +61,7 @@ public class ExportView extends MidasView {
 
     public ExportView(
             final ShareholdersService shareholdersService,
-            final MidasConfig config,
+            final CoreConfig config,
             final MessageSource messageSource,
             final UserConfigService userConfigService,
             final MidasLocaleResolver midasLocaleResolver,
