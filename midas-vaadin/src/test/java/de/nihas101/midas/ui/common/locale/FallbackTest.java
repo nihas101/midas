@@ -1,5 +1,7 @@
 package de.nihas101.midas.ui.common.locale;
 
+import de.nihas101.midas.vaadin.ui.common.locale.Fallback;
+import de.nihas101.midas.vaadin.ui.common.locale.MidasLocaleResolver;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;

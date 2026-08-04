@@ -7,6 +7,7 @@ import de.nihas101.midas.core.config.MidasConfig;
 import de.nihas101.midas.core.config.ThemeConfig;
 import de.nihas101.midas.core.config.UIConfig;
 import de.nihas101.midas.core.sqlite.SqliteConfig;
+import de.nihas101.midas.vaadin.ui.common.locale.DefaultLanguageMidasLocaleResolver;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;

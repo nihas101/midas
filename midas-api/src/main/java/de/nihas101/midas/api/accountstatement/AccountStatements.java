@@ -1,7 +1,7 @@
 package de.nihas101.midas.api.accountstatement;
 
-import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.api.openingbalance.OpeningBalance;
+import de.nihas101.midas.commons.BookingType;
 
 import java.util.List;
 

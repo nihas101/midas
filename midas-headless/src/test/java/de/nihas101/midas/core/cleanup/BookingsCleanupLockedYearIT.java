@@ -6,8 +6,6 @@ import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.commons.Source;
-import de.nihas101.midas.core.cleanup.BookingsCleanup;
-import de.nihas101.midas.core.cleanup.CleanupConfig;
 import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
 import de.nihas101.midas.persistance.bookings.BookingEntity;
 import de.nihas101.midas.persistance.bookings.BookingsRepository;

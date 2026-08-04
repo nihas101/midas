@@ -1,8 +1,8 @@
 package de.nihas101.midas.core.accountstatement.service;
 
 import de.nihas101.midas.api.accountstatement.AccountStatements;
-import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.api.shareholder.Shareholder;
+import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.commons.Source;
 import de.nihas101.midas.core.accountstatement.dto.DefaultAccountStatement;
@@ -18,7 +18,6 @@ import de.nihas101.midas.persistance.accountstatements.AccountStatementOverrides
 import de.nihas101.midas.persistance.accountstatements.AccountStatementsRepository;
 import de.nihas101.midas.persistance.openingbalance.OpeningBalanceEntity;
 import de.nihas101.midas.persistance.openingbalance.OpeningBalanceRepository;
-import de.nihas101.midas.persistance.shareholders.ShareholderEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

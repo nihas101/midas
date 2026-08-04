@@ -1,5 +1,6 @@
 package de.nihas101.midas.ui.common.locale;
 
+import de.nihas101.midas.vaadin.ui.common.locale.InvalidLocale;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

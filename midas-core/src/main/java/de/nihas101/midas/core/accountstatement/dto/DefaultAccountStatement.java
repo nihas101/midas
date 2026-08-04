@@ -2,8 +2,8 @@ package de.nihas101.midas.core.accountstatement.dto;
 
 import de.nihas101.midas.api.accountstatement.LabeledAccountStatement;
 import de.nihas101.midas.commons.BookingType;
-import de.nihas101.midas.commons.Source;
 import de.nihas101.midas.commons.MoneyAmount;
+import de.nihas101.midas.commons.Source;
 import de.nihas101.midas.persistance.accountstatements.AccountStatementEntity;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;

@@ -41,7 +41,8 @@ jobs:
           VERSION=${GITHUB_REF#refs/tags/}
           VERSION=${VERSION#v}
           mkdir midas-distribution
-          cp midas-ui-vaadin/target/midas.jar midas-distribution/
+          cp midas-ui-vaadin/target/midas-vaadin.jar midas-distribution/
+          cp midas-headless/target/midas-headless.jar midas-distribution/
           zip -r midas-$VERSION.zip midas-distribution/
 
       - name: Upload Release Assets

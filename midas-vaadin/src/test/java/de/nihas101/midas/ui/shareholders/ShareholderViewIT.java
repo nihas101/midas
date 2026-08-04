@@ -8,6 +8,8 @@ import com.vaadin.flow.component.textfield.TextField;
 import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.core.shareholders.service.ShareholdersService;
 import de.nihas101.midas.ui.AbstractKaribuTest;
+import de.nihas101.midas.vaadin.ui.shareholders.ShareholdersTable;
+import de.nihas101.midas.vaadin.ui.shareholders.ShareholdersView;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

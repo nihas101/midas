@@ -3,6 +3,7 @@ package de.nihas101.midas.ui.common.locale;
 import de.nihas101.midas.api.userconfig.UserConfig;
 import de.nihas101.midas.api.userconfig.UserConfigReader;
 import de.nihas101.midas.core.userconfig.dto.DefaultUserConfig;
+import de.nihas101.midas.vaadin.ui.common.locale.UserConfigMidasLocaleResolver;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;

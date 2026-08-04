@@ -1,7 +1,7 @@
 package de.nihas101.midas.core.bookings.monthlytotal;
 
-import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.api.bookings.Bookings;
+import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.commons.MoneyAmount;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;

@@ -224,23 +224,23 @@
             </td>
 
             <td class="text-right amount double-separator-column"
-                th:text="${row.amount(T(de.nihas101.midas.core.bookings.entity.BookingType).WITHDRAWAL).cents != 0 ? row.amount(T(de.nihas101.midas.core.bookings.entity.BookingType).WITHDRAWAL).format(#locale) : ''}">
+                th:text="${row.amount(T(de.nihas101.midas.commons.BookingType).WITHDRAWAL).cents != 0 ? row.amount(T(de.nihas101.midas.commons.BookingType).WITHDRAWAL).format(#locale) : ''}">
                 Withdrawal
             </td>
             <td class="text-right amount separator-column"
-                th:text="${row.amount(T(de.nihas101.midas.core.bookings.entity.BookingType).TAX_PREVIOUS_YEAR).cents != 0 ? row.amount(T(de.nihas101.midas.core.bookings.entity.BookingType).TAX_PREVIOUS_YEAR).format(#locale) : ''}">
+                th:text="${row.amount(T(de.nihas101.midas.commons.BookingType).TAX_PREVIOUS_YEAR).cents != 0 ? row.amount(T(de.nihas101.midas.commons.BookingType).TAX_PREVIOUS_YEAR).format(#locale) : ''}">
                 Tax Prev
             </td>
             <td class="text-right amount separator-column"
-                th:text="${row.amount(T(de.nihas101.midas.core.bookings.entity.BookingType).TAX_CREDIT).cents != 0 ? row.amount(T(de.nihas101.midas.core.bookings.entity.BookingType).TAX_CREDIT).format(#locale) : ''}">
+                th:text="${row.amount(T(de.nihas101.midas.commons.BookingType).TAX_CREDIT).cents != 0 ? row.amount(T(de.nihas101.midas.commons.BookingType).TAX_CREDIT).format(#locale) : ''}">
                 Tax Credit
             </td>
             <td class="text-right amount separator-column"
-                th:text="${row.amount(T(de.nihas101.midas.core.bookings.entity.BookingType).INTEREST).cents != 0 ? row.amount(T(de.nihas101.midas.core.bookings.entity.BookingType).INTEREST).format(#locale) : ''}">
+                th:text="${row.amount(T(de.nihas101.midas.commons.BookingType).INTEREST).cents != 0 ? row.amount(T(de.nihas101.midas.commons.BookingType).INTEREST).format(#locale) : ''}">
                 Interest
             </td>
             <td class="text-right amount separator-column"
-                th:text="${row.amount(T(de.nihas101.midas.core.bookings.entity.BookingType).COMPENSATION).cents != 0 ? row.amount(T(de.nihas101.midas.core.bookings.entity.BookingType).COMPENSATION).format(#locale) : ''}">
+                th:text="${row.amount(T(de.nihas101.midas.commons.BookingType).COMPENSATION).cents != 0 ? row.amount(T(de.nihas101.midas.commons.BookingType).COMPENSATION).format(#locale) : ''}">
                 Comp
             </td>
 

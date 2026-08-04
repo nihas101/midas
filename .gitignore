@@ -36,10 +36,3 @@ build/
 ### DB files ###
 *.db
 *.db.bak
-/src/main/frontend/
-/midas-core/src/main/frontend/
-/midas-i18n/src/main/frontend/
-/midas-api/src/main/frontend/
-/midas-commons/src/main/frontend/
-/midas-persistence/src/main/frontend/
-/midas-headless/src/main/frontend/
