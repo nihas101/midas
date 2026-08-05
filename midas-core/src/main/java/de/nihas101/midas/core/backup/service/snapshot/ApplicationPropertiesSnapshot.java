@@ -1,6 +1,9 @@
 package de.nihas101.midas.core.backup.service.snapshot;
 
 import de.nihas101.midas.core.backup.service.MidasTemplatesResolver;
+import de.nihas101.midas.persistance.backup.ArchiveWriter;
+import de.nihas101.midas.persistance.backup.DatabaseLocation;
+import de.nihas101.midas.persistance.backup.Snapshot;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -48,8 +51,7 @@ public class ApplicationPropertiesSnapshot implements Snapshot {
     }
 
     private void correctDataSourceUrl(final Properties props) {
-        final String dbName = databaseLocation.databaseLocation();
-        final String targetUrl = "jdbc:sqlite:" + dbName;
+        final String targetUrl = databaseLocation.prefix() + databaseLocation.databaseLocation();
         if (!targetUrl.equals(props.getProperty("spring.datasource.url"))) {
             log.info("Adjusting spring.datasource.url to '{}' for portability", targetUrl);
             props.setProperty("spring.datasource.url", targetUrl);

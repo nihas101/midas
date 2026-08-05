@@ -1,5 +1,6 @@
 package de.nihas101.midas.core.backup.service.snapshot;
 
+import de.nihas101.midas.persistance.backup.Snapshot;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

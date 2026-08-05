@@ -4,11 +4,11 @@ import de.nihas101.midas.api.backup.BackupStatusWriter;
 import de.nihas101.midas.core.backup.service.snapshot.ApplicationPropertiesSnapshot;
 import de.nihas101.midas.core.backup.service.snapshot.JarSnapshot;
 import de.nihas101.midas.core.backup.service.snapshot.MidasSnapshot;
-import de.nihas101.midas.core.backup.service.snapshot.SqliteDatabaseLocation;
-import de.nihas101.midas.core.backup.service.snapshot.SqliteSnapshot;
 import de.nihas101.midas.core.backup.service.snapshot.ZipArchive;
+import de.nihas101.midas.persistance.backup.DatabaseLocation;
+import de.nihas101.midas.persistance.backup.DatabaseLocationFactory;
+import de.nihas101.midas.persistance.backup.DbSnapshotFactory;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -24,20 +24,23 @@ public class BackupService { // TODO: Extract interface
     private final BackupStatusWriter backupStatusWriter;
     private final MidasExecutableResolver executableResolver;
     private final MidasTemplatesResolver templatesResolver;
-    private final String datasourceUrl;
+    private final DatabaseLocationFactory databaseLocationFactory;
+    private final DbSnapshotFactory dbSnapshotFactory;
 
     public BackupService(
             final JdbcTemplate jdbcTemplate,
             final BackupStatusWriter backupStatusWriter,
             final MidasExecutableResolver executableResolver,
             final MidasTemplatesResolver templatesResolver,
-            @Value("${spring.datasource.url}") final String datasourceUrl
+            final DatabaseLocationFactory databaseLocationFactory,
+            final DbSnapshotFactory dbSnapshotFactory
     ) {
         this.jdbcTemplate = jdbcTemplate;
         this.backupStatusWriter = backupStatusWriter;
         this.executableResolver = executableResolver;
         this.templatesResolver = templatesResolver;
-        this.datasourceUrl = datasourceUrl;
+        this.databaseLocationFactory = databaseLocationFactory;
+        this.dbSnapshotFactory = dbSnapshotFactory;
     }
 
     // TODO: Wrap byte[] in output class that abstracts where the return goes
@@ -58,12 +61,11 @@ public class BackupService { // TODO: Extract interface
     }
 
     private MidasSnapshot midasSnapshot(final ZipArchive zipArchive) {
-        final SqliteDatabaseLocation databaseLocation = new SqliteDatabaseLocation(datasourceUrl);
+        final DatabaseLocation databaseLocation = databaseLocationFactory.create();
         return new MidasSnapshot(
-                new SqliteSnapshot(
+                dbSnapshotFactory.create(
                         jdbcTemplate,
-                        zipArchive,
-                        databaseLocation
+                        zipArchive
                 ),
                 new ApplicationPropertiesSnapshot(
                         zipArchive,

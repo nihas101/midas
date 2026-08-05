@@ -40,7 +40,6 @@ import de.nihas101.midas.core.accountstatement.service.DefaultAccountStatementSe
 import de.nihas101.midas.core.accountstatement.service.RunningTotalAccountStatementService;
 import de.nihas101.midas.core.bookings.service.BookingsService;
 import de.nihas101.midas.core.config.CoreConfig;
-import de.nihas101.midas.core.config.ThemeConfig;
 import de.nihas101.midas.core.export.ExportFactory;
 import de.nihas101.midas.core.export.ExportViewName;
 import de.nihas101.midas.core.lock.ShareholderLock;

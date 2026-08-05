@@ -1,4 +1,4 @@
-package de.nihas101.midas.core.backup.service.snapshot;
+package de.nihas101.midas.persistance.backup;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

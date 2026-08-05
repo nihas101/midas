@@ -1,4 +1,4 @@
-package de.nihas101.midas.core.backup.service.snapshot;
+package de.nihas101.midas.persistance.backup;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,7 +9,7 @@ import java.nio.file.Paths;
 
 @Slf4j
 @RequiredArgsConstructor
-public class CleanupSnapshotFile implements CleanupSnapshot {
+public class CleanupSnapshotFile implements de.nihas101.midas.persistance.backup.CleanupSnapshot {
 
     private final String snapshotFilename;
 

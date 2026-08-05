@@ -1,4 +1,4 @@
-package de.nihas101.midas.core.backup.service.snapshot;
+package de.nihas101.midas.persistance.sqlite;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;

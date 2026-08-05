@@ -39,6 +39,11 @@
             <artifactId>midas-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>de.nihas101</groupId>
+            <artifactId>midas-persistence-sqlite</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>

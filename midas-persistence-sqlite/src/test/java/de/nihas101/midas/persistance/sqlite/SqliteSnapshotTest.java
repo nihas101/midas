@@ -1,5 +1,9 @@
-package de.nihas101.midas.core.backup.service.snapshot;
+package de.nihas101.midas.persistance.sqlite;
 
+import de.nihas101.midas.persistance.backup.ArchiveWriter;
+import de.nihas101.midas.persistance.backup.CleanupSnapshot;
+import de.nihas101.midas.persistance.backup.CreateSnapshot;
+import de.nihas101.midas.persistance.backup.DatabaseLocation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -7,14 +11,10 @@ import org.mockito.Mockito;
 import java.io.File;
 import java.io.IOException;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 class SqliteSnapshotTest {
 
     private ArchiveWriter archiveWriter;
-    private SqliteDatabaseLocation databaseLocation;
+    private DatabaseLocation databaseLocation;
     private SqliteSnapshot sqliteSnapshot;
     private CleanupSnapshot cleanupSnapshot;
     private CreateSnapshot createSnapshot;
@@ -22,10 +22,10 @@ class SqliteSnapshotTest {
 
     @BeforeEach
     void setUp() {
-        archiveWriter = mock(ArchiveWriter.class);
-        databaseLocation = mock(SqliteDatabaseLocation.class);
-        cleanupSnapshot = mock(CleanupSnapshot.class);
-        createSnapshot = mock(CreateSnapshot.class);
+        archiveWriter = Mockito.mock(ArchiveWriter.class);
+        databaseLocation = Mockito.mock(DatabaseLocation.class);
+        cleanupSnapshot = Mockito.mock(CleanupSnapshot.class);
+        createSnapshot = Mockito.mock(CreateSnapshot.class);
         sqliteSnapshot = new SqliteSnapshot(
                 archiveWriter,
                 databaseLocation,
@@ -37,12 +37,12 @@ class SqliteSnapshotTest {
 
     @Test
     void createExecutesVacuumAndAddsToArchive() throws IOException {
-        when(databaseLocation.databaseLocation()).thenReturn("target_midas.db");
+        Mockito.when(databaseLocation.databaseLocation()).thenReturn("target_midas.db");
 
         sqliteSnapshot.create();
 
         Mockito.verify(createSnapshot).create();
-        verify(archiveWriter).add(new File(TEST_SNAPSHOT_FILE), "target_midas.db");
+        Mockito.verify(archiveWriter).add(new File(TEST_SNAPSHOT_FILE), "target_midas.db");
     }
 
     @Test

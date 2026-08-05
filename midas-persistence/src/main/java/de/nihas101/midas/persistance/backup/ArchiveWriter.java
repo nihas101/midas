@@ -1,4 +1,4 @@
-package de.nihas101.midas.core.backup.service.snapshot;
+package de.nihas101.midas.persistance.backup;
 
 import java.io.File;
 import java.io.IOException;

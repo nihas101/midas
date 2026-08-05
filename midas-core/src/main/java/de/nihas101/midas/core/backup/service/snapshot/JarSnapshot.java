@@ -1,6 +1,8 @@
 package de.nihas101.midas.core.backup.service.snapshot;
 
 import de.nihas101.midas.core.backup.service.MidasExecutableResolver;
+import de.nihas101.midas.persistance.backup.ArchiveWriter;
+import de.nihas101.midas.persistance.backup.Snapshot;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

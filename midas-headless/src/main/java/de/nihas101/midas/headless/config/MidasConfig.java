@@ -1,18 +1,16 @@
 package de.nihas101.midas.headless.config;
 
 import de.nihas101.midas.core.cleanup.CleanupConfig;
-import de.nihas101.midas.core.config.DesktopConfig;
 import de.nihas101.midas.core.config.I18nConfig;
 import de.nihas101.midas.core.config.ThemeConfig;
 import de.nihas101.midas.core.config.TitleConfig;
 import de.nihas101.midas.core.config.UIConfig;
-import de.nihas101.midas.core.sqlite.SqliteConfig;
+import de.nihas101.midas.persistance.DbConfig;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 
 @Data
 @Configuration
@@ -24,7 +22,7 @@ public class MidasConfig {
     private UIConfig ui;
     private I18nConfig i18n;
     private CleanupConfig cleanup;
-    private SqliteConfig sqlite;
+    private DbConfig db;
 
     public MidasConfig() {
         this(
@@ -33,7 +31,8 @@ public class MidasConfig {
                 new UIConfig(),
                 new I18nConfig(),
                 new CleanupConfig(),
-                new SqliteConfig()
+                new DbConfig() {
+                }
         );
     }
 
@@ -63,8 +62,8 @@ public class MidasConfig {
     }
 
     @Bean
-    public SqliteConfig sqliteConfig() {
-        return sqlite;
+    public DbConfig dbConfig() {
+        return db;
     }
 
 }

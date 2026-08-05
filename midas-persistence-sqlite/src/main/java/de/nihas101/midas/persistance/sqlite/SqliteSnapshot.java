@@ -1,5 +1,12 @@
-package de.nihas101.midas.core.backup.service.snapshot;
+package de.nihas101.midas.persistance.sqlite;
 
+import de.nihas101.midas.persistance.backup.ArchiveWriter;
+import de.nihas101.midas.persistance.backup.CleanupSnapshot;
+import de.nihas101.midas.persistance.backup.CleanupSnapshotFile;
+import de.nihas101.midas.persistance.backup.CreateSnapshot;
+import de.nihas101.midas.persistance.backup.CreateSnapshotFile;
+import de.nihas101.midas.persistance.backup.DatabaseLocation;
+import de.nihas101.midas.persistance.backup.DbSnapshot;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -10,10 +17,10 @@ import java.nio.file.Paths;
 
 @Slf4j
 @RequiredArgsConstructor
-public class SqliteSnapshot implements Snapshot {
+public class SqliteSnapshot implements DbSnapshot {
 
     private final ArchiveWriter archiveWriter;
-    private final SqliteDatabaseLocation databaseLocation;
+    private final DatabaseLocation databaseLocation;
     private final String snapshotFilename;
     private final CleanupSnapshot cleanupSnapshot;
     private final CreateSnapshot createSnapshot;
@@ -21,7 +28,7 @@ public class SqliteSnapshot implements Snapshot {
     public SqliteSnapshot(
             final JdbcTemplate jdbcTemplate,
             final ArchiveWriter archiveWriter,
-            final SqliteDatabaseLocation databaseLocation
+            final DatabaseLocation databaseLocation
     ) {
         this(
                 jdbcTemplate,
@@ -34,7 +41,7 @@ public class SqliteSnapshot implements Snapshot {
     public SqliteSnapshot(
             final JdbcTemplate jdbcTemplate,
             final ArchiveWriter archiveWriter,
-            final SqliteDatabaseLocation databaseLocation,
+            final DatabaseLocation databaseLocation,
             final String snapshotFilename
     ) {
         this(
@@ -51,7 +58,7 @@ public class SqliteSnapshot implements Snapshot {
     public SqliteSnapshot(
             final JdbcTemplate jdbcTemplate,
             final ArchiveWriter archiveWriter,
-            final SqliteDatabaseLocation databaseLocation,
+            final DatabaseLocation databaseLocation,
             final String snapshotFilename,
             final CleanupSnapshotFile cleanupSnapshot
     ) {

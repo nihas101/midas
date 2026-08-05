@@ -29,6 +29,7 @@
         <module>midas-persistence</module>
         <module>midas-commons</module>
         <module>midas-headless</module>
+        <module>midas-persistence-sqlite</module>
     </modules>
     <scm>
         <connection/>

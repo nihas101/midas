@@ -6,7 +6,7 @@ import de.nihas101.midas.core.config.I18nConfig;
 import de.nihas101.midas.core.config.ThemeConfig;
 import de.nihas101.midas.core.config.TitleConfig;
 import de.nihas101.midas.core.config.UIConfig;
-import de.nihas101.midas.core.sqlite.SqliteConfig;
+import de.nihas101.midas.persistance.DbConfig;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -24,7 +24,7 @@ public class MidasConfig {
     private I18nConfig i18n;
     private DesktopConfig desktop; // TODO: Only relevant for midas-vaadin, so should only appear there
     private CleanupConfig cleanup;
-    private SqliteConfig sqlite;
+    private DbConfig db;
 
     public MidasConfig() {
         this(
@@ -34,7 +34,8 @@ public class MidasConfig {
                 new I18nConfig(),
                 new DesktopConfig(),
                 new CleanupConfig(),
-                new SqliteConfig()
+                new DbConfig() {
+                }
         );
     }
 
@@ -69,8 +70,8 @@ public class MidasConfig {
     }
 
     @Bean
-    public SqliteConfig sqliteConfig() {
-        return sqlite;
+    public DbConfig dbConfig() {
+        return db;
     }
 
 }

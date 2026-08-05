@@ -1,6 +1,8 @@
 package de.nihas101.midas.core.backup.service.snapshot;
 
 import de.nihas101.midas.core.backup.service.MidasTemplatesResolver;
+import de.nihas101.midas.persistance.backup.ArchiveWriter;
+import de.nihas101.midas.persistance.backup.DatabaseLocation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -55,6 +57,7 @@ class ApplicationPropertiesSnapshotTest {
 
         when(propertiesLoader.load()).thenReturn(props);
         when(databaseLocation.databaseLocation()).thenReturn("midas.db");
+        when(databaseLocation.prefix()).thenReturn("jdbc:sqlite:");
 
         snapshot.create();
 
@@ -92,6 +95,7 @@ class ApplicationPropertiesSnapshotTest {
 
         when(propertiesLoader.load()).thenReturn(props);
         when(databaseLocation.databaseLocation()).thenReturn("midas.db");
+        when(databaseLocation.prefix()).thenReturn("jdbc:sqlite:");
 
         snapshot.create();
 

@@ -1,5 +1,6 @@
 package de.nihas101.midas.core.backup.service.snapshot;
 
+import de.nihas101.midas.persistance.backup.ArchiveWriter;
 import lombok.RequiredArgsConstructor;
 
 import java.io.ByteArrayOutputStream;

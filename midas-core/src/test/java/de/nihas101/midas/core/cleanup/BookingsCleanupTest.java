@@ -5,7 +5,7 @@ import de.nihas101.midas.core.config.I18nConfig;
 import de.nihas101.midas.core.config.ThemeConfig;
 import de.nihas101.midas.core.config.TitleConfig;
 import de.nihas101.midas.core.config.UIConfig;
-import de.nihas101.midas.core.sqlite.SqliteConfig;
+import de.nihas101.midas.persistance.DbConfig;
 import de.nihas101.midas.persistance.bookings.BookingsRepository;
 import de.nihas101.midas.persistance.lock.LockRepository;
 import org.junit.jupiter.api.Test;
@@ -50,7 +50,8 @@ class BookingsCleanupTest {
                 new UIConfig(),
                 new I18nConfig(),
                 new CleanupConfig(),
-                new SqliteConfig()
+                new DbConfig() {
+                }
         );
 
         final BookingsCleanup cleanup = new BookingsCleanup(bookingsRepository, lockRepository, config);

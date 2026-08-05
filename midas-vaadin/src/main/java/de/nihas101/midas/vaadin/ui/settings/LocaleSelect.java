@@ -4,7 +4,6 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.i18n.I18NProvider;
 import de.nihas101.midas.core.config.CoreConfig;
-import de.nihas101.midas.core.config.UIConfig;
 import de.nihas101.midas.core.userconfig.service.UserConfigService;
 import lombok.extern.slf4j.Slf4j;
 

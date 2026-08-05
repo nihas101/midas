@@ -1,4 +1,4 @@
-package de.nihas101.midas.core.sqlite;
+package de.nihas101.midas.persistance.sqlite;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @ConditionalOnProperty(
-        name = "midas.sqlite.optimize.enabled",
+        name = "midas.db.sqlite.optimize.enabled",
         havingValue = "true",
         matchIfMissing = true
 )

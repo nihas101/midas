@@ -1,5 +1,7 @@
-package de.nihas101.midas.core.backup.service.snapshot;
+package de.nihas101.midas.persistance.backup;
 
 public interface DatabaseLocation {
     String databaseLocation();
+
+    String prefix();
 }

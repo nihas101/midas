@@ -40,7 +40,7 @@ The app will be available at `http://localhost:8082`
 
 ### 3.2. Database Migrations
 
-Database schema changes are managed via Liquibase. Changelogs are located in `midas-core/src/main/resources/db/changelog`
+Database schema changes are managed via Liquibase. Changelogs are located in `midas-persistence-sqlite/src/main/resources/db/changelog`
 
 * **Never** modify an existing changelog file
 * Always create a new XML file for changes and register it in `db.changelog-master.xml`
@@ -80,7 +80,7 @@ The `.github/workflows/maven-publish.yml` workflow will:
 1. Trigger on the release creation
 2. **Synchronize Version**: Extract the version from the tag (e.g., `1.0.0`) and update `pom.xml` automatically
 3. **Production Build**: Build the project with the `-Pproduction` profile (optimizes frontend)
-4. **Upload Assets**: Attach `midas.jar` (an executable Fat-JAR) to the release
+4. **Upload Assets**: Attach `midas-headless.jar` and `midas-vaadin.jar` (executable Fat-JARs) to the release
 
 ## 7. Stress Testing & Performance
 
