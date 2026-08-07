@@ -125,7 +125,7 @@ public class XlsxExportTarget implements ExportTarget, AutoCloseable {
         } else if (value instanceof BigDecimal bigDecimal) {
             writeAmount(cell, bigDecimal.doubleValue());
         } else if (value instanceof Number number) {
-            writeAmount(cell, number.doubleValue());
+            cell.setCellValue(number.doubleValue());
         } else if (value != null) {
             cell.setCellValue(value.toString());
         }
@@ -136,8 +136,8 @@ public class XlsxExportTarget implements ExportTarget, AutoCloseable {
         cell.setCellStyle(dateStyle);
     }
 
-    private void writeAmount(final Cell cell, final double bigDecimal) {
-        cell.setCellValue(bigDecimal);
+    private void writeAmount(final Cell cell, final double value) {
+        cell.setCellValue(value);
         cell.setCellStyle(amountStyle);
     }
 
