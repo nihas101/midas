@@ -1,6 +1,7 @@
 package de.nihas101.midas.core.backup.service.snapshot;
 
 import de.nihas101.midas.persistance.backup.CleanupSnapshotFile;
+import de.nihas101.midas.persistance.backup.CreateSnapshotFile;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -15,7 +16,7 @@ class CreateSnapshotFileTest {
         final CleanupSnapshotFile cleanupSnapshotFile = mock(CleanupSnapshotFile.class);
         final JdbcTemplate jdbcTemplate = mock(JdbcTemplate.class);
         final String snapshotFilename = "backup.db";
-        final de.nihas101.midas.persistance.backup.CreateSnapshotFile createSnapshotFile = new de.nihas101.midas.persistance.backup.CreateSnapshotFile(
+        final CreateSnapshotFile createSnapshotFile = new CreateSnapshotFile(
                 cleanupSnapshotFile,
                 jdbcTemplate,
                 snapshotFilename
@@ -29,7 +30,7 @@ class CreateSnapshotFileTest {
 
     @Test
     void createWithNullJdbcTemplate() {
-        final de.nihas101.midas.persistance.backup.CreateSnapshotFile createSnapshotFile = new de.nihas101.midas.persistance.backup.CreateSnapshotFile(
+        final CreateSnapshotFile createSnapshotFile = new CreateSnapshotFile(
                 null,
                 null,
                 null
@@ -40,7 +41,7 @@ class CreateSnapshotFileTest {
 
     @Test
     void createWithNullSnapshotFileName() {
-        final de.nihas101.midas.persistance.backup.CreateSnapshotFile createSnapshotFile = new de.nihas101.midas.persistance.backup.CreateSnapshotFile(
+        final CreateSnapshotFile createSnapshotFile = new CreateSnapshotFile(
                 null,
                 mock(JdbcTemplate.class),
                 null

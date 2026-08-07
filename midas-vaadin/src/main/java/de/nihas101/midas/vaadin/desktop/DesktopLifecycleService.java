@@ -1,7 +1,7 @@
 package de.nihas101.midas.vaadin.desktop;
 
 import de.nihas101.midas.core.browser.WebPage;
-import de.nihas101.midas.core.config.DesktopConfig;
+import de.nihas101.midas.vaadin.config.DesktopConfig;
 import de.nihas101.midas.vaadin.config.MidasConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;

@@ -9,7 +9,7 @@ import java.nio.file.Paths;
 
 @Slf4j
 @RequiredArgsConstructor
-public class CleanupSnapshotFile implements de.nihas101.midas.persistance.backup.CleanupSnapshot {
+public class CleanupSnapshotFile implements CleanupSnapshot {
 
     private final String snapshotFilename;
 
