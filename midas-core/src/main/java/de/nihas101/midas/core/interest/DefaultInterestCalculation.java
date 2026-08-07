@@ -1,10 +1,13 @@
 package de.nihas101.midas.core.interest;
 
 import de.nihas101.midas.api.bookings.Bookings;
+import de.nihas101.midas.api.bookings.MonthlyTotalSum;
+import de.nihas101.midas.api.interest.Interest;
+import de.nihas101.midas.api.interest.InterestCalculation;
 import de.nihas101.midas.commons.MoneyAmount;
+import de.nihas101.midas.core.bookings.monthlytotal.DefaultMonthlyTotalSum;
 import de.nihas101.midas.core.bookings.monthlytotal.MonthlyCumulativeSum;
-import de.nihas101.midas.core.bookings.monthlytotal.MonthlyTotalSum;
-import de.nihas101.midas.core.interest.interestamount.Interest;
+import de.nihas101.midas.core.interest.interestamount.DefaultInterest;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -20,7 +23,7 @@ import static java.math.BigDecimal.valueOf;
 
 // TODO: Tests
 // TODO: These constructors are a mess, extract classes from that logic
-public record InterestCalculation(
+public record DefaultInterestCalculation(
         BigDecimal interestSum,
         BigDecimal divisor,
         MoneyAmount interest,
@@ -28,9 +31,9 @@ public record InterestCalculation(
         Map<Month, MonthlyTotalSum> monthlyTotalSums,
         Map<Month, MoneyAmount> monthlyBalances,
         Map<Month, Interest> interests
-) {
+) implements InterestCalculation {
 
-    public InterestCalculation(
+    public DefaultInterestCalculation(
             final Bookings bookings,
             final Year year,
             final BigDecimal interestRate
@@ -43,7 +46,7 @@ public record InterestCalculation(
         );
     }
 
-    public InterestCalculation(
+    public DefaultInterestCalculation(
             final Bookings bookings,
             final Year year,
             final BigDecimal interestRate,
@@ -55,7 +58,7 @@ public record InterestCalculation(
                 interestRate,
                 monthlyBalances,
                 Arrays.stream(Month.values()).collect(
-                        Collectors.toMap(Function.identity(), month -> new Interest(
+                        Collectors.toMap(Function.identity(), month -> new DefaultInterest(
                                 monthlyBalances.get(month),
                                 valueOf(30L),
                                 interestRate
@@ -83,7 +86,7 @@ public record InterestCalculation(
                 .collect(Collectors.toMap(Function.identity(), month -> new MonthlyCumulativeSum(bookings, month)));
     }
 
-    public InterestCalculation(
+    public DefaultInterestCalculation(
             final Bookings bookings,
             final Year year,
             final BigDecimal interestRate,
@@ -99,7 +102,7 @@ public record InterestCalculation(
                         .map(Interest::interestAmount)
                         .reduce(ZERO, BigDecimal::add)
                         .add(
-                                new Interest(
+                                new DefaultInterest(
                                         bookings.openingBalance() != null ? bookings.openingBalance().getOpeningBalance() : MoneyAmount.ZERO,
                                         valueOf(30L),
                                         interestRate
@@ -111,13 +114,13 @@ public record InterestCalculation(
                         .reduce(ZERO, BigDecimal::add),
                 interestRate,
                 Arrays.stream(Month.values())
-                        .collect(Collectors.toMap(Function.identity(), month -> new MonthlyTotalSum(bookings, year.atMonth(month).getMonth()))),
+                        .collect(Collectors.toMap(Function.identity(), month -> new DefaultMonthlyTotalSum(bookings, year.atMonth(month).getMonth()))),
                 monthlyBalances,
                 interests
         );
     }
 
-    public InterestCalculation(
+    public DefaultInterestCalculation(
             final BigDecimal interestSum,
             final BigDecimal daysInInterestYear,
             final BigDecimal interestRate,
@@ -134,7 +137,7 @@ public record InterestCalculation(
         );
     }
 
-    public InterestCalculation(
+    public DefaultInterestCalculation(
             final BigDecimal interestSum,
             final BigDecimal divisor,
             final Map<Month, MonthlyTotalSum> monthlyTotalSums,
@@ -154,7 +157,7 @@ public record InterestCalculation(
         );
     }
 
-    public InterestCalculation(
+    public DefaultInterestCalculation(
             BigDecimal interestSum,
             BigDecimal divisor,
             MoneyAmount interest,

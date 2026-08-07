@@ -3,6 +3,7 @@ package de.nihas101.midas.core.bookings.monthlytotal;
 import de.nihas101.midas.api.bookings.Booking;
 import de.nihas101.midas.api.bookings.Bookings;
 import de.nihas101.midas.api.bookings.FilteredBookings;
+import de.nihas101.midas.api.bookings.MonthlyTotal;
 import de.nihas101.midas.api.openingbalance.OpeningBalance;
 import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.commons.MoneyAmount;
@@ -30,10 +31,10 @@ class TotalSumCalculatorTest {
         Booking b2 = createBooking(BookingType.WITHDRAWAL, 500L, testMonth, "B");
         Booking b3 = createBooking(BookingType.INTEREST, 200L, testMonth, "C");
 
-        MonthlyTotalSum.MonthlySumTotalCalculator calculator = createCalculator(new FilteredBookings(List.of(b1, b2, b3)));
+        DefaultMonthlyTotalSum.MonthlySumTotalCalculator calculator = createCalculator(new FilteredBookings(List.of(b1, b2, b3)));
 
         // Act
-        MonthlyTotal totals = new MonthlyTotalSum(calculator);
+        MonthlyTotal totals = new DefaultMonthlyTotalSum(calculator);
 
         // Assert
         assertEquals(MoneyAmount.ofCents(1500L), totals.monthlyTotal(BookingType.WITHDRAWAL));
@@ -65,7 +66,7 @@ class TotalSumCalculatorTest {
             }
         };
 
-        MonthlyTotalSum.MonthlySumTotalCalculator calculator = new MonthlyTotalSum.MonthlySumTotalCalculator(mockBookings, Month.JANUARY);
+        DefaultMonthlyTotalSum.MonthlySumTotalCalculator calculator = new DefaultMonthlyTotalSum.MonthlySumTotalCalculator(mockBookings, Month.JANUARY);
         Map<BookingType, MoneyAmount> totals = calculator.monthlyTotals();
 
         for (BookingType type : BookingType.values()) {
@@ -79,7 +80,7 @@ class TotalSumCalculatorTest {
         Booking pos = createBooking(BookingType.WITHDRAWAL, 1000L, Month.MARCH, "Plus");
         Booking neg = createBooking(BookingType.WITHDRAWAL, -400L, Month.MARCH, "Minus");
 
-        final MonthlyTotalSum.MonthlySumTotalCalculator calculator = createCalculator(new FilteredBookings(List.of(pos, neg)));
+        final DefaultMonthlyTotalSum.MonthlySumTotalCalculator calculator = createCalculator(new FilteredBookings(List.of(pos, neg)));
 
         // Act
         Map<BookingType, MoneyAmount> totals = calculator.monthlyTotals();
@@ -90,14 +91,14 @@ class TotalSumCalculatorTest {
 
     @Test
     void monthlyTotals_null() {
-        final MonthlyTotalSum.MonthlySumTotalCalculator calculator = createCalculator(null);
+        final DefaultMonthlyTotalSum.MonthlySumTotalCalculator calculator = createCalculator(null);
 
         Map<BookingType, MoneyAmount> totals = calculator.monthlyTotals();
 
         assertEquals(MoneyAmount.ZERO, totals.get(BookingType.WITHDRAWAL));
     }
 
-    private static MonthlyTotalSum.MonthlySumTotalCalculator createCalculator(final FilteredBookings filteredBookings) {
+    private static DefaultMonthlyTotalSum.MonthlySumTotalCalculator createCalculator(final FilteredBookings filteredBookings) {
         final Bookings bookings = new Bookings() {
             @Override
             public OpeningBalance openingBalance() {
@@ -120,7 +121,7 @@ class TotalSumCalculatorTest {
             }
         };
 
-        return new MonthlyTotalSum.MonthlySumTotalCalculator(bookings, Month.MARCH);
+        return new DefaultMonthlyTotalSum.MonthlySumTotalCalculator(bookings, Month.MARCH);
     }
 
     private Booking createBooking(

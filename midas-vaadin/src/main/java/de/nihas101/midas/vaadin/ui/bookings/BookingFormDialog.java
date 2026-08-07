@@ -197,9 +197,10 @@ public class BookingFormDialog extends Dialog {
         if (isEditMode) {
             binder.setBean(bookingToEdit);
         } else {
-            final Booking booking = bookingFactory.create();
-            booking.setDate(LocalDate.now());
-            booking.setSource(Source.USER);
+            final Booking booking = bookingFactory.create(
+                    LocalDate.now(),
+                    Source.USER
+            );
             if (initialShareholder != null) {
                 booking.setShareholderId(initialShareholder.getId());
                 shareholderPicker.setValue(initialShareholder);
@@ -359,9 +360,10 @@ public class BookingFormDialog extends Dialog {
 
     private void resetForm() {
         final Booking current = binder.getBean();
-        final Booking next = bookingFactory.create();
-        next.setShareholderId(current.getShareholderId());
-        next.setDate(current.getDate());
+        final Booking next = bookingFactory.create(
+                current.getShareholderId(),
+                current.getDate()
+        );
         binder.setBean(next);
     }
 }

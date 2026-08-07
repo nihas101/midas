@@ -1,5 +1,6 @@
 package de.nihas101.midas.core.interest.interestamount;
 
+import de.nihas101.midas.api.interest.Interest;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;

@@ -11,8 +11,9 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
+import de.nihas101.midas.api.userconfig.UserConfigFactory;
+import de.nihas101.midas.api.userconfig.UserConfigService;
 import de.nihas101.midas.core.config.CoreConfig;
-import de.nihas101.midas.core.userconfig.service.UserConfigService;
 import de.nihas101.midas.vaadin.ui.accountstatement.AccountStatementView;
 import de.nihas101.midas.vaadin.ui.backup.BackupView;
 import de.nihas101.midas.vaadin.ui.bookings.BookingsView;
@@ -39,13 +40,15 @@ public class MainView extends MidasView {
             final CoreConfig config,
             final MessageSource messageSource,
             final UserConfigService userConfigService,
-            final MidasLocaleResolver midasLocaleResolver
+            final MidasLocaleResolver midasLocaleResolver,
+            final UserConfigFactory userConfigFactory
     ) {
         super(
                 config,
                 userConfigService,
                 messageSource,
-                midasLocaleResolver
+                midasLocaleResolver,
+                userConfigFactory
         );
 
         final Div hubGrid = new Div();

@@ -12,9 +12,9 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.RouterLink;
 import de.nihas101.midas.api.userconfig.UserConfig;
+import de.nihas101.midas.api.userconfig.UserConfigFactory;
+import de.nihas101.midas.api.userconfig.UserConfigService;
 import de.nihas101.midas.core.config.CoreConfig;
-import de.nihas101.midas.core.userconfig.dto.DefaultUserConfig;
-import de.nihas101.midas.core.userconfig.service.UserConfigService;
 import de.nihas101.midas.vaadin.ui.accountstatement.AccountStatementView;
 import de.nihas101.midas.vaadin.ui.backup.BackupView;
 import de.nihas101.midas.vaadin.ui.bookings.BookingsView;
@@ -35,13 +35,16 @@ public class MidasView extends AppLayout {
 
     private final CoreConfig midasConfig;
     private final Locale locale;
+    private final UserConfigFactory userConfigFactory;
 
     public MidasView(
             final CoreConfig config,
             final UserConfigService userConfigService,
             final MessageSource messageSource,
-            final MidasLocaleResolver midasLocaleResolver
+            final MidasLocaleResolver midasLocaleResolver,
+            final UserConfigFactory userConfigFactory
     ) {
+        this.userConfigFactory = userConfigFactory;
         final UserConfig userConfig = getUserConfig(userConfigService);
         applyTheme(userConfig.getTheme(), config.getTheme().getDefaultTheme());
         this.locale = midasLocaleResolver.resolve();
@@ -96,7 +99,7 @@ public class MidasView extends AppLayout {
     private UserConfig getUserConfig(final UserConfigService userConfigService) {
         final Optional<UserConfig> userConfig = userConfigService.findByUserIdentifier(UserConfigService.DEFAULT_USER);
         if (userConfig.isEmpty()) {
-            UserConfig newUserConfig = new DefaultUserConfig(UserConfigService.DEFAULT_USER);
+            final UserConfig newUserConfig = userConfigFactory.create(UserConfigService.DEFAULT_USER);
             userConfigService.save(newUserConfig);
             return newUserConfig;
         } else {

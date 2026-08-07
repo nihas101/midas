@@ -4,11 +4,12 @@ import de.nihas101.midas.api.bookings.Booking;
 import de.nihas101.midas.api.bookings.Bookings;
 import de.nihas101.midas.api.bookings.BookingsWriter;
 import de.nihas101.midas.api.interest.InterestBookingsReader;
+import de.nihas101.midas.api.interest.InterestCalculation;
 import de.nihas101.midas.api.interest.InterestUpdatingOpeningBalanceService;
 import de.nihas101.midas.api.openingbalance.OpeningBalance;
 import de.nihas101.midas.api.openingbalance.OpeningBalanceService;
 import de.nihas101.midas.core.bookings.service.BookingsService;
-import de.nihas101.midas.core.interest.InterestCalculation;
+import de.nihas101.midas.core.interest.DefaultInterestCalculation;
 import de.nihas101.midas.core.interest.dto.InterestRate;
 import de.nihas101.midas.core.openingbalance.service.DefaultOpeningBalanceService;
 import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
@@ -84,7 +85,7 @@ public class DefaultInterestUpdatingOpeningBalanceService implements InterestUpd
         }
 
         final Bookings bookings = bookingsReader.interestRelatedBookingsForShareholderAndYear(shareholder.getId(), year);
-        final InterestCalculation interestCalculation = new InterestCalculation(
+        final InterestCalculation interestCalculation = new DefaultInterestCalculation(
                 bookings,
                 year,
                 interestRate.get().getInterestRate()

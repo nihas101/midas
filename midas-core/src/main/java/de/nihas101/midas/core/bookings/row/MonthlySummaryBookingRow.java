@@ -2,10 +2,11 @@ package de.nihas101.midas.core.bookings.row;
 
 import de.nihas101.midas.api.bookings.Booking;
 import de.nihas101.midas.api.bookings.Bookings;
+import de.nihas101.midas.api.bookings.MonthlyTotal;
+import de.nihas101.midas.api.bookings.MonthlyTotalSum;
 import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.commons.MoneyAmount;
-import de.nihas101.midas.core.bookings.monthlytotal.MonthlyTotal;
-import de.nihas101.midas.core.bookings.monthlytotal.MonthlyTotalSum;
+import de.nihas101.midas.core.bookings.monthlytotal.DefaultMonthlyTotalSum;
 
 import java.time.Month;
 import java.util.Collections;
@@ -26,7 +27,7 @@ public record MonthlySummaryBookingRow(
     ) {
         this(
                 comment,
-                new MonthlyTotalSum(bookings, month)
+                new DefaultMonthlyTotalSum(bookings, month)
         );
     }
 

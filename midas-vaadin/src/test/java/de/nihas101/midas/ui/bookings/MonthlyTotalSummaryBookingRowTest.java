@@ -8,7 +8,7 @@ import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.commons.Source;
 import de.nihas101.midas.core.bookings.dto.DefaultBooking;
-import de.nihas101.midas.core.bookings.monthlytotal.MonthlyTotalSum;
+import de.nihas101.midas.core.bookings.monthlytotal.DefaultMonthlyTotalSum;
 import de.nihas101.midas.core.bookings.row.MonthlySummaryBookingRow;
 import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
 import org.junit.jupiter.api.Assertions;
@@ -162,7 +162,7 @@ class MonthlyTotalSummaryBookingRowTest {
                 Month.MARCH
         );
 
-        Assertions.assertEquals(new MonthlyTotalSum(expected), bookingRow.amounts());
+        Assertions.assertEquals(new DefaultMonthlyTotalSum(expected), bookingRow.amounts());
     }
 
     public static Stream<Arguments> amountsValues() {

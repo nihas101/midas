@@ -3,6 +3,7 @@ package de.nihas101.midas.core.bookings.monthlytotal;
 import de.nihas101.midas.api.bookings.Booking;
 import de.nihas101.midas.api.bookings.Bookings;
 import de.nihas101.midas.api.bookings.FilteredBookings;
+import de.nihas101.midas.api.bookings.MonthlyTotalSum;
 import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.commons.MoneyAmount;
 import lombok.EqualsAndHashCode;
@@ -20,23 +21,23 @@ import java.util.stream.Collectors;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor
-public class MonthlyTotalSum implements MonthlyTotal, Sum {
+public class DefaultMonthlyTotalSum implements MonthlyTotalSum {
 
     private final Map<BookingType, MoneyAmount> monthlyTotals;
-    public static final MonthlyTotalSum ZERO = new MonthlyTotalSum();
+    public static final MonthlyTotalSum ZERO = new DefaultMonthlyTotalSum();
 
-    private MonthlyTotalSum() {
+    private DefaultMonthlyTotalSum() {
         this(Collections.emptyMap());
     }
 
-    public MonthlyTotalSum(
+    public DefaultMonthlyTotalSum(
             final Bookings bookings,
             final Month month
     ) {
         this(new MonthlySumTotalCalculator(bookings, month));
     }
 
-    public MonthlyTotalSum(final MonthlySumTotalCalculator monthlySumTotalCalculator) {
+    public DefaultMonthlyTotalSum(final MonthlySumTotalCalculator monthlySumTotalCalculator) {
         this(monthlySumTotalCalculator.monthlyTotals());
     }
 

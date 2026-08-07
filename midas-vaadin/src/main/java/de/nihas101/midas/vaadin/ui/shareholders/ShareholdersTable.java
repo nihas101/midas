@@ -10,9 +10,9 @@ import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import de.nihas101.midas.api.shareholder.Shareholder;
+import de.nihas101.midas.api.shareholder.ShareholderFactory;
 import de.nihas101.midas.api.shareholder.ShareholdersReader;
 import de.nihas101.midas.api.shareholder.ShareholdersWriter;
-import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
 import de.nihas101.midas.vaadin.ui.common.AddButton;
 import de.nihas101.midas.vaadin.ui.common.CancelButton;
 import de.nihas101.midas.vaadin.ui.common.DeleteButton;
@@ -28,16 +28,19 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
 
     private final ShareholdersReader shareholdersReader;
     private final ShareholdersWriter shareholdersWriter;
+    private final ShareholderFactory shareholderFactory;
 
     public ShareholdersTable(
             final ShareholdersReader shareholdersReader,
             final ShareholdersWriter shareholdersWriter,
             final MessageSource messageSource,
-            final Locale locale
+            final Locale locale,
+            final ShareholderFactory shareholderFactory
     ) {
         super(Shareholder.class);
         this.shareholdersReader = shareholdersReader;
         this.shareholdersWriter = shareholdersWriter;
+        this.shareholderFactory = shareholderFactory;
         this.setColumns(); // Clear auto-generated columns to manually add them with editors
         this.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.LUMO_COMPACT);
 
@@ -234,7 +237,7 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
         final List<Shareholder> shareholders = shareholdersReader.shareholders().toList();
 
         // Add permanent empty row for new shareholder
-        Shareholder dummy = new DefaultShareholder();
+        final Shareholder dummy = shareholderFactory.create();
         shareholders.add(dummy);
 
         this.setItems(shareholders);

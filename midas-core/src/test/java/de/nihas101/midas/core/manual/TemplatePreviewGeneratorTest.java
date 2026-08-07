@@ -1,19 +1,20 @@
 package de.nihas101.midas.core.manual;
 
+import de.nihas101.midas.api.accountstatement.AccountStatementRowService;
+import de.nihas101.midas.api.accountstatement.RunningTotalAccountStatements;
 import de.nihas101.midas.api.bookings.Bookings;
 import de.nihas101.midas.api.bookings.BookingsReader;
 import de.nihas101.midas.api.interest.InterestBookingsReader;
+import de.nihas101.midas.api.interest.InterestCalculation;
+import de.nihas101.midas.api.interest.InterestRowService;
 import de.nihas101.midas.api.shareholder.Shareholder;
-import de.nihas101.midas.core.accountstatement.row.AccountStatementRowService;
-import de.nihas101.midas.core.accountstatement.runningtotal.RunningTotalAccountStatements;
 import de.nihas101.midas.core.accountstatement.service.RunningTotalAccountStatementService;
 import de.nihas101.midas.core.bookings.row.BookingRow;
 import de.nihas101.midas.core.bookings.row.BookingRowService;
 import de.nihas101.midas.core.export.ExportViewName;
 import de.nihas101.midas.core.export.pdf.PdfViewData;
-import de.nihas101.midas.core.interest.InterestCalculation;
+import de.nihas101.midas.core.interest.DefaultInterestCalculation;
 import de.nihas101.midas.core.interest.dto.InterestRate;
-import de.nihas101.midas.core.interest.row.InterestRowService;
 import de.nihas101.midas.core.interest.service.InterestRateService;
 import de.nihas101.midas.core.shareholders.service.ShareholdersService;
 import lombok.extern.slf4j.Slf4j;
@@ -217,7 +218,7 @@ public class TemplatePreviewGeneratorTest {
         final BigDecimal interestRate = rate != null ? rate.getInterestRate() : BigDecimal.ZERO;
 
         final Bookings bookings = interestBookingsReader.interestRelatedBookingsForShareholderAndYear(shareholder.getId(), year);
-        final InterestCalculation interestCalculation = new InterestCalculation(bookings, year, interestRate);
+        final InterestCalculation interestCalculation = new DefaultInterestCalculation(bookings, year, interestRate);
 
         final List<Object> rows = new ArrayList<>(interestRowService.generateRows(year, bookings, interestRate, interestCalculation, locale));
 

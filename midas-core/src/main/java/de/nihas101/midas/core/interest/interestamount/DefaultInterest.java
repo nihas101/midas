@@ -1,5 +1,6 @@
 package de.nihas101.midas.core.interest.interestamount;
 
+import de.nihas101.midas.api.interest.Interest;
 import de.nihas101.midas.commons.MoneyAmount;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -11,14 +12,14 @@ import java.math.RoundingMode;
 // Using the 'kaufmaennische Zinsformel'
 @ToString
 @RequiredArgsConstructor
-public class Interest {
+public class DefaultInterest implements Interest {
 
     private final BigDecimal capital; // aka 'Kapital' k
     private final BigDecimal interestDays; // aka 'Zinstage' t
     private final BigDecimal interestRate; // aka 'Zinsfuß' p
 
     // TODO: Use appropriate classes here instead of BigDecimal
-    public Interest(
+    public DefaultInterest(
             MoneyAmount capital,
             BigDecimal interestDays,
             BigDecimal interestRate
@@ -31,11 +32,13 @@ public class Interest {
     }
 
     // aka 'Tageszins' Z
+    @Override
     public BigDecimal dailyInterestRate() {
         return interestAmount().divide(interestDivisor(), RoundingMode.HALF_UP);
     }
 
     // aka 'Zins-' or 'Diskontzahl'
+    @Override
     public BigDecimal interestAmount() {
         if (capital == null || interestDays == null) {
             return BigDecimal.ZERO;
@@ -47,6 +50,7 @@ public class Interest {
     }
 
     // aka 'Zinsteiler'
+    @Override
     public BigDecimal interestDivisor() {
         if (interestRate == null) {
             return BigDecimal.ONE;
@@ -55,6 +59,7 @@ public class Interest {
         return BigDecimal.valueOf(360).divide(interestRate, RoundingMode.HALF_UP);
     }
 
+    @Override
     public BigDecimal interestDays() {
         return interestDays;
     }

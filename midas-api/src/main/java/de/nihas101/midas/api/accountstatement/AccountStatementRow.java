@@ -1,4 +1,4 @@
-package de.nihas101.midas.core.accountstatement.row;
+package de.nihas101.midas.api.accountstatement;
 
 import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.commons.MoneyAmount;

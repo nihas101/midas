@@ -1,4 +1,4 @@
-package de.nihas101.midas.core.interest.row;
+package de.nihas101.midas.api.interest;
 
 import lombok.Getter;
 

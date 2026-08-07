@@ -1,4 +1,4 @@
-package de.nihas101.midas.core.bookings.monthlytotal;
+package de.nihas101.midas.api.bookings;
 
 import de.nihas101.midas.commons.MoneyAmount;
 

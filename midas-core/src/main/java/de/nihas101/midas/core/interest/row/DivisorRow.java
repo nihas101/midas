@@ -1,5 +1,7 @@
 package de.nihas101.midas.core.interest.row;
 
+import de.nihas101.midas.api.interest.InterestCalculationRow;
+import de.nihas101.midas.api.interest.Transaction;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 

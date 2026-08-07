@@ -1,9 +1,10 @@
 package de.nihas101.midas.core.accountstatement.row;
 
+import de.nihas101.midas.api.accountstatement.AccountStatementRow;
+import de.nihas101.midas.api.accountstatement.RunningTotalAccountStatement;
 import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.core.accountstatement.runningtotal.OpeningRunningTotalAccountStatement;
-import de.nihas101.midas.core.accountstatement.runningtotal.RunningTotalAccountStatement;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;

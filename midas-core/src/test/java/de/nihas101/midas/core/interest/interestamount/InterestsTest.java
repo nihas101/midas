@@ -13,22 +13,22 @@ class InterestsTest {
 
     private final Interests interests = new Interests(
             Map.of(
-                    Month.SEPTEMBER, new Interest(
+                    Month.SEPTEMBER, new DefaultInterest(
                             MoneyAmount.ofCents(1000000L),
                             BigDecimal.valueOf(16),
                             BigDecimal.valueOf(0.5)
                     ),
-                    Month.OCTOBER, new Interest(
+                    Month.OCTOBER, new DefaultInterest(
                             MoneyAmount.ofCents(1360000L),
                             BigDecimal.valueOf(28),
                             BigDecimal.valueOf(0.5)
                     ),
-                    Month.NOVEMBER, new Interest(
+                    Month.NOVEMBER, new DefaultInterest(
                             MoneyAmount.ofCents(1140000L),
                             BigDecimal.valueOf(46),
                             BigDecimal.valueOf(0.5)
                     ),
-                    Month.DECEMBER, new Interest(
+                    Month.DECEMBER, new DefaultInterest(
                             MoneyAmount.ofCents(1140000L),
                             BigDecimal.valueOf(0),
                             BigDecimal.valueOf(0.5)

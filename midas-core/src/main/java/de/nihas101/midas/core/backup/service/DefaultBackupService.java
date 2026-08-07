@@ -1,5 +1,6 @@
 package de.nihas101.midas.core.backup.service;
 
+import de.nihas101.midas.api.backup.BackupService;
 import de.nihas101.midas.api.backup.BackupStatusWriter;
 import de.nihas101.midas.core.backup.service.snapshot.ApplicationPropertiesSnapshot;
 import de.nihas101.midas.core.backup.service.snapshot.JarSnapshot;
@@ -18,7 +19,7 @@ import java.util.zip.ZipOutputStream;
 
 @Slf4j
 @Service
-public class BackupService { // TODO: Extract interface
+public class DefaultBackupService implements BackupService {
 
     private final JdbcTemplate jdbcTemplate;
     private final BackupStatusWriter backupStatusWriter;
@@ -27,7 +28,7 @@ public class BackupService { // TODO: Extract interface
     private final DatabaseLocationFactory databaseLocationFactory;
     private final DbSnapshotFactory dbSnapshotFactory;
 
-    public BackupService(
+    public DefaultBackupService(
             final JdbcTemplate jdbcTemplate,
             final BackupStatusWriter backupStatusWriter,
             final MidasExecutableResolver executableResolver,
@@ -43,8 +44,7 @@ public class BackupService { // TODO: Extract interface
         this.dbSnapshotFactory = dbSnapshotFactory;
     }
 
-    // TODO: Wrap byte[] in output class that abstracts where the return goes
-    //  Even better -> Don't have a return and pass in the class that handles the output stream as needed
+    @Override
     public byte[] createBackup() throws Exception {
         log.info("Starting backup creation...");
         try (

@@ -7,9 +7,11 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import de.nihas101.midas.api.shareholder.ShareholderFactory;
+import de.nihas101.midas.api.userconfig.UserConfigFactory;
+import de.nihas101.midas.api.userconfig.UserConfigService;
 import de.nihas101.midas.core.config.CoreConfig;
 import de.nihas101.midas.core.shareholders.service.ShareholdersService;
-import de.nihas101.midas.core.userconfig.service.UserConfigService;
 import de.nihas101.midas.vaadin.ui.common.MidasView;
 import de.nihas101.midas.vaadin.ui.common.locale.MidasLocaleResolver;
 import lombok.extern.slf4j.Slf4j;
@@ -27,15 +29,27 @@ public class ShareholdersView extends MidasView {
             final CoreConfig config,
             final MessageSource messageSource,
             final UserConfigService userConfigService,
-            final MidasLocaleResolver midasLocaleResolver
+            final MidasLocaleResolver midasLocaleResolver,
+            final UserConfigFactory userConfigFactory,
+            final ShareholderFactory shareholderFactory
     ) {
         super(
                 config,
                 userConfigService,
                 messageSource,
-                midasLocaleResolver
+                midasLocaleResolver,
+                userConfigFactory
         );
 
+        final VerticalLayout content = createContent(shareholdersService, messageSource, shareholderFactory);
+        setContent(content);
+    }
+
+    private VerticalLayout createContent(
+            final ShareholdersService shareholdersService,
+            final MessageSource messageSource,
+            final ShareholderFactory shareholderFactory
+    ) {
         final VerticalLayout content = new VerticalLayout();
         content.addClassName("shareholders-view-content");
         content.setSizeFull();
@@ -49,11 +63,11 @@ public class ShareholdersView extends MidasView {
                         shareholdersService,
                         shareholdersService,
                         messageSource,
-                        getLocale()
+                        getLocale(),
+                        shareholderFactory
                 )
         );
-
-        setContent(content);
+        return content;
     }
 
     public static Icon icon() {

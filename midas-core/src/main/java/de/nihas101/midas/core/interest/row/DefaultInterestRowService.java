@@ -1,10 +1,12 @@
 package de.nihas101.midas.core.interest.row;
 
 import de.nihas101.midas.api.bookings.Bookings;
+import de.nihas101.midas.api.interest.InterestCalculation;
+import de.nihas101.midas.api.interest.InterestCalculationRow;
+import de.nihas101.midas.api.interest.InterestRowService;
 import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.core.bookings.row.BookingRow;
 import de.nihas101.midas.core.bookings.row.DefaultBookingsToBookingRowConverter;
-import de.nihas101.midas.core.interest.InterestCalculation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
@@ -20,10 +22,11 @@ import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 @RequiredArgsConstructor
-public class InterestRowService {
+public class DefaultInterestRowService implements InterestRowService {
 
     private final MessageSource messageSource;
 
+    @Override
     public List<InterestCalculationRow> generateRows(
             final Year year,
             final Bookings bookings,

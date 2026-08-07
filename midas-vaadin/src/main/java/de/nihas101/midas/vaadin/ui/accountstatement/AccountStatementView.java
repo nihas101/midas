@@ -26,17 +26,19 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
+import de.nihas101.midas.api.accountstatement.AccountStatementRow;
+import de.nihas101.midas.api.accountstatement.AccountStatementRowService;
+import de.nihas101.midas.api.accountstatement.AccountStatementService;
+import de.nihas101.midas.api.accountstatement.RunningTotalAccountStatements;
 import de.nihas101.midas.api.bookings.Booking;
 import de.nihas101.midas.api.bookings.Bookings;
 import de.nihas101.midas.api.bookings.BookingsReader;
 import de.nihas101.midas.api.lock.LockService;
 import de.nihas101.midas.api.lock.LockWriter;
 import de.nihas101.midas.api.shareholder.Shareholder;
+import de.nihas101.midas.api.userconfig.UserConfigFactory;
+import de.nihas101.midas.api.userconfig.UserConfigService;
 import de.nihas101.midas.commons.MoneyAmount;
-import de.nihas101.midas.core.accountstatement.row.AccountStatementRow;
-import de.nihas101.midas.core.accountstatement.row.AccountStatementRowService;
-import de.nihas101.midas.core.accountstatement.runningtotal.RunningTotalAccountStatements;
-import de.nihas101.midas.core.accountstatement.service.DefaultAccountStatementService;
 import de.nihas101.midas.core.accountstatement.service.RunningTotalAccountStatementService;
 import de.nihas101.midas.core.bookings.service.BookingsService;
 import de.nihas101.midas.core.config.CoreConfig;
@@ -44,7 +46,6 @@ import de.nihas101.midas.core.export.ExportFactory;
 import de.nihas101.midas.core.export.ExportViewName;
 import de.nihas101.midas.core.lock.ShareholderLock;
 import de.nihas101.midas.core.shareholders.service.ShareholdersService;
-import de.nihas101.midas.core.userconfig.service.UserConfigService;
 import de.nihas101.midas.vaadin.ui.bookings.BookingsView;
 import de.nihas101.midas.vaadin.ui.common.AddButton;
 import de.nihas101.midas.vaadin.ui.common.DownloadTrigger;
@@ -77,7 +78,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
     public static final VaadinIcon icon = VaadinIcon.WALLET;
 
     private final ShareholdersService shareholdersService;
-    private final DefaultAccountStatementService accountStatementService;
+    private final AccountStatementService accountStatementService;
     private final RunningTotalAccountStatementService runningTotalAccountStatementService;
     private final MessageSource messageSource;
     private final AccountStatementRowService accountStatementRowService;
@@ -99,7 +100,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
 
     public AccountStatementView(
             final ShareholdersService shareholdersService,
-            final DefaultAccountStatementService accountStatementService,
+            final AccountStatementService accountStatementService,
             final RunningTotalAccountStatementService runningTotalAccountStatementService,
             final CoreConfig config,
             final MessageSource messageSource,
@@ -109,9 +110,16 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
             final BookingsService bookingsReader,
             final LockService lockWriter,
             final ShareholderLock shareholderLock,
-            final ExportFactory exportFactory
+            final ExportFactory exportFactory,
+            final UserConfigFactory userConfigFactory
     ) {
-        super(config, userConfigService, messageSource, midasLocaleResolver);
+        super(
+                config,
+                userConfigService,
+                messageSource,
+                midasLocaleResolver,
+                userConfigFactory
+        );
         this.shareholdersService = shareholdersService;
         this.accountStatementService = accountStatementService;
         this.runningTotalAccountStatementService = runningTotalAccountStatementService;

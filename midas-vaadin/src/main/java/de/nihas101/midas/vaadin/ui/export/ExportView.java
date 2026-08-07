@@ -17,13 +17,14 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.nihas101.midas.api.export.Export;
 import de.nihas101.midas.api.shareholder.Shareholder;
+import de.nihas101.midas.api.userconfig.UserConfigFactory;
+import de.nihas101.midas.api.userconfig.UserConfigService;
 import de.nihas101.midas.core.config.CoreConfig;
 import de.nihas101.midas.core.export.ExportFactory;
 import de.nihas101.midas.core.export.ExportRequest;
 import de.nihas101.midas.core.export.ExportViewName;
 import de.nihas101.midas.core.export.ExportViews;
 import de.nihas101.midas.core.shareholders.service.ShareholdersService;
-import de.nihas101.midas.core.userconfig.service.UserConfigService;
 import de.nihas101.midas.vaadin.ui.common.DatePickerI18nProvider;
 import de.nihas101.midas.vaadin.ui.common.DownloadTrigger;
 import de.nihas101.midas.vaadin.ui.common.MidasView;
@@ -65,9 +66,16 @@ public class ExportView extends MidasView {
             final MessageSource messageSource,
             final UserConfigService userConfigService,
             final MidasLocaleResolver midasLocaleResolver,
-            final ExportFactory exportFactory
+            final ExportFactory exportFactory,
+            final UserConfigFactory userConfigFactory
     ) {
-        super(config, userConfigService, messageSource, midasLocaleResolver);
+        super(
+                config,
+                userConfigService,
+                messageSource,
+                midasLocaleResolver,
+                userConfigFactory
+        );
         this.shareholdersService = shareholdersService;
         this.messageSource = messageSource;
         this.exportFactory = exportFactory;

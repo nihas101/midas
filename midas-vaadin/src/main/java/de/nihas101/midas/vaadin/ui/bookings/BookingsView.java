@@ -29,8 +29,11 @@ import de.nihas101.midas.api.interest.InterestUpdatingOpeningBalanceService;
 import de.nihas101.midas.api.lock.LockService;
 import de.nihas101.midas.api.lock.LockWriter;
 import de.nihas101.midas.api.openingbalance.OpeningBalance;
+import de.nihas101.midas.api.openingbalance.OpeningBalanceFactory;
 import de.nihas101.midas.api.openingbalance.OpeningBalanceService;
 import de.nihas101.midas.api.shareholder.Shareholder;
+import de.nihas101.midas.api.userconfig.UserConfigFactory;
+import de.nihas101.midas.api.userconfig.UserConfigService;
 import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.commons.Source;
@@ -41,9 +44,7 @@ import de.nihas101.midas.core.config.CoreConfig;
 import de.nihas101.midas.core.export.ExportFactory;
 import de.nihas101.midas.core.export.ExportViewName;
 import de.nihas101.midas.core.lock.ShareholderLock;
-import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
 import de.nihas101.midas.core.shareholders.service.ShareholdersService;
-import de.nihas101.midas.core.userconfig.service.UserConfigService;
 import de.nihas101.midas.vaadin.ui.common.AddButton;
 import de.nihas101.midas.vaadin.ui.common.DeleteButton;
 import de.nihas101.midas.vaadin.ui.common.DownloadTrigger;
@@ -89,6 +90,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
     private final ExportFactory exportFactory;
     private final DownloadTrigger downloadTrigger;
     private final BookingFactory bookingFactory;
+    private final OpeningBalanceFactory openingBalanceFactory;
 
     private Checkbox updateNextYearsBalanceAutomaticallyToggle;
     private BigDecimalField openingBalanceField;
@@ -109,9 +111,17 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
             final LockService lockWriter,
             final ShareholderLock shareholderLock,
             final ExportFactory exportFactory,
-            final BookingFactory bookingFactory
+            final BookingFactory bookingFactory,
+            final OpeningBalanceFactory openingBalanceFactory,
+            final UserConfigFactory userConfigFactory
     ) {
-        super(config, userConfigService, messageSource, midasLocaleResolver);
+        super(
+                config,
+                userConfigService,
+                messageSource,
+                midasLocaleResolver,
+                userConfigFactory
+        );
         this.shareholdersService = shareholdersService;
         this.bookingsReader = bookingsReader;
         this.bookingsWriter = bookingsWriter;
@@ -122,6 +132,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         this.shareholderLock = shareholderLock;
         this.exportFactory = exportFactory;
         this.bookingFactory = bookingFactory;
+        this.openingBalanceFactory = openingBalanceFactory;
 
         VerticalLayout content = new VerticalLayout();
         content.setSizeFull();
@@ -298,7 +309,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         final OpeningBalance openingBalance = openingBalanceService.openingBalance(shareholder.getId(), year);
         if (openingBalance == null) {
             openingBalanceService.create(
-                    new DefaultOpeningBalance(
+                    openingBalanceFactory.create(
                             null,
                             shareholder.getId(),
                             MoneyAmount.of(amount),
@@ -606,12 +617,12 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
             nextYearsOpeningBalance.setSource(Source.SYSTEM);
             openingBalanceService.update(nextYearsOpeningBalance);
         } else {
-            final OpeningBalance openingBalance = DefaultOpeningBalance.builder()
-                    .shareholderId(headerActionBar.getSelectedShareholder().getId())
-                    .openingBalance(nextYearsOpening)
-                    .year(headerActionBar.getSelectedYear().plusYears(1))
-                    .source(Source.SYSTEM)
-                    .build();
+            final OpeningBalance openingBalance = openingBalanceFactory.create(
+                    headerActionBar.getSelectedShareholder().getId(),
+                    nextYearsOpening,
+                    headerActionBar.getSelectedYear().plusYears(1),
+                    Source.SYSTEM
+            );
             openingBalanceService.create(openingBalance);
         }
     }

@@ -8,8 +8,9 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.i18n.I18NProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import de.nihas101.midas.api.userconfig.UserConfigFactory;
+import de.nihas101.midas.api.userconfig.UserConfigService;
 import de.nihas101.midas.core.config.CoreConfig;
-import de.nihas101.midas.core.userconfig.service.UserConfigService;
 import de.nihas101.midas.vaadin.ui.common.MidasView;
 import de.nihas101.midas.vaadin.ui.common.locale.MidasLocaleResolver;
 import org.springframework.context.MessageSource;
@@ -26,13 +27,15 @@ public class SettingsView extends MidasView {
             final I18NProvider i18NProvider,
             final UserConfigService userConfigService,
             final MessageSource messageSource,
-            final MidasLocaleResolver midasLocaleResolver
+            final MidasLocaleResolver midasLocaleResolver,
+            final UserConfigFactory userConfigFactory
     ) {
         super(
                 config,
                 userConfigService,
                 messageSource,
-                midasLocaleResolver
+                midasLocaleResolver,
+                userConfigFactory
         );
         final VerticalLayout content = new VerticalLayout();
         content.setSpacing(true);
@@ -41,6 +44,18 @@ public class SettingsView extends MidasView {
 
         content.add(new H2(messageSource.getMessage("settings", null, getLocale())));
 
+        final VerticalLayout formContainer = formContainer(config, i18NProvider, userConfigService);
+        content.add(formContainer);
+        content.setAlignSelf(FlexComponent.Alignment.CENTER, formContainer);
+
+        setContent(content);
+    }
+
+    private VerticalLayout formContainer(
+            final CoreConfig config,
+            final I18NProvider i18NProvider,
+            final UserConfigService userConfigService
+    ) {
         final VerticalLayout formContainer = new VerticalLayout();
         formContainer.setWidth("550px"); // Consistent width with other views
         formContainer.setPadding(false);
@@ -60,10 +75,7 @@ public class SettingsView extends MidasView {
         );
 
         formContainer.add(themeToggleButton, localeSelect);
-        content.add(formContainer);
-        content.setAlignSelf(FlexComponent.Alignment.CENTER, formContainer);
-
-        setContent(content);
+        return formContainer;
     }
 
     public static Icon icon() {

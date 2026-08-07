@@ -1,8 +1,8 @@
 package de.nihas101.midas.core.export.accountstatement;
 
+import de.nihas101.midas.api.accountstatement.RunningTotalAccountStatement;
+import de.nihas101.midas.api.accountstatement.RunningTotalAccountStatements;
 import de.nihas101.midas.api.shareholder.Shareholder;
-import de.nihas101.midas.core.accountstatement.runningtotal.RunningTotalAccountStatement;
-import de.nihas101.midas.core.accountstatement.runningtotal.RunningTotalAccountStatements;
 import de.nihas101.midas.core.accountstatement.service.RunningTotalAccountStatementService;
 import de.nihas101.midas.core.export.sort.DisplayIdExportRowSort;
 import de.nihas101.midas.core.export.sort.ExportRowSort;

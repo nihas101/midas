@@ -1,7 +1,8 @@
 package de.nihas101.midas.core.accountstatement.row;
 
+import de.nihas101.midas.api.accountstatement.AccountStatementRow;
+import de.nihas101.midas.api.accountstatement.RunningTotalAccountStatements;
 import de.nihas101.midas.commons.MoneyAmount;
-import de.nihas101.midas.core.accountstatement.runningtotal.RunningTotalAccountStatements;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 

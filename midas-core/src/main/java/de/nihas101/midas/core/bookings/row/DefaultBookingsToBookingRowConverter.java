@@ -3,9 +3,10 @@ package de.nihas101.midas.core.bookings.row;
 import de.nihas101.midas.api.bookings.Booking;
 import de.nihas101.midas.api.bookings.Bookings;
 import de.nihas101.midas.api.bookings.FilteredBookings;
+import de.nihas101.midas.api.bookings.MonthlyTotalSum;
 import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.commons.MoneyAmount;
-import de.nihas101.midas.core.bookings.monthlytotal.MonthlyTotalSum;
+import de.nihas101.midas.core.bookings.monthlytotal.DefaultMonthlyTotalSum;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Month;
@@ -64,7 +65,7 @@ public class DefaultBookingsToBookingRowConverter implements BookingsToBookingRo
     private MonthlyTotalSum createMonthlyTotalSum(final Booking booking) {
         final Map<BookingType, MoneyAmount> entryAmounts = new EnumMap<>(BookingType.class);
         entryAmounts.put(booking.getType(), booking.getAmount());
-        return new MonthlyTotalSum(entryAmounts);
+        return new DefaultMonthlyTotalSum(entryAmounts);
     }
 
 }

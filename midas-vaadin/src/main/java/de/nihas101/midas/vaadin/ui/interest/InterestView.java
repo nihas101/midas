@@ -17,30 +17,33 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.nihas101.midas.api.bookings.Booking;
+import de.nihas101.midas.api.bookings.BookingFactory;
 import de.nihas101.midas.api.bookings.Bookings;
 import de.nihas101.midas.api.interest.InterestBookingsReader;
+import de.nihas101.midas.api.interest.InterestBookingsService;
 import de.nihas101.midas.api.interest.InterestBookingsWriter;
+import de.nihas101.midas.api.interest.InterestCalculation;
+import de.nihas101.midas.api.interest.InterestCalculationFactory;
+import de.nihas101.midas.api.interest.InterestCalculationRow;
+import de.nihas101.midas.api.interest.InterestRowService;
+import de.nihas101.midas.api.interest.Transaction;
+import de.nihas101.midas.api.interest.TransactionType;
 import de.nihas101.midas.api.lock.LockService;
 import de.nihas101.midas.api.lock.LockWriter;
 import de.nihas101.midas.api.shareholder.Shareholder;
+import de.nihas101.midas.api.userconfig.UserConfigFactory;
+import de.nihas101.midas.api.userconfig.UserConfigService;
 import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.commons.Source;
-import de.nihas101.midas.core.bookings.dto.DefaultBooking;
 import de.nihas101.midas.core.config.CoreConfig;
 import de.nihas101.midas.core.export.ExportFactory;
 import de.nihas101.midas.core.export.ExportViewName;
-import de.nihas101.midas.core.interest.InterestCalculation;
+import de.nihas101.midas.core.interest.DefaultInterestCalculation;
 import de.nihas101.midas.core.interest.dto.InterestRate;
-import de.nihas101.midas.core.interest.row.InterestCalculationRow;
-import de.nihas101.midas.core.interest.row.InterestRowService;
-import de.nihas101.midas.core.interest.row.Transaction;
-import de.nihas101.midas.core.interest.row.TransactionType;
-import de.nihas101.midas.core.interest.service.DefaultInterestBookingsService;
 import de.nihas101.midas.core.interest.service.InterestRateService;
 import de.nihas101.midas.core.lock.ShareholderLock;
 import de.nihas101.midas.core.shareholders.service.ShareholdersService;
-import de.nihas101.midas.core.userconfig.service.UserConfigService;
 import de.nihas101.midas.vaadin.ui.common.DownloadTrigger;
 import de.nihas101.midas.vaadin.ui.common.HeaderActionBar;
 import de.nihas101.midas.vaadin.ui.common.MidasView;
@@ -79,6 +82,8 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
     private final LockWriter lockWriter;
     private final ShareholderLock shareholderLock;
     private final ExportFactory exportFactory;
+    private final BookingFactory bookingFactory;
+    private final InterestCalculationFactory interestCalculationFactory;
 
     private BigDecimalField interestRateField;
     private HorizontalLayout actionRow;
@@ -89,7 +94,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
 
     public InterestView(
             final ShareholdersService shareholdersService,
-            final DefaultInterestBookingsService bookingsService,
+            final InterestBookingsService bookingsService,
             final InterestRateService interestRateService,
             final CoreConfig config,
             final MessageSource messageSource,
@@ -98,9 +103,18 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
             final InterestRowService interestRowService,
             final LockService lockWriter,
             final ShareholderLock shareholderLock,
-            final ExportFactory exportFactory
+            final ExportFactory exportFactory,
+            final UserConfigFactory userConfigFactory,
+            final BookingFactory bookingFactory,
+            final InterestCalculationFactory interestCalculationFactory
     ) {
-        super(config, userConfigService, messageSource, midasLocaleResolver);
+        super(
+                config,
+                userConfigService,
+                messageSource,
+                midasLocaleResolver,
+                userConfigFactory
+        );
         this.shareholdersService = shareholdersService;
         this.bookingsWriter = bookingsService;
         this.bookingsReader = bookingsService;
@@ -110,6 +124,8 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
         this.lockWriter = lockWriter;
         this.shareholderLock = shareholderLock;
         this.exportFactory = exportFactory;
+        this.bookingFactory = bookingFactory;
+        this.interestCalculationFactory = interestCalculationFactory;
 
         VerticalLayout content = new VerticalLayout();
         content.setSizeFull();
@@ -237,7 +253,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
         // TODO: Updating of these two fields should be handled in a transaction
         final InterestRate interestRate = updateInterestRate(shareholder, year, rate);
         final Bookings bookings = bookingsReader.interestRelatedBookingsForShareholderAndYear(shareholder.getId(), year);
-        final InterestCalculation interestCalculation = new InterestCalculation(
+        final InterestCalculation interestCalculation = interestCalculationFactory.create(
                 bookings,
                 year,
                 interestRate.getInterestRate()
@@ -273,9 +289,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
             booking.setAmount(interestCalculation.interest());
             bookingsWriter.update(booking);
         } else {
-            final Booking newBooking = new DefaultBooking(
-                    null,
-                    null,
+            final Booking newBooking = bookingFactory.create(
                     shareholder.getId(),
                     year.atMonth(Month.DECEMBER).atEndOfMonth(),
                     BookingType.INTEREST,
@@ -332,7 +346,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
             interestCalculationGrid.setItems(emptyList());
             return;
         }
-        final InterestCalculation interestCalculation = new InterestCalculation(
+        final InterestCalculation interestCalculation = new DefaultInterestCalculation(
                 bookings,
                 year,
                 interestRate

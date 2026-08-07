@@ -1,5 +1,6 @@
 package de.nihas101.midas.core.interest.interestamount;
 
+import de.nihas101.midas.api.interest.Interest;
 import de.nihas101.midas.commons.MoneyAmount;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -9,7 +10,7 @@ import java.math.RoundingMode;
 
 class InterestTest {
 
-    private final Interest interest = new Interest(
+    private final Interest interest = new DefaultInterest(
             MoneyAmount.ofCents(1000000L),
             BigDecimal.valueOf(16),
             BigDecimal.valueOf(0.5)
@@ -17,7 +18,7 @@ class InterestTest {
 
     @Test
     void dailyInterestRate_null() {
-        Assertions.assertEquals(createExpected(0, 4), new Interest(
+        Assertions.assertEquals(createExpected(0, 4), new DefaultInterest(
                 (MoneyAmount) null,
                 null,
                 null
@@ -31,7 +32,7 @@ class InterestTest {
 
     @Test
     void interestAmount_null() {
-        Assertions.assertEquals(createExpected(0, 4), new Interest(
+        Assertions.assertEquals(createExpected(0, 4), new DefaultInterest(
                 (MoneyAmount) null,
                 null,
                 null
@@ -40,7 +41,7 @@ class InterestTest {
 
     @Test
     void interestAmount_interestDaysNegative() {
-        Assertions.assertEquals(createExpected(0, 4), new Interest(
+        Assertions.assertEquals(createExpected(0, 4), new DefaultInterest(
                 (MoneyAmount) null,
                 BigDecimal.valueOf(-1),
                 null
@@ -54,7 +55,7 @@ class InterestTest {
 
     @Test
     void interestDivisor_null() {
-        Assertions.assertEquals(createExpected(360, 4), new Interest(
+        Assertions.assertEquals(createExpected(360, 4), new DefaultInterest(
                 (MoneyAmount) null,
                 null,
                 null
@@ -63,7 +64,7 @@ class InterestTest {
 
     @Test
     void interestDivisor_interestRate0() {
-        Assertions.assertEquals(createExpected(360, 4), new Interest(
+        Assertions.assertEquals(createExpected(360, 4), new DefaultInterest(
                 (MoneyAmount) null,
                 null,
                 BigDecimal.valueOf(0)

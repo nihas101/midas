@@ -2,10 +2,10 @@ package de.nihas101.midas.core.bookings.row;
 
 import de.nihas101.midas.api.bookings.Booking;
 import de.nihas101.midas.api.bookings.Bookings;
+import de.nihas101.midas.api.bookings.MonthlyTotal;
 import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.commons.MoneyAmount;
-import de.nihas101.midas.core.bookings.monthlytotal.MonthlyTotal;
-import de.nihas101.midas.core.bookings.monthlytotal.MonthlyTotalSum;
+import de.nihas101.midas.core.bookings.monthlytotal.DefaultMonthlyTotalSum;
 
 import java.util.Collections;
 import java.util.List;
@@ -24,7 +24,7 @@ public record OpeningBalanceBookingRow(
 
     @Override
     public MoneyAmount amount(final BookingType type) {
-        return MonthlyTotalSum.ZERO.monthlyTotal(type);
+        return DefaultMonthlyTotalSum.ZERO.monthlyTotal(type);
     }
 
     @Override
@@ -44,7 +44,7 @@ public record OpeningBalanceBookingRow(
 
     @Override
     public MonthlyTotal amounts() {
-        return MonthlyTotalSum.ZERO;
+        return DefaultMonthlyTotalSum.ZERO;
     }
 
     @Override

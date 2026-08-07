@@ -1,7 +1,9 @@
 package de.nihas101.midas.core.interest.row;
 
 import de.nihas101.midas.api.bookings.Bookings;
-import de.nihas101.midas.core.interest.interestamount.Interest;
+import de.nihas101.midas.api.interest.InterestCalculationRow;
+import de.nihas101.midas.api.interest.Transaction;
+import de.nihas101.midas.core.interest.interestamount.DefaultInterest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 
@@ -31,7 +33,7 @@ public class OpeningBalanceInterestCalculationRow implements InterestCalculation
                 ),
                 bookings.openingBalance().getOpeningBalance(),
                 bookings.openingBalance().getOpeningBalance(),
-                new Interest(
+                new DefaultInterest(
                         bookings.openingBalance().getOpeningBalance(),
                         BigDecimal.valueOf(30L), // TODO: Make this passable from outside
                         interestRate

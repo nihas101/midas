@@ -2,7 +2,7 @@ package de.nihas101.midas.vaadin.ui.common.locale;
 
 import de.nihas101.midas.api.userconfig.UserConfig;
 import de.nihas101.midas.api.userconfig.UserConfigReader;
-import de.nihas101.midas.core.userconfig.service.UserConfigService;
+import de.nihas101.midas.api.userconfig.UserConfigService;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Locale;

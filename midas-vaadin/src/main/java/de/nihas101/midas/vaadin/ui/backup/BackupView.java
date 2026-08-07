@@ -16,11 +16,12 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.streams.DownloadHandler;
 import com.vaadin.flow.server.streams.DownloadResponse;
+import de.nihas101.midas.api.backup.BackupService;
+import de.nihas101.midas.api.userconfig.UserConfigFactory;
+import de.nihas101.midas.api.userconfig.UserConfigService;
 import de.nihas101.midas.core.backup.service.BackupFileNameProvider;
-import de.nihas101.midas.core.backup.service.BackupService;
 import de.nihas101.midas.core.backup.service.BackupStatusService;
 import de.nihas101.midas.core.config.CoreConfig;
-import de.nihas101.midas.core.userconfig.service.UserConfigService;
 import de.nihas101.midas.vaadin.ui.common.MidasView;
 import de.nihas101.midas.vaadin.ui.common.locale.MidasLocaleResolver;
 import lombok.extern.slf4j.Slf4j;
@@ -55,13 +56,15 @@ public class BackupView extends MidasView {
             final BackupService backupService,
             final BackupStatusService backupStatusService,
             final BackupFileNameProvider fileNameProvider,
-            final MessageSource messageSource
+            final MessageSource messageSource,
+            final UserConfigFactory userConfigFactory
     ) {
         super(
                 midasConfig,
                 userConfigService,
                 messageSource,
-                midasLocaleResolver
+                midasLocaleResolver,
+                userConfigFactory
         );
         this.backupService = backupService;
         this.backupStatusService = backupStatusService;

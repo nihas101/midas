@@ -1,6 +1,7 @@
 package de.nihas101.midas.core.accountstatement.runningtotal;
 
 import de.nihas101.midas.api.accountstatement.LabeledAccountStatement;
+import de.nihas101.midas.api.accountstatement.RunningTotalAccountStatement;
 import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.commons.MoneyAmount;
 import lombok.EqualsAndHashCode;

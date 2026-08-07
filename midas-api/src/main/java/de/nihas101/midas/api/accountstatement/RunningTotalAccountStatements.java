@@ -1,4 +1,4 @@
-package de.nihas101.midas.core.accountstatement.runningtotal;
+package de.nihas101.midas.api.accountstatement;
 
 import java.util.List;
 

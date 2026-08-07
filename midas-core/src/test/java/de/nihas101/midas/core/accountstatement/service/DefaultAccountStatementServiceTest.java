@@ -1,12 +1,12 @@
 package de.nihas101.midas.core.accountstatement.service;
 
+import de.nihas101.midas.api.accountstatement.AccountStatementRow;
 import de.nihas101.midas.api.accountstatement.AccountStatements;
 import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.commons.Source;
 import de.nihas101.midas.core.accountstatement.dto.DefaultAccountStatement;
-import de.nihas101.midas.core.accountstatement.row.AccountStatementRow;
 import de.nihas101.midas.core.accountstatement.row.RunningTotalAccountStatementRow;
 import de.nihas101.midas.core.accountstatement.runningtotal.DefaultRunningTotalAccountStatement;
 import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
