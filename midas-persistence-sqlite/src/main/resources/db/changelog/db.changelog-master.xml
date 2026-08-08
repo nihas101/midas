@@ -17,4 +17,5 @@
     <include file="db/changelog/009-add-performance-indices.xml"/>
     <include file="db/changelog/010-add-source-to-opening-balance.xml"/>
     <include file="db/changelog/011-create-locked-years-table.xml"/>
+    <include file="db/changelog/012-create-comment-templates-table.xml"/>
 </databaseChangeLog>
