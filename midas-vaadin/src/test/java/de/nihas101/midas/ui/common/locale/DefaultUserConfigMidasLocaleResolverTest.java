@@ -1,0 +1,49 @@
+package de.nihas101.midas.ui.common.locale;
+
+import de.nihas101.midas.api.userconfig.UserConfig;
+import de.nihas101.midas.api.userconfig.UserConfigReader;
+import de.nihas101.midas.core.userconfig.dto.DefaultUserConfig;
+import de.nihas101.midas.vaadin.ui.common.locale.UserConfigMidasLocaleResolver;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.Locale;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class DefaultUserConfigMidasLocaleResolverTest {
+
+    @ParameterizedTest
+    @MethodSource("resolveValues")
+    void resolve(final UserConfigReader userConfigReader, final Locale expected) {
+        final UserConfigMidasLocaleResolver localeResolver = new UserConfigMidasLocaleResolver(userConfigReader);
+        final Locale resolve = localeResolver.resolve();
+        assertEquals(expected, resolve);
+    }
+
+    public static Stream<Arguments> resolveValues() {
+        return Stream.of(
+                Arguments.of((UserConfigReader) any -> Optional.empty(), null),
+                Arguments.of((UserConfigReader) any -> Optional.of(new DefaultUserConfig()), null),
+                Arguments.of((UserConfigReader) any -> {
+                    final UserConfig userConfig = DefaultUserConfig.builder().locale("").build();
+                    return Optional.of(userConfig);
+                }, null),
+                Arguments.of((UserConfigReader) any -> {
+                    final UserConfig userConfig = DefaultUserConfig.builder().locale("         ").build();
+                    return Optional.of(userConfig);
+                }, null),
+                Arguments.of((UserConfigReader) any -> {
+                    final UserConfig userConfig = DefaultUserConfig.builder().locale("notAValidLocale").build();
+                    return Optional.of(userConfig);
+                }, null),
+                Arguments.of((UserConfigReader) any -> {
+                    final UserConfig userConfig = DefaultUserConfig.builder().locale("de").build();
+                    return Optional.of(userConfig);
+                }, Locale.GERMAN)
+        );
+    }
+}

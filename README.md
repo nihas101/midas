@@ -55,14 +55,14 @@ The application can be configured using `application.properties`. Below are some
       window is closed before shutting down (default: `PT60S`).
 * `midas.export.pdf.template-path`: The path to HTML templates to be rendered
   via [Thymeleaf](https://www.thymeleaf.org/) in the PDF export
-    * See `src/main/resources/templates/export` for the default templates
+    * See `midas-core/src/main/resources/templates/export` for the default templates
     * See `de.nihas101.midas.export.pdf.PdfViewData` for the data structure used as input
 * `midas.cleanup`
   * `enabled`: Whether a cleanup of old bookings is triggered on startup of the application (default: `true`).
   * `cutoff`: The period after which a booking is considered 'old' and eligible for cleanup (default: `PT10Y`).
   * `delayBetweenCleanups`: Defines the duration (in [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601#Durations)) between separate cleanup runs (default: `PT1H`).
   * `limit`: The maximum number of bookings deleted during the cleanup phase. Set to `-1` for no limit (default: `1000`).
-* `midas.sqlite.optimize`
+* `midas.db.sqlite.optimize`
   * `enabled`: Whether `PRAGMA optimize` is run on startup and shutdown to keep the SQLite query planner statistics up to date (default: `true`).
 * `spring`
     * `datasource.url`: The JDBC URL for the SQLite database (e.g., `jdbc:sqlite:midas.db`).

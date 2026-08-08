@@ -1,0 +1,140 @@
+package de.nihas101.midas.core.bookings.monthlytotal;
+
+import de.nihas101.midas.api.bookings.Booking;
+import de.nihas101.midas.api.bookings.Bookings;
+import de.nihas101.midas.api.bookings.FilteredBookings;
+import de.nihas101.midas.api.bookings.MonthlyTotal;
+import de.nihas101.midas.api.openingbalance.OpeningBalance;
+import de.nihas101.midas.commons.BookingType;
+import de.nihas101.midas.commons.MoneyAmount;
+import de.nihas101.midas.core.bookings.dto.DefaultBooking;
+import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+
+import java.time.LocalDate;
+import java.time.Month;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class TotalSumCalculatorTest {
+
+    @ParameterizedTest
+    @EnumSource(Month.class)
+    void monthlyTotals_sumsAmountsByType(Month testMonth) {
+        // Arrange
+        Booking b1 = createBooking(BookingType.WITHDRAWAL, 1000L, testMonth, "A");
+        Booking b2 = createBooking(BookingType.WITHDRAWAL, 500L, testMonth, "B");
+        Booking b3 = createBooking(BookingType.INTEREST, 200L, testMonth, "C");
+
+        DefaultMonthlyTotalSum.MonthlySumTotalCalculator calculator = createCalculator(new FilteredBookings(List.of(b1, b2, b3)));
+
+        // Act
+        MonthlyTotal totals = new DefaultMonthlyTotalSum(calculator);
+
+        // Assert
+        assertEquals(MoneyAmount.ofCents(1500L), totals.monthlyTotal(BookingType.WITHDRAWAL));
+        assertEquals(MoneyAmount.ofCents(200L), totals.monthlyTotal(BookingType.INTEREST));
+        assertEquals(MoneyAmount.ZERO, totals.monthlyTotal(BookingType.TAX_PREVIOUS_YEAR));
+    }
+
+    @Test
+    void monthlyTotals_emptyMonthReturnsZeros() {
+        Bookings mockBookings = new Bookings() {
+            @Override
+            public OpeningBalance openingBalance() {
+                return new DefaultOpeningBalance(MoneyAmount.ZERO);
+            }
+
+            @Override
+            public FilteredBookings bookingsInMonth(Month m) {
+                return new FilteredBookings(List.of());
+            }
+
+            @Override
+            public FilteredBookings filter(final Function<Booking, Boolean> condition) {
+                return new FilteredBookings(List.of());
+            }
+
+            @Override
+            public boolean isEmpty() {
+                return true;
+            }
+        };
+
+        DefaultMonthlyTotalSum.MonthlySumTotalCalculator calculator = new DefaultMonthlyTotalSum.MonthlySumTotalCalculator(mockBookings, Month.JANUARY);
+        Map<BookingType, MoneyAmount> totals = calculator.monthlyTotals();
+
+        for (BookingType type : BookingType.values()) {
+            assertEquals(MoneyAmount.ZERO, totals.get(type), "Type " + type + " should be ZERO");
+        }
+    }
+
+    @Test
+    void monthlyTotals_handlesNegativeAmounts() {
+        // Arrange
+        Booking pos = createBooking(BookingType.WITHDRAWAL, 1000L, Month.MARCH, "Plus");
+        Booking neg = createBooking(BookingType.WITHDRAWAL, -400L, Month.MARCH, "Minus");
+
+        final DefaultMonthlyTotalSum.MonthlySumTotalCalculator calculator = createCalculator(new FilteredBookings(List.of(pos, neg)));
+
+        // Act
+        Map<BookingType, MoneyAmount> totals = calculator.monthlyTotals();
+
+        // Assert
+        assertEquals(MoneyAmount.ofCents(600L), totals.get(BookingType.WITHDRAWAL));
+    }
+
+    @Test
+    void monthlyTotals_null() {
+        final DefaultMonthlyTotalSum.MonthlySumTotalCalculator calculator = createCalculator(null);
+
+        Map<BookingType, MoneyAmount> totals = calculator.monthlyTotals();
+
+        assertEquals(MoneyAmount.ZERO, totals.get(BookingType.WITHDRAWAL));
+    }
+
+    private static DefaultMonthlyTotalSum.MonthlySumTotalCalculator createCalculator(final FilteredBookings filteredBookings) {
+        final Bookings bookings = new Bookings() {
+            @Override
+            public OpeningBalance openingBalance() {
+                return new DefaultOpeningBalance(MoneyAmount.ZERO);
+            }
+
+            @Override
+            public FilteredBookings bookingsInMonth(Month m) {
+                return m == Month.MARCH ? filteredBookings : new FilteredBookings(List.of());
+            }
+
+            @Override
+            public FilteredBookings filter(final Function<Booking, Boolean> condition) {
+                return new FilteredBookings(List.of());
+            }
+
+            @Override
+            public boolean isEmpty() {
+                return false;
+            }
+        };
+
+        return new DefaultMonthlyTotalSum.MonthlySumTotalCalculator(bookings, Month.MARCH);
+    }
+
+    private Booking createBooking(
+            final BookingType type,
+            final long cents,
+            final Month month,
+            final String comment
+    ) {
+        return DefaultBooking.builder()
+                .type(type)
+                .amount(MoneyAmount.ofCents(cents))
+                .date(LocalDate.of(2026, month, 1))
+                .comment(comment)
+                .build();
+    }
+}

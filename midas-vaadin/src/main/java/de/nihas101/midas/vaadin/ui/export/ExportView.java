@@ -1,0 +1,294 @@
+package de.nihas101.midas.vaadin.ui.export;
+
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.checkbox.CheckboxGroup;
+import com.vaadin.flow.component.checkbox.CheckboxGroupVariant;
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
+import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.Route;
+import de.nihas101.midas.api.export.Export;
+import de.nihas101.midas.api.shareholder.Shareholder;
+import de.nihas101.midas.api.userconfig.UserConfigFactory;
+import de.nihas101.midas.api.userconfig.UserConfigService;
+import de.nihas101.midas.core.config.CoreConfig;
+import de.nihas101.midas.core.export.ExportFactory;
+import de.nihas101.midas.core.export.ExportRequest;
+import de.nihas101.midas.core.export.ExportViewName;
+import de.nihas101.midas.core.export.ExportViews;
+import de.nihas101.midas.core.shareholders.service.ShareholdersService;
+import de.nihas101.midas.vaadin.ui.common.DatePickerI18nProvider;
+import de.nihas101.midas.vaadin.ui.common.DownloadTrigger;
+import de.nihas101.midas.vaadin.ui.common.MidasView;
+import de.nihas101.midas.vaadin.ui.common.locale.MidasLocaleResolver;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
+
+import java.io.ByteArrayOutputStream;
+import java.time.LocalDate;
+import java.time.Year;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+
+@Slf4j
+@Route("export")
+@PageTitle("Export")
+public class ExportView extends MidasView {
+
+    public static final VaadinIcon icon = VaadinIcon.DOWNLOAD;
+
+    private final ShareholdersService shareholdersService;
+    private final MessageSource messageSource;
+    private final ExportFactory exportFactory;
+    private final DownloadTrigger downloadTrigger;
+
+    private MultiSelectComboBox<Shareholder> shareholderPicker;
+    private Checkbox selectAllCheckbox;
+    private CheckboxGroup<ExportViewName> viewPicker;
+    private DatePicker startDatePicker;
+    private DatePicker endDatePicker;
+    private CheckboxGroup<String> formatPicker;
+    private Button exportButton;
+    private final VerticalLayout mainContent;
+
+    public ExportView(
+            final ShareholdersService shareholdersService,
+            final CoreConfig config,
+            final MessageSource messageSource,
+            final UserConfigService userConfigService,
+            final MidasLocaleResolver midasLocaleResolver,
+            final ExportFactory exportFactory,
+            final UserConfigFactory userConfigFactory
+    ) {
+        super(
+                config,
+                userConfigService,
+                messageSource,
+                midasLocaleResolver,
+                userConfigFactory
+        );
+        this.shareholdersService = shareholdersService;
+        this.messageSource = messageSource;
+        this.exportFactory = exportFactory;
+
+        mainContent = new VerticalLayout();
+        mainContent.setSizeFull();
+        mainContent.setSpacing(true);
+        mainContent.setPadding(true);
+        mainContent.setAlignItems(FlexComponent.Alignment.START);
+
+        mainContent.add(new H2(messageSource.getMessage("export", null, getLocale())));
+
+        this.downloadTrigger = new DownloadTrigger(mainContent);
+
+        // Form container to keep elements left-aligned but centered as a group
+        VerticalLayout formContainer = new VerticalLayout();
+        formContainer.setWidth("600px");
+        formContainer.setPadding(false);
+        formContainer.setSpacing(true);
+        formContainer.setAlignItems(FlexComponent.Alignment.START);
+
+        setupShareholderSelection(formContainer);
+        setupViewSelection(formContainer);
+        setupDateSelection(formContainer);
+        setupFormatSelection(formContainer);
+
+        mainContent.add(formContainer);
+        mainContent.setAlignSelf(FlexComponent.Alignment.CENTER, formContainer);
+
+        updateExportButtonState();
+
+        setContent(mainContent);
+    }
+
+    private void updateExportButtonState() {
+        if (shareholderPicker == null || viewPicker == null || formatPicker == null || startDatePicker == null || endDatePicker == null || exportButton == null) {
+            return;
+        }
+        boolean shareholdersSelected = !shareholderPicker.getValue().isEmpty();
+        shareholderPicker.setInvalid(!shareholdersSelected);
+        shareholderPicker.setErrorMessage(shareholdersSelected ? "" : messageSource.getMessage("export.validation.no-shareholders", null, getLocale()));
+
+        boolean viewsSelected = !viewPicker.getValue().isEmpty();
+        viewPicker.setInvalid(!viewsSelected);
+        viewPicker.setErrorMessage(viewsSelected ? "" : messageSource.getMessage("export.validation.no-views", null, getLocale()));
+
+        boolean formatsSelected = !formatPicker.getValue().isEmpty();
+        formatPicker.setInvalid(!formatsSelected);
+        formatPicker.setErrorMessage(formatsSelected ? "" : messageSource.getMessage("export.validation.no-formats", null, getLocale()));
+
+        boolean datesValid = startDatePicker.getValue() != null &&
+                endDatePicker.getValue() != null &&
+                !endDatePicker.getValue().isBefore(startDatePicker.getValue());
+        endDatePicker.setInvalid(!datesValid);
+        endDatePicker.setErrorMessage(datesValid ? "" : messageSource.getMessage("export.validation.invalid-dates", null, getLocale()));
+
+        exportButton.setEnabled(shareholdersSelected && viewsSelected && formatsSelected && datesValid);
+    }
+
+    private void setupShareholderSelection(VerticalLayout content) {
+        HorizontalLayout layout = new HorizontalLayout();
+        layout.setAlignItems(FlexComponent.Alignment.BASELINE);
+        layout.setWidthFull();
+
+        shareholderPicker = new MultiSelectComboBox<>(messageSource.getMessage("export.shareholders.label", null, getLocale()));
+        final Set<Shareholder> allShareholders = Set.copyOf(shareholdersService.shareholders().toList());
+        shareholderPicker.setItems(allShareholders);
+        shareholderPicker.setItemLabelGenerator(s -> s.getFirstName() + " " + s.getLastName() + " (" + s.getDisplayId() + ")");
+        shareholderPicker.setWidth("400px");
+
+        selectAllCheckbox = new Checkbox(messageSource.getMessage("export.select-all.label", null, getLocale()));
+
+        shareholderPicker.addValueChangeListener(e -> {
+            if (e.isFromClient()) {
+                selectAllCheckbox.setValue(e.getValue().size() == allShareholders.size());
+            }
+            updateExportButtonState();
+        });
+
+        selectAllCheckbox.addValueChangeListener(e -> {
+            if (e.isFromClient()) {
+                if (e.getValue()) {
+                    shareholderPicker.setValue(allShareholders);
+                } else {
+                    shareholderPicker.deselectAll();
+                }
+            }
+            updateExportButtonState();
+        });
+
+        // Set defaults
+        shareholderPicker.setValue(allShareholders);
+        selectAllCheckbox.setValue(true);
+
+        layout.add(shareholderPicker, selectAllCheckbox);
+        layout.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
+        content.add(layout);
+    }
+
+    private void setupViewSelection(VerticalLayout content) {
+        final List<ExportViewName> allViews = Arrays.stream(ExportViewName.values()).toList();
+
+        viewPicker = new CheckboxGroup<>(messageSource.getMessage("export.views.label", null, getLocale()));
+        viewPicker.setItems(allViews);
+        viewPicker.setItemLabelGenerator(key -> messageSource.getMessage("export.view." + key.getName(), null, getLocale()));
+        viewPicker.addThemeVariants(CheckboxGroupVariant.LUMO_VERTICAL);
+        viewPicker.addValueChangeListener(e -> updateExportButtonState());
+
+        // Set defaults
+        viewPicker.select(allViews);
+
+        content.add(viewPicker);
+    }
+
+    private void setupDateSelection(VerticalLayout content) {
+        final HorizontalLayout dateLayout = new HorizontalLayout();
+        dateLayout.setSpacing(true);
+        dateLayout.setWidthFull();
+        dateLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
+
+        final DatePicker.DatePickerI18n i18n = DatePickerI18nProvider.datePickerI18n(
+                messageSource,
+                getLocale()
+        );
+        startDatePicker = new DatePicker(messageSource.getMessage("export.start-date.label", null, getLocale()));
+        startDatePicker.setLocale(getLocale());
+        startDatePicker.setI18n(i18n);
+        startDatePicker.setValue(LocalDate.of(Year.now().getValue(), 1, 1));
+        startDatePicker.addValueChangeListener(e -> updateExportButtonState());
+
+        endDatePicker = new DatePicker(messageSource.getMessage("export.end-date.label", null, getLocale()));
+        endDatePicker.setLocale(getLocale());
+        endDatePicker.setI18n(i18n);
+        endDatePicker.setValue(LocalDate.of(Year.now().getValue(), 12, 31));
+        endDatePicker.addValueChangeListener(e -> updateExportButtonState());
+
+        dateLayout.add(startDatePicker, endDatePicker);
+        content.add(dateLayout);
+    }
+
+    private void setupFormatSelection(VerticalLayout content) {
+        final HorizontalLayout layout = new HorizontalLayout();
+        layout.setWidthFull();
+        layout.setAlignItems(FlexComponent.Alignment.END);
+
+        final List<String> allFormats = List.of("xlsx", "pdf");
+
+        formatPicker = new CheckboxGroup<>(messageSource.getMessage("export.formats.label", null, getLocale()));
+        formatPicker.setItems(allFormats);
+        formatPicker.setItemLabelGenerator(key -> messageSource.getMessage("export.format." + key, null, getLocale()));
+        formatPicker.addThemeVariants(CheckboxGroupVariant.LUMO_VERTICAL);
+        formatPicker.select("pdf");
+        formatPicker.addValueChangeListener(e -> updateExportButtonState());
+
+        exportButton = new Button(
+                messageSource.getMessage("export.button", null, getLocale()),
+                VaadinIcon.DOWNLOAD.create()
+        );
+        exportButton.addThemeVariants(com.vaadin.flow.component.button.ButtonVariant.LUMO_PRIMARY);
+        exportButton.addClickListener(e -> runExport());
+
+        layout.add(formatPicker, exportButton);
+        layout.setFlexGrow(1, formatPicker);
+        layout.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
+
+        content.add(layout);
+    }
+
+    private void runExport() {
+        try {
+            final LocalDate from = startDatePicker.getValue();
+            final LocalDate to = endDatePicker.getValue();
+            final Set<ExportViewName> views = viewPicker.getValue();
+            final ExportRequest request = new ExportRequest(
+                    List.copyOf(shareholderPicker.getValue()),
+                    new ExportViews(views, messageSource, getLocale()),
+                    from,
+                    to,
+                    formatPicker.getValue()
+            );
+
+            if (request.formats().contains("xlsx")) {
+                runXlsxExport(request);
+            }
+            if (request.formats().contains("pdf")) {
+                runPdfExport(request);
+            }
+
+            Notification.show(messageSource.getMessage("export.notification.success", null, getLocale()));
+        } catch (Exception e) {
+            log.error("Export failed", e);
+            Notification.show(messageSource.getMessage("export.notification.error", new Object[]{e.getMessage()}, getLocale()), 5000, Notification.Position.MIDDLE);
+        }
+    }
+
+    private void runXlsxExport(final ExportRequest request) {
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        final Export xlsxExport = exportFactory.createXlsxExport(request, out, getLocale());
+        xlsxExport.trigger();
+
+        final byte[] data = out.toByteArray();
+        downloadTrigger.triggerDownload(data, xlsxExport.fileName(), xlsxExport.mimeType());
+    }
+
+    private void runPdfExport(final ExportRequest request) {
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        final Export pdfExport = exportFactory.createPdfExport(request, out, getLocale());
+        pdfExport.trigger();
+        final byte[] data = out.toByteArray();
+        downloadTrigger.triggerDownload(data, pdfExport.fileName(), pdfExport.mimeType());
+    }
+
+    public static Icon icon() {
+        return icon.create();
+    }
+}

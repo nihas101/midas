@@ -1,0 +1,123 @@
+package de.nihas101.midas.core.accountstatement.dto;
+
+import de.nihas101.midas.api.accountstatement.LabeledAccountStatement;
+import de.nihas101.midas.commons.BookingType;
+import de.nihas101.midas.commons.MoneyAmount;
+import de.nihas101.midas.commons.Source;
+import de.nihas101.midas.persistance.accountstatements.AccountStatementEntity;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
+import org.springframework.context.MessageSource;
+
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.Year;
+import java.util.Locale;
+import java.util.Optional;
+
+@ToString
+@EqualsAndHashCode
+@RequiredArgsConstructor
+public final class DefaultAccountStatement implements LabeledAccountStatement {
+    private final Integer id;
+    private final Year year;
+    private final BookingType type;
+    private final MoneyAmount amount;
+    private final String label;
+    private final boolean hidden;
+    private final Source source;
+
+    public DefaultAccountStatement(
+            final AccountStatementEntity accountStatementEntity,
+            final MessageSource messageSource,
+            final Locale locale
+    ) {
+        this(
+                accountStatementEntity != null ? accountStatementEntity.getId() : null,
+                Optional.ofNullable(accountStatementEntity)
+                        .map(AccountStatementEntity::getDate)
+                        .map(LocalDate::getYear)
+                        .map(Year::of)
+                        .orElse(null),
+                accountStatementEntity != null ? accountStatementEntity.getType() : null,
+                accountStatementEntity != null ? accountStatementEntity.getAmount() : null,
+                messageSource,
+                locale
+        );
+    }
+
+    public DefaultAccountStatement(
+            final Integer id,
+            final Year year,
+            final BookingType type,
+            final MoneyAmount amount,
+            final MessageSource messageSource,
+            final Locale locale
+    ) {
+        this(
+                id,
+                year,
+                type,
+                amount,
+                type != null && messageSource != null
+                        ? messageSource.getMessage(type.getAccountStatementI18nKey(), null, locale)
+                        : null,
+                MoneyAmount.ZERO.equals(amount), // Hide zero amounts by default, unless the user overrides this
+                Source.SYSTEM
+        );
+    }
+
+    public DefaultAccountStatement(
+            final Integer id,
+            final Year year,
+            final BookingType type,
+            final MoneyAmount amount,
+            final String label
+    ) {
+        this(
+                id,
+                year,
+                type,
+                amount,
+                label,
+                false,
+                Source.SYSTEM
+        );
+    }
+
+    @Override
+    public Integer id() {
+        return id;
+    }
+
+    @Override
+    public LocalDate date() {
+        return year != null ? year.atMonth(Month.DECEMBER).atEndOfMonth() : null;
+    }
+
+    @Override
+    public String label() {
+        return label;
+    }
+
+    @Override
+    public MoneyAmount amount() {
+        return amount;
+    }
+
+    @Override
+    public boolean isHidden() {
+        return hidden;
+    }
+
+    @Override
+    public boolean isManualExtra() {
+        return source == Source.USER;
+    }
+
+    @Override
+    public BookingType bookingType() {
+        return type;
+    }
+}
