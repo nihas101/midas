@@ -9,7 +9,6 @@ import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.textfield.BigDecimalField;
-import com.vaadin.flow.component.textfield.TextField;
 import de.nihas101.midas.api.bookings.Booking;
 import de.nihas101.midas.api.bookings.Bookings;
 import de.nihas101.midas.api.openingbalance.OpeningBalance;
@@ -20,6 +19,8 @@ import de.nihas101.midas.commons.Source;
 import de.nihas101.midas.core.bookings.dto.DefaultBooking;
 import de.nihas101.midas.core.bookings.row.BookingRow;
 import de.nihas101.midas.core.bookings.service.BookingsService;
+import de.nihas101.midas.core.commenttemplate.dto.DefaultCommentTemplate;
+import de.nihas101.midas.core.commenttemplate.service.CommentTemplatesService;
 import de.nihas101.midas.core.interest.service.openingbalanceupdate.DefaultInterestUpdatingOpeningBalanceService;
 import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
 import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
@@ -35,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Year;
+import java.util.Set;
 
 import static com.github.mvysny.kaributesting.v10.LocatorJ._click;
 import static com.github.mvysny.kaributesting.v10.LocatorJ._get;
@@ -52,6 +54,9 @@ public class BookingsViewIT extends AbstractKaribuTest {
 
     @Autowired
     private DefaultInterestUpdatingOpeningBalanceService openingBalanceService;
+
+    @Autowired
+    private CommentTemplatesService commentTemplatesService;
 
     @Test
     void testBookingsWorkflow() {
@@ -90,7 +95,7 @@ public class BookingsViewIT extends AbstractKaribuTest {
         // Find elements in the dialog
         final DatePicker datePicker = _get(DatePicker.class, spec -> spec.withLabel("Date"));
         final ComboBox<BookingType> typePicker = _get(ComboBox.class, spec -> spec.withLabel("Type"));
-        final TextField commentField = _get(TextField.class, spec -> spec.withLabel("Comment"));
+        final ComboBox<String> commentField = _get(ComboBox.class, spec -> spec.withLabel("Comment"));
         final BigDecimalField amountField = _get(BigDecimalField.class, spec -> spec.withLabel("Amount"));
 
         _setValue(datePicker, LocalDate.of(2026, 5, 10));
@@ -150,7 +155,7 @@ public class BookingsViewIT extends AbstractKaribuTest {
         // Find elements in the dialog
         final DatePicker datePicker = _get(DatePicker.class, spec -> spec.withLabel("Date"));
         final ComboBox<BookingType> typePicker = _get(ComboBox.class, spec -> spec.withLabel("Type"));
-        final TextField commentField = _get(TextField.class, spec -> spec.withLabel("Comment"));
+        final ComboBox<String> commentField = _get(ComboBox.class, spec -> spec.withLabel("Comment"));
         final BigDecimalField amountField = _get(BigDecimalField.class, spec -> spec.withLabel("Amount"));
 
         _setValue(datePicker, LocalDate.of(2026, 6, 12));
@@ -170,7 +175,7 @@ public class BookingsViewIT extends AbstractKaribuTest {
 
         final DatePicker datePicker2 = _get(DatePicker.class, spec -> spec.withLabel("Date"));
         final ComboBox<BookingType> typePicker2 = _get(ComboBox.class, spec -> spec.withLabel("Type"));
-        final TextField commentField2 = _get(TextField.class, spec -> spec.withLabel("Comment"));
+        final ComboBox<String> commentField2 = _get(ComboBox.class, spec -> spec.withLabel("Comment"));
         final BigDecimalField amountField2 = _get(BigDecimalField.class, spec -> spec.withLabel("Amount"));
 
         _setValue(datePicker2, LocalDate.of(2026, 6, 12));
@@ -447,5 +452,61 @@ public class BookingsViewIT extends AbstractKaribuTest {
         Assertions.assertNotNull(nextYearBalance);
         Assertions.assertEquals(0, BigDecimal.ZERO.compareTo(nextYearBalance.getOpeningBalance().toBigDecimalForInput()));
         Assertions.assertEquals(Source.SYSTEM, nextYearBalance.getSource());
+    }
+
+    @Test
+    void testCommentTemplatesSuggestionsAndCustomInput() {
+        // Prepopulate comment templates
+        commentTemplatesService.save(DefaultCommentTemplate.builder()
+                .text("General Template")
+                .bookingTypes(Set.of())
+                .build());
+
+        commentTemplatesService.save(DefaultCommentTemplate.builder()
+                .text("Withdrawal Only Template")
+                .bookingTypes(Set.of(BookingType.WITHDRAWAL))
+                .build());
+
+        // Prepopulate shareholder
+        final Shareholder sh = new DefaultShareholder(null, 301, "Charlie", "TemplateUser");
+        shareholdersService.create(sh);
+        final Shareholder savedSh = shareholdersService.shareholders().toList().stream()
+                .filter(s -> "Charlie".equals(s.getFirstName()) && "TemplateUser".equals(s.getLastName()))
+                .findFirst()
+                .orElseThrow();
+
+        // Navigate to BookingsView
+        UI.getCurrent().navigate(BookingsView.class);
+        _setValue(_get(ShareholderPicker.class), savedSh);
+        _setValue(_get(YearPicker.class), 2026);
+
+        // Open Booking Dialog
+        final Button addBookingButton = _get(Button.class, spec -> spec.withText("Add Booking"));
+        _click(addBookingButton);
+
+        final DatePicker datePicker = _get(DatePicker.class, spec -> spec.withLabel("Date"));
+        final ComboBox<BookingType> typePicker = _get(ComboBox.class, spec -> spec.withLabel("Type"));
+        final ComboBox<String> commentPicker = _get(ComboBox.class, spec -> spec.withLabel("Comment"));
+        final BigDecimalField amountField = _get(BigDecimalField.class, spec -> spec.withLabel("Amount"));
+
+        _setValue(datePicker, LocalDate.of(2026, 7, 1));
+        _setValue(typePicker, BookingType.WITHDRAWAL);
+
+        // Verify suggestions for WITHDRAWAL include both General Template and Withdrawal Only Template
+        final java.util.List<String> suggestions = commentTemplatesService.getSuggestions(BookingType.WITHDRAWAL);
+        Assertions.assertTrue(suggestions.contains("General Template"));
+        Assertions.assertTrue(suggestions.contains("Withdrawal Only Template"));
+
+        // Enter a custom comment
+        _setValue(commentPicker, "My Custom Comment");
+        _setValue(amountField, new BigDecimal("75.00"));
+
+        final Button saveButton = _get(Button.class, spec -> spec.withText("Save"));
+        _click(saveButton);
+
+        // Verify booking was created in DB with the custom comment
+        final Bookings bookings = bookingsService.bookingsForShareholderAndYear(savedSh.getId(), Year.of(2026));
+        Assertions.assertEquals(1, bookings.filter(b -> true).bookings().size());
+        Assertions.assertEquals("My Custom Comment", bookings.filter(b -> true).bookings().getFirst().getComment());
     }
 }

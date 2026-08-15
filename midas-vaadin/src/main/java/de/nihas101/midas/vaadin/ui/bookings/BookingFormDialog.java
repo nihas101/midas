@@ -11,7 +11,6 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.BigDecimalField;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.ValidationResult;
@@ -20,6 +19,7 @@ import de.nihas101.midas.api.bookings.Booking;
 import de.nihas101.midas.api.bookings.BookingFactory;
 import de.nihas101.midas.api.bookings.BookingsReader;
 import de.nihas101.midas.api.bookings.BookingsWriter;
+import de.nihas101.midas.api.commenttemplate.CommentTemplatesReader;
 import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.api.shareholder.ShareholdersReader;
 import de.nihas101.midas.commons.BookingType;
@@ -35,6 +35,7 @@ import org.springframework.context.MessageSource;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Year;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
@@ -47,6 +48,7 @@ public class BookingFormDialog extends Dialog {
 
     private final BookingsReader bookingsReader;
     private final BookingsWriter bookingsWriter;
+    private final CommentTemplatesReader commentTemplatesReader;
     private final ShareholderLock shareholderLock;
     private final Consumer<Booking> onSave;
 
@@ -73,6 +75,7 @@ public class BookingFormDialog extends Dialog {
                 shareholdersReader,
                 bookingsReader,
                 bookingsWriter,
+                null,
                 messageSource,
                 locale,
                 initialShareholder,
@@ -100,6 +103,36 @@ public class BookingFormDialog extends Dialog {
                 shareholdersReader,
                 bookingsReader,
                 bookingsWriter,
+                null,
+                messageSource,
+                locale,
+                initialShareholder,
+                null,
+                shareholderLock,
+                onSave,
+                uiConfig,
+                bookingFactory
+        );
+    }
+
+    public BookingFormDialog(
+            final ShareholdersReader shareholdersReader,
+            final BookingsReader bookingsReader,
+            final BookingsWriter bookingsWriter,
+            final CommentTemplatesReader commentTemplatesReader,
+            final MessageSource messageSource,
+            final Locale locale,
+            final Shareholder initialShareholder,
+            final ShareholderLock shareholderLock,
+            final Consumer<Booking> onSave,
+            final UIConfig uiConfig,
+            final BookingFactory bookingFactory
+    ) {
+        this(
+                shareholdersReader,
+                bookingsReader,
+                bookingsWriter,
+                commentTemplatesReader,
                 messageSource,
                 locale,
                 initialShareholder,
@@ -127,6 +160,7 @@ public class BookingFormDialog extends Dialog {
                 shareholdersReader,
                 bookingsReader,
                 bookingsWriter,
+                null,
                 messageSource,
                 locale,
                 initialShareholder,
@@ -151,8 +185,39 @@ public class BookingFormDialog extends Dialog {
             final UIConfig uiConfig,
             final BookingFactory bookingFactory
     ) {
+        this(
+                shareholdersReader,
+                bookingsReader,
+                bookingsWriter,
+                null,
+                messageSource,
+                locale,
+                initialShareholder,
+                bookingToEdit,
+                shareholderLock,
+                onSave,
+                uiConfig,
+                bookingFactory
+        );
+    }
+
+    public BookingFormDialog(
+            final ShareholdersReader shareholdersReader,
+            final BookingsReader bookingsReader,
+            final BookingsWriter bookingsWriter,
+            final CommentTemplatesReader commentTemplatesReader,
+            final MessageSource messageSource,
+            final Locale locale,
+            final Shareholder initialShareholder,
+            final Booking bookingToEdit,
+            final ShareholderLock shareholderLock,
+            final Consumer<Booking> onSave,
+            final UIConfig uiConfig,
+            final BookingFactory bookingFactory
+    ) {
         this.bookingsReader = bookingsReader;
         this.bookingsWriter = bookingsWriter;
+        this.commentTemplatesReader = commentTemplatesReader;
         this.shareholderLock = shareholderLock;
         this.messageSource = messageSource;
         this.locale = locale;
@@ -182,10 +247,12 @@ public class BookingFormDialog extends Dialog {
 
         datePicker = datePicker(messageSource, locale, shareholderLock);
         final ComboBox<BookingType> typePicker = typePicker(messageSource, locale);
-        final TextField commentField = commentField(messageSource, locale);
+        final ComboBox<String> commentPicker = commentPicker(messageSource, locale);
         final BigDecimalField amountField = amountField(messageSource, locale);
 
-        formLayout.add(shareholderPicker, datePicker, typePicker, commentField, amountField);
+        typePicker.addValueChangeListener(e -> updateCommentSuggestions(commentPicker, e.getValue()));
+
+        formLayout.add(shareholderPicker, datePicker, typePicker, commentPicker, amountField);
         add(formLayout);
 
         addAnotherCheckbox = new Checkbox(messageSource.getMessage("bookings.add-another", null, locale));
@@ -196,6 +263,7 @@ public class BookingFormDialog extends Dialog {
 
         if (isEditMode) {
             binder.setBean(bookingToEdit);
+            updateCommentSuggestions(commentPicker, bookingToEdit.getType());
         } else {
             final Booking booking = bookingFactory.create(
                     LocalDate.now(),
@@ -206,6 +274,15 @@ public class BookingFormDialog extends Dialog {
                 shareholderPicker.setValue(initialShareholder);
             }
             binder.setBean(booking);
+            updateCommentSuggestions(commentPicker, null);
+        }
+    }
+
+    private void updateCommentSuggestions(final ComboBox<String> commentPicker, final BookingType bookingType) {
+        if (commentTemplatesReader != null) {
+            commentPicker.setItems(commentTemplatesReader.getSuggestions(bookingType));
+        } else {
+            commentPicker.setItems(Collections.emptyList());
         }
     }
 
@@ -233,11 +310,13 @@ public class BookingFormDialog extends Dialog {
         return amountField;
     }
 
-    private TextField commentField(final MessageSource messageSource, final Locale locale) {
-        final TextField commentField = new TextField(messageSource.getMessage("bookings.comment", null, locale));
-        binder.forField(commentField)
+    private ComboBox<String> commentPicker(final MessageSource messageSource, final Locale locale) {
+        final ComboBox<String> commentPicker = new ComboBox<>(messageSource.getMessage("bookings.comment", null, locale));
+        commentPicker.setAllowCustomValue(true);
+        commentPicker.addCustomValueSetListener(e -> commentPicker.setValue(e.getDetail()));
+        binder.forField(commentPicker)
                 .bind(Booking::getComment, Booking::setComment);
-        return commentField;
+        return commentPicker;
     }
 
     private ComboBox<BookingType> typePicker(final MessageSource messageSource, final Locale locale) {
@@ -262,7 +341,7 @@ public class BookingFormDialog extends Dialog {
                 .withValidator((Validator<LocalDate>) (value, context) -> {
                     final Shareholder shareholder = shareholderPicker.getValue();
                     final Year year = Year.of(this.datePicker.getValue().getYear());
-                    final boolean isLocked = shareholderLock.isLocked(shareholder, year);
+                    final boolean isLocked = shareholderLock != null && shareholderLock.isLocked(shareholder, year);
                     return isLocked ? ValidationResult.error(
                             messageSource.getMessage(
                                     "bookings.lock.error.year-locked",
