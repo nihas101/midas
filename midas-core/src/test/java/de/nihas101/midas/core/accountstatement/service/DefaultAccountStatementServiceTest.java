@@ -114,7 +114,7 @@ class DefaultAccountStatementServiceTest {
         Assertions.assertEquals(DefaultOpeningBalance.fromEntity(openingBalance), accountStatements.openingBalance());
         Assertions.assertEquals(List.of(), accountStatements.manualStatements());
         Assertions.assertEquals(
-                new DefaultAccountStatement(withdrawal, messageSource, locale),
+                DefaultAccountStatement.fromEntity(withdrawal, messageSource, locale),
                 accountStatements.forType(BookingType.WITHDRAWAL)
         );
         Assertions.assertEquals(
@@ -130,11 +130,11 @@ class DefaultAccountStatementServiceTest {
                 accountStatements.forType(BookingType.TAX_PREVIOUS_YEAR)
         );
         Assertions.assertEquals(
-                new DefaultAccountStatement(taxCredit, messageSource, locale),
+                DefaultAccountStatement.fromEntity(taxCredit, messageSource, locale),
                 accountStatements.forType(BookingType.TAX_CREDIT)
         );
         Assertions.assertEquals(
-                new DefaultAccountStatement(interest, messageSource, locale),
+                DefaultAccountStatement.fromEntity(interest, messageSource, locale),
                 accountStatements.forType(BookingType.INTEREST)
         );
         Assertions.assertEquals(

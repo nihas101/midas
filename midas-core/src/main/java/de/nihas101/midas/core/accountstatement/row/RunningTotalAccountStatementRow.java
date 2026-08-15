@@ -87,7 +87,7 @@ public class RunningTotalAccountStatementRow implements AccountStatementRow {
 
     @Override
     public BookingType bookingType() {
-        return accountStatement.bookingType();
+        return accountStatement.type();
     }
 
     @Override

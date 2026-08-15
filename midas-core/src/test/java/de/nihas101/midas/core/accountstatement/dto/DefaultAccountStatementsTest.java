@@ -1,5 +1,6 @@
 package de.nihas101.midas.core.accountstatement.dto;
 
+import de.nihas101.midas.api.accountstatement.AccountStatement;
 import de.nihas101.midas.api.accountstatement.AccountStatements;
 import de.nihas101.midas.api.accountstatement.LabeledAccountStatement;
 import de.nihas101.midas.api.openingbalance.OpeningBalance;
@@ -18,8 +19,10 @@ import java.time.Year;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 class DefaultAccountStatementsTest {
@@ -32,7 +35,7 @@ class DefaultAccountStatementsTest {
         final AccountStatements accountStatement = new DefaultAccountStatements(
                 null,
                 null,
-                (Year) null,
+                null,
                 null,
                 null,
                 null
@@ -68,7 +71,7 @@ class DefaultAccountStatementsTest {
     @Test
     void forTypeNull() {
         final AccountStatements accountStatement = new DefaultAccountStatements(
-                List.of(),
+                Map.of(),
                 null,
                 bt -> new DefaultAccountStatement(
                         1,
@@ -77,9 +80,7 @@ class DefaultAccountStatementsTest {
                         MoneyAmount.ZERO,
                         null,
                         null
-                ),
-                null,
-                null
+                )
         );
         Assertions.assertNull(accountStatement.forType(null));
     }
@@ -87,7 +88,7 @@ class DefaultAccountStatementsTest {
     @Test
     void forTypeNullMap() {
         final AccountStatements accountStatement = new DefaultAccountStatements(
-                (Map<BookingType, LabeledAccountStatement>) null,
+                null,
                 null,
                 bt -> new DefaultAccountStatement(
                         1,
@@ -114,11 +115,21 @@ class DefaultAccountStatementsTest {
     @Test
     void forTypeNullMapAndNoFallback() {
         final AccountStatements accountStatement = new DefaultAccountStatements(
-                (Map<BookingType, LabeledAccountStatement>) null,
+                null,
                 null,
                 null
         );
         Assertions.assertNull(accountStatement.forType(BookingType.WITHDRAWAL));
+    }
+
+    private static Map<BookingType, LabeledAccountStatement> toDto(final List<AccountStatementEntity> entities) {
+        return Optional.ofNullable(entities).stream()
+                .flatMap(java.util.Collection::stream)
+                .collect(Collectors.toMap(
+                        AccountStatementEntity::getType,
+                        ase -> DefaultAccountStatement.fromEntity(ase, null, null),
+                        (a, b) -> a
+                ));
     }
 
     @ParameterizedTest
@@ -130,11 +141,9 @@ class DefaultAccountStatementsTest {
             final LabeledAccountStatement expectedAccountStatement
     ) {
         final AccountStatements accountStatement = new DefaultAccountStatements(
-                accountStatements,
+                toDto(accountStatements),
                 null,
-                defaultsSupplier,
-                null,
-                null
+                defaultsSupplier
         );
         Assertions.assertEquals(expectedAccountStatement, accountStatement.forType(bookingType));
     }
@@ -227,14 +236,15 @@ class DefaultAccountStatementsTest {
     @Test
     void forAllTypes() {
         final AtomicInteger id = new AtomicInteger(1);
-        final List<AccountStatementEntity> accountStatementEntities = Arrays.stream(BookingType.values())
+        final List<? extends AccountStatement> accountStatementEntities = Arrays.stream(BookingType.values())
                 .map(bookingType -> {
                     final int currentId = id.getAndIncrement();
-                    return new AccountStatementEntity(
+                    return new DefaultAccountStatement(
                             currentId,
-                            CURRENT_DATE,
+                            CURRENT_YEAR,
                             bookingType,
-                            MoneyAmount.ofCents(currentId * 100L)
+                            MoneyAmount.ofCents(currentId * 100L),
+                            "dummy"
                     );
                 })
                 .toList();
@@ -250,7 +260,7 @@ class DefaultAccountStatementsTest {
 
         for (final BookingType bookingType : BookingType.values()) {
             final LabeledAccountStatement expected = accountStatementEntities.stream()
-                    .filter(a -> bookingType == a.getType())
+                    .filter(a -> bookingType == a.type())
                     .findFirst()
                     .map(ase -> new DefaultAccountStatement(ase, null, null))
                     .orElseThrow();

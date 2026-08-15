@@ -1,17 +1,20 @@
 package de.nihas101.midas.core.accountstatement.service;
 
+import de.nihas101.midas.api.accountstatement.AccountStatement;
 import de.nihas101.midas.api.accountstatement.AccountStatementService;
 import de.nihas101.midas.api.accountstatement.AccountStatements;
 import de.nihas101.midas.api.openingbalance.OpeningBalance;
 import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.commons.MoneyAmount;
+import de.nihas101.midas.core.accountstatement.dto.DefaultAccountStatement;
+import de.nihas101.midas.core.accountstatement.dto.DefaultAccountStatementOverride;
 import de.nihas101.midas.core.accountstatement.dto.DefaultAccountStatements;
 import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
 import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
-import de.nihas101.midas.persistance.accountstatements.AccountStatementEntity;
 import de.nihas101.midas.persistance.accountstatements.AccountStatementOrderEntity;
 import de.nihas101.midas.persistance.accountstatements.AccountStatementOrdersRepository;
+import de.nihas101.midas.persistance.accountstatements.AccountStatementOverride;
 import de.nihas101.midas.persistance.accountstatements.AccountStatementOverrideEntity;
 import de.nihas101.midas.persistance.accountstatements.AccountStatementOverridesRepository;
 import de.nihas101.midas.persistance.accountstatements.AccountStatementsRepository;
@@ -46,16 +49,27 @@ public class DefaultAccountStatementService implements AccountStatementService {
             final MessageSource messageSource,
             final Locale locale
     ) {
-        final List<AccountStatementEntity> accountStatementEntities = accountStatementsRepository.accountStatements(
-                shareholder.getId(),
-                year.atMonth(Month.JANUARY).atDay(1),
-                year.atMonth(Month.DECEMBER).atEndOfMonth()
-        );
+        final List<? extends AccountStatement> accountStatements = accountStatementsRepository.accountStatements(
+                        shareholder.getId(),
+                        year.atMonth(Month.JANUARY).atDay(1),
+                        year.atMonth(Month.DECEMBER).atEndOfMonth()
+                )
+                .stream()
+                .map(accountStatement ->
+                        DefaultAccountStatement.fromEntity(
+                                accountStatement,
+                                messageSource,
+                                locale
+                        )
+                ).toList();
 
-        final List<AccountStatementOverrideEntity> overrides = accountStatementOverridesRepository.findByShareholderIdAndYear(
-                shareholder.getId(),
-                year.getValue()
-        );
+        final List<AccountStatementOverride> overrides = accountStatementOverridesRepository.findByShareholderIdAndYear(
+                        shareholder.getId(),
+                        year.getValue()
+                )
+                .stream()
+                .map(DefaultAccountStatementOverride::fromEntity)
+                .toList();
 
         final OpeningBalance openingBalance = openingBalanceRepository.findByShareholderAndDate(
                         DefaultShareholder.fromDto(shareholder),
@@ -65,7 +79,7 @@ public class DefaultAccountStatementService implements AccountStatementService {
                 .orElse(null);
 
         return new DefaultAccountStatements(
-                accountStatementEntities,
+                accountStatements,
                 overrides,
                 year,
                 openingBalance,

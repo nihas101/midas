@@ -289,7 +289,7 @@ class AccountStatementSortTest {
         }
 
         @Override
-        public BookingType bookingType() {
+        public BookingType type() {
             return bookingType;
         }
 
