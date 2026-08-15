@@ -18,7 +18,6 @@ public class DefaultInterest implements Interest {
     private final BigDecimal interestDays; // aka 'Zinstage' t
     private final BigDecimal interestRate; // aka 'Zinsfuß' p
 
-    // TODO: Use appropriate classes here instead of BigDecimal
     public DefaultInterest(
             MoneyAmount capital,
             BigDecimal interestDays,

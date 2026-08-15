@@ -21,7 +21,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DefaultRunningTotalAccountStatements implements RunningTotalAccountStatements {
 
-    // TODO: Don't expose this
     private final List<RunningTotalAccountStatement> runningTotalAccountStatements;
 
     public DefaultRunningTotalAccountStatements(

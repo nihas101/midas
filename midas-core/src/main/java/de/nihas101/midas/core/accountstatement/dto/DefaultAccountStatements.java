@@ -111,7 +111,6 @@ public class DefaultAccountStatements implements AccountStatements {
         );
     }
 
-    // TODO: This can probably be simplified
     private static Map<BookingType, LabeledAccountStatement> buildMergedStatements(
             final List<AccountStatementEntity> accountStatementEntities,
             final List<AccountStatementOverrideEntity> overrides,

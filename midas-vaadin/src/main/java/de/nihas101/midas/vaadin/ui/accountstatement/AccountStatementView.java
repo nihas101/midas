@@ -146,10 +146,8 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         setContent(content);
     }
 
-    // TODO: Also add these to local storage
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
-        // TODO: Move this logic into the query parameter?
         event.getLocation().getQueryParameters().getSingleParameter(QueryParameter.QUERY_PARAM_SHAREHOLDER)
                 .ifPresent(shareholderId -> {
                     try {
