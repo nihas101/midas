@@ -119,18 +119,16 @@
     <table class="as-table">
         <thead>
         <tr>
-            <th th:text="${data.headers[0]}">ID</th>
-            <th th:text="${data.headers[1]}">Date</th>
-            <th class="as-col-type" th:text="${data.headers[2]}">Type</th>
-            <th class="text-right separator-column" th:text="${data.headers[3]}">Debit</th>
-            <th class="text-right separator-column" th:text="${data.headers[4]}">Credit</th>
-            <th class="text-right separator-column" th:text="${data.headers[5]}">Balance</th>
+            <th th:text="${data.headers[0]}">Date</th>
+            <th class="as-col-type" th:text="${data.headers[1]}">Type</th>
+            <th class="text-right separator-column" th:text="${data.headers[2]}">Debit</th>
+            <th class="text-right separator-column" th:text="${data.headers[3]}">Credit</th>
+            <th class="text-right separator-column" th:text="${data.headers[4]}">Balance</th>
         </tr>
         </thead>
         <tbody>
         <th:block th:each="row : ${data.rows}">
             <tr th:if="${!(row instanceof T(de.nihas101.midas.core.accountstatement.row.ClosingAccountStatementRow))}">
-                <td th:text="${row.displayId() != null and row.displayId() != 0 ? row.displayId() : ''}">ID</td>
                 <td th:text="${row.dateStr()}">Date</td>
                 <td th:text="${row.label()}">Type</td>
 
@@ -147,7 +145,7 @@
             </tr>
             <tr th:if="${row instanceof T(de.nihas101.midas.core.accountstatement.row.ClosingAccountStatementRow)}"
                 class="as-closing-row">
-                <td colspan="4" class="text-right" th:text="${row.label()}">Endstand per ...</td>
+                <td colspan="3" class="text-right" th:text="${row.label()}">Endstand per ...</td>
                 <td></td>
                 <td class="text-right amount" th:text="${row.balance() != null ? row.balance().format(#locale) : ''}">
                     Balance

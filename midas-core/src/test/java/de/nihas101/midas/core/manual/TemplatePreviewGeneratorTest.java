@@ -172,7 +172,6 @@ public class TemplatePreviewGeneratorTest {
 
     private PdfViewData extractAccountStatementsData(Shareholder shareholder, LocalDate startDate, Locale locale) {
         List<String> headers = List.of(
-                messageSource.getMessage("account-statements.table.id", null, locale),
                 messageSource.getMessage("account-statements.table.date", null, locale),
                 messageSource.getMessage("account-statements.table.type", null, locale),
                 messageSource.getMessage("account-statements.table.debit", null, locale),
