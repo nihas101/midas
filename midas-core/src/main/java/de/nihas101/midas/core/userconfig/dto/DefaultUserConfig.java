@@ -25,7 +25,7 @@ public class DefaultUserConfig implements UserConfig {
         this.userIdentifier = userIdentifier;
     }
 
-    public static UserConfig fromEntity(final UserConfigEntity userConfigEntity) { // TODO: Tests
+    public static UserConfig fromEntity(final UserConfigEntity userConfigEntity) {
         return new DefaultUserConfig(
                 userConfigEntity.getId(),
                 userConfigEntity.getUserIdentifier(),

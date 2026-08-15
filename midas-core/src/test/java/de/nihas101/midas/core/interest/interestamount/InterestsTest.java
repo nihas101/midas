@@ -9,6 +9,9 @@ import java.math.RoundingMode;
 import java.time.Month;
 import java.util.Map;
 
+import static java.math.BigDecimal.ONE;
+import static java.math.BigDecimal.ZERO;
+
 class InterestsTest {
 
     private final Interests interests = new Interests(
@@ -60,5 +63,25 @@ class InterestsTest {
         );
     }
 
-    // TODO: Tests for edge cases like null, empty map etc.
+    @Test
+    void handlesNullMapGracefully() {
+        final Interests emptyInterests = new Interests(null);
+        Assertions.assertEquals(ZERO, emptyInterests.interestAmountSum());
+        Assertions.assertEquals(ONE, emptyInterests.interestDivisor());
+        Assertions.assertEquals(
+                MoneyAmount.ZERO.toBigDecimal().setScale(0, RoundingMode.HALF_UP),
+                emptyInterests.interest()
+        );
+    }
+
+    @Test
+    void handlesEmptyMapGracefully() {
+        final Interests emptyInterests = new Interests(Map.of());
+        Assertions.assertEquals(ZERO, emptyInterests.interestAmountSum());
+        Assertions.assertEquals(ONE, emptyInterests.interestDivisor());
+        Assertions.assertEquals(
+                MoneyAmount.ZERO.toBigDecimal().setScale(0, RoundingMode.HALF_UP),
+                emptyInterests.interest()
+        );
+    }
 }

@@ -13,7 +13,7 @@ import java.util.List;
 public record OpeningBalanceBookingRow(
         MoneyAmount balance,
         List<Booking> bookings
-) implements BookingRow { // TODO: Test
+) implements BookingRow {
 
     public OpeningBalanceBookingRow(final Bookings bookings) {
         this(
@@ -32,6 +32,7 @@ public record OpeningBalanceBookingRow(
         return "";
     }
 
+    // TODO: Make the format configurable, like with account statement
     @Override
     public String dateStr() {
         return "01.01.";

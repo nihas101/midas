@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class DefaultUserConfigService implements UserConfigService { // TODO: Test
+public class DefaultUserConfigService implements UserConfigService {
 
     private final UserConfigRepository userConfigRepository;
 

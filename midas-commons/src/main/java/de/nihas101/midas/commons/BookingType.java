@@ -53,7 +53,6 @@ public enum BookingType {
     }
 
     public static List<BookingType> creatableByUser() {
-        return Arrays.stream(BookingType.values())
-                .toList();
+        return Arrays.stream(BookingType.values()).toList();
     }
 }

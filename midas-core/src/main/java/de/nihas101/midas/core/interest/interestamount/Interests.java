@@ -8,6 +8,9 @@ import java.math.RoundingMode;
 import java.time.Month;
 import java.util.Map;
 
+import static java.math.BigDecimal.ONE;
+import static java.math.BigDecimal.ZERO;
+
 @RequiredArgsConstructor
 public class Interests {
 
@@ -18,16 +21,24 @@ public class Interests {
     }
 
     public BigDecimal interestAmountSum() {
+        if (interests == null || interests.isEmpty()) {
+            return ZERO;
+        }
+
         return interests.values().stream()
                 .map(Interest::interestAmount)
-                .reduce(BigDecimal.valueOf(0), BigDecimal::add);
+                .reduce(ZERO, BigDecimal::add);
     }
 
     public BigDecimal interestDivisor() {
+        if (interests == null || interests.isEmpty()) {
+            return ONE;
+        }
+
         return interests.values()
                 .stream()
                 .findFirst()
                 .map(Interest::interestDivisor)
-                .orElse(BigDecimal.ONE);
+                .orElse(ONE);
     }
 }

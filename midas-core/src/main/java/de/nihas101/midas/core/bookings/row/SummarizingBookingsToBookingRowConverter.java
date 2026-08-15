@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.function.Consumer;
 
-// TODO: Test
 @RequiredArgsConstructor
 public class SummarizingBookingsToBookingRowConverter implements BookingsToBookingRowConverter {
 
