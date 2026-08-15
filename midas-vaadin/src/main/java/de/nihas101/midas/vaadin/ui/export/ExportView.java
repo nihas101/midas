@@ -36,8 +36,10 @@ import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
 import java.time.Year;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
 
 @Slf4j
 @Route("export")
@@ -141,7 +143,8 @@ public class ExportView extends MidasView {
         layout.setWidthFull();
 
         shareholderPicker = new MultiSelectComboBox<>(messageSource.getMessage("export.shareholders.label", null, getLocale()));
-        final Set<Shareholder> allShareholders = Set.copyOf(shareholdersService.shareholders().toList());
+        final List<Shareholder> allShareholders = shareholdersService.shareholders().toList();
+        allShareholders.sort(Comparator.comparing(Shareholder::getDisplayId));
         shareholderPicker.setItems(allShareholders);
         shareholderPicker.setItemLabelGenerator(s -> s.getFirstName() + " " + s.getLastName() + " (" + s.getDisplayId() + ")");
         shareholderPicker.setWidth("400px");

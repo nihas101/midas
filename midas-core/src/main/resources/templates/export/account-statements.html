@@ -31,16 +31,20 @@
             height: 2px;
             margin-bottom: 10px;
         }
-        .as-info-line {
+        .as-info-table {
             width: 100%;
+            border-collapse: collapse;
             margin-bottom: 0;
+            margin-top: 0;
+            font-size: 12pt;
         }
-        .as-page {
-            float: right;
-            font-size: 9pt;
+        .as-info-table td {
+            border: none;
+            padding: 0;
+            vertical-align: top;
         }
-        .as-shareholder {
-            float: left;
+        .as-page-cell {
+            text-align: right;
             font-size: 9pt;
         }
         .as-shareholder-label {
@@ -65,7 +69,7 @@
             border-collapse: collapse;
             border-top: 1px dashed #333;
             margin-top: 0 !important;
-            font-size: 9.5pt;
+            font-size: 10pt;
         }
         .as-table th, .as-table td {
             padding: 3px 4px;
@@ -104,33 +108,32 @@
 
     <div class="as-double-line"></div>
 
-    <div class="as-info-line">
-        <div class="as-shareholder">
-            <strong class="as-shareholder-label" th:text="#{bookings.shareholder} + ':'">Gesellschafter:</strong>
-            <span th:text="${data.shareholder.displayId} + ' ' + ${data.shareholder.firstName} + ' ' + ${data.shareholder.lastName}">1 Max Mustermann</span>
-        </div>
-        <div class="as-page">
-            <span th:text="#{account-statement.header.page}">Seite:</span>
-            <span class="page-num"></span>
-        </div>
-        <div style="clear: both;"></div>
-    </div>
+    <table class="as-info-table">
+        <tr>
+            <td>
+                <strong class="as-shareholder-label" th:text="#{bookings.shareholder} + ':'">Gesellschafter:</strong>
+                <span th:text="${data.shareholder.displayId} + ' ' + ${data.shareholder.firstName} + ' ' + ${data.shareholder.lastName}">1 Max Mustermann</span>
+            </td>
+            <td class="as-page-cell">
+                <span th:text="#{account-statement.header.page}">Seite:</span>
+                <span class="page-num"></span>
+            </td>
+        </tr>
+    </table>
 
     <table class="as-table">
         <thead>
         <tr>
-            <th th:text="${data.headers[0]}">ID</th>
-            <th th:text="${data.headers[1]}">Date</th>
-            <th class="as-col-type" th:text="${data.headers[2]}">Type</th>
-            <th class="text-right separator-column" th:text="${data.headers[3]}">Debit</th>
-            <th class="text-right separator-column" th:text="${data.headers[4]}">Credit</th>
-            <th class="text-right separator-column" th:text="${data.headers[5]}">Balance</th>
+            <th th:text="${data.headers[0]}">Date</th>
+            <th class="as-col-type" th:text="${data.headers[1]}">Type</th>
+            <th class="text-right separator-column" th:text="${data.headers[2]}">Debit</th>
+            <th class="text-right separator-column" th:text="${data.headers[3]}">Credit</th>
+            <th class="text-right separator-column" th:text="${data.headers[4]}">Balance</th>
         </tr>
         </thead>
         <tbody>
         <th:block th:each="row : ${data.rows}">
             <tr th:if="${!(row instanceof T(de.nihas101.midas.core.accountstatement.row.ClosingAccountStatementRow))}">
-                <td th:text="${row.displayId() != null and row.displayId() != 0 ? row.displayId() : ''}">ID</td>
                 <td th:text="${row.dateStr()}">Date</td>
                 <td th:text="${row.label()}">Type</td>
 
@@ -147,7 +150,7 @@
             </tr>
             <tr th:if="${row instanceof T(de.nihas101.midas.core.accountstatement.row.ClosingAccountStatementRow)}"
                 class="as-closing-row">
-                <td colspan="4" class="text-right" th:text="${row.label()}">Endstand per ...</td>
+                <td colspan="3" class="text-right" th:text="${row.label()}">Endstand per ...</td>
                 <td></td>
                 <td class="text-right amount" th:text="${row.balance() != null ? row.balance().format(#locale) : ''}">
                     Balance

@@ -106,7 +106,6 @@ public class PdfViewDataExtractor {
 
     private PdfViewData extractAccountStatementsData(final Shareholder shareholder) {
         List<String> headers = List.of(
-                messageSource.getMessage("account-statements.table.id", null, locale),
                 messageSource.getMessage("account-statements.table.date", null, locale),
                 messageSource.getMessage("account-statements.table.type", null, locale),
                 messageSource.getMessage("account-statements.table.debit", null, locale),

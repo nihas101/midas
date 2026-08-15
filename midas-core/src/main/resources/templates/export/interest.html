@@ -31,16 +31,20 @@
             height: 2px;
             margin-bottom: 10px;
         }
-        .ir-info-line {
+        .ir-info-table {
             width: 100%;
+            border-collapse: collapse;
             margin-bottom: 0;
+            margin-top: 0;
+            font-size: 12pt;
         }
-        .ir-page {
-            float: right;
-            font-size: 9pt;
+        .ir-info-table td {
+            border: none;
+            padding: 0;
+            vertical-align: top;
         }
-        .ir-shareholder {
-            float: left;
+        .ir-page-cell {
+            text-align: right;
             font-size: 9pt;
         }
         .ir-shareholder-label {
@@ -62,7 +66,7 @@
             border-collapse: collapse;
             border-top: 1px dashed #333;
             margin-top: 0 !important;
-            font-size: 9.5pt;
+            font-size: 10pt;
         }
         .ir-table th, .ir-table td {
             padding: 3px 4px;
@@ -117,16 +121,17 @@
 
     <div class="ir-double-line"></div>
 
-    <div class="ir-info-line">
-        <div class="ir-shareholder">
-            <strong class="ir-shareholder-label" th:text="#{bookings.shareholder} + ':'">Gesellschafter:</strong>
-            <span th:text="${data.shareholder.displayId} + ' ' + ${data.shareholder.firstName} + ' ' + ${data.shareholder.lastName}">1 Max Mustermann</span>
-        </div>
-        <div class="ir-page">
-            <span th:text="#{interest.header.interest-rate(${#numbers.formatDecimal(data.interestRate, 1, 'DEFAULT', 2, 'DEFAULT')})}">Zinssatz = 5.00%</span>
-        </div>
-        <div style="clear: both;"></div>
-    </div>
+    <table class="ir-info-table">
+        <tr>
+            <td>
+                <strong class="ir-shareholder-label" th:text="#{bookings.shareholder} + ':'">Gesellschafter:</strong>
+                <span th:text="${data.shareholder.displayId} + ' ' + ${data.shareholder.firstName} + ' ' + ${data.shareholder.lastName}">1 Max Mustermann</span>
+            </td>
+            <td class="ir-page-cell">
+                <span th:text="#{interest.header.interest-rate(${#numbers.formatDecimal(data.interestRate, 1, 'DEFAULT', 2, 'DEFAULT')})}">Zinssatz = 5.00%</span>
+            </td>
+        </tr>
+    </table>
 
     <table class="ir-table">
         <thead>
