@@ -9,13 +9,13 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 @RequiredArgsConstructor
-public class BaseInterestCalculationRow implements InterestCalculationRow { // TODO: Get rid of this class and merge it with the ones using it as delegate
+public class BaseInterestCalculationRow implements InterestCalculationRow {
     public static final int DEFAULT_INTEREST_DAYS_COUNT = 30;
     private final String monthAsString;
     private final MoneyAmount monthlyTotalSum;
     private final MoneyAmount balanceAtEndOfMonth;
     private final int interestDaysCount;
-    private final BigDecimal interestAmount; // TODO: A class for this?
+    private final BigDecimal interestAmount;
 
     public BaseInterestCalculationRow(
             final String monthAsString,
