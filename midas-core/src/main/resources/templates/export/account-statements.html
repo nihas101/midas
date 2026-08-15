@@ -31,17 +31,21 @@
             height: 2px;
             margin-bottom: 10px;
         }
-        .as-info-line {
+        .as-info-table {
             width: 100%;
+            border-collapse: collapse;
             margin-bottom: 0;
-        }
-        .as-page {
-            float: right;
-            font-size: 9pt;
-        }
-        .as-shareholder {
-            float: left;
+            margin-top: 0;
             font-size: 12pt;
+        }
+        .as-info-table td {
+            border: none;
+            padding: 0;
+            vertical-align: top;
+        }
+        .as-page-cell {
+            text-align: right;
+            font-size: 9pt;
         }
         .as-shareholder-label {
             margin-right: 10px;
@@ -104,17 +108,18 @@
 
     <div class="as-double-line"></div>
 
-    <div class="as-info-line">
-        <div class="as-shareholder">
-            <strong class="as-shareholder-label" th:text="#{bookings.shareholder} + ':'">Gesellschafter:</strong>
-            <span th:text="${data.shareholder.displayId} + ' ' + ${data.shareholder.firstName} + ' ' + ${data.shareholder.lastName}">1 Max Mustermann</span>
-        </div>
-        <div class="as-page">
-            <span th:text="#{account-statement.header.page}">Seite:</span>
-            <span class="page-num"></span>
-        </div>
-        <div style="clear: both;"></div>
-    </div>
+    <table class="as-info-table">
+        <tr>
+            <td>
+                <strong class="as-shareholder-label" th:text="#{bookings.shareholder} + ':'">Gesellschafter:</strong>
+                <span th:text="${data.shareholder.displayId} + ' ' + ${data.shareholder.firstName} + ' ' + ${data.shareholder.lastName}">1 Max Mustermann</span>
+            </td>
+            <td class="as-page-cell">
+                <span th:text="#{account-statement.header.page}">Seite:</span>
+                <span class="page-num"></span>
+            </td>
+        </tr>
+    </table>
 
     <table class="as-table">
         <thead>
