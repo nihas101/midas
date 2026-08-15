@@ -1,5 +1,6 @@
 package de.nihas101.midas.core.cleanup;
 
+import de.nihas101.midas.core.config.AccountStatementConfig;
 import de.nihas101.midas.core.config.CoreConfig;
 import de.nihas101.midas.core.config.I18nConfig;
 import de.nihas101.midas.core.config.ThemeConfig;
@@ -51,7 +52,8 @@ class BookingsCleanupTest {
                 new I18nConfig(),
                 new CleanupConfig(),
                 new DbConfig() {
-                }
+                },
+                new AccountStatementConfig()
         );
 
         final BookingsCleanup cleanup = new BookingsCleanup(bookingsRepository, lockRepository, config);

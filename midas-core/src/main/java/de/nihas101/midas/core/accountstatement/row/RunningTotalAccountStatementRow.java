@@ -5,15 +5,28 @@ import de.nihas101.midas.api.accountstatement.RunningTotalAccountStatement;
 import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.core.accountstatement.runningtotal.OpeningRunningTotalAccountStatement;
-import lombok.RequiredArgsConstructor;
+import de.nihas101.midas.core.config.AccountStatementConfig;
+import io.micrometer.common.util.StringUtils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-@RequiredArgsConstructor
 public class RunningTotalAccountStatementRow implements AccountStatementRow {
 
     private final RunningTotalAccountStatement accountStatement;
+    private final String dateFormat;
+
+    public RunningTotalAccountStatementRow(final RunningTotalAccountStatement accountStatement) {
+        this(accountStatement, AccountStatementConfig.DEFAULT_DATE_FORMAT);
+    }
+
+    public RunningTotalAccountStatementRow(
+            final RunningTotalAccountStatement accountStatement,
+            final String dateFormat
+    ) {
+        this.accountStatement = accountStatement;
+        this.dateFormat = StringUtils.isNotBlank(dateFormat) ? dateFormat : AccountStatementConfig.DEFAULT_DATE_FORMAT;
+    }
 
     @Override
     public Integer displayId() {
@@ -24,7 +37,7 @@ public class RunningTotalAccountStatementRow implements AccountStatementRow {
     public String dateStr() {
         final LocalDate date = accountStatement.date();
         if (date != null) {
-            return date.format(DateTimeFormatter.ofPattern("dd.MM")); // TODO: Make this configurable
+            return date.format(DateTimeFormatter.ofPattern(dateFormat));
         } else {
             return "";
         }

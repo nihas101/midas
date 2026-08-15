@@ -53,6 +53,8 @@ The application can be configured using `application.properties`. Below are some
       windows (and sessions) are active (default: `true`).
     * `grace-period`: The amount of time (in [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601#Durations)) the application will wait after the last browser
       window is closed before shutting down (default: `PT60S`).
+* `midas.account-statement`
+    * `date-format`: Sets the date format pattern for account statement rows (default: `dd.MM`).
 * `midas.export.pdf.template-path`: The path to HTML templates to be rendered
   via [Thymeleaf](https://www.thymeleaf.org/) in the PDF export
     * See `midas-core/src/main/resources/templates/export` for the default templates
