@@ -48,7 +48,7 @@ public class MoneyAmount {
         return new MoneyAmount(this.cents - other.cents);
     }
 
-    public MoneyAmount abs() { // TODO: Test
+    public MoneyAmount abs() {
         return MoneyAmount.ofCents(Math.abs(cents));
     }
 
@@ -73,7 +73,7 @@ public class MoneyAmount {
         return format(Locale.ENGLISH); // Default for internal logging/debugging
     }
 
-    public boolean smallerThan(final MoneyAmount amount) { // TODO: Add tests
+    public boolean smallerThan(final MoneyAmount amount) {
         return getCents() < amount.getCents();
     }
 }

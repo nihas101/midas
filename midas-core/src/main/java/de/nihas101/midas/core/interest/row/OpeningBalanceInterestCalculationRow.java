@@ -14,7 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 @RequiredArgsConstructor
-public class OpeningBalanceInterestCalculationRow implements InterestCalculationRow { // TODO: Test
+public class OpeningBalanceInterestCalculationRow implements InterestCalculationRow {
 
     private final InterestCalculationRow interestCalculationRow;
 
