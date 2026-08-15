@@ -49,7 +49,7 @@ public class FinalSumRow implements InterestCalculationRow {
     }
 
     @Override
-    public Integer interestDaysCount() {
+    public BigDecimal interestDaysCount() {
         return null;
     }
 

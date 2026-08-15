@@ -448,9 +448,9 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
         return interestAmounts == null ? "" : interestAmounts.toString();
     }
 
-    private String formatDays(final Integer days) {
+    private String formatDays(final BigDecimal days) {
         // To display empty cells for empty amounts
-        return days == null ? "" : days.toString();
+        return days == null ? "" : String.valueOf(days.intValue());
     }
 
     private String formatAmount(final MoneyAmount amount) {

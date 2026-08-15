@@ -10,11 +10,12 @@ import java.math.RoundingMode;
 
 @RequiredArgsConstructor
 public class BaseInterestCalculationRow implements InterestCalculationRow {
-    public static final int DEFAULT_INTEREST_DAYS_COUNT = 30;
+    public static final BigDecimal DEFAULT_INTEREST_DAYS = BigDecimal.valueOf(30L);
+
     private final String monthAsString;
     private final MoneyAmount monthlyTotalSum;
     private final MoneyAmount balanceAtEndOfMonth;
-    private final int interestDaysCount;
+    private final BigDecimal interestDaysCount;
     private final BigDecimal interestAmount;
 
     public BaseInterestCalculationRow(
@@ -27,7 +28,7 @@ public class BaseInterestCalculationRow implements InterestCalculationRow {
                 monthAsString,
                 totalTransactionAmount,
                 balanceAtEndOfMonth,
-                DEFAULT_INTEREST_DAYS_COUNT,
+                DEFAULT_INTEREST_DAYS,
                 interestAmount
         );
     }
@@ -48,7 +49,7 @@ public class BaseInterestCalculationRow implements InterestCalculationRow {
     }
 
     @Override
-    public Integer interestDaysCount() {
+    public BigDecimal interestDaysCount() {
         return interestDaysCount;
     }
 
