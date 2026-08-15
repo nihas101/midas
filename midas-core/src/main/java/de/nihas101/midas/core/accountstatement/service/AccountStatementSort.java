@@ -64,8 +64,8 @@ public class AccountStatementSort {
     }
 
     private Integer getDefaultOrderIndex(final LabeledAccountStatement statement) {
-        return statement.bookingType() != null
-                ? statement.bookingType().getSortKey()
+        return statement.type() != null
+                ? statement.type().getSortKey()
                 : MANUAL_STATEMENT_OFFSET + (statement.id() != null ? statement.id() : 0);
     }
 }

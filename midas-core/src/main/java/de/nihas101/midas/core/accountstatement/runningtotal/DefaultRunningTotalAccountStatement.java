@@ -54,7 +54,7 @@ public class DefaultRunningTotalAccountStatement implements RunningTotalAccountS
     }
 
     @Override
-    public BookingType bookingType() {
-        return statement != null ? statement.bookingType() : null;
+    public BookingType type() {
+        return statement != null ? statement.type() : null;
     }
 }

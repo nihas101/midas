@@ -1,5 +1,6 @@
 package de.nihas101.midas.core.accountstatement.dto;
 
+import de.nihas101.midas.api.accountstatement.AccountStatement;
 import de.nihas101.midas.api.accountstatement.LabeledAccountStatement;
 import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.commons.MoneyAmount;
@@ -22,7 +23,7 @@ class DefaultAccountStatementTest {
 
     @Test
     void nullTest() {
-        final LabeledAccountStatement accountStatement = new DefaultAccountStatement(null, null, null);
+        final LabeledAccountStatement accountStatement = new DefaultAccountStatement((AccountStatement) null, null, null);
         Assertions.assertNull(accountStatement.id());
         Assertions.assertNull(accountStatement.amount());
         Assertions.assertNull(accountStatement.date());

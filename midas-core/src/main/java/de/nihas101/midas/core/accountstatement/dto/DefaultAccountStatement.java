@@ -1,5 +1,6 @@
 package de.nihas101.midas.core.accountstatement.dto;
 
+import de.nihas101.midas.api.accountstatement.AccountStatement;
 import de.nihas101.midas.api.accountstatement.LabeledAccountStatement;
 import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.commons.MoneyAmount;
@@ -29,19 +30,19 @@ public final class DefaultAccountStatement implements LabeledAccountStatement {
     private final Source source;
 
     public DefaultAccountStatement(
-            final AccountStatementEntity accountStatementEntity,
+            final AccountStatement accountStatement,
             final MessageSource messageSource,
             final Locale locale
     ) {
         this(
-                accountStatementEntity != null ? accountStatementEntity.getId() : null,
-                Optional.ofNullable(accountStatementEntity)
-                        .map(AccountStatementEntity::getDate)
+                accountStatement != null ? accountStatement.id() : null,
+                Optional.ofNullable(accountStatement)
+                        .map(AccountStatement::date)
                         .map(LocalDate::getYear)
                         .map(Year::of)
                         .orElse(null),
-                accountStatementEntity != null ? accountStatementEntity.getType() : null,
-                accountStatementEntity != null ? accountStatementEntity.getAmount() : null,
+                accountStatement != null ? accountStatement.type() : null,
+                accountStatement != null ? accountStatement.amount() : null,
                 messageSource,
                 locale
         );
@@ -92,6 +93,11 @@ public final class DefaultAccountStatement implements LabeledAccountStatement {
     }
 
     @Override
+    public BookingType type() {
+        return type;
+    }
+
+    @Override
     public LocalDate date() {
         return year != null ? year.atMonth(Month.DECEMBER).atEndOfMonth() : null;
     }
@@ -116,8 +122,22 @@ public final class DefaultAccountStatement implements LabeledAccountStatement {
         return source == Source.USER;
     }
 
-    @Override
-    public BookingType bookingType() {
-        return type;
+    public static DefaultAccountStatement fromEntity(
+            final AccountStatementEntity accountStatementEntity,
+            final MessageSource messageSource,
+            final Locale locale
+    ) {
+        return new DefaultAccountStatement(
+                accountStatementEntity != null ? accountStatementEntity.getId() : null,
+                Optional.ofNullable(accountStatementEntity)
+                        .map(AccountStatementEntity::getDate)
+                        .map(LocalDate::getYear)
+                        .map(Year::of)
+                        .orElse(null),
+                accountStatementEntity != null ? accountStatementEntity.getType() : null,
+                accountStatementEntity != null ? accountStatementEntity.getAmount() : null,
+                messageSource,
+                locale
+        );
     }
 }
