@@ -45,7 +45,7 @@ public class InterestRow implements InterestCalculationRow {
     }
 
     @Override
-    public Integer interestDaysCount() {
+    public BigDecimal interestDaysCount() {
         return null;
     }
 

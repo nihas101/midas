@@ -11,7 +11,7 @@ public interface InterestCalculationRow {
 
     Transaction balanceAtEndOfMonth();
 
-    Integer interestDaysCount();
+    BigDecimal interestDaysCount();
 
     BigDecimal interestAmount();
 

@@ -44,6 +44,22 @@ class OpeningBalanceInterestCalculationRowTest {
         );
 
         assertEquals("Anfangsbestand 2026", row.label());
-        assertEquals(30, row.interestDaysCount());
+        assertEquals(30, row.interestDaysCount().intValue());
+    }
+
+    @Test
+    void acceptsCustomInterestDays() {
+        when(bookings.openingBalance()).thenReturn(new DefaultOpeningBalance(MoneyAmount.ofCents(100000L)));
+
+        final OpeningBalanceInterestCalculationRow row = new OpeningBalanceInterestCalculationRow(
+                bookings,
+                Year.of(2026),
+                BigDecimal.valueOf(5),
+                BigDecimal.valueOf(15),
+                messageSource,
+                Locale.ENGLISH
+        );
+
+        assertEquals(15, row.interestDaysCount().intValue());
     }
 }

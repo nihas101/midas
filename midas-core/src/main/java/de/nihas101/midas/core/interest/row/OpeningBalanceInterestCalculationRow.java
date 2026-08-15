@@ -4,7 +4,6 @@ import de.nihas101.midas.api.bookings.Bookings;
 import de.nihas101.midas.api.interest.InterestCalculationRow;
 import de.nihas101.midas.api.interest.Transaction;
 import de.nihas101.midas.core.interest.interestamount.DefaultInterest;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 
 import java.math.BigDecimal;
@@ -13,7 +12,6 @@ import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-@RequiredArgsConstructor
 public class OpeningBalanceInterestCalculationRow implements InterestCalculationRow {
 
     private final InterestCalculationRow interestCalculationRow;
@@ -25,6 +23,28 @@ public class OpeningBalanceInterestCalculationRow implements InterestCalculation
             final MessageSource messageSource,
             final Locale locale
     ) {
+        this(
+                bookings,
+                year,
+                interestRate,
+                BaseInterestCalculationRow.DEFAULT_INTEREST_DAYS,
+                messageSource,
+                locale
+        );
+    }
+
+    public OpeningBalanceInterestCalculationRow(
+            final Bookings bookings,
+            final Year year,
+            final BigDecimal interestRate,
+            final BigDecimal interestDays,
+            final MessageSource messageSource,
+            final Locale locale
+    ) {
+        final BigDecimal effectiveInterestDays = interestDays != null
+                ? interestDays
+                : BaseInterestCalculationRow.DEFAULT_INTEREST_DAYS;
+
         this.interestCalculationRow = new BaseInterestCalculationRow(
                 messageSource.getMessage(
                         "interest.opening-balance",
@@ -33,9 +53,10 @@ public class OpeningBalanceInterestCalculationRow implements InterestCalculation
                 ),
                 bookings.openingBalance().getOpeningBalance(),
                 bookings.openingBalance().getOpeningBalance(),
+                effectiveInterestDays,
                 new DefaultInterest(
                         bookings.openingBalance().getOpeningBalance(),
-                        BigDecimal.valueOf(30L), // TODO: Make this passable from outside
+                        effectiveInterestDays,
                         interestRate
                 ).interestAmount()
         );
@@ -57,7 +78,7 @@ public class OpeningBalanceInterestCalculationRow implements InterestCalculation
     }
 
     @Override
-    public Integer interestDaysCount() {
+    public BigDecimal interestDaysCount() {
         return interestCalculationRow.interestDaysCount();
     }
 
