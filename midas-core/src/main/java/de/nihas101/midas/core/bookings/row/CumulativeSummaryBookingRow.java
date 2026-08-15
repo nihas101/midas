@@ -50,10 +50,26 @@ public class CumulativeSummaryBookingRow implements BookingRow {
                 dateStr,
                 comment,
                 monthlyCumulativeSum,
-                monthlyCumulativeSum.sum(), // TODO: Sum is calculated twice here. Think on how to avoid that
-                bookings.openingBalance()
-                        .getOpeningBalance()
-                        .plus(monthlyCumulativeSum.sum()),
+                monthlyCumulativeSum.sum(),
+                bookings.openingBalance().getOpeningBalance(),
+                partName
+        );
+    }
+
+    private CumulativeSummaryBookingRow(
+            final String dateStr,
+            final String comment,
+            final MonthlyCumulativeSum monthlyCumulativeSum,
+            final MoneyAmount sum,
+            final MoneyAmount openingBalance,
+            final String partName
+    ) {
+        this(
+                dateStr,
+                comment,
+                monthlyCumulativeSum,
+                sum,
+                openingBalance.plus(sum),
                 Collections.emptyList(),
                 partName
         );
