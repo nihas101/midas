@@ -1,6 +1,7 @@
 package de.nihas101.midas.ui.common.locale;
 
 import de.nihas101.midas.core.cleanup.CleanupConfig;
+import de.nihas101.midas.core.config.AccountStatementConfig;
 import de.nihas101.midas.core.config.CoreConfig;
 import de.nihas101.midas.core.config.I18nConfig;
 import de.nihas101.midas.core.config.ThemeConfig;
@@ -50,7 +51,8 @@ class DefaultLanguageMidasLocaleResolverTest {
                                 new I18nConfig(),
                                 new CleanupConfig(),
                                 new DbConfig() {
-                                }
+                                },
+                                new AccountStatementConfig()
                         ), Locale.ENGLISH
                 ),
                 Arguments.of(
@@ -61,7 +63,8 @@ class DefaultLanguageMidasLocaleResolverTest {
                                 new I18nConfig("", false),
                                 new CleanupConfig(),
                                 new DbConfig() {
-                                }
+                                },
+                                new AccountStatementConfig()
                         ), null
                 ),
                 Arguments.of(
@@ -72,7 +75,8 @@ class DefaultLanguageMidasLocaleResolverTest {
                                 new I18nConfig("        ", false),
                                 new CleanupConfig(),
                                 new DbConfig() {
-                                }
+                                },
+                                new AccountStatementConfig()
                         ), null
                 ),
                 Arguments.of(
@@ -83,7 +87,8 @@ class DefaultLanguageMidasLocaleResolverTest {
                                 new I18nConfig("notAValidLocale", false),
                                 new CleanupConfig(),
                                 new DbConfig() {
-                                }
+                                },
+                                new AccountStatementConfig()
                         ), null
                 ),
                 Arguments.of(
@@ -94,7 +99,8 @@ class DefaultLanguageMidasLocaleResolverTest {
                                 new I18nConfig("en", false),
                                 new CleanupConfig(),
                                 new DbConfig() {
-                                }
+                                },
+                                new AccountStatementConfig()
                         ), Locale.ENGLISH
                 ),
                 Arguments.of(
@@ -105,7 +111,8 @@ class DefaultLanguageMidasLocaleResolverTest {
                                 new I18nConfig("de", false),
                                 new CleanupConfig(),
                                 new DbConfig() {
-                                }
+                                },
+                                new AccountStatementConfig()
                         ), Locale.GERMAN
                 )
         );

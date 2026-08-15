@@ -9,7 +9,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import de.nihas101.midas.api.commenttemplate.CommentTemplate;
 import de.nihas101.midas.api.commenttemplate.CommentTemplatesReader;
 import de.nihas101.midas.api.commenttemplate.CommentTemplatesWriter;
-import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.vaadin.ui.common.AddButton;
 import de.nihas101.midas.vaadin.ui.common.DeleteButton;
 import de.nihas101.midas.vaadin.ui.common.EditButton;

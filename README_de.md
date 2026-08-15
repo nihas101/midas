@@ -56,6 +56,8 @@ Eigenschaften aufgeführt:
       Browserfenster (und Sessions) mehr aktiv sind (Standard: `true`).
     * `grace-period`: Die Zeitspanne (in [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601#Durations)), die die Anwendung wartet, nachdem das letzte Browserfenster
       geschlossen wurde, bevor sie herunterfahren wird (Standard: `PT60S`).
+* `midas.account-statement`
+    * `date-format`: Legt das Datumsformat-Muster für die Abrechnungskontoansicht und -export fest (Standard: `dd.MM`).
 * `midas.export.pdf.template-path`: Pfad zu den HTML‑Templates, die über [Thymeleaf](https://www.thymeleaf.org/) für den
   PDF‑Export gerendert werden.
     * Siehe `midas-core/src/main/resources/templates/export` für die Standard‑Templates.
