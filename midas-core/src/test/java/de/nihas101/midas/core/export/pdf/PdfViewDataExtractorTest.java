@@ -130,7 +130,7 @@ class PdfViewDataExtractorTest {
 
         final PdfViewData result = extractor.extractData(shareholder, ExportViewName.ACCOUNT_STATEMENTS);
         assertEquals(ExportViewName.ACCOUNT_STATEMENTS, result.viewName());
-        assertEquals(6, result.headers().size());
+        assertEquals(5, result.headers().size());
         assertEquals(2, result.rows().size());
     }
 
