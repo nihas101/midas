@@ -13,6 +13,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
@@ -24,6 +25,8 @@ import de.nihas101.midas.api.bookings.BookingFactory;
 import de.nihas101.midas.api.bookings.Bookings;
 import de.nihas101.midas.api.bookings.BookingsReader;
 import de.nihas101.midas.api.bookings.BookingsWriter;
+import de.nihas101.midas.api.commenttemplate.CommentTemplatesReader;
+import de.nihas101.midas.api.commenttemplate.CommentTemplatesWriter;
 import de.nihas101.midas.api.interest.InterestUpdatingBookingsService;
 import de.nihas101.midas.api.interest.InterestUpdatingOpeningBalanceService;
 import de.nihas101.midas.api.lock.LockService;
@@ -40,11 +43,13 @@ import de.nihas101.midas.commons.Source;
 import de.nihas101.midas.core.bookings.row.BookingRow;
 import de.nihas101.midas.core.bookings.row.BookingRowService;
 import de.nihas101.midas.core.bookings.service.BookingsService;
+import de.nihas101.midas.core.commenttemplate.service.CommentTemplatesService;
 import de.nihas101.midas.core.config.CoreConfig;
 import de.nihas101.midas.core.export.ExportFactory;
 import de.nihas101.midas.core.export.ExportViewName;
 import de.nihas101.midas.core.lock.ShareholderLock;
 import de.nihas101.midas.core.shareholders.service.ShareholdersService;
+import de.nihas101.midas.vaadin.ui.commenttemplate.CommentTemplatesTable;
 import de.nihas101.midas.vaadin.ui.common.AddButton;
 import de.nihas101.midas.vaadin.ui.common.DeleteButton;
 import de.nihas101.midas.vaadin.ui.common.DownloadTrigger;
@@ -82,6 +87,8 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
     private final ShareholdersService shareholdersService;
     private final BookingsReader bookingsReader;
     private final BookingsWriter bookingsWriter;
+    private final CommentTemplatesReader commentTemplatesReader;
+    private final CommentTemplatesWriter commentTemplatesWriter;
     private final OpeningBalanceService openingBalanceService;
     private final MessageSource messageSource;
     private final BookingRowService bookingRowService;
@@ -103,6 +110,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
             final BookingsService bookingsReader,
             final InterestUpdatingBookingsService bookingsWriter,
             final InterestUpdatingOpeningBalanceService openingBalanceService,
+            final CommentTemplatesService commentTemplatesService,
             final CoreConfig config,
             final MessageSource messageSource,
             final UserConfigService userConfigService,
@@ -125,6 +133,8 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         this.shareholdersService = shareholdersService;
         this.bookingsReader = bookingsReader;
         this.bookingsWriter = bookingsWriter;
+        this.commentTemplatesReader = commentTemplatesService;
+        this.commentTemplatesWriter = commentTemplatesService;
         this.openingBalanceService = openingBalanceService;
         this.messageSource = messageSource;
         this.bookingRowService = bookingRowService;
@@ -141,8 +151,24 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
 
         this.downloadTrigger = new DownloadTrigger(content);
 
-        setupHeader(content);
-        setupGrid(content);
+        VerticalLayout bookingsTabContent = new VerticalLayout();
+        bookingsTabContent.setSizeFull();
+        setupHeader(bookingsTabContent);
+        setupGrid(bookingsTabContent);
+
+        CommentTemplatesTable commentTemplatesTable = new CommentTemplatesTable(
+                commentTemplatesReader,
+                commentTemplatesWriter,
+                messageSource,
+                getLocale()
+        );
+
+        TabSheet tabSheet = new TabSheet();
+        tabSheet.setSizeFull();
+        tabSheet.add(messageSource.getMessage("bookings", null, getLocale()), bookingsTabContent);
+        tabSheet.add(messageSource.getMessage("comment-templates", null, getLocale()), commentTemplatesTable);
+
+        content.add(tabSheet);
 
         setContent(content);
     }
@@ -277,6 +303,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                             shareholdersService,
                             bookingsReader,
                             bookingsWriter,
+                            commentTemplatesReader,
                             messageSource,
                             locale,
                             headerActionBar.getSelectedShareholder(),
@@ -395,6 +422,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                         shareholdersService,
                         bookingsReader,
                         bookingsWriter,
+                        commentTemplatesReader,
                         messageSource,
                         getLocale(),
                         headerActionBar.getSelectedShareholder(),
