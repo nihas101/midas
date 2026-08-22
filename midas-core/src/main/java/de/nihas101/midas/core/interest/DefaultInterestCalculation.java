@@ -8,6 +8,9 @@ import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.core.bookings.monthlytotal.DefaultMonthlyTotalSum;
 import de.nihas101.midas.core.bookings.monthlytotal.MonthlyCumulativeSum;
 import de.nihas101.midas.core.interest.interestamount.DefaultInterest;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -21,158 +24,139 @@ import java.util.stream.Collectors;
 import static java.math.BigDecimal.ZERO;
 import static java.math.BigDecimal.valueOf;
 
-// TODO: Tests
-// TODO: These constructors are a mess, extract classes from that logic
-public record DefaultInterestCalculation(
-        BigDecimal interestSum,
-        BigDecimal divisor,
-        MoneyAmount interest,
-        MoneyAmount finalSum,
-        Map<Month, MonthlyTotalSum> monthlyTotalSums,
-        Map<Month, MoneyAmount> monthlyBalances,
-        Map<Month, Interest> interests
-) implements InterestCalculation {
+@ToString
+@EqualsAndHashCode
+@RequiredArgsConstructor
+public final class DefaultInterestCalculation implements InterestCalculation {
+    private final BigDecimal interestSum;
+    private final BigDecimal divisor;
+    private final MoneyAmount interest;
+    private final MoneyAmount finalSum;
+    private final Map<Month, MonthlyTotalSum> monthlyTotalSums;
+    private final Map<Month, MoneyAmount> monthlyBalances;
+    private final Map<Month, Interest> interests;
 
     public DefaultInterestCalculation(
             final Bookings bookings,
             final Year year,
             final BigDecimal interestRate
     ) {
-        this(
-                bookings,
-                year,
-                interestRate,
-                getMonthlyBalances(bookings, getMonthlyBookingSums(getMonthlyCumulativeSums(bookings)))
-        );
+        final Map<Month, MoneyAmount> monthlyBookingSums = monthlyBookingSums(bookings);
+        final MoneyAmount openingBalance = openingBalance(bookings);
+        final Map<Month, MoneyAmount> monthlyBalances = monthlyBalances(openingBalance, monthlyBookingSums);
+        final Map<Month, Interest> interests = interests(interestRate, monthlyBalances);
+        final BigDecimal interestSum = interestSum(interestRate, openingBalance, interests);
+        final BigDecimal divisor = divisor(interestRate, interests);
+        final MoneyAmount interest = interest(divisor, interestSum);
+
+        this.interestSum = interestSum;
+        this.divisor = divisor;
+        this.interest = interest;
+        this.finalSum = monthlyBalances.get(Month.DECEMBER).plus(interest);
+        this.monthlyTotalSums = monthlyTotalSums(bookings, year);
+        this.monthlyBalances = monthlyBalances;
+        this.interests = interests;
     }
 
-    public DefaultInterestCalculation(
-            final Bookings bookings,
-            final Year year,
-            final BigDecimal interestRate,
-            final Map<Month, MoneyAmount> monthlyBalances
-    ) {
-        this(
-                bookings,
-                year,
-                interestRate,
-                monthlyBalances,
-                Arrays.stream(Month.values()).collect(
-                        Collectors.toMap(Function.identity(), month -> new DefaultInterest(
-                                monthlyBalances.get(month),
-                                valueOf(30L),
-                                interestRate
-                        )))
-        );
-    }
-
-    private static Map<Month, MoneyAmount> getMonthlyBalances(final Bookings bookings, final Map<Month, MoneyAmount> monthlyBookingSums) {
+    private Map<Month, MonthlyTotalSum> monthlyTotalSums(final Bookings bookings, final Year year) {
         return Arrays.stream(Month.values())
-                .collect(Collectors.toMap(Function.identity(), month -> bookings.openingBalance()
-                        .getOpeningBalance()
-                        .plus(monthlyBookingSums.get(month))));
+                .collect(Collectors.toMap(Function.identity(), month -> new DefaultMonthlyTotalSum(bookings, year.atMonth(month).getMonth())));
     }
 
-    private static Map<Month, MoneyAmount> getMonthlyBookingSums(final Map<Month, MonthlyCumulativeSum> monthlyCumulativeSums) {
-        return Arrays.stream(Month.values())
-                .collect(Collectors.toMap(Function.identity(), month -> {
-                    final MonthlyCumulativeSum monthlyCumulativeSum = monthlyCumulativeSums.get(month);
-                    return monthlyCumulativeSum.sum();
-                }));
+    private MoneyAmount interest(final BigDecimal divisor, final BigDecimal interestSum) {
+        return divisor.compareTo(ZERO) > 0
+                ? MoneyAmount.of(interestSum.setScale(4, RoundingMode.HALF_UP).divide(divisor, RoundingMode.HALF_UP))
+                : MoneyAmount.ZERO;
     }
 
-    private static Map<Month, MonthlyCumulativeSum> getMonthlyCumulativeSums(final Bookings bookings) {
-        return Arrays.stream(Month.values())
+    private Map<Month, MoneyAmount> monthlyBookingSums(final Bookings bookings) {
+        final Map<Month, MonthlyCumulativeSum> monthlyCumulativeSums = Arrays.stream(Month.values())
                 .collect(Collectors.toMap(Function.identity(), month -> new MonthlyCumulativeSum(bookings, month)));
+
+        return Arrays.stream(Month.values())
+                .collect(Collectors.toMap(Function.identity(), month -> monthlyCumulativeSums.get(month).sum()));
     }
 
-    public DefaultInterestCalculation(
-            final Bookings bookings,
-            final Year year,
-            final BigDecimal interestRate,
-            final Map<Month, MoneyAmount> monthlyBalances,
-            final Map<Month, Interest> interests
-    ) {
-        this(
-                interests.entrySet()
-                        .stream()
-                        // The last month is excluded from the sum of interests
-                        .filter(e -> !Month.DECEMBER.equals(e.getKey()))
-                        .map(Map.Entry::getValue)
-                        .map(Interest::interestAmount)
-                        .reduce(ZERO, BigDecimal::add)
-                        .add(
-                                new DefaultInterest(
-                                        bookings.openingBalance() != null ? bookings.openingBalance().getOpeningBalance() : MoneyAmount.ZERO,
-                                        valueOf(30L),
-                                        interestRate
-                                ).interestAmount()
-                        ),
-                interests.values()
-                        .stream()
-                        .map(Interest::interestDays)
-                        .reduce(ZERO, BigDecimal::add),
-                interestRate,
-                Arrays.stream(Month.values())
-                        .collect(Collectors.toMap(Function.identity(), month -> new DefaultMonthlyTotalSum(bookings, year.atMonth(month).getMonth()))),
-                monthlyBalances,
-                interests
-        );
+    private static MoneyAmount openingBalance(final Bookings bookings) {
+        return bookings.openingBalance() != null
+                ? bookings.openingBalance().getOpeningBalance()
+                : MoneyAmount.ZERO;
     }
 
-    public DefaultInterestCalculation(
-            final BigDecimal interestSum,
-            final BigDecimal daysInInterestYear,
-            final BigDecimal interestRate,
-            final Map<Month, MonthlyTotalSum> monthlyTotalSums,
-            final Map<Month, MoneyAmount> monthlyBalances,
-            final Map<Month, Interest> interests
-    ) {
-        this(
-                interestSum,
-                interestRate.compareTo(ZERO) > 0 ? daysInInterestYear.divide(interestRate, RoundingMode.HALF_UP) : ZERO, // divisor
-                monthlyTotalSums,
-                monthlyBalances,
-                interests
-        );
+    private BigDecimal divisor(final BigDecimal interestRate, final Map<Month, Interest> interests) {
+        final BigDecimal daysInInterestYear = interests.values()
+                .stream()
+                .map(Interest::interestDays)
+                .reduce(ZERO, BigDecimal::add);
+
+        return (interestRate != null && interestRate.compareTo(ZERO) > 0)
+                ? daysInInterestYear.divide(interestRate, RoundingMode.HALF_UP)
+                : ZERO;
     }
 
-    public DefaultInterestCalculation(
-            final BigDecimal interestSum,
-            final BigDecimal divisor,
-            final Map<Month, MonthlyTotalSum> monthlyTotalSums,
-            final Map<Month, MoneyAmount> monthlyBalances,
-            final Map<Month, Interest> interests
-    ) {
-        this(
-                interestSum,
-                divisor,
-                // interest
-                divisor.compareTo(ZERO) > 0
-                        ? MoneyAmount.of(interestSum.setScale(4, RoundingMode.HALF_UP).divide(divisor, RoundingMode.HALF_UP))
-                        : MoneyAmount.ZERO,
-                monthlyTotalSums,
-                monthlyBalances,
-                interests
-        );
+    private BigDecimal interestSum(final BigDecimal interestRate, final MoneyAmount openingBalance, final Map<Month, Interest> interests) {
+        final BigDecimal openingInterest = new DefaultInterest(
+                openingBalance,
+                valueOf(30L),
+                interestRate
+        ).interestAmount();
+
+        return interests.entrySet()
+                .stream()
+                .filter(e -> !Month.DECEMBER.equals(e.getKey()))
+                .map(Map.Entry::getValue)
+                .map(Interest::interestAmount)
+                .reduce(ZERO, BigDecimal::add)
+                .add(openingInterest);
     }
 
-    public DefaultInterestCalculation(
-            BigDecimal interestSum,
-            BigDecimal divisor,
-            MoneyAmount interest,
-            Map<Month, MonthlyTotalSum> monthlyTotalSums,
-            Map<Month, MoneyAmount> monthlyBalances,
-            Map<Month, Interest> interests
-    ) {
-        this(
-                interestSum,
-                divisor,
-                interest,
-                monthlyBalances.get(Month.DECEMBER).plus(interest), // finalSum
-                monthlyTotalSums,
-                monthlyBalances,
-                interests
-        );
+    private Map<Month, MoneyAmount> monthlyBalances(final MoneyAmount openingBalance, final Map<Month, MoneyAmount> monthlyBookingSums) {
+        return Arrays.stream(Month.values())
+                .collect(Collectors.toMap(Function.identity(), month -> openingBalance.plus(monthlyBookingSums.get(month))));
     }
+
+    private Map<Month, Interest> interests(final BigDecimal interestRate, final Map<Month, MoneyAmount> monthlyBalances) {
+        return Arrays.stream(Month.values())
+                .collect(Collectors.toMap(Function.identity(), month -> new DefaultInterest(
+                        monthlyBalances.get(month),
+                        valueOf(30L),
+                        interestRate
+                )));
+    }
+
+    @Override
+    public BigDecimal interestSum() {
+        return interestSum;
+    }
+
+    @Override
+    public BigDecimal divisor() {
+        return divisor;
+    }
+
+    @Override
+    public MoneyAmount interest() {
+        return interest;
+    }
+
+    @Override
+    public MoneyAmount finalSum() {
+        return finalSum;
+    }
+
+    @Override
+    public Map<Month, MonthlyTotalSum> monthlyTotalSums() {
+        return monthlyTotalSums;
+    }
+
+    @Override
+    public Map<Month, MoneyAmount> monthlyBalances() {
+        return monthlyBalances;
+    }
+
+    @Override
+    public Map<Month, Interest> interests() {
+        return interests;
+    }
+
 }
