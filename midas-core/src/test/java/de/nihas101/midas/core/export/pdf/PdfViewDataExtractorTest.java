@@ -96,7 +96,7 @@ class PdfViewDataExtractorTest {
 
         when(bookingsReader.bookingsForShareholderAndDates(eq(1), any(), any()))
                 .thenReturn(bookings);
-        when(bookingRowService.generateRows(any(Bookings.class), eq(locale)))
+        when(bookingRowService.generateRows(any(Bookings.class), eq(locale), eq(year)))
                 .thenReturn(List.of(mock(BookingRow.class), mock(BookingRow.class)));
 
         final PdfViewData result = extractor.extractData(shareholder, ExportViewName.BOOKINGS, year);

@@ -102,7 +102,8 @@ public class PdfViewDataExtractor {
                                         yearStart,
                                         yearEnd
                                 ),
-                                locale
+                                locale,
+                                year
                         )
                 )
         );

@@ -535,7 +535,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
             return;
         }
 
-        grid.setItems(bookingRowService.generateRows(bookings, getLocale()));
+        grid.setItems(bookingRowService.generateRows(bookings, getLocale(), year));
     }
 
     private void refreshGrid() {
@@ -572,7 +572,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         // TODO: We currently mix two responsibilities here, the creation of the display rows and the logic for calculating them,
         //       we should separate those concerns in the future, so that updateNextYearsBalance does not depend on ui related
         //       classes for business logic
-        final List<BookingRow> bookingRows = bookingRowService.generateRows(bookings, getLocale());
+        final List<BookingRow> bookingRows = bookingRowService.generateRows(bookings, getLocale(), year);
         if (!isLocked) {
             updateNextYearsBalanceIfNeeded(shareholder, year, bookingRows);
         }

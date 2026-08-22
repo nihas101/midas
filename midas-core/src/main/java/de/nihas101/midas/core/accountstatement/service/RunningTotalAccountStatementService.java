@@ -52,7 +52,8 @@ public class RunningTotalAccountStatementService {
                 new OpeningRunningTotalAccountStatement(
                         openingBalance,
                         messageSource,
-                        locale
+                        locale,
+                        year
                 )
         );
     }
