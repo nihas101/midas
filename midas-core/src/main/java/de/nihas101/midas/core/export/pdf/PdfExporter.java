@@ -63,34 +63,13 @@ public class PdfExporter implements Export {
             final PdfService pdfService,
             final PdfViewDataExtractor pdfViewDataExtractor
     ) {
-        final int totalFiles = totalFilesCount(request);
-        if (totalFiles == 0) {
-            throw new IllegalArgumentException("At least one shareholder and view are required for the PDF export");
-        }
-        if (totalFiles == 1) {
-            this.pdfGenerator = new SinglePdfGenerator(
-                    request,
-                    pdfService,
-                    locale,
-                    outputStream,
-                    pdfViewDataExtractor
-            );
-        } else {
-            this.pdfGenerator = new MultiPdfGenerator(
-                    request,
-                    pdfService,
-                    locale,
-                    outputStream,
-                    pdfViewDataExtractor
-            );
-        }
-    }
-
-    private int totalFilesCount(final ExportRequest request) {
-        final int startYear = request.startDate() != null ? request.startDate().getYear() : 0;
-        final int endYear = request.endDate() != null ? request.endDate().getYear() : startYear;
-        final int totalYears = endYear - startYear + 1;
-        return request.shareholders().size() * request.views().size() * totalYears;
+        this.pdfGenerator = new PdfGeneratorFactory(
+                request,
+                pdfService,
+                locale,
+                outputStream,
+                pdfViewDataExtractor
+        ).createPdfGenerator();
     }
 
     @Override
