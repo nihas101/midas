@@ -333,7 +333,8 @@ class DefaultAccountStatementServiceTest {
                                 "label"
                         ),
                         MoneyAmount.ZERO
-                )
+                ),
+                "dd.MM."
         );
     }
 }

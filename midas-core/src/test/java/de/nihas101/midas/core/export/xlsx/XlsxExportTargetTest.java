@@ -1,5 +1,6 @@
 package de.nihas101.midas.core.export.xlsx;
 
+import de.nihas101.midas.core.config.DatesConfig;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -26,7 +27,10 @@ class XlsxExportTargetTest {
 
     @BeforeEach
     void setUp() {
-        target = new XlsxExportTarget();
+        target = new XlsxExportTarget(
+                new XSSFWorkbook(),
+                new DatesConfig()
+        );
     }
 
     @Test
@@ -103,7 +107,7 @@ class XlsxExportTargetTest {
     @Test
     void close_closesTheUnderlyingWorkbook() throws Exception {
         XSSFWorkbook workbook = new XSSFWorkbook();
-        XlsxExportTarget target = new XlsxExportTarget(workbook);
+        XlsxExportTarget target = new XlsxExportTarget(workbook, new DatesConfig());
 
         target.close();
 

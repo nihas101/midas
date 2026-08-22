@@ -3,7 +3,7 @@ package de.nihas101.midas.core.accountstatement.row;
 import de.nihas101.midas.api.accountstatement.AccountStatementRow;
 import de.nihas101.midas.api.accountstatement.RunningTotalAccountStatement;
 import de.nihas101.midas.api.accountstatement.RunningTotalAccountStatements;
-import de.nihas101.midas.core.config.AccountStatementConfig;
+import de.nihas101.midas.core.config.DatesConfig;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -30,7 +30,7 @@ class DefaultAccountStatementRowServiceTest {
 
     @Test
     void usesCustomDateFormatFromConfig() {
-        final AccountStatementConfig config = new AccountStatementConfig("yyyy-MM-dd");
+        final DatesConfig config = new DatesConfig("yyyy-MM-dd", "dd-MM-yyyy");
         final DefaultAccountStatementRowService service = new DefaultAccountStatementRowService(messageSource, config);
 
         when(runningTotalAccountStatement.date()).thenReturn(LocalDate.of(2026, 8, 15));
@@ -39,19 +39,6 @@ class DefaultAccountStatementRowServiceTest {
         final List<AccountStatementRow> rows = service.generateRows(runningTotalAccountStatements, true);
 
         assertEquals(1, rows.size());
-        assertEquals("2026-08-15", rows.get(0).dateStr());
-    }
-
-    @Test
-    void usesDefaultDateFormatWhenConfigIsNull() {
-        final DefaultAccountStatementRowService service = new DefaultAccountStatementRowService(messageSource, null);
-
-        when(runningTotalAccountStatement.date()).thenReturn(LocalDate.of(2026, 8, 15));
-        when(runningTotalAccountStatements.runningTotalAccountStatements()).thenReturn(List.of(runningTotalAccountStatement));
-
-        final List<AccountStatementRow> rows = service.generateRows(runningTotalAccountStatements, true);
-
-        assertEquals(1, rows.size());
-        assertEquals("15.08", rows.get(0).dateStr());
+        assertEquals("2026-08-15", rows.getFirst().dateStr());
     }
 }

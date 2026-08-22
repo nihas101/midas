@@ -3,10 +3,9 @@ package de.nihas101.midas.core.accountstatement.row;
 import de.nihas101.midas.api.accountstatement.AccountStatementRow;
 import de.nihas101.midas.api.accountstatement.AccountStatementRowService;
 import de.nihas101.midas.api.accountstatement.RunningTotalAccountStatements;
-import de.nihas101.midas.core.config.AccountStatementConfig;
+import de.nihas101.midas.core.config.DatesConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +20,7 @@ import java.util.stream.Stream;
 public class DefaultAccountStatementRowService implements AccountStatementRowService {
 
     private final MessageSource messageSource;
-    private final AccountStatementConfig accountStatementConfig;
+    private final DatesConfig datesConfig;
 
     @Override
     public List<AccountStatementRow> generateRows(
@@ -43,9 +42,7 @@ public class DefaultAccountStatementRowService implements AccountStatementRowSer
     }
 
     private String dateFormat() {
-        return accountStatementConfig != null && StringUtils.isNotBlank(accountStatementConfig.getDateFormat())
-                ? accountStatementConfig.getDateFormat()
-                : AccountStatementConfig.DEFAULT_DATE_FORMAT;
+        return datesConfig.getMediumDateFormat();
     }
 
     @Override
@@ -55,6 +52,7 @@ public class DefaultAccountStatementRowService implements AccountStatementRowSer
     ) {
         return new ClosingAccountStatementRow(
                 accountStatements,
+                datesConfig,
                 messageSource,
                 locale
         );

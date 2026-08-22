@@ -41,8 +41,8 @@ The application can be configured using `application.properties`. Below are some
 
 * `midas.i18n`
     * `default-locale`: Sets the default locale for the application (e.g., `en`, `de`).
-    * `force-default-language`: If `true`, forces the application to use the `default-locale` regardless of
-      browser settings.
+    * `force-default-language`: If `true`, forces the application to use the `default-locale` regardless of browser
+      settings.
 * `midas.theme.default-theme`: Sets the default theme for the application (e.g., `dark`).
 * `midas.ui`
     * `hide-theme-toggle`: If `true`, hides the theme toggle button in the UI.
@@ -50,23 +50,27 @@ The application can be configured using `application.properties`. Below are some
     * `default-add-another-checkbox-state`: sets the default of 'Add another' type checkboxes (default: `false`)
     * `currency-symbol`: Sets the currency symbol displayed in UI input fields and labels (default: `€`).
 * `midas.desktop`
-    * `.auto-shutdown-enabled`: If `true`, the application will automatically shut down when no browser
-      windows (and sessions) are active (default: `true`).
-    * `grace-period`: The amount of time (in [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601#Durations)) the application will wait after the last browser
-      window is closed before shutting down (default: `PT60S`).
-* `midas.account-statement`
-    * `date-format`: Sets the date format pattern for account statement rows (default: `dd.MM`).
+    * `.auto-shutdown-enabled`: If `true`, the application will automatically shut down when no browser windows (and
+      sessions) are active (default: `true`).
+    * `grace-period`: The amount of time (in [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601#Durations)) the
+      application will wait after the last browser window is closed before shutting down (default: `PT60S`).
+* `midas.dates`
+    * `medium-date-format`: Sets the date string used for medium length date fields (default: `dd.MM.`).
+    * `long-date-format`: Sets the date format pattern for long length date fields (default: `dd.MM.yyyy`).
 * `midas.export.pdf.template-path`: The path to HTML templates to be rendered
   via [Thymeleaf](https://www.thymeleaf.org/) in the PDF export
     * See `midas-core/src/main/resources/templates/export` for the default templates
     * See `de.nihas101.midas.export.pdf.PdfViewData` for the data structure used as input
 * `midas.cleanup`
-  * `enabled`: Whether a cleanup of old bookings is triggered on startup of the application (default: `true`).
-  * `cutoff`: The period after which a booking is considered 'old' and eligible for cleanup (default: `PT10Y`).
-  * `delayBetweenCleanups`: Defines the duration (in [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601#Durations)) between separate cleanup runs (default: `PT1H`).
-  * `limit`: The maximum number of bookings deleted during the cleanup phase. Set to `-1` for no limit (default: `1000`).
+    * `enabled`: Whether a cleanup of old bookings is triggered on startup of the application (default: `true`).
+    * `cutoff`: The period after which a booking is considered 'old' and eligible for cleanup (default: `PT10Y`).
+    * `delayBetweenCleanups`: Defines the duration (in [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601#Durations))
+      between separate cleanup runs (default: `PT1H`).
+    * `limit`: The maximum number of bookings deleted during the cleanup phase. Set to `-1` for no limit (default:
+      `1000`).
 * `midas.db.sqlite.optimize`
-  * `enabled`: Whether `PRAGMA optimize` is run on startup and shutdown to keep the SQLite query planner statistics up to date (default: `true`).
+    * `enabled`: Whether `PRAGMA optimize` is run on startup and shutdown to keep the SQLite query planner statistics up
+      to date (default: `true`).
 * `spring`
     * `datasource.url`: The JDBC URL for the SQLite database (e.g., `jdbc:sqlite:midas.db`).
     * `jpa.show-sql`: If `true`, Hibernate will log all SQL statements to the console.

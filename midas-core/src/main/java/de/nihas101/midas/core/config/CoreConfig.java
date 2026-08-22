@@ -18,7 +18,7 @@ public class CoreConfig {
     private final I18nConfig i18n;
     private final CleanupConfig cleanup;
     private final DbConfig db;
-    private final AccountStatementConfig accountStatement;
+    private final DatesConfig dates;
 
     @Bean
     public ReloadableResourceBundleMessageSource messageSource() {

@@ -2,11 +2,15 @@ package de.nihas101.midas.core.bookings.row;
 
 import de.nihas101.midas.api.bookings.Bookings;
 import de.nihas101.midas.commons.MoneyAmount;
+import de.nihas101.midas.core.config.DatesConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.Month;
+import java.time.Year;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,11 +21,16 @@ import java.util.concurrent.atomic.AtomicReference;
 @RequiredArgsConstructor
 public class BookingRowService {
 
+    public static final LocalDate FIRST_DAY = Year.now().atMonth(Month.JANUARY).atDay(1);
+
     private final MessageSource messageSource;
+    private final DatesConfig bookingsConfig;
 
     public List<BookingRow> generateRows(final Bookings bookings, final Locale locale) {
+        final String dateFormat = bookingsConfig.getMediumDateFormat();
+
         List<BookingRow> rows = new ArrayList<>();
-        rows.add(new OpeningBalanceBookingRow(bookings));
+        rows.add(new OpeningBalanceBookingRow(bookings, FIRST_DAY.format(DateTimeFormatter.ofPattern(dateFormat))));
         rows.addAll(monthlySummaryRows(bookings, locale));
         return rows;
     }
@@ -89,6 +98,7 @@ public class BookingRowService {
                         bookings,
                         month,
                         curr,
+                        DateTimeFormatter.ofPattern(bookingsConfig.getMediumDateFormat()),
                         rows::add
                 ),
                 new MonthlySummaryBookingRow(

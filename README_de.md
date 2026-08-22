@@ -3,8 +3,8 @@
 **Sprachen**: [English](README.md) | [Deutsch](README_de.md)
 
 Midas ist ein Programm zur Erstellung von Finanzberichten für Gesellschafter. Es ermöglicht die Eingabe von Buchungen
-und das Erzeugen verschiedener Berichte.
-Die Hauptziele sind Zukunftssicherheit, langfristige Kompatibilität und eine browserbasierte Benutzeroberfläche.
+und das Erzeugen verschiedener Berichte. Die Hauptziele sind Zukunftssicherheit, langfristige Kompatibilität und eine
+browserbasierte Benutzeroberfläche.
 
 ## Verwendung
 
@@ -50,26 +50,34 @@ Eigenschaften aufgeführt:
 * `midas.ui`
     * `hide-theme-toggle`: Wenn `true`, wird der Theme-Umschaltknopf in der Benutzeroberfläche ausgeblendet.
     * `hide-language-selector`: Wenn `true`, wird die Sprachauswahl in der Benutzeroberfläche ausgeblendet.
-    * `default-add-another-checkbox-state`: setzt die Standartbelegung von Checkboxen der Art 'Weiter hinzufügen' (Standard: `false`)
+    * `default-add-another-checkbox-state`: setzt die Standartbelegung von Checkboxen der Art 'Weiter hinzufügen'
+      (Standard: `false`)
     * `currency-symbol`: Legt das in der Benutzeroberfläche angezeigte Währungssymbol fest (Standard: `€`).
 * `midas.desktop`
-    * `auto-shutdown-enabled`: Wenn `true`, wird die Anwendung automatisch heruntergefahren, sobald keine
-      Browserfenster (und Sessions) mehr aktiv sind (Standard: `true`).
-    * `grace-period`: Die Zeitspanne (in [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601#Durations)), die die Anwendung wartet, nachdem das letzte Browserfenster
-      geschlossen wurde, bevor sie herunterfahren wird (Standard: `PT60S`).
-* `midas.account-statement`
-    * `date-format`: Legt das Datumsformat-Muster für die Abrechnungskontoansicht und -export fest (Standard: `dd.MM`).
+    * `auto-shutdown-enabled`: Wenn `true`, wird die Anwendung automatisch heruntergefahren, sobald keine Browserfenster
+      (und Sessions) mehr aktiv sind (Standard: `true`).
+    * `grace-period`: Die Zeitspanne (in [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601#Durations)), die die
+      Anwendung wartet, nachdem das letzte Browserfenster geschlossen wurde, bevor sie herunterfahren wird (Standard:
+      `PT60S`).
+* `midas.dates`
+    * `medium-date-format`: Legt das Datumsformat-Muster für Datumsfelder mittlerer Länge fest (Standard: `dd.MM.`).
+    * `long-date-format`: Legt das Datumsformat-Muster für lange Datumsfelder fest (Standard: `dd.MM.yyyy`).
 * `midas.export.pdf.template-path`: Pfad zu den HTML‑Templates, die über [Thymeleaf](https://www.thymeleaf.org/) für den
   PDF‑Export gerendert werden.
     * Siehe `midas-core/src/main/resources/templates/export` für die Standard‑Templates.
     * Siehe `de.nihas101.midas.export.pdf.PdfViewData` für die Eingabedatenstruktur.
 * `midas.cleanup`
-    * `enabled`: Gibt an, ob beim Start der Applikation eine Bereinigung alter Buchungen ausgelöst wird (Standard: `true`)
-    * `cutoff`: Der Zeitraum, nach dessen Ablauf eine Buchung als 'veraltet' gilt und zur Bereinigung in Frage kommt (Standard: `PT10Y`)
-    * `delayBetweenCleanups`: Legt die Dauer (in [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601#Durations))zwischen einzelnen Bereinigungsläufen fest (Standard: `PT1H`).
-    * `limit`: Die maximale Anzahl der Buchungen, die während der Bereinigungsphase gelöscht werden. Setzen Sie den Wert auf `-1`, um kein Limit festzulegen (Standard: `1000`).
+    * `enabled`: Gibt an, ob beim Start der Applikation eine Bereinigung alter Buchungen ausgelöst wird (Standard:
+      `true`)
+    * `cutoff`: Der Zeitraum, nach dessen Ablauf eine Buchung als 'veraltet' gilt und zur Bereinigung in Frage kommt
+      (Standard: `PT10Y`)
+    * `delayBetweenCleanups`: Legt die Dauer (in [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601#Durations))zwischen
+      einzelnen Bereinigungsläufen fest (Standard: `PT1H`).
+    * `limit`: Die maximale Anzahl der Buchungen, die während der Bereinigungsphase gelöscht werden. Setzen Sie den Wert
+      auf `-1`, um kein Limit festzulegen (Standard: `1000`).
 * `midas.db.sqlite.optimize`
-    * `enabled`: Gibt an, ob `PRAGMA optimize` beim Start und Herunterfahren ausgeführt wird, um die Statistiken des SQLite‑Query‑Planers aktuell zu halten (Standard: `true`).
+    * `enabled`: Gibt an, ob `PRAGMA optimize` beim Start und Herunterfahren ausgeführt wird, um die Statistiken des
+      SQLite‑Query‑Planers aktuell zu halten (Standard: `true`).
 * `spring`
     * `datasource.url`: Die JDBC‑URL für die SQLite‑Datenbank (z.B. `jdbc:sqlite:midas.db`).
     * `jpa.show-sql`: Wenn `true`, protokolliert Hibernate alle SQL‑Queries in der Konsole.

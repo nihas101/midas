@@ -3,6 +3,7 @@ package de.nihas101.midas.core.accountstatement.row;
 import de.nihas101.midas.api.accountstatement.AccountStatementRow;
 import de.nihas101.midas.api.accountstatement.RunningTotalAccountStatements;
 import de.nihas101.midas.commons.MoneyAmount;
+import de.nihas101.midas.core.config.DatesConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 
@@ -17,6 +18,7 @@ public class ClosingAccountStatementRow implements AccountStatementRow {
 
     public ClosingAccountStatementRow(
             final RunningTotalAccountStatements accountStatements,
+            final DatesConfig datesConfig,
             final MessageSource messageSource,
             final Locale locale
     ) {
@@ -27,7 +29,7 @@ public class ClosingAccountStatementRow implements AccountStatementRow {
                         new Object[]{
                                 accountStatements.runningTotalAccountStatements()
                                         .getLast().date()
-                                        .format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+                                        .format(DateTimeFormatter.ofPattern(datesConfig.getLongDateFormat()))
                         },
                         locale
                 )
