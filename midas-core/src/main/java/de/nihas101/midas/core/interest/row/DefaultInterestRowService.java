@@ -7,6 +7,7 @@ import de.nihas101.midas.api.interest.InterestRowService;
 import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.core.bookings.row.BookingRow;
 import de.nihas101.midas.core.bookings.row.DefaultBookingsToBookingRowConverter;
+import de.nihas101.midas.core.config.DatesConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.Month;
 import java.time.Year;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,6 +27,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class DefaultInterestRowService implements InterestRowService {
 
     private final MessageSource messageSource;
+    private final DatesConfig datesConfig;
 
     @Override
     public List<InterestCalculationRow> generateRows(
@@ -67,6 +70,7 @@ public class DefaultInterestRowService implements InterestRowService {
                         new FinalSumRow(
                                 year.atMonth(Month.DECEMBER).atEndOfMonth(),
                                 interestCalculation.finalSum(),
+                                datesConfig,
                                 messageSource,
                                 locale
                         )
@@ -130,6 +134,7 @@ public class DefaultInterestRowService implements InterestRowService {
                 bookings,
                 month,
                 currentBalance.get(),
+                DateTimeFormatter.ofPattern(datesConfig.getMediumDateFormat()),
                 bookingRows::add
         ).generate();
 

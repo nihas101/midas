@@ -29,12 +29,13 @@ public class DefaultBookingsToBookingRowConverter implements BookingsToBookingRo
             final Bookings bookings,
             final Month month,
             final MoneyAmount startingBalance,
+            final DateTimeFormatter dateTimeFormatter,
             final Consumer<BookingRow> consumer
     ) {
         this(
                 bookings.bookingsInMonth(month),
                 startingBalance,
-                DateTimeFormatter.ofPattern("dd.MM"),
+                dateTimeFormatter,
                 consumer
         );
     }

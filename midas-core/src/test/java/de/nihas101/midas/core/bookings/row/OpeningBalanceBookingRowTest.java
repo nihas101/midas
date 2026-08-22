@@ -23,7 +23,7 @@ class OpeningBalanceBookingRowTest {
     void constructsFromBookingsCorrectly() {
         when(bookings.openingBalance()).thenReturn(new DefaultOpeningBalance(MoneyAmount.ofCents(1000L)));
 
-        final OpeningBalanceBookingRow row = new OpeningBalanceBookingRow(bookings);
+        final OpeningBalanceBookingRow row = new OpeningBalanceBookingRow(bookings, "dd.MM.");
 
         assertEquals("", row.displayId());
         assertEquals("01.01.", row.dateStr());
@@ -33,5 +33,14 @@ class OpeningBalanceBookingRowTest {
 
         assertEquals(MoneyAmount.ofCents(1000L), row.balance());
         assertTrue(row.bookings().isEmpty());
+    }
+
+    @Test
+    void constructsWithCustomDateFormat() {
+        when(bookings.openingBalance()).thenReturn(new DefaultOpeningBalance(MoneyAmount.ofCents(1000L)));
+
+        final OpeningBalanceBookingRow row = new OpeningBalanceBookingRow(bookings, "MM - dd");
+
+        assertEquals("01 - 01", row.dateStr());
     }
 }

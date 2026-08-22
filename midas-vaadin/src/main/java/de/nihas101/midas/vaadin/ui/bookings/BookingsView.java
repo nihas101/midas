@@ -68,6 +68,7 @@ import org.springframework.context.MessageSource;
 import java.math.BigDecimal;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -456,7 +457,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
 
         final String[] args = new String[]{
                 messageSource.getMessage(booking.getType().getI18nKey(), null, getLocale()),
-                booking.getDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")), // TODO: Make format configurable
+                booking.getDate().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)),
                 booking.getAmount().format(getLocale())
         };
         dialog.setText(messageSource.getMessage("bookings.table.delete.confirmation.message", args, getLocale()));

@@ -8,6 +8,7 @@ import de.nihas101.midas.api.interest.InterestBookingsService;
 import de.nihas101.midas.api.interest.InterestRowService;
 import de.nihas101.midas.core.accountstatement.service.RunningTotalAccountStatementService;
 import de.nihas101.midas.core.bookings.row.BookingRowService;
+import de.nihas101.midas.core.config.DatesConfig;
 import de.nihas101.midas.core.export.accountstatement.AccountStatementExportDataSource;
 import de.nihas101.midas.core.export.accountstatement.AccountStatementsRowExtractor;
 import de.nihas101.midas.core.export.bookings.BookingsExportDataSource;
@@ -43,6 +44,7 @@ public class ExportFactory {
     private final AccountStatementRowService accountStatementRowService;
     private final InterestRowService interestRowService;
     private final InterestBookingsService interestBookingsService;
+    private final DatesConfig datesConfig;
 
     public Export createXlsxExport(
             final ExportRequest request,
@@ -108,7 +110,8 @@ public class ExportFactory {
                 new XslxFile(
                         request.startDate(),
                         request.endDate()
-                )
+                ),
+                datesConfig
         );
     }
 

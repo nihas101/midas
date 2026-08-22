@@ -1,7 +1,7 @@
 package de.nihas101.midas.headless.config;
 
 import de.nihas101.midas.core.cleanup.CleanupConfig;
-import de.nihas101.midas.core.config.AccountStatementConfig;
+import de.nihas101.midas.core.config.DatesConfig;
 import de.nihas101.midas.core.config.I18nConfig;
 import de.nihas101.midas.core.config.ThemeConfig;
 import de.nihas101.midas.core.config.TitleConfig;
@@ -24,7 +24,7 @@ public class MidasConfig {
     private I18nConfig i18n;
     private CleanupConfig cleanup;
     private DbConfig db;
-    private AccountStatementConfig accountStatement;
+    private DatesConfig dates;
 
     public MidasConfig() {
         this(
@@ -35,7 +35,7 @@ public class MidasConfig {
                 new CleanupConfig(),
                 new DbConfig() {
                 },
-                new AccountStatementConfig()
+                new DatesConfig()
         );
     }
 
@@ -70,7 +70,7 @@ public class MidasConfig {
     }
 
     @Bean
-    public AccountStatementConfig accountStatementConfig() {
-        return accountStatement;
+    public DatesConfig datesConfig() {
+        return dates;
     }
 }

@@ -3,6 +3,7 @@ package de.nihas101.midas.core.interest.row;
 import de.nihas101.midas.api.interest.InterestCalculationRow;
 import de.nihas101.midas.api.interest.Transaction;
 import de.nihas101.midas.commons.MoneyAmount;
+import de.nihas101.midas.core.config.DatesConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 
@@ -19,6 +20,7 @@ public class FinalSumRow implements InterestCalculationRow {
     public FinalSumRow(
             final LocalDate date,
             final MoneyAmount sum,
+            final DatesConfig datesConfig,
             final MessageSource messageSource,
             final Locale locale
     ) {
@@ -26,8 +28,7 @@ public class FinalSumRow implements InterestCalculationRow {
                 sum,
                 messageSource.getMessage(
                         "interest.summary.final-sum",
-                        // TODO: Allow the user to define all these formats somewhere?
-                        new Object[]{date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))},
+                        new Object[]{date.format(DateTimeFormatter.ofPattern(datesConfig.getLongDateFormat()))},
                         locale
                 )
         );

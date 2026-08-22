@@ -1,6 +1,7 @@
 package de.nihas101.midas.core.export.xlsx;
 
 import de.nihas101.midas.api.export.ExportTarget;
+import de.nihas101.midas.core.config.DatesConfig;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -24,13 +25,9 @@ public class XlsxExportTarget implements ExportTarget, AutoCloseable {
     private final CellStyle headerStyle;
     private final CellStyle amountStyle;
 
-    public XlsxExportTarget() {
-        this(new XSSFWorkbook());
-    }
-
-    public XlsxExportTarget(final XSSFWorkbook workbook) {
+    public XlsxExportTarget(final XSSFWorkbook workbook, final DatesConfig datesConfig) {
         this.workbook = workbook;
-        this.dateStyle = dateStyle(workbook);
+        this.dateStyle = dateStyle(workbook, datesConfig);
         this.amountStyle = amountStyle(workbook);
         this.headerStyle = headerStyle(workbook);
     }
@@ -44,10 +41,10 @@ public class XlsxExportTarget implements ExportTarget, AutoCloseable {
         return style;
     }
 
-    private CellStyle dateStyle(final Workbook workbook) {
+    private CellStyle dateStyle(final Workbook workbook, final DatesConfig datesConfig) {
         final CellStyle style = workbook.createCellStyle();
         final CreationHelper createHelper = workbook.getCreationHelper();
-        style.setDataFormat(createHelper.createDataFormat().getFormat("dd.mm.yyyy"));
+        style.setDataFormat(createHelper.createDataFormat().getFormat(datesConfig.getLongDateFormat()));
         return style;
     }
 

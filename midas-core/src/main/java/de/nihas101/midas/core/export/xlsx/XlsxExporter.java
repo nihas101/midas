@@ -2,6 +2,7 @@ package de.nihas101.midas.core.export.xlsx;
 
 import de.nihas101.midas.api.export.Export;
 import de.nihas101.midas.api.export.ExportDataSource;
+import de.nihas101.midas.core.config.DatesConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,12 +21,13 @@ public class XlsxExporter implements Export {
     public XlsxExporter(
             final List<ExportDataSource> dataSources,
             final OutputStream outputStream,
-            final XslxFile xslxFile
+            final XslxFile xslxFile,
+            final DatesConfig datesConfig
     ) {
         this(
                 dataSources,
                 outputStream,
-                new XlsxExportTargetFactory(),
+                new XlsxExportTargetFactory(datesConfig),
                 xslxFile
         );
     }

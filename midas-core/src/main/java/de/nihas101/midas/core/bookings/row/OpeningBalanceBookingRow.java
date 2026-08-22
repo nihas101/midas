@@ -7,18 +7,24 @@ import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.core.bookings.monthlytotal.DefaultMonthlyTotalSum;
 
-import java.util.Collections;
+import java.time.Month;
+import java.time.Year;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+
+import static java.util.Collections.emptyList;
 
 public record OpeningBalanceBookingRow(
         MoneyAmount balance,
-        List<Booking> bookings
+        List<Booking> bookings,
+        String date
 ) implements BookingRow {
 
-    public OpeningBalanceBookingRow(final Bookings bookings) {
+    public OpeningBalanceBookingRow(final Bookings bookings, final String rowDateFormat) {
         this(
                 bookings.openingBalance().getOpeningBalance(),
-                Collections.emptyList()
+                emptyList(),
+                rowDateFormat
         );
     }
 
@@ -32,10 +38,9 @@ public record OpeningBalanceBookingRow(
         return "";
     }
 
-    // TODO: Make the format configurable, like with account statement
     @Override
     public String dateStr() {
-        return "01.01.";
+        return Year.now().atMonth(Month.JANUARY).atDay(1).format(DateTimeFormatter.ofPattern(date));
     }
 
     @Override
