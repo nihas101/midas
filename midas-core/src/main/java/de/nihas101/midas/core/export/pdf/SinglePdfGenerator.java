@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.OutputStream;
 import java.time.LocalDate;
+import java.time.Year;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -68,7 +69,8 @@ public class SinglePdfGenerator implements PdfGenerator {
                 outputStream,
                 pdfViewDataExtractor.extractData(
                         shareholder,
-                        localizedExportView != null ? localizedExportView.internalName() : null
+                        localizedExportView != null ? localizedExportView.internalName() : null,
+                        startDate != null ? Year.of(startDate.getYear()) : Year.now()
                 ),
                 new PdfFile(
                         shareholder,

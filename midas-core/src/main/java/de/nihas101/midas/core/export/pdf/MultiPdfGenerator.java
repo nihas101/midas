@@ -68,27 +68,58 @@ public class MultiPdfGenerator implements PdfGenerator {
     }
 
     private void generatePdfPerShareholder(final ZipOutputStream zos) throws IOException {
-        for (final Shareholder shareholder : shareholders) {
-            generatePdfPerView(zos, shareholder);
+        final int startYear = startDate != null ? startDate.getYear() : 0;
+        final int endYear = endDate != null ? endDate.getYear() : startYear;
+
+        for (int currentYear = startYear; currentYear <= endYear; currentYear++) {
+            final LocalDate yearStart = yearStart(currentYear, startYear);
+            final LocalDate yearEnd = yearEnd(currentYear, endYear);
+            for (final Shareholder shareholder : shareholders) {
+                generatePdfPerView(
+                        zos,
+                        shareholder,
+                        yearStart,
+                        yearEnd
+                );
+            }
         }
     }
 
-    private void generatePdfPerView(final ZipOutputStream zos, final Shareholder shareholder) throws IOException {
+    private LocalDate yearEnd(final int currentYear, final int endYear) {
+        return (currentYear == endYear && endDate != null)
+                ? endDate
+                : LocalDate.of(currentYear, 12, 31);
+    }
+
+    private LocalDate yearStart(final int currentYear, final int startYear) {
+        return (currentYear == startYear && startDate != null)
+                ? startDate
+                : LocalDate.of(currentYear, 1, 1);
+    }
+
+    private void generatePdfPerView(
+            final ZipOutputStream zos,
+            final Shareholder shareholder,
+            final LocalDate currentStartDate,
+            final LocalDate currentEndDate
+    ) throws IOException {
         for (final LocalizedExportView view : views.iterator()) {
-            createEntryForView(zos, shareholder, view);
+            createEntryForView(zos, shareholder, view, currentStartDate, currentEndDate);
         }
     }
 
     private void createEntryForView(
             final ZipOutputStream zos,
             final Shareholder shareholder,
-            final LocalizedExportView view
+            final LocalizedExportView view,
+            final LocalDate currentStartDate,
+            final LocalDate currentEndDate
     ) throws IOException {
         final PdfFile pdfFile = new PdfFile(
                 shareholder,
                 view.localizedName(),
-                startDate,
-                endDate
+                currentStartDate,
+                currentEndDate
         );
         zos.putNextEntry(new ZipEntry(pdfFile.name()));
 
@@ -101,8 +132,8 @@ public class MultiPdfGenerator implements PdfGenerator {
         new SinglePdfGenerator(
                 shareholder,
                 view,
-                startDate,
-                endDate,
+                currentStartDate,
+                currentEndDate,
                 pdfService,
                 locale,
                 baos,

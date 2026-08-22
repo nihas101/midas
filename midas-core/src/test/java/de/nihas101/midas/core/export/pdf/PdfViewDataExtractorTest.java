@@ -28,7 +28,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.MessageSource;
 
 import java.math.BigDecimal;
-import java.time.Month;
 import java.time.Year;
 import java.util.List;
 import java.util.Locale;
@@ -88,8 +87,8 @@ class PdfViewDataExtractorTest {
 
     @Test
     void extractData_bookingsView_returnsPdfViewDataWithBookings() {
-        when(request.startDate()).thenReturn(Year.of(2026).atMonth(Month.JANUARY).atDay(1));
-        when(request.endDate()).thenReturn(Year.of(2026).atMonth(Month.DECEMBER).atEndOfMonth());
+        final Year year = Year.of(2026);
+
         when(shareholder.getFirstName()).thenReturn("John");
         when(shareholder.getLastName()).thenReturn("Doe");
         when(shareholder.getId()).thenReturn(1);
@@ -100,7 +99,7 @@ class PdfViewDataExtractorTest {
         when(bookingRowService.generateRows(any(Bookings.class), eq(locale)))
                 .thenReturn(List.of(mock(BookingRow.class), mock(BookingRow.class)));
 
-        final PdfViewData result = extractor.extractData(shareholder, ExportViewName.BOOKINGS);
+        final PdfViewData result = extractor.extractData(shareholder, ExportViewName.BOOKINGS, year);
         assertEquals(ExportViewName.BOOKINGS, result.viewName());
         assertEquals("John Doe", result.shareholderName());
         assertEquals(2026, result.year());
@@ -111,7 +110,8 @@ class PdfViewDataExtractorTest {
 
     @Test
     void extractData_accountStatementsView_returnsPdfViewDataWithAccountStatements() {
-        when(request.startDate()).thenReturn(Year.of(2026).atMonth(Month.JANUARY).atDay(1));
+        final Year year = Year.of(2026);
+
         when(shareholder.getFirstName()).thenReturn("John");
         when(shareholder.getLastName()).thenReturn("Doe");
         when(messageSource.getMessage(anyString(), any(), eq(locale))).thenReturn("dummy");
@@ -128,7 +128,7 @@ class PdfViewDataExtractorTest {
         when(accountStatementRowService.generateRows(mockRunningTotal, false)).thenReturn(List.of(mock(AccountStatementRow.class)));
         when(accountStatementRowService.generateClosingRow(mockRunningTotal, locale)).thenReturn(mock(AccountStatementRow.class));
 
-        final PdfViewData result = extractor.extractData(shareholder, ExportViewName.ACCOUNT_STATEMENTS);
+        final PdfViewData result = extractor.extractData(shareholder, ExportViewName.ACCOUNT_STATEMENTS, year);
         assertEquals(ExportViewName.ACCOUNT_STATEMENTS, result.viewName());
         assertEquals(5, result.headers().size());
         assertEquals(2, result.rows().size());
@@ -136,7 +136,8 @@ class PdfViewDataExtractorTest {
 
     @Test
     void extractData_interestView_returnsPdfViewDataWithInterest() {
-        when(request.startDate()).thenReturn(Year.of(2026).atMonth(Month.JANUARY).atDay(1));
+        final Year year = Year.of(2026);
+
         when(shareholder.getFirstName()).thenReturn("John");
         when(shareholder.getLastName()).thenReturn("Doe");
         when(shareholder.getId()).thenReturn(1);
@@ -158,7 +159,7 @@ class PdfViewDataExtractorTest {
         when(interestRowService.generateRows(any(Year.class), eq(bookings), any(BigDecimal.class), any(), eq(locale)))
                 .thenReturn(List.of(mock(InterestCalculationRow.class)));
 
-        final PdfViewData result = extractor.extractData(shareholder, ExportViewName.INTEREST);
+        final PdfViewData result = extractor.extractData(shareholder, ExportViewName.INTEREST, year);
         assertEquals(ExportViewName.INTEREST, result.viewName());
         assertEquals(new BigDecimal("5.0"), result.interestRate());
         assertEquals(7, result.headers().size());
@@ -167,12 +168,13 @@ class PdfViewDataExtractorTest {
 
     @Test
     void extractData_unknownView_returnsDefaultPdfViewData() {
-        when(request.startDate()).thenReturn(Year.of(2026).atMonth(Month.JANUARY).atDay(1));
+        final Year year = Year.of(2026);
+
         when(shareholder.getFirstName()).thenReturn("John");
         when(shareholder.getLastName()).thenReturn("Doe");
 
-        final PdfViewData result = extractor.extractData(shareholder, null);
-        assertEquals(null, result.viewName());
+        final PdfViewData result = extractor.extractData(shareholder, null, year);
+        assertNull(result.viewName());
         assertEquals(2026, result.year());
         assertNull(result.interestRate());
         assertTrue(result.headers().isEmpty());
