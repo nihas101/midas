@@ -9,6 +9,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import de.nihas101.midas.api.accountstatement.AccountStatementService;
 import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.commons.MoneyAmount;
+import de.nihas101.midas.core.config.UIConfig;
 import de.nihas101.midas.vaadin.ui.common.SaveButton;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.MessageSource;
@@ -24,6 +25,7 @@ public class ManualRowDialog extends Dialog {
             final AccountStatementService accountStatementService,
             final Shareholder shareholder,
             final Year year,
+            final UIConfig uiConfig,
             Runnable afterSave,
             final Locale locale
     ) {
@@ -43,7 +45,7 @@ public class ManualRowDialog extends Dialog {
                 messageSource.getMessage("bookings.amount", null, locale)
         );
         amountField.setLocale(locale);
-        amountField.setSuffixComponent(new Span("€")); // TODO: currency from config?
+        amountField.setSuffixComponent(new Span(uiConfig.getCurrencySymbol()));
         amountField.setWidthFull();
 
         layout.add(labelField, amountField);

@@ -247,7 +247,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         openingBalanceField = new BigDecimalField(messageSource.getMessage("bookings.type.opening-balance", null, locale));
         openingBalanceField.setMaxWidth("9em");
         openingBalanceField.setLocale(locale);
-        openingBalanceField.setSuffixComponent(new Span("€")); // TODO: Use currency from properties
+        openingBalanceField.setSuffixComponent(new Span(getMidasConfig().getUi().getCurrencySymbol()));
         openingBalanceField.addValueChangeListener(e -> {
             if (e.isFromClient()) {
                 saveOpeningBalance();
@@ -277,7 +277,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                                 "bookings.dialog.opening-balance-exists.warning.message",
                                 new Object[]{
                                         shareholder.getFirstName() + " " + shareholder.getLastName(),
-                                        nextYearsOpeningBalance.getOpeningBalance().format(locale) + "€", // TODO: Define currency in properties
+                                        nextYearsOpeningBalance.getOpeningBalance().format(locale) + getMidasConfig().getUi().getCurrencySymbol(),
                                         nextYear
                                 },
                                 locale

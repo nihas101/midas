@@ -73,7 +73,7 @@ import static java.util.Collections.emptyList;
 @Slf4j
 @Route("account-statements")
 @PageTitle("Account Statements")
-public class AccountStatementView extends MidasView implements BeforeEnterObserver { // TODO: Add a toggle to carry forward the closing balance to next year
+public class AccountStatementView extends MidasView implements BeforeEnterObserver {
 
     public static final VaadinIcon icon = VaadinIcon.WALLET;
 
@@ -235,6 +235,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                             accountStatementService,
                             headerActionBar.getSelectedShareholder(),
                             headerActionBar.getSelectedYear(),
+                            getMidasConfig().getUi(),
                             this::refreshContent,
                             locale
                     );
@@ -557,7 +558,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                 messageSource.getMessage("bookings.amount", null, getLocale())
         );
         amountField.setLocale(getLocale());
-        amountField.setSuffixComponent(new Span("€")); // TODO: currency from config?
+        amountField.setSuffixComponent(new Span(getMidasConfig().getUi().getCurrencySymbol()));
         amountField.setValue(row.amount().toBigDecimalForInput());
         amountField.setWidthFull();
 

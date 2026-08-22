@@ -50,7 +50,8 @@ Eigenschaften aufgeführt:
 * `midas.ui`
     * `hide-theme-toggle`: Wenn `true`, wird der Theme-Umschaltknopf in der Benutzeroberfläche ausgeblendet.
     * `hide-language-selector`: Wenn `true`, wird die Sprachauswahl in der Benutzeroberfläche ausgeblendet.
-    *  `default-add-another-checkbox-state`: setzt die Standartbelegung von Checkboxen der Art 'Weiter hinzufügen' (Standard: `false`)
+    * `default-add-another-checkbox-state`: setzt die Standartbelegung von Checkboxen der Art 'Weiter hinzufügen' (Standard: `false`)
+    * `currency-symbol`: Legt das in der Benutzeroberfläche angezeigte Währungssymbol fest (Standard: `€`).
 * `midas.desktop`
     * `auto-shutdown-enabled`: Wenn `true`, wird die Anwendung automatisch heruntergefahren, sobald keine
       Browserfenster (und Sessions) mehr aktiv sind (Standard: `true`).

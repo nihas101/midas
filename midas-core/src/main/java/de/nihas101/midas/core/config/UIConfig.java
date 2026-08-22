@@ -9,8 +9,9 @@ public class UIConfig {
     private boolean hideThemeToggle;
     private boolean hideLanguageSelector;
     private boolean defaultAddAnotherCheckboxState;
+    private String currencySymbol;
 
     public UIConfig() {
-        this(false, false, false);
+        this(false, false, false, "€");
     }
 }

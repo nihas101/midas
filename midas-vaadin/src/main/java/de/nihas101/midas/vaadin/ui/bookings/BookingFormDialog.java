@@ -59,6 +59,7 @@ public class BookingFormDialog extends Dialog {
     private final ComboBox<Shareholder> shareholderPicker;
     private final DatePicker datePicker;
     private final BookingFactory bookingFactory;
+    private final UIConfig uiConfig;
 
     public BookingFormDialog(
             final ShareholdersReader shareholdersReader,
@@ -223,6 +224,7 @@ public class BookingFormDialog extends Dialog {
         this.locale = locale;
         this.onSave = onSave;
         this.bookingFactory = bookingFactory;
+        this.uiConfig = uiConfig != null ? uiConfig : new UIConfig();
 
         final boolean isEditMode = bookingToEdit != null;
         final String titleKey = isEditMode ? "bookings.dialog.title.edit" : "bookings.dialog.title.add";
@@ -290,7 +292,7 @@ public class BookingFormDialog extends Dialog {
         // TODO: Extract into class, so we dont have to set the local everywhere
         BigDecimalField amountField = new BigDecimalField(messageSource.getMessage("bookings.amount", null, locale));
         amountField.setLocale(locale);
-        amountField.setSuffixComponent(new Span("€")); // TODO: currency from config?
+        amountField.setSuffixComponent(new Span(uiConfig.getCurrencySymbol()));
         binder.forField(amountField)
                 .asRequired()
                 .withValidator((Validator<BigDecimal>) (value, context) -> value.longValue() != 0L
