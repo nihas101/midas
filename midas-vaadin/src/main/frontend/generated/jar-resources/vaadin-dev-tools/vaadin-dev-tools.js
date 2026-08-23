@@ -1,4 +1,5 @@
-import{LitElement as H,css as U,html as F}from"lit";import{property as V,query as $,state as B,customElement as D}from"lit/decorators.js";function b(o,e,t,s){var n=arguments.length,r=n<3?e:s===null?s=Object.getOwnPropertyDescriptor(e,t):s,a;if(typeof Reflect=="object"&&typeof Reflect.decorate=="function")r=Reflect.decorate(o,e,t,s);else for(var l=o.length-1;l>=0;l--)(a=o[l])&&(r=(n<3?a(r):n>3?a(e,t,r):a(e,t))||r);return n>3&&r&&Object.defineProperty(e,t,r),r}class j extends HTMLElement{#o;#n;#e;#s;#t;constructor(){super(),this.#o=null,this.#e=!1,this.#s=null,this.#t=null,this.#n=this.attachShadow({mode:"closed"}),this.render(),this.setupProtection()}static get observedAttributes(){return["expired","start-failure","license-download"]}render(){const e=`
+import{LitElement as e,css as t,html as n}from"lit";import{customElement as r,property as i,state as a}from"lit/decorators.js";function o(e,t,n,r){var i=arguments.length,a=i<3?t:r===null?r=Object.getOwnPropertyDescriptor(t,n):r,o;if(typeof Reflect==`object`&&typeof Reflect.decorate==`function`)a=Reflect.decorate(e,t,n,r);else for(var s=e.length-1;s>=0;s--)(o=e[s])&&(a=(i<3?o(a):i>3?o(t,n,a):o(t,n))||a);return i>3&&a&&Object.defineProperty(t,n,a),a}var s=class extends HTMLElement{#e;#t;#n;#r;#i;#a;constructor(){super(),this.#e=null,this.#n=!1,this.#r=null,this.#i=null,this.#a=null,this.#t=this.attachShadow({mode:`closed`}),this.render(),this.setupProtection()}static get observedAttributes(){return[`expired`,`start-failure`,`license-download`,`product`]}get isEnterprise(){return this.#a===`vaadin-ee`}render(){this.#t.innerHTML=`
+    
       <style>
         :host {
           position: fixed;
@@ -72,9 +73,12 @@ import{LitElement as H,css as U,html as F}from"lit";import{property as V,query a
         }
         
         ul li {
-          align-items: center;
           display: flex;
-          gap: 0.25rem;
+          gap: 0.5rem;
+        }
+
+        ul li svg {
+          flex-shrink: 0;
         }
         
         ul li span:first-of-type {
@@ -152,57 +156,56 @@ import{LitElement as H,css as U,html as F}from"lit";import{property as V,query a
           font-weight: 600;
         }
       </style>
-     `;this.#n.innerHTML=`
-    ${e}
+     
     <div class='container'>
-      ${this.#e?`
+      ${this.#n?`
         <h2>Trial expired</h2>
-        <p>
-          Vaadin Core is free and open-source. Sign in to keep using 
-          <span class="badge">
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M3 15.75V12C3 11.5875 3.14687 11.2344 3.44062 10.9406C3.73437 10.6469 4.0875 10.5 4.5 10.5H13.5C13.9125 10.5 14.2656 10.6469 14.5594 10.9406C14.8531 11.2344 15 11.5875 15 12V15.75H3ZM6.75 9.75C5.7125 9.75 4.82812 9.38438 4.09687 8.65313C3.36562 7.92188 3 7.0375 3 6C3 4.9625 3.36562 4.07813 4.09687 3.34688C4.82812 2.61563 5.7125 2.25 6.75 2.25H11.25C12.2875 2.25 13.1719 2.61563 13.9031 3.34688C14.6344 4.07813 15 4.9625 15 6C15 7.0375 14.6344 7.92188 13.9031 8.65313C13.1719 9.38438 12.2875 9.75 11.25 9.75H6.75ZM4.5 14.25H13.5V12H4.5V14.25ZM6.75 8.25H11.25C11.875 8.25 12.4062 8.03125 12.8437 7.59375C13.2812 7.15625 13.5 6.625 13.5 6C13.5 5.375 13.2812 4.84375 12.8437 4.40625C12.4062 3.96875 11.875 3.75 11.25 3.75H6.75C6.125 3.75 5.59375 3.96875 5.15625 4.40625C4.71875 4.84375 4.5 5.375 4.5 6C4.5 6.625 4.71875 7.15625 5.15625 7.59375C5.59375 8.03125 6.125 8.25 6.75 8.25ZM6.75 6.75C6.9625 6.75 7.14062 6.67813 7.28437 6.53438C7.42812 6.39063 7.5 6.2125 7.5 6C7.5 5.7875 7.42812 5.60938 7.28437 5.46563C7.14062 5.32188 6.9625 5.25 6.75 5.25C6.5375 5.25 6.35937 5.32188 6.21562 5.46563C6.07187 5.60938 6 5.7875 6 6C6 6.2125 6.07187 6.39063 6.21562 6.53438C6.35937 6.67813 6.5375 6.75 6.75 6.75ZM11.25 6.75C11.4625 6.75 11.6406 6.67813 11.7844 6.53438C11.9281 6.39063 12 6.2125 12 6C12 5.7875 11.9281 5.60938 11.7844 5.46563C11.6406 5.32188 11.4625 5.25 11.25 5.25C11.0375 5.25 10.8594 5.32188 10.7156 5.46563C10.5719 5.60938 10.5 5.7875 10.5 6C10.5 6.2125 10.5719 6.39063 10.7156 6.53438C10.8594 6.67813 11.0375 6.75 11.25 6.75Z" fill="url(#paint0_linear_85_182)"/>
-            <defs>
-              <linearGradient id="paint0_linear_85_182" x1="9" y1="2.25" x2="9" y2="15.75" gradientUnits="userSpaceOnUse">
-                <stop stop-color="#1A81FA"/>
-                <stop offset="1" stop-color="#8854FC"/>
-              </linearGradient>
-            </defs>
-          </svg>
-          Vaadin Copilot</span>,
-          <span class="badge">
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M12 15V9.75H15V15H12ZM7.5 15V3H10.5V15H7.5ZM3 15V6.75H6V15H3Z" fill="url(#paint0_linear_85_186)"/>
-              <defs>
-                <linearGradient id="paint0_linear_85_186" x1="9" y1="3" x2="9" y2="15" gradientUnits="userSpaceOnUse">
-                  <stop stop-color="#1A81FA"/>
-                  <stop offset="1" stop-color="#8854FC"/>
-                </linearGradient>
-              </defs>
-            </svg>
-            Pro components
-          </span> and 
-          <span class="badge">
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M8.2125 11.6625L12.45 7.425L11.3812 6.35625L8.2125 9.525L6.6375 7.95L5.56875 9.01875L8.2125 11.6625ZM9 16.5C7.2625 16.0625 5.82812 15.0656 4.69687 13.5094C3.56562 11.9531 3 10.225 3 8.325V3.75L9 1.5L15 3.75V8.325C15 10.225 14.4344 11.9531 13.3031 13.5094C12.1719 15.0656 10.7375 16.0625 9 16.5ZM9 14.925C10.3 14.5125 11.375 13.6875 12.225 12.45C13.075 11.2125 13.5 9.8375 13.5 8.325V4.78125L9 3.09375L4.5 4.78125V8.325C4.5 9.8375 4.925 11.2125 5.775 12.45C6.625 13.6875 7.7 14.5125 9 14.925Z" fill="url(#paint0_linear_85_190)"/>
-              <defs>
-                <linearGradient id="paint0_linear_85_190" x1="9" y1="1.5" x2="9" y2="16.5" gradientUnits="userSpaceOnUse">
-                  <stop stop-color="#1A81FA"/>
-                  <stop offset="1" stop-color="#8854FC"/>
-                </linearGradient>
-              </defs>
-            </svg>
-            Team features
-          </span> for 30 more days.
-        </p>
+        ${this.getExpiredIntro()}
         <p>Continue getting full access to:</p>
         ${this.getProductsList()}
-        <button ${this.#t==="started"?"disabled":""} class='primary'>
+        <button ${this.#i===`started`?`disabled`:``} class='primary'>
           <span>Extend trial 30 days</span>
           <span>Sign up ⋅ No credit card required</span>
         </button>
         `:`
         <h2>Get full access to all features</h2>
+        ${this.getAccessIntro()}
+        <p>Get full access:</p>
+        ${this.getProductsList()}
+        <button ${this.#i===`started`?`disabled`:``} class='primary'>
+          <span>Start 7-day trial</span>
+          <span>No registration or credit card required</span>
+        </button>
+        <button ${this.#i===`started`?`disabled`:``} class='secondary'>
+          Activate your license
+        </button>
+        `}
+      ${this.#r?`
+        <div class='error'>
+          <h3>Trial failed to start</h3>
+          <p>Something went wrong while starting your trial. Try again in a moment. If the issue persists, <a href="https://pages.vaadin.com/contact" target="_blank">contact our support team</a>.</p>
+        </div>`:``}
+      ${this.#i===`started`?`<p><strong>Waiting for the license key to be downloaded...</strong></p>`:``}
+      ${this.#i===`failed`?`<div class="error">Failed to download the license key. Please try again later.</div>`:``}
+      <hr>
+      <p>
+        By starting your trial, you agree to our <a href='https://vaadin.com/commercial-license-and-service-terms' target='_blank'>terms and conditions</a>.
+      </p>
+    </div>
+    `,this.#t.querySelector(`button.primary`)?.addEventListener(`click`,()=>{this.dispatchEvent(new CustomEvent(`primary-button-click`,{detail:{expired:this.#n}}))}),this.#t.querySelector(`button.secondary`)?.addEventListener(`click`,()=>{this.dispatchEvent(new CustomEvent(`secondary-button-click`))})}getAccessIntro(){return this.isEnterprise?`
+        <p>
+          This application uses <span class="badge">
+          <svg width="18" height="18" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 15V9.75h3V15h-3Zm-4.5 0V3h3v12h-3ZM3 15V6.75h3V15H3Z" fill="url(#ee)"/>
+          <defs>
+            <linearGradient id="ee" x1="9" y1="3" x2="9" y2="15" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#1A81FA"/>
+              <stop offset="1" stop-color="#8854FC"/>
+            </linearGradient>
+          </defs>
+        </svg>
+          Vaadin Enterprise Edition</span>. Activate a free trial to use it.
+        </p>`:`
         <p>
           Vaadin Core is free and open-source. To use Pro components like <span class="badge">
           <svg width="18" height="18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -215,53 +218,65 @@ import{LitElement as H,css as U,html as F}from"lit";import{property as V,query a
           </defs>
         </svg>
           Charts</span> in your app, activate a free trial.
-        </p>
-        <p>Get full access:</p>
-        ${this.getProductsList()}
-        <button ${this.#t==="started"?"disabled":""} class='primary'>
-          <span>Start 7-day trial</span>
-          <span>No registration or credit card required</span>
-        </button>
-        <button ${this.#t==="started"?"disabled":""} class='secondary'>
-          Activate your license
-        </button>
-        `}
-      ${this.#s?`
-        <div class='error'>
-          <h3>Trial failed to start</h3>
-          <p>Something went wrong while starting your trial. Try again in a moment. If the issue persists, <a href="https://pages.vaadin.com/contact" target="_blank">contact our support team</a>.</p>
-        </div>`:""}
-      ${this.#t==="started"?"<p><strong>Waiting for the license key to be downloaded...</strong></p>":""}
-      ${this.#t==="failed"?'<div class="error">Failed to download the license key. Please try again later.</div>':""}
-      <hr>
-      <p>
-        By starting your trial, you agree to our <a href='https://vaadin.com/commercial-license-and-service-terms' target='_blank'>terms and conditions</a>.
-      </p>
-    </div>
-    `,this.#n.querySelector("button.primary")?.addEventListener("click",()=>{this.dispatchEvent(new CustomEvent("primary-button-click",{detail:{expired:this.#e}}))}),this.#n.querySelector("button.secondary")?.addEventListener("click",()=>{this.dispatchEvent(new CustomEvent("secondary-button-click"))})}getProductsList(){return`
+        </p>`}getExpiredIntro(){return this.isEnterprise?`
+        <p>
+          Sign in to keep using
+          <span class="badge">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 15V9.75H15V15H12ZM7.5 15V3H10.5V15H7.5ZM3 15V6.75H6V15H3Z" fill="url(#eex)"/>
+              <defs>
+                <linearGradient id="eex" x1="9" y1="3" x2="9" y2="15" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#1A81FA"/>
+                  <stop offset="1" stop-color="#8854FC"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            Vaadin Enterprise Edition
+          </span> for 30 more days.
+        </p>`:`
+        <p>
+          Vaadin Core is free and open-source. Sign in to keep using
+          <span class="badge">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 15V9.75H15V15H12ZM7.5 15V3H10.5V15H7.5ZM3 15V6.75H6V15H3Z" fill="url(#paint0_linear_85_186)"/>
+              <defs>
+                <linearGradient id="paint0_linear_85_186" x1="9" y1="3" x2="9" y2="15" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#1A81FA"/>
+                  <stop offset="1" stop-color="#8854FC"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            Pro components
+          </span> and
+          <span class="badge">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8.2125 11.6625L12.45 7.425L11.3812 6.35625L8.2125 9.525L6.6375 7.95L5.56875 9.01875L8.2125 11.6625ZM9 16.5C7.2625 16.0625 5.82812 15.0656 4.69687 13.5094C3.56562 11.9531 3 10.225 3 8.325V3.75L9 1.5L15 3.75V8.325C15 10.225 14.4344 11.9531 13.3031 13.5094C12.1719 15.0656 10.7375 16.0625 9 16.5ZM9 14.925C10.3 14.5125 11.375 13.6875 12.225 12.45C13.075 11.2125 13.5 9.8375 13.5 8.325V4.78125L9 3.09375L4.5 4.78125V8.325C4.5 9.8375 4.925 11.2125 5.775 12.45C6.625 13.6875 7.7 14.5125 9 14.925Z" fill="url(#paint0_linear_85_190)"/>
+              <defs>
+                <linearGradient id="paint0_linear_85_190" x1="9" y1="1.5" x2="9" y2="16.5" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#1A81FA"/>
+                  <stop offset="1" stop-color="#8854FC"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            Team features
+          </span> for 30 more days.
+        </p>`}getProductsList(){return this.isEnterprise?`
         <ul>
           <li>
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none">
-            <path
-              d="M4 21v-5c0-.55.196-1.02.588-1.412A1.926 1.926 0 0 1 6 14h12c.55 0 1.02.196 1.413.588.391.391.587.862.587 1.412v5H4Zm5-8c-1.383 0-2.563-.488-3.537-1.463C4.487 10.563 4 9.383 4 8s.487-2.563 1.463-3.537C6.437 3.487 7.617 3 9 3h6c1.383 0 2.563.487 3.538 1.463C19.512 5.437 20 6.617 20 8s-.488 2.563-1.462 3.537C17.562 12.512 16.383 13 15 13H9Zm-3 6h12v-3H6v3Zm3-8h6c.833 0 1.542-.292 2.125-.875A2.893 2.893 0 0 0 18 8c0-.833-.292-1.542-.875-2.125A2.893 2.893 0 0 0 15 5H9c-.833 0-1.542.292-2.125.875A2.893 2.893 0 0 0 6 8c0 .833.292 1.542.875 2.125A2.893 2.893 0 0 0 9 11Zm0-2c.283 0 .52-.096.713-.287A.968.968 0 0 0 10 8a.968.968 0 0 0-.287-.713A.968.968 0 0 0 9 7a.968.968 0 0 0-.713.287A.968.968 0 0 0 8 8c0 .283.096.52.287.713.192.191.43.287.713.287Zm6 0c.283 0 .52-.096.713-.287A.967.967 0 0 0 16 8a.967.967 0 0 0-.287-.713A.968.968 0 0 0 15 7a.968.968 0 0 0-.713.287A.967.967 0 0 0 14 8c0 .283.096.52.287.713.192.191.43.287.713.287Z"
-              fill="url(#a)"
-            />
+            <path d="M16 20v-7h4v7h-4Zm-6 0V4h4v16h-4Zm-6 0V9h4v11H4Z" fill="url(#eel)"/>
             <defs>
-              <linearGradient
-                id="a"
-                x1="12"
-                y1="3"
-                x2="12"
-                y2="21"
-                gradientUnits="userSpaceOnUse"
-              >
+              <linearGradient id="eel" x1="12" y1="4" x2="12" y2="20" gradientUnits="userSpaceOnUse">
                 <stop stop-color="#1A81FA" />
                 <stop offset="1" stop-color="#8854FC" />
               </linearGradient>
             </defs>
           </svg>
-            <span>Vaadin Copilot</span><span>⋅</span><span>AI-powered assistant for building UIs</span>
+            <p><span>Vaadin Enterprise Edition</span><br/><span>All Pro components, Team features and Kits</span></p>
           </li>
+        </ul>
+    `:`
+        <ul>
           <li>
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none">
             <path
@@ -282,7 +297,7 @@ import{LitElement as H,css as U,html as F}from"lit";import{property as V,query a
               </linearGradient>
             </defs>
           </svg>
-            <span>Pro components</span><span>⋅</span><span>Charts, Grid Pro, CRUD and more</span>
+            <p><span>Pro components</span><br/><span>Charts, Grid Pro, CRUD and more</span></p>
           </li>
           <li>
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none">
@@ -304,15 +319,10 @@ import{LitElement as H,css as U,html as F}from"lit";import{property as V,query a
               </linearGradient>
             </defs></svg
           >
-            <span>Team features</span><span>⋅</span><span>Acceleration Kits</span>
+            <p><span>Team features</span><br/><span>Acceleration Kits</span></p>
           </li>
         </ul>
-    `}connectedCallback(){this.setupParentRemovalProtection()}disconnectedCallback(){this.cleanup()}attributeChangedCallback(e,t,s){e==="expired"?this.handleExpiredChange(s!==null&&s!=="false"):e==="start-failure"?this.handleStartFailed(s==="expired"):e==="license-download"&&this.handleLicenseDownload(s)}handleLicenseDownload(e){this.#t!==e&&(this.#t=e,this.render())}handleExpiredChange(e){this.#e!==e&&(this.#e=e,this.render())}handleStartFailed(e){(this.#s!==e||this.#e!==e)&&(this.#e=e,this.#s=!0,this.render())}setupProtection(){const e=Element.prototype.remove;this.remove=function(){console.debug("Attempt to remove vaadin-pretrial detected - restoring");const t=this.parentNode;e.apply(this,arguments),this.restoreSplashScreen(t)},this.protectStyles()}setupParentRemovalProtection(){!this.#o&&this.parentNode&&(this.#o=new MutationObserver(e=>{e.forEach(t=>{t.type==="childList"&&t.removedNodes.forEach(s=>{s===this&&(console.debug("vaadin-pretrial removal detected - restoring"),this.restoreSplashScreen(t.target))})})}),this.#o.observe(this.parentNode,{childList:!0,subtree:!0}))}protectStyles(){Object.defineProperty(this,"style",{get(){return{}},set(e){}})}cleanup(){this.#o&&this.#o.disconnect()}restoreSplashScreen(e){e&&setTimeout(()=>{console.debug("Re-adding vaadin-pretrial component");const t=this.querySelector('[slot="products"]');e.contains(this)&&e.removeChild(this);const s=document.createElement("vaadin-pretrial");this.#e&&s.setAttribute("expired","true"),this.#s&&s.setAttribute("start-failure",this.#e?"expired":""),t&&s.appendChild(t.cloneNode(!0)),e.appendChild(s)},0)}}customElements.define("vaadin-pretrial",j);function Z(o){o.detail.expired?G():J()}function z(){G()}const W=(o,e)=>{if(o&&!o.querySelector("vaadin-pretrial")){const t=e.preTrial?.trialState==="EXPIRED",s=document.createElement("vaadin-pretrial");t&&s.setAttribute("expired","");const n=document.createElement("div");n.setAttribute("slot","products"),n.innerHTML=`
-      This application is using:
-      <ul>
-        <li>${e.product.name}</li>
-      </ul>
-    `,s.appendChild(n),s.addEventListener("secondary-button-click",z),s.addEventListener("primary-button-click",Z),o.innerHTML="<slot></slot>",o.appendChild(s)}},y=(o,e)=>{e&&e.querySelector("vaadin-pretrial")?.setAttribute("start-failure",o?"expired":"")},S=(o,e)=>{e&&e.querySelector("vaadin-pretrial")?.setAttribute("license-download",o)},C=1e3,x=(o,e)=>{const t=Array.from(o.querySelectorAll(e.join(", "))),s=Array.from(o.querySelectorAll("*")).filter(n=>n.shadowRoot).flatMap(n=>x(n.shadowRoot,e));return[...t,...s]};let R=!1;const g=(o,e)=>{R||(window.addEventListener("message",n=>{n.data==="validate-license"&&window.location.reload()},!1),R=!0);const t=o._overlayElement;if(t){if(t.shadowRoot){const n=t.shadowRoot.querySelector("slot:not([name])");if(n&&n.assignedElements().length>0){g(n.assignedElements()[0],e);return}}g(t,e);return}const s=e.messageHtml?e.messageHtml:`${e.message} <p>Component: ${e.product.name} ${e.product.version}</p>`.replace(/https:([^ ]*)/g,"<a href='https:$1'>https:$1</a>");o.isConnected&&(o.outerHTML=`<no-license style="display:flex;align-items:center;text-align:center;justify-content:center;"><div>${s}</div></no-license>`)},f={},I={},u={},M={},h=o=>`${o.name}_${o.version}`,_=o=>{const{cvdlName:e,version:t}=o.constructor,s={name:e,version:t},n=o.tagName.toLowerCase();f[e]=f[e]??[],f[e].push(n);const r=u[h(s)];r&&setTimeout(()=>g(o,r),C),u[h(s)]||M[h(s)]||I[h(s)]||(I[h(s)]=!0,window.Vaadin.devTools.checkLicense(s))},P=o=>{M[h(o)]=!0,console.debug("License check ok for",o)},q=o=>{const e=o.product.name;u[h(o.product)]=o,console.error("License check failed for",e);const t=f[e];t?.length>0&&x(document,t).forEach(s=>{setTimeout(()=>g(s,u[h(o.product)]),C)})},K=o=>{const e=o.message,t=o.product.name;o.messageHtml=`No license found. <a target=_blank onclick="javascript:window.open(this.href);return false;" href="${e}">Go here to start a trial or retrieve your license.</a>`,u[h(o.product)]=o,console.error("No license found when checking",t);const s=f[t];s?.length>0&&x(document,s).forEach(n=>{setTimeout(()=>g(n,u[h(o.product)]),C)})},Y=(o,e)=>o.command==="license-check-ok"?(P(o.data),!0):o.command==="license-check-failed"?(q(o.data),!0):o.command==="license-check-nokey"?(W(e,o.data),K(o.data),!0):o.command==="license-pretrial-started"?(console.debug("Pre-trial period started",o.data),window.location.reload(),!0):o.command==="license-pretrial-expired"?(console.debug("Pre-trial period expired",o.data),y(!0,e),!0):o.command==="license-pretrial-failed"?(console.debug("Pre-trial period start failed",o.data),y(!1,e),!0):o.command==="license-download-completed"?(console.debug("License downloaded"),window.location.reload(),!0):o.command==="license-download-started"?(S("started",e),!0):o.command==="license-download-failed"?(S("failed",e),!0):!1,J=()=>{window.Vaadin.devTools.startPreTrial()},G=()=>{const o=Object.values(u);o.length>0&&window.Vaadin.devTools.downloadLicense(o[0].product)},X=()=>{window.Vaadin.devTools.createdCvdlElements.forEach(o=>{_(o)}),window.Vaadin.devTools.createdCvdlElements={push:o=>{_(o)}}};var i;(function(o){o.ACTIVE="active",o.INACTIVE="inactive",o.UNAVAILABLE="unavailable",o.ERROR="error"})(i||(i={}));const k=class k{constructor(){this.status=i.UNAVAILABLE}onHandshake(){}onConnectionError(e){}onStatusChange(e){}setActive(e){!e&&this.status===i.ACTIVE?this.setStatus(i.INACTIVE):e&&this.status===i.INACTIVE&&this.setStatus(i.ACTIVE)}setStatus(e){this.status!==e&&(this.status=e,this.onStatusChange(e))}};k.HEARTBEAT_INTERVAL=18e4;let v=k;class Q extends v{constructor(e){super(),this.webSocket=new WebSocket(e),this.webSocket.onmessage=t=>this.handleMessage(t),this.webSocket.onerror=t=>this.handleError(t),this.webSocket.onclose=t=>{this.status!==i.ERROR&&this.setStatus(i.UNAVAILABLE),this.webSocket=void 0},setInterval(()=>{this.webSocket&&self.status!==i.ERROR&&this.status!==i.UNAVAILABLE&&this.webSocket.send("")},v.HEARTBEAT_INTERVAL)}onReload(e){}handleMessage(e){let t;try{t=JSON.parse(e.data)}catch(s){this.handleError(`[${s.name}: ${s.message}`);return}if(t.command==="hello")this.setStatus(i.ACTIVE),this.onHandshake();else if(t.command==="reload"){if(this.status===i.ACTIVE){const s=t.strategy||"reload";this.onReload(s)}}else this.handleError(`Unknown message from the livereload server: ${e}`)}handleError(e){console.error(e),this.setStatus(i.ERROR),e instanceof Event&&this.webSocket?this.onConnectionError(`Error in WebSocket connection to ${this.webSocket.url}`):this.onConnectionError(e)}}const L=16384,T=class T extends v{constructor(e){if(super(),this.canSend=!1,!e)return;const t={transport:"websocket",fallbackTransport:"websocket",url:e,contentType:"application/json; charset=UTF-8",reconnectInterval:5e3,timeout:-1,maxReconnectOnClose:1e7,trackMessageLength:!0,enableProtocol:!0,handleOnlineOffline:!1,executeCallbackBeforeReconnect:!0,messageDelimiter:"|",onMessage:s=>{const n={data:s.responseBody};this.handleMessage(n)},onError:s=>{this.canSend=!1,this.handleError(s)},onOpen:()=>{this.canSend=!0},onClose:()=>{this.canSend=!1},onClientTimeout:()=>{this.canSend=!1},onReconnect:()=>{this.canSend=!1},onReopen:()=>{this.canSend=!0}};ee().then(s=>{this.socket=s.subscribe(t)})}onReload(e){}onUpdate(e,t){}onMessage(e){}handleMessage(e){let t;try{t=JSON.parse(e.data)}catch(s){this.handleError(`[${s.name}: ${s.message}`);return}if(t.command==="hello")this.setStatus(i.ACTIVE),this.onHandshake();else if(t.command==="reload"){if(this.status===i.ACTIVE){const s=t.strategy||"reload";this.onReload(s)}}else t.command==="update"?this.status===i.ACTIVE&&this.onUpdate(t.path,t.content):this.onMessage(t)}handleError(e){console.error(e),this.setStatus(i.ERROR),this.onConnectionError(e)}send(e,t){if(!this.socket||!this.canSend){A(()=>this.socket&&this.canSend,a=>this.send(e,t));return}const s=JSON.stringify({command:e,data:t});let r=s.length+"|"+s;for(;r.length;)this.socket.push(r.substring(0,L)),r=r.substring(L)}};T.HEARTBEAT_INTERVAL=18e4;let E=T;function A(o,e){const t=o();t?e(t):setTimeout(()=>A(o,e),50)}function ee(){return new Promise((o,e)=>{A(()=>window?.vaadinPush?.atmosphere,o)})}var c,O;(function(o){o.LOG="log",o.INFORMATION="information",o.WARNING="warning",o.ERROR="error"})(O||(O={}));const N=import.meta.hot?import.meta.hot.hmrClient:void 0;var d;let m=(d=class extends H{constructor(){super(...arguments),this.unhandledMessages=[],this.conf={enable:!1,url:"",contextRelativePath:"",liveReloadPort:-1},this.bodyShadowRoot=null,this.frontendStatus=i.UNAVAILABLE,this.javaStatus=i.UNAVAILABLE,this.componentPickActive=!1,this.nextMessageId=1,this.transitionDuration=0}static get styles(){return[U`
+    `}connectedCallback(){this.setupParentRemovalProtection()}disconnectedCallback(){this.cleanup()}attributeChangedCallback(e,t,n){e===`expired`?this.handleExpiredChange(n!==null&&n!==`false`):e===`start-failure`?this.handleStartFailed(n===`expired`):e===`license-download`?this.handleLicenseDownload(n):e===`product`&&this.handleProduct(n)}handleProduct(e){this.#a!==e&&(this.#a=e,this.render())}handleLicenseDownload(e){this.#i!==e&&(this.#i=e,this.render())}handleExpiredChange(e){this.#n!==e&&(this.#n=e,this.render())}handleStartFailed(e){(this.#r!==e||this.#n!==e)&&(this.#n=e,this.#r=!0,this.render())}setupProtection(){let e=Element.prototype.remove,t=this;this.remove=function(){console.debug(`Attempt to remove vaadin-pretrial detected - restoring`);let n=t.parentNode;e.call(t),t.restoreSplashScreen(n)},this.protectStyles()}setupParentRemovalProtection(){!this.#e&&this.parentNode&&(this.#e=new MutationObserver(e=>{e.forEach(e=>{e.type===`childList`&&e.removedNodes.forEach(t=>{t===this&&(console.debug(`vaadin-pretrial removal detected - restoring`),this.restoreSplashScreen(e.target))})})}),this.#e.observe(this.parentNode,{childList:!0,subtree:!0}))}protectStyles(){Object.defineProperty(this,"style",{get(){return{}},set(e){}})}cleanup(){this.#e&&this.#e.disconnect()}restoreSplashScreen(e){e&&setTimeout(()=>{console.debug(`Re-adding vaadin-pretrial component`);let t=this.querySelector(`[slot="products"]`);e.contains(this)&&e.removeChild(this);let n=document.createElement(`vaadin-pretrial`);this.#a&&n.setAttribute(`product`,this.#a),this.#n&&n.setAttribute(`expired`,`true`),this.#r&&n.setAttribute(`start-failure`,this.#n?`expired`:``),t&&n.appendChild(t.cloneNode(!0)),e.appendChild(n)},0)}};customElements.define(`vaadin-pretrial`,s);function c(e){e.detail.expired?A():k()}function l(){A()}var u=(e,t)=>{if(!e)return;let n=t.product?.name,r=e.querySelector(`vaadin-pretrial`);if(r){n===`vaadin-ee`&&r.getAttribute(`product`)!==`vaadin-ee`&&r.setAttribute(`product`,`vaadin-ee`);return}let i=t.preTrial?.trialState===`EXPIRED`,a=document.createElement(`vaadin-pretrial`);n&&a.setAttribute(`product`,n),i&&a.setAttribute(`expired`,``),a.addEventListener(`secondary-button-click`,l),a.addEventListener(`primary-button-click`,c),e.innerHTML=`<slot></slot>`,e.appendChild(a)},d=(e,t)=>{t&&t.querySelector(`vaadin-pretrial`)?.setAttribute(`start-failure`,e?`expired`:``)},f=(e,t)=>{t&&t.querySelector(`vaadin-pretrial`)?.setAttribute(`license-download`,e)},p=1e3,m=`vaadin-license-download-completed`,h=(e,t)=>{let n=Array.from(e.querySelectorAll(t.join(`, `))),r=Array.from(e.querySelectorAll(`*`)).filter(e=>e.shadowRoot).flatMap(e=>h(e.shadowRoot,t));return[...n,...r]},g=!1,_=(e,t)=>{g||=(window.addEventListener(`message`,e=>{e.data===`validate-license`&&window.location.reload()},!1),!0);let n=e._overlayElement;if(n){if(n.shadowRoot){let e=n.shadowRoot.querySelector(`slot:not([name])`);if(e&&e.assignedElements().length>0){_(e.assignedElements()[0],t);return}}_(n,t);return}let r=t.messageHtml?t.messageHtml:`${t.message} <p>Component: ${t.product.name} ${t.product.version}</p>`.replace(/https:([^ ]*)/g,`<a href='https:$1'>https:$1</a>`);e.isConnected&&(e.outerHTML=`<no-license style="display:flex;align-items:center;text-align:center;justify-content:center;"><div>${r}</div></no-license>`)},v={},y={},b={},x={},S=e=>`${e.name}_${e.version}`,C=e=>{let{cvdlName:t,version:n}=e.constructor,r={name:t,version:n},i=e.tagName.toLowerCase();v[t]=v[t]??[],v[t].push(i);let a=b[S(r)];a&&setTimeout(()=>_(e,a),p),b[S(r)]||x[S(r)]||y[S(r)]||(y[S(r)]=!0,window.Vaadin.devTools.checkLicense(r))},w=e=>{x[S(e)]=!0,console.debug(`License check ok for`,e)},T=e=>{let t=e.product.name;b[S(e.product)]=e,console.error(`License check failed for`,t);let n=v[t];n?.length>0&&h(document,n).forEach(t=>{setTimeout(()=>_(t,b[S(e.product)]),p)})},E=e=>{let t=e.message,n=e.product.name;e.messageHtml=`No license found. <a target=_blank onclick="javascript:window.open(this.href);return false;" href="${t}">Go here to start a trial or retrieve your license.</a>`,b[S(e.product)]=e,console.error(`No license found when checking`,n);let r=v[n];r?.length>0&&h(document,r).forEach(t=>{setTimeout(()=>_(t,b[S(e.product)]),p)})},D=(e,t)=>e.command===`license-check-ok`?(w(e.data),!0):e.command===`license-check-failed`?(T(e.data),!0):e.command===`license-check-nokey`?(u(t,e.data),E(e.data),!0):e.command===`license-pretrial-started`?(console.debug(`Pre-trial period started`,e.data),window.location.reload(),!0):e.command===`license-pretrial-expired`?(console.debug(`Pre-trial period expired`,e.data),d(!0,t),!0):e.command===`license-pretrial-failed`?(console.debug(`Pre-trial period start failed`,e.data),d(!1,t),!0):e.command===`license-download-completed`?(console.debug(`License downloaded`),O(e.data),!0):e.command===`license-download-started`?(f(`started`,t),!0):e.command===`license-download-failed`?(f(`failed`,t),!0):!1,O=e=>{let t=new CustomEvent(m,{detail:e,cancelable:!0});document.dispatchEvent(t)&&window.location.reload()},k=()=>{window.Vaadin.devTools.startPreTrial()},A=e=>{let t=Object.values(b);t.length>0&&window.Vaadin.devTools.downloadLicense(t[0].product,e)},j=()=>{window.Vaadin.devTools.createdCvdlElements.forEach(e=>{C(e)}),window.Vaadin.devTools.createdCvdlElements={push:e=>{C(e)}}},M;(function(e){e.ACTIVE=`active`,e.INACTIVE=`inactive`,e.UNAVAILABLE=`unavailable`,e.ERROR=`error`})(M||={});var N=class{constructor(){this.status=M.UNAVAILABLE}static{this.HEARTBEAT_INTERVAL=18e4}onHandshake(){}onConnectionError(e){}onStatusChange(e){}setActive(e){!e&&this.status===M.ACTIVE?this.setStatus(M.INACTIVE):e&&this.status===M.INACTIVE&&this.setStatus(M.ACTIVE)}setStatus(e){this.status!==e&&(this.status=e,this.onStatusChange(e))}},P=class extends N{constructor(e){super(),this.webSocket=new WebSocket(e),this.webSocket.onmessage=e=>this.handleMessage(e),this.webSocket.onerror=e=>this.handleError(e),this.webSocket.onclose=e=>{this.status!==M.ERROR&&this.setStatus(M.UNAVAILABLE),this.webSocket=void 0},setInterval(()=>{this.webSocket&&self.status!==M.ERROR&&this.status!==M.UNAVAILABLE&&this.webSocket.send(``)},N.HEARTBEAT_INTERVAL)}onReload(e){}handleMessage(e){let t;try{t=JSON.parse(e.data)}catch(e){this.handleError(`[${e.name}: ${e.message}`);return}if(t.command===`hello`)this.setStatus(M.ACTIVE),this.onHandshake();else if(t.command===`reload`){if(this.status===M.ACTIVE){let e=t.strategy||`reload`;this.onReload(e)}}else this.handleError(`Unknown message from the livereload server: ${e}`)}handleError(e){console.error(e),this.setStatus(M.ERROR),e instanceof Event&&this.webSocket?this.onConnectionError(`Error in WebSocket connection to ${this.webSocket.url}`):this.onConnectionError(e)}},F=16384,I=class extends N{static{this.HEARTBEAT_INTERVAL=18e4}constructor(e){if(super(),this.canSend=!1,!e)return;let t={transport:`websocket`,fallbackTransport:`websocket`,url:e,contentType:`application/json; charset=UTF-8`,reconnectInterval:5e3,timeout:-1,maxReconnectOnClose:1e7,trackMessageLength:!0,enableProtocol:!0,handleOnlineOffline:!1,executeCallbackBeforeReconnect:!0,messageDelimiter:`|`,onMessage:e=>{let t={data:e.responseBody};this.handleMessage(t)},onError:e=>{this.canSend=!1,this.handleError(e)},onOpen:()=>{this.canSend=!0},onClose:()=>{this.canSend=!1},onClientTimeout:()=>{this.canSend=!1},onReconnect:()=>{this.canSend=!1},onReopen:()=>{this.canSend=!0}};R().then(e=>{this.socket=e.subscribe(t)})}onReload(e){}onUpdate(e,t){}onMessage(e){}handleMessage(e){let t;try{t=JSON.parse(e.data)}catch(e){this.handleError(`[${e.name}: ${e.message}`);return}if(t.command===`hello`)this.setStatus(M.ACTIVE),this.onHandshake();else if(t.command===`reload`){if(this.status===M.ACTIVE){let e=t.strategy||`reload`;this.onReload(e)}}else t.command===`update`?this.status===M.ACTIVE&&this.onUpdate(t.path,t.content):this.onMessage(t)}handleError(e){console.error(e),this.setStatus(M.ERROR),this.onConnectionError(e)}send(e,t){if(!this.socket||!this.canSend){L(()=>this.socket&&this.canSend,n=>this.send(e,t));return}let n=JSON.stringify({command:e,data:t}),r=n.length+`|`+n;for(;r.length;)this.socket.push(r.substring(0,F)),r=r.substring(F)}};function L(e,t){let n=e();n?t(n):setTimeout(()=>L(e,t),50)}function R(){return new Promise((e,t)=>{L(()=>window?.vaadinPush?.atmosphere,e)})}var z=1,B=`vaadin-refresh-ui`;function V(e){if(e.id)return`#`+CSS.escape(e.id);let t=[],n=e;for(;n&&n!==document.documentElement&&n!==document.body;){if(n.id){t.unshift(`#`+CSS.escape(n.id));break}let e=n.parentElement;if(!e)break;let r=1,i=n.previousElementSibling;for(;i;)i.tagName===n.tagName&&r++,i=i.previousElementSibling;t.unshift(n.tagName.toLowerCase()+`:nth-of-type(`+r+`)`),n=e}return t.length>0?t.join(` > `):``}function H(){let e=window.Vaadin;return Object.keys(e?.Flow?.clients||{}).filter(e=>e!==`TypeScript`).map(t=>e.Flow.clients[t])}function U(){let e={};return(window.scrollX!==0||window.scrollY!==0)&&(e.__window__={scrollTop:window.scrollY,scrollLeft:window.scrollX}),document.querySelectorAll(`*`).forEach(t=>{if(t.scrollTop>0||t.scrollLeft>0){let n=V(t);n&&(e[n]={scrollTop:t.scrollTop,scrollLeft:t.scrollLeft})}}),e}function W(e){let t=U();H().forEach(t=>{t.sendEventMessage&&t.sendEventMessage(z,`ui-refresh`,{fullRefresh:e})}),q(t)}var G=!1;function K(){G||(G=!0,window.addEventListener(B,e=>{W(e.detail?.fullRefresh===!0)}))}function q(e){if(Object.keys(e).length===0)return;let t=0,n=()=>{requestAnimationFrame(()=>{for(let[t,n]of Object.entries(e))if(t===`__window__`)window.scrollTo(n.scrollLeft,n.scrollTop);else{let e=document.querySelector(t);e&&(e.scrollTop=n.scrollTop,e.scrollLeft=n.scrollLeft)}})},r=()=>{let e=H();e.length>0&&e.every(e=>!e.isActive())||++t>=200?n():setTimeout(r,50)};setTimeout(r,50)}var J,Y;(function(e){e.LOG=`log`,e.INFORMATION=`information`,e.WARNING=`warning`,e.ERROR=`error`})(Y||={});var X=import.meta.hot?import.meta.hot.hmrClient:void 0,Z=class extends e{constructor(){super(...arguments),this.unhandledMessages=[],this.conf={enable:!1,url:``,contextRelativePath:``,liveReloadPort:-1},this.bodyShadowRoot=null,this.frontendStatus=M.UNAVAILABLE,this.javaStatus=M.UNAVAILABLE,this.componentPickActive=!1}static{J=this}static get styles(){return[t`
         :host {
           --dev-tools-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell,
             'Helvetica Neue', sans-serif;
@@ -793,5 +803,5 @@ import{LitElement as H,css as U,html as F}from"lit";import{property as V,query a
             background-color: var(--dev-tools-background-color-active-blurred);
           }
         }
-      `]}static get isActive(){const e=window.sessionStorage.getItem(c.ACTIVE_KEY_IN_SESSION_STORAGE);return e===null||e!=="false"}elementTelemetry(){let e={};try{const t=localStorage.getItem("vaadin.statistics.basket");if(!t)return;e=JSON.parse(t)}catch{return}this.frontendConnection&&this.frontendConnection.send("reportTelemetry",{browserData:e})}openWebSocketConnection(){if(this.frontendStatus=i.UNAVAILABLE,this.javaStatus=i.UNAVAILABLE,!this.conf.token){console.error("Dev tools functionality denied for this host. See Vaadin documentation on how to configure devmode.hostsAllowed property: https://vaadin.com/docs/latest/configuration/properties#properties");return}const e=r=>console.error(r),t=(r="reload")=>{if(r==="refresh"||r==="full-refresh"){const a=window.Vaadin;Object.keys(a.Flow.clients).filter(l=>l!=="TypeScript").map(l=>a.Flow.clients[l]).forEach(l=>{l.sendEventMessage?l.sendEventMessage(1,"ui-refresh",{fullRefresh:r==="full-refresh"}):console.warn("Ignoring ui-refresh event for application ",id)})}else{const a=window.sessionStorage.getItem(c.TRIGGERED_COUNT_KEY_IN_SESSION_STORAGE),l=a?parseInt(a,10)+1:1;window.sessionStorage.setItem(c.TRIGGERED_COUNT_KEY_IN_SESSION_STORAGE,l.toString()),window.sessionStorage.setItem(c.TRIGGERED_KEY_IN_SESSION_STORAGE,"true"),window.location.reload()}},s=(r,a)=>{const l="context://",w=r.substring(l.length);if(r.startsWith(l)&&(r=this.conf.contextRelativePath+w),a){let p=document.head.querySelector(`style[data-file-path='${r}']`);p||(p=document.createElement("style"),p.setAttribute("data-file-path",r),document.head.appendChild(p),this.removeOldLinks(w)),p.textContent=a,document.dispatchEvent(new CustomEvent("vaadin-theme-updated"))}else if(a===""||a===null){const p=document.head.querySelector(`style[data-file-path='${r}']`);p?p.remove():this.removeOldLinks(w),document.dispatchEvent(new CustomEvent("vaadin-theme-updated"))}},n=new E(this.getDedicatedWebSocketUrl());n.onHandshake=()=>{c.isActive||n.setActive(!1),this.elementTelemetry()},n.onConnectionError=e,n.onReload=t,n.onUpdate=s,n.onStatusChange=r=>{this.frontendStatus=r},n.onMessage=r=>this.handleFrontendMessage(r),this.frontendConnection=n,this.conf.backend===c.SPRING_BOOT_DEVTOOLS&&this.conf.liveReloadPort&&(this.javaConnection=new Q(this.getSpringBootWebSocketUrl(window.location)),this.javaConnection.onHandshake=()=>{c.isActive||this.javaConnection.setActive(!1)},this.javaConnection.onReload=t,this.javaConnection.onConnectionError=e,this.javaConnection.onStatusChange=r=>{this.javaStatus=r})}removeOldLinks(e){Array.from(document.head.querySelectorAll('link[rel="stylesheet"]')).forEach(s=>{let n=s.getAttribute("data-file-path")||s.getAttribute("href");n&&n.includes(e)&&s.remove()})}tabHandleMessage(e,t){const s=e;return s.handleMessage&&s.handleMessage.call(e,t)}handleFrontendMessage(e){e.command==="featureFlags"||Y(e,this.bodyShadowRoot)||this.handleHmrMessage(e)||this.unhandledMessages.push(e)}handleHmrMessage(e){return e.command!=="hmr"?!1:(N&&N.notifyListeners(e.data.event,e.data.eventData),!0)}getDedicatedWebSocketUrl(){function e(s){const n=document.createElement("div");return n.innerHTML=`<a href="${s}"/>`,n.firstChild.href}if(this.conf.url===void 0)return;const t=e(this.conf.url);if(!t.startsWith("http://")&&!t.startsWith("https://")){console.error("The protocol of the url should be http or https for live reload to work.");return}return`${t}?v-r=push&debug_window&token=${this.conf.token}`}getSpringBootWebSocketUrl(e){const{hostname:t}=e,s=e.protocol==="https:"?"wss":"ws";if(t.endsWith("gitpod.io")){const n=t.replace(/.*?-/,"");return`${s}://${this.conf.liveReloadPort}-${n}`}else return`${s}://${t}:${this.conf.liveReloadPort}`}connectedCallback(){if(super.connectedCallback(),this.bodyShadowRoot=document.body.attachShadow({mode:"closed"}),this.bodyShadowRoot.innerHTML="<slot></slot>",this.conf=window.Vaadin.devToolsConf||this.conf,window.sessionStorage.getItem(c.TRIGGERED_KEY_IN_SESSION_STORAGE)){const n=new Date;`${`0${n.getHours()}`.slice(-2)}${`0${n.getMinutes()}`.slice(-2)}${`0${n.getSeconds()}`.slice(-2)}`,window.sessionStorage.removeItem(c.TRIGGERED_KEY_IN_SESSION_STORAGE)}this.transitionDuration=parseInt(window.getComputedStyle(this).getPropertyValue("--dev-tools-transition-duration"),10);const t=window;t.Vaadin=t.Vaadin||{},t.Vaadin.devTools=Object.assign(this,t.Vaadin.devTools);const s=window.Vaadin;s.devToolsPlugins&&(Array.from(s.devToolsPlugins).forEach(n=>this.initPlugin(n)),s.devToolsPlugins={push:n=>this.initPlugin(n)}),this.openWebSocketConnection(),X()}async initPlugin(e){const t=this;e.init({send:function(s,n){t.frontendConnection.send(s,n)}})}format(e){return e.toString()}checkLicense(e){this.frontendConnection?this.frontendConnection.send("checkLicense",e):P(e)}startPreTrial(){this.frontendConnection?this.frontendConnection.send("startPreTrialLicense",{}):(console.error("Cannot start pre-trial: no connection"),y(!1,this.bodyShadowRoot))}downloadLicense(e){this.frontendConnection?this.frontendConnection.send("downloadLicense",e):S("failed",this.bodyShadowRoot)}setActive(e){this.frontendConnection?.setActive(e),this.javaConnection?.setActive(e),window.sessionStorage.setItem(c.ACTIVE_KEY_IN_SESSION_STORAGE,e?"true":"false")}render(){return F` <div style="display: none" class="dev-tools"></div>`}setJavaLiveReloadActive(e){this.javaConnection?this.javaConnection.setActive(e):this.frontendConnection?.setActive(e)}},c=d,d.DISMISSED_NOTIFICATIONS_IN_LOCAL_STORAGE="vaadin.live-reload.dismissedNotifications",d.ACTIVE_KEY_IN_SESSION_STORAGE="vaadin.live-reload.active",d.TRIGGERED_KEY_IN_SESSION_STORAGE="vaadin.live-reload.triggered",d.TRIGGERED_COUNT_KEY_IN_SESSION_STORAGE="vaadin.live-reload.triggeredCount",d.AUTO_DEMOTE_NOTIFICATION_DELAY=5e3,d.HOTSWAP_AGENT="HOTSWAP_AGENT",d.JREBEL="JREBEL",d.SPRING_BOOT_DEVTOOLS="SPRING_BOOT_DEVTOOLS",d.BACKEND_DISPLAY_NAME={HOTSWAP_AGENT:"HotswapAgent",JREBEL:"JRebel",SPRING_BOOT_DEVTOOLS:"Spring Boot Devtools"},d);b([V({type:String,attribute:!1})],m.prototype,"frontendStatus",void 0);b([V({type:String,attribute:!1})],m.prototype,"javaStatus",void 0);b([$(".window")],m.prototype,"root",void 0);b([B()],m.prototype,"componentPickActive",void 0);m=c=b([D("vaadin-dev-tools")],m);
+      `]}static{this.DISMISSED_NOTIFICATIONS_IN_LOCAL_STORAGE=`vaadin.live-reload.dismissedNotifications`}static{this.ACTIVE_KEY_IN_SESSION_STORAGE=`vaadin.live-reload.active`}static{this.TRIGGERED_KEY_IN_SESSION_STORAGE=`vaadin.live-reload.triggered`}static{this.TRIGGERED_COUNT_KEY_IN_SESSION_STORAGE=`vaadin.live-reload.triggeredCount`}static{this.AUTO_DEMOTE_NOTIFICATION_DELAY=5e3}static{this.HOTSWAP_AGENT=`HOTSWAP_AGENT`}static{this.JREBEL=`JREBEL`}static{this.SPRING_BOOT_DEVTOOLS=`SPRING_BOOT_DEVTOOLS`}static{this.BACKEND_DISPLAY_NAME={HOTSWAP_AGENT:`HotswapAgent`,JREBEL:`JRebel`,SPRING_BOOT_DEVTOOLS:`Spring Boot Devtools`}}static get isActive(){let e=window.sessionStorage.getItem(J.ACTIVE_KEY_IN_SESSION_STORAGE);return e===null||e!==`false`}elementTelemetry(){let e={};try{let t=localStorage.getItem(`vaadin.statistics.basket`);if(!t)return;e=JSON.parse(t)}catch{return}this.frontendConnection&&this.frontendConnection.send(`reportTelemetry`,{browserData:e})}openWebSocketConnection(){if(this.frontendStatus=M.UNAVAILABLE,this.javaStatus=M.UNAVAILABLE,!this.conf.token){console.error(`Dev tools functionality denied for this host. See Vaadin documentation on how to configure devmode.hostsAllowed property: https://vaadin.com/docs/latest/configuration/properties#properties`);return}let e=e=>console.error(e),t=(e=`reload`)=>{if(e===`refresh`||e===`full-refresh`)W(e===`full-refresh`);else{let e=U();window.sessionStorage.setItem(`vaadin-hotswap-scroll`,JSON.stringify(e));let t=window.sessionStorage.getItem(J.TRIGGERED_COUNT_KEY_IN_SESSION_STORAGE),n=t?parseInt(t,10)+1:1;window.sessionStorage.setItem(J.TRIGGERED_COUNT_KEY_IN_SESSION_STORAGE,n.toString()),window.sessionStorage.setItem(J.TRIGGERED_KEY_IN_SESSION_STORAGE,`true`),window.location.reload()}},n=(e,t)=>{let n=e.substring(10);if(e.startsWith(`context://`)&&(e=this.conf.contextRelativePath+n),t){let r=document.head.querySelector(`style[data-file-path='${e}']`);r||(r=document.createElement(`style`),r.setAttribute(`data-file-path`,e),document.head.appendChild(r),this.removeOldLinks(n)),r.textContent=t,document.dispatchEvent(new CustomEvent(`vaadin-theme-updated`))}else if(t===``||t===null){let t=document.head.querySelector(`style[data-file-path='${e}']`);t?t.remove():this.removeOldLinks(n),document.dispatchEvent(new CustomEvent(`vaadin-theme-updated`))}},r=this.getDedicatedWebSocketUrl();if(!r)return;let i=new I(r);i.onHandshake=()=>{J.isActive||i.setActive(!1),this.conf.usageStatisticsEnabled===!1?(localStorage.setItem(`vaadin.statistics.optout`,`true`),localStorage.removeItem(`vaadin.statistics.basket`),localStorage.removeItem(`vaadin.statistics.firstuse`)):localStorage.removeItem(`vaadin.statistics.optout`),this.elementTelemetry()},i.onConnectionError=e,i.onReload=t,i.onUpdate=n,i.onStatusChange=e=>{this.frontendStatus=e},i.onMessage=e=>this.handleFrontendMessage(e),this.frontendConnection=i,this.conf.backend===J.SPRING_BOOT_DEVTOOLS&&this.conf.liveReloadPort&&(this.javaConnection=new P(this.getSpringBootWebSocketUrl(window.location)),this.javaConnection.onHandshake=()=>{J.isActive||this.javaConnection.setActive(!1)},this.javaConnection.onReload=t,this.javaConnection.onConnectionError=e,this.javaConnection.onStatusChange=e=>{this.javaStatus=e})}removeOldLinks(e){Array.from(document.head.querySelectorAll(`link[rel="stylesheet"]`)).forEach(t=>{let n=t.getAttribute(`data-file-path`)||t.getAttribute(`href`);if(n){let r=n.split(/[?#]/)[0];(r===e||r.endsWith(`/`+e))&&t.remove()}})}tabHandleMessage(e,t){let n=e;return n.handleMessage&&n.handleMessage.call(e,t)}handleFrontendMessage(e){e.command===`featureFlags`||D(e,this.bodyShadowRoot)||this.handleHmrMessage(e)||this.unhandledMessages.push(e)}handleHmrMessage(e){return e.command===`hmr`?(X&&X.notifyListeners(e.data.event,e.data.eventData),!0):!1}getDedicatedWebSocketUrl(){function e(e){let t=document.createElement(`div`);return t.innerHTML=`<a href="${e}"/>`,t.firstChild.href}if(this.conf.url===void 0)return;let t=e(this.conf.url);if(!t.startsWith(`http://`)&&!t.startsWith(`https://`)){console.error(`The protocol of the url should be http or https for live reload to work.`);return}return`${t}?v-r=push&debug_window&token=${this.conf.token}`}getSpringBootWebSocketUrl(e){let{hostname:t}=e,n=e.protocol===`https:`?`wss`:`ws`;if(t.endsWith(`gitpod.io`)){let e=t.replace(/.*?-/,``);return`${n}://${this.conf.liveReloadPort}-${e}`}else return`${n}://${t}:${this.conf.liveReloadPort}`}connectedCallback(){super.connectedCallback(),this.bodyShadowRoot=document.body.attachShadow({mode:`closed`}),this.bodyShadowRoot.innerHTML=`<slot></slot>`,this.conf=window.Vaadin?.devToolsConf||this.conf,window.sessionStorage.getItem(J.TRIGGERED_KEY_IN_SESSION_STORAGE)&&window.sessionStorage.removeItem(J.TRIGGERED_KEY_IN_SESSION_STORAGE);let e=window.sessionStorage.getItem(`vaadin-hotswap-scroll`);e!==null&&(window.sessionStorage.removeItem(`vaadin-hotswap-scroll`),q(JSON.parse(e))),K();let t=window;t.Vaadin=t.Vaadin||{},t.Vaadin.devTools=Object.assign(this,t.Vaadin.devTools);let n=window.Vaadin;n.devToolsPlugins&&=(Array.from(n.devToolsPlugins).forEach(e=>this.initPlugin(e)),{push:e=>this.initPlugin(e)}),this.openWebSocketConnection(),j()}async initPlugin(e){let t=this;e.init({send:function(e,n){t.frontendConnection.send(e,n)}})}format(e){return e.toString()}checkLicense(e){this.frontendConnection?this.frontendConnection.send(`checkLicense`,e):w(e)}startPreTrial(){this.frontendConnection?this.frontendConnection.send(`startPreTrialLicense`,{}):(console.error(`Cannot start pre-trial: no connection`),d(!1,this.bodyShadowRoot))}downloadLicense(e,t){this.frontendConnection?this.frontendConnection.send(`downloadLicense`,{...e,...t}):f(`failed`,this.bodyShadowRoot)}setActive(e){this.frontendConnection?.setActive(e),this.javaConnection?.setActive(e),window.sessionStorage.setItem(J.ACTIVE_KEY_IN_SESSION_STORAGE,e?`true`:`false`)}render(){return n` <div style="display: none" class="dev-tools"></div>`}setJavaLiveReloadActive(e){this.javaConnection?this.javaConnection.setActive(e):this.frontendConnection?.setActive(e)}};o([i({type:String,attribute:!1})],Z.prototype,`frontendStatus`,void 0),o([i({type:String,attribute:!1})],Z.prototype,`javaStatus`,void 0),o([a()],Z.prototype,`componentPickActive`,void 0),Z=J=o([r(`vaadin-dev-tools`)],Z);
 //# sourceMappingURL=vaadin-dev-tools.js.map
