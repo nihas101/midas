@@ -4,6 +4,6 @@ import './index';
 
 import './vaadin-react.js';
 import './app-shell-imports.js';
-import './theme-midas-theme.global.generated.js';
-import { applyTheme } from './theme.js';
-applyTheme(document);
+import './css.generated.js';
+import { applyCss } from './css.generated.js';
+applyCss(document);

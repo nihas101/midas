@@ -1,5 +1,6 @@
 app-shell-imports.d.ts
 app-shell-imports.js
+css.generated.d.ts
 flow/Flow.tsx
 flow/ReactAdapter.tsx
 flow/chunks/chunk-1cbcd1701567f7eab4522e32a5c3a1cb7a521001924068df25fdec47b1b92d20.js
@@ -132,8 +133,6 @@ jsx-dev-transform/jsx-dev-runtime.ts
 jsx-dev-transform/jsx-runtime.ts
 layouts.json
 routes.tsx
-theme.d.ts
-theme.js
 vaadin-featureflags.js
 vaadin-react.tsx
 vaadin.ts
