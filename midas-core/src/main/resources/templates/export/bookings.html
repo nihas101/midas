@@ -209,7 +209,7 @@
             <!-- Normal Data Columns -->
             <th:block th:if="${!isMonthly and !isCumulative}">
                 <td th:text="${row.displayId()}">ID</td>
-                <td th:text="${row.dateStr()}">Date</td>
+                <td th:text="${row.formattedDate()}">Date</td>
                 <td colspan="2" class="bk-truncate" th:text="${row.comment()}">Comment</td>
             </th:block>
 

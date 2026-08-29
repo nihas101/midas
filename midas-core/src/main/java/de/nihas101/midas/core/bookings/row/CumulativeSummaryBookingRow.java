@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CumulativeSummaryBookingRow implements BookingRow {
 
-    private final String dateStr;
+    private final String formattedDate;
     private final String comment;
     private final MonthlyCumulativeSum amounts;
     private final MoneyAmount total;
@@ -24,14 +24,14 @@ public class CumulativeSummaryBookingRow implements BookingRow {
     private final String partName;
 
     public CumulativeSummaryBookingRow(
-            final String dateStr,
+            final String formattedDate,
             final String comment,
             final Bookings bookings,
             final Month month,
             final String partName
     ) {
         this(
-                dateStr,
+                formattedDate,
                 comment,
                 bookings,
                 new MonthlyCumulativeSum(bookings, month),
@@ -40,14 +40,14 @@ public class CumulativeSummaryBookingRow implements BookingRow {
     }
 
     public CumulativeSummaryBookingRow(
-            final String dateStr,
+            final String formattedDate,
             final String comment,
             final Bookings bookings,
             final MonthlyCumulativeSum monthlyCumulativeSum,
             final String partName
     ) {
         this(
-                dateStr,
+                formattedDate,
                 comment,
                 monthlyCumulativeSum,
                 monthlyCumulativeSum.sum(),
@@ -57,7 +57,7 @@ public class CumulativeSummaryBookingRow implements BookingRow {
     }
 
     private CumulativeSummaryBookingRow(
-            final String dateStr,
+            final String formattedDate,
             final String comment,
             final MonthlyCumulativeSum monthlyCumulativeSum,
             final MoneyAmount sum,
@@ -65,7 +65,7 @@ public class CumulativeSummaryBookingRow implements BookingRow {
             final String partName
     ) {
         this(
-                dateStr,
+                formattedDate,
                 comment,
                 monthlyCumulativeSum,
                 sum,
@@ -86,8 +86,8 @@ public class CumulativeSummaryBookingRow implements BookingRow {
     }
 
     @Override
-    public String dateStr() {
-        return dateStr;
+    public String formattedDate() {
+        return formattedDate;
     }
 
     @Override

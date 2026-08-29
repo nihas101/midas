@@ -3,6 +3,7 @@ package de.nihas101.midas.core.interest.row;
 import de.nihas101.midas.api.bookings.Bookings;
 import de.nihas101.midas.api.interest.InterestCalculationRow;
 import de.nihas101.midas.api.interest.Transaction;
+import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.core.interest.interestamount.DefaultInterest;
 import org.springframework.context.MessageSource;
 
@@ -45,20 +46,21 @@ public class OpeningBalanceInterestCalculationRow implements InterestCalculation
                 ? interestDays
                 : BaseInterestCalculationRow.DEFAULT_INTEREST_DAYS;
 
+        final MoneyAmount openingBalance = bookings.openingBalance().getOpeningBalance();
         this.interestCalculationRow = new BaseInterestCalculationRow(
                 messageSource.getMessage(
                         "interest.opening-balance",
                         new Object[]{year.format(DateTimeFormatter.ofPattern("yyyy"))},
                         locale
                 ),
-                bookings.openingBalance().getOpeningBalance(),
-                bookings.openingBalance().getOpeningBalance(),
                 effectiveInterestDays,
                 new DefaultInterest(
-                        bookings.openingBalance().getOpeningBalance(),
+                        openingBalance,
                         effectiveInterestDays,
                         interestRate
-                ).interestAmount()
+                ).interestAmount(),
+                new Transaction(openingBalance),
+                new Transaction(openingBalance)
         );
     }
 

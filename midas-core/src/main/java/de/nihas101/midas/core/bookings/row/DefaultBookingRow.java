@@ -9,7 +9,7 @@ import java.util.List;
 
 public record DefaultBookingRow(
         String displayId,
-        String dateStr,
+        String formattedDate,
         String comment,
         MonthlyTotal amounts,
         MoneyAmount total,

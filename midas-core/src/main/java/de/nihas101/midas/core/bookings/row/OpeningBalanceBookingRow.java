@@ -45,7 +45,7 @@ public record OpeningBalanceBookingRow(
     }
 
     @Override
-    public String dateStr() {
+    public String formattedDate() {
         return year.atMonth(Month.JANUARY).atDay(1).format(DateTimeFormatter.ofPattern(dateFormat));
     }
 

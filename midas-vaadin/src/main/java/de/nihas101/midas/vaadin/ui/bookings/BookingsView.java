@@ -255,8 +255,6 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
             }
         });
 
-        // TODO: When implementing the locking of years, check beforehand if the year is locked and if so, grey this check box out with a tooltip on why and what do to to re-enable it
-
         updateNextYearsBalanceAutomaticallyToggle = new Checkbox(messageSource.getMessage("booking.update.automatically.toggle.label", null, locale));
         updateNextYearsBalanceAutomaticallyToggle.addValueChangeListener(e -> {
             if (!e.isFromClient()) {
@@ -363,7 +361,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.LUMO_COMPACT);
 
         setupColumn(grid.addColumn(BookingRow::displayId), "bookings.table.id", ColumnTextAlign.START);
-        setupColumn(grid.addColumn(BookingRow::dateStr), "bookings.table.date", ColumnTextAlign.START);
+        setupColumn(grid.addColumn(BookingRow::formattedDate), "bookings.table.date", ColumnTextAlign.START);
         setupColumn(grid.addColumn(BookingRow::comment), "bookings.table.comment", ColumnTextAlign.START);
 
         final Grid.Column<BookingRow> totalColumn = grid.addColumn(r -> formatAmount(r.total()));

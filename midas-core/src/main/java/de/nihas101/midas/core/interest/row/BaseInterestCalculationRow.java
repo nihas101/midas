@@ -13,10 +13,10 @@ public class BaseInterestCalculationRow implements InterestCalculationRow {
     public static final BigDecimal DEFAULT_INTEREST_DAYS = BigDecimal.valueOf(30L);
 
     private final String monthAsString;
-    private final MoneyAmount monthlyTotalSum;
-    private final MoneyAmount balanceAtEndOfMonth;
     private final BigDecimal interestDaysCount;
     private final BigDecimal interestAmount;
+    private final Transaction totalTransaction;
+    private final Transaction balanceAtEndOfMonth;
 
     public BaseInterestCalculationRow(
             final String monthAsString,
@@ -26,10 +26,10 @@ public class BaseInterestCalculationRow implements InterestCalculationRow {
     ) {
         this(
                 monthAsString,
-                totalTransactionAmount,
-                balanceAtEndOfMonth,
                 DEFAULT_INTEREST_DAYS,
-                interestAmount
+                interestAmount,
+                new Transaction(totalTransactionAmount),
+                new Transaction(balanceAtEndOfMonth)
         );
     }
 
@@ -40,12 +40,12 @@ public class BaseInterestCalculationRow implements InterestCalculationRow {
 
     @Override
     public Transaction totalTransaction() {
-        return new Transaction(monthlyTotalSum); // TODO: Move into field
+        return totalTransaction;
     }
 
     @Override
     public Transaction balanceAtEndOfMonth() {
-        return new Transaction(balanceAtEndOfMonth); // TODO: Move into field
+        return balanceAtEndOfMonth;
     }
 
     @Override
