@@ -5,13 +5,11 @@ import de.nihas101.midas.api.openingbalance.OpeningBalance;
 import de.nihas101.midas.api.openingbalance.OpeningBalanceService;
 import de.nihas101.midas.core.lock.service.LockedException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.time.Year;
 
 @Service
-@Primary
 @RequiredArgsConstructor
 public class LockingOpeningBalanceService implements OpeningBalanceService {
 

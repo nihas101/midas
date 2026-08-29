@@ -2,7 +2,7 @@ package de.nihas101.midas.core.export.bookings;
 
 import de.nihas101.midas.api.bookings.BookingsReader;
 import de.nihas101.midas.api.openingbalance.OpeningBalance;
-import de.nihas101.midas.api.openingbalance.OpeningBalanceService;
+import de.nihas101.midas.api.openingbalance.OpeningBalanceReader;
 import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.core.export.sort.DisplayIdExportRowSort;
 import de.nihas101.midas.core.export.sort.ExportRowSort;
@@ -27,7 +27,7 @@ public class BookingsRowExtractor {
     private final LocalDate startDate;
     private final LocalDate endDate;
     private final BookingsReader bookingsReader;
-    private final OpeningBalanceService openingBalanceService;
+    private final OpeningBalanceReader openingBalanceReader;
     private final MessageSource messageSource;
     private final Locale locale;
     private final ExportRowSort exportRowSort;
@@ -37,7 +37,7 @@ public class BookingsRowExtractor {
             final LocalDate startDate,
             final LocalDate endDate,
             final BookingsReader bookingsReader,
-            final OpeningBalanceService openingBalanceService,
+            final OpeningBalanceReader openingBalanceReader,
             final MessageSource messageSource,
             final Locale locale
     ) {
@@ -46,7 +46,7 @@ public class BookingsRowExtractor {
                 startDate,
                 endDate,
                 bookingsReader,
-                openingBalanceService,
+                openingBalanceReader,
                 messageSource,
                 locale,
                 new DisplayIdExportRowSort()
@@ -79,7 +79,7 @@ public class BookingsRowExtractor {
             final String shareholderName,
             final int yearValue
     ) {
-        final OpeningBalance openingBalance = openingBalanceService.openingBalance(shareholder.getId(), year);
+        final OpeningBalance openingBalance = openingBalanceReader.openingBalance(shareholder.getId(), year);
         if (openingBalance == null) {
             return Optional.empty();
         }

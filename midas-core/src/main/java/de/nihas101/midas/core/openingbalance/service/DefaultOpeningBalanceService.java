@@ -13,7 +13,7 @@ import java.time.Year;
 
 @Service
 @RequiredArgsConstructor
-public class DefaultOpeningBalanceService implements OpeningBalanceService { // TODO: Add reading and writing interface
+public class DefaultOpeningBalanceService implements OpeningBalanceService {
 
     private final OpeningBalanceRepository openingBalanceRepository;
     private final ShareholdersRepository shareholdersRepository;

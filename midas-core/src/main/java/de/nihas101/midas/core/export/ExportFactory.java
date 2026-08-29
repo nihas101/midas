@@ -6,6 +6,7 @@ import de.nihas101.midas.api.export.Export;
 import de.nihas101.midas.api.export.ExportDataSource;
 import de.nihas101.midas.api.interest.InterestBookingsService;
 import de.nihas101.midas.api.interest.InterestRowService;
+import de.nihas101.midas.api.openingbalance.OpeningBalanceReader;
 import de.nihas101.midas.core.accountstatement.service.RunningTotalAccountStatementService;
 import de.nihas101.midas.core.bookings.row.BookingRowService;
 import de.nihas101.midas.core.config.DatesConfig;
@@ -20,7 +21,6 @@ import de.nihas101.midas.core.export.pdf.PdfService;
 import de.nihas101.midas.core.export.xlsx.XlsxExporter;
 import de.nihas101.midas.core.export.xlsx.XslxFile;
 import de.nihas101.midas.core.interest.service.InterestRateService;
-import de.nihas101.midas.core.openingbalance.service.DefaultOpeningBalanceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
@@ -35,7 +35,7 @@ import java.util.Locale;
 public class ExportFactory {
 
     private final BookingsReader bookingsReader;
-    private final DefaultOpeningBalanceService openingBalanceService;
+    private final OpeningBalanceReader openingBalanceReader;
     private final InterestRateService interestRateService;
     private final RunningTotalAccountStatementService runningTotalAccountStatementService;
     private final MessageSource messageSource;
@@ -61,7 +61,7 @@ public class ExportFactory {
                                     request.startDate(),
                                     request.endDate(),
                                     bookingsReader,
-                                    openingBalanceService,
+                                    openingBalanceReader,
                                     messageSource,
                                     locale
                             ),
