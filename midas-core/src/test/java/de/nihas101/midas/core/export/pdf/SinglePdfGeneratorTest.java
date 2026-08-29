@@ -50,7 +50,7 @@ class SinglePdfGeneratorTest {
         // Setup request mock
         when(request.shareholders()).thenReturn(Collections.singletonList(shareholder));
         when(request.views()).thenReturn(new ExportViews(Set.of(ExportViewName.BOOKINGS)));
-        when(pdfViewDataExtractor.extractData(eq(shareholder), eq(ExportViewName.BOOKINGS))).thenReturn(pdfViewData);
+        when(pdfViewDataExtractor.extractData(eq(shareholder), eq(ExportViewName.BOOKINGS), any())).thenReturn(pdfViewData);
 
         new SinglePdfGenerator(
                 request,
@@ -61,7 +61,7 @@ class SinglePdfGeneratorTest {
         ).generate();
 
         // Verify interactions
-        verify(pdfViewDataExtractor).extractData(eq(shareholder), eq(ExportViewName.BOOKINGS));
+        verify(pdfViewDataExtractor).extractData(eq(shareholder), eq(ExportViewName.BOOKINGS), any());
         verify(pdfService).generatePdf(eq(pdfViewData), eq(locale), eq(outputStream));
     }
 
@@ -69,7 +69,7 @@ class SinglePdfGeneratorTest {
     void generate_propagatesPdfExportException() {
         when(request.shareholders()).thenReturn(Collections.singletonList(shareholder));
         when(request.views()).thenReturn(new ExportViews(Set.of(ExportViewName.BOOKINGS)));
-        when(pdfViewDataExtractor.extractData(any(), any())).thenReturn(pdfViewData);
+        when(pdfViewDataExtractor.extractData(any(), any(), any())).thenReturn(pdfViewData);
         doThrow(new PdfExportException("dummy exception", new RuntimeException()))
                 .when(pdfService).generatePdf(any(), any(), any());
 

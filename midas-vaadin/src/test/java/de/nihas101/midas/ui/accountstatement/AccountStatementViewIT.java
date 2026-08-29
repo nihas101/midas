@@ -90,7 +90,7 @@ public class AccountStatementViewIT extends AbstractKaribuTest {
         final List<Grid> grids = _find(Grid.class);
         Assertions.assertTrue(grids.size() >= 2, "Should have at least 2 grids (account statement and closing statement)");
 
-        @SuppressWarnings("unchecked") final Grid<AccountStatementRow> accountStatementGrid = (Grid<AccountStatementRow>) grids.get(0);
+        final Grid<AccountStatementRow> accountStatementGrid = (Grid<AccountStatementRow>) grids.get(0);
         Assertions.assertTrue(GridKt._size(accountStatementGrid) > 0, "Account statement grid should not be empty");
     }
 }

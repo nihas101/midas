@@ -17,14 +17,20 @@ import static java.util.Collections.emptyList;
 public record OpeningBalanceBookingRow(
         MoneyAmount balance,
         List<Booking> bookings,
-        String date
+        String dateFormat,
+        Year year
 ) implements BookingRow {
 
-    public OpeningBalanceBookingRow(final Bookings bookings, final String rowDateFormat) {
+    public OpeningBalanceBookingRow(
+            final Bookings bookings,
+            final String dateFormat,
+            final Year year
+    ) {
         this(
                 bookings.openingBalance().getOpeningBalance(),
                 emptyList(),
-                rowDateFormat
+                dateFormat,
+                year
         );
     }
 
@@ -40,7 +46,7 @@ public record OpeningBalanceBookingRow(
 
     @Override
     public String dateStr() {
-        return Year.now().atMonth(Month.JANUARY).atDay(1).format(DateTimeFormatter.ofPattern(date));
+        return year.atMonth(Month.JANUARY).atDay(1).format(DateTimeFormatter.ofPattern(dateFormat));
     }
 
     @Override

@@ -15,12 +15,12 @@ import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
-import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -56,13 +56,15 @@ class MultiPdfGeneratorTest {
 
     @Test
     void generate_createsZipWithCorrectEntries() throws Exception {
-        when(request.shareholders()).thenReturn(Collections.singletonList(shareholder));
+        final Year year = Year.of(2026);
+
+        when(request.shareholders()).thenReturn(singletonList(shareholder));
         when(request.views()).thenReturn(new ExportViews(Set.of(ExportViewName.BOOKINGS)));
-        when(request.startDate()).thenReturn(Year.of(2026).atMonth(Month.JANUARY).atDay(1));
-        when(request.endDate()).thenReturn(Year.of(2026).atMonth(Month.DECEMBER).atEndOfMonth());
+        when(request.startDate()).thenReturn(year.atMonth(Month.JANUARY).atDay(1));
+        when(request.endDate()).thenReturn(year.atMonth(Month.DECEMBER).atEndOfMonth());
         when(shareholder.getFirstName()).thenReturn("John");
         when(shareholder.getLastName()).thenReturn("Doe");
-        when(pdfViewDataExtractor.extractData(eq(shareholder), eq(ExportViewName.BOOKINGS))).thenReturn(pdfViewData);
+        when(pdfViewDataExtractor.extractData(eq(shareholder), eq(ExportViewName.BOOKINGS), eq(year))).thenReturn(pdfViewData);
         // Mock pdfService to write dummy bytes
         doAnswer(invocation -> {
             final ByteArrayOutputStream baos = invocation.getArgument(2);
@@ -84,7 +86,7 @@ class MultiPdfGeneratorTest {
         generator.generate();
 
         // Verify service interactions
-        verify(pdfViewDataExtractor).extractData(eq(shareholder), eq(ExportViewName.BOOKINGS));
+        verify(pdfViewDataExtractor).extractData(eq(shareholder), eq(ExportViewName.BOOKINGS), eq(year));
         verify(pdfService).generatePdf(eq(pdfViewData), any(Locale.class), any(ByteArrayOutputStream.class));
 
         // Read the zip content and verify entry name and content
@@ -103,15 +105,16 @@ class MultiPdfGeneratorTest {
 
     @Test
     void generate_propagatesPdfExportException() {
-        when(request.shareholders()).thenReturn(Collections.singletonList(shareholder));
+        when(request.shareholders()).thenReturn(singletonList(shareholder));
         when(request.views()).thenReturn(new ExportViews(Set.of(ExportViewName.BOOKINGS)));
         when(request.startDate()).thenReturn(LocalDate.now());
         when(request.endDate()).thenReturn(LocalDate.now().plusDays(1));
-        when(pdfViewDataExtractor.extractData(any(), any())).thenReturn(pdfViewData);
+        when(pdfViewDataExtractor.extractData(any(), any(), any())).thenReturn(pdfViewData);
         doThrow(new PdfExportException("failed", new RuntimeException()))
                 .when(pdfService).generatePdf(any(), any(), any());
         ByteArrayOutputStream zipOut = new ByteArrayOutputStream();
         generator = new MultiPdfGenerator(request, pdfService, Locale.US, zipOut, pdfViewDataExtractor);
+
         assertThrows(PdfExportException.class, () -> generator.generate());
     }
 }

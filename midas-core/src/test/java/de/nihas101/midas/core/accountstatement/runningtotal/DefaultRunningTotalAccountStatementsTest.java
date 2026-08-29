@@ -36,7 +36,8 @@ class DefaultRunningTotalAccountStatementsTest {
                 new OpeningRunningTotalAccountStatement(
                         accountStatements.openingBalance(),
                         Mockito.mock(MessageSource.class),
-                        Locale.ENGLISH
+                        Locale.ENGLISH,
+                        TEST_YEAR
                 )
         );
 
@@ -77,7 +78,7 @@ class DefaultRunningTotalAccountStatementsTest {
         final DefaultRunningTotalAccountStatements runningTotals = new DefaultRunningTotalAccountStatements(
                 accountStatements,
                 typeOrder,
-                new OpeningRunningTotalAccountStatement(openingBalance, Mockito.mock(MessageSource.class), Locale.ENGLISH)
+                new OpeningRunningTotalAccountStatement(openingBalance, Mockito.mock(MessageSource.class), Locale.ENGLISH, TEST_YEAR)
         );
 
         // Assert
@@ -132,7 +133,7 @@ class DefaultRunningTotalAccountStatementsTest {
         final DefaultRunningTotalAccountStatements orderA = new DefaultRunningTotalAccountStatements(
                 accountStatements,
                 List.of(BookingType.WITHDRAWAL, BookingType.INTEREST),
-                new OpeningRunningTotalAccountStatement(openingBalance, Mockito.mock(MessageSource.class), Locale.ENGLISH)
+                new OpeningRunningTotalAccountStatement(openingBalance, Mockito.mock(MessageSource.class), Locale.ENGLISH, TEST_YEAR)
         );
         Assertions.assertEquals(MoneyAmount.ofCents(10L), orderA.runningTotalAccountStatements().get(1).currentBalance());
         Assertions.assertEquals(MoneyAmount.ofCents(30L), orderA.runningTotalAccountStatements().get(2).currentBalance());
@@ -141,7 +142,7 @@ class DefaultRunningTotalAccountStatementsTest {
         final DefaultRunningTotalAccountStatements orderB = new DefaultRunningTotalAccountStatements(
                 accountStatements,
                 List.of(BookingType.INTEREST, BookingType.WITHDRAWAL),
-                new OpeningRunningTotalAccountStatement(openingBalance, Mockito.mock(MessageSource.class), Locale.ENGLISH)
+                new OpeningRunningTotalAccountStatement(openingBalance, Mockito.mock(MessageSource.class), Locale.ENGLISH, TEST_YEAR)
         );
         Assertions.assertEquals(MoneyAmount.ofCents(20L), orderB.runningTotalAccountStatements().get(1).currentBalance());
         Assertions.assertEquals(MoneyAmount.ofCents(30L), orderB.runningTotalAccountStatements().get(2).currentBalance());
@@ -182,7 +183,7 @@ class DefaultRunningTotalAccountStatementsTest {
         final DefaultRunningTotalAccountStatements runningTotals = new DefaultRunningTotalAccountStatements(
                 accountStatements,
                 typeOrder,
-                new OpeningRunningTotalAccountStatement(openingBalance, Mockito.mock(MessageSource.class), Locale.ENGLISH)
+                new OpeningRunningTotalAccountStatement(openingBalance, Mockito.mock(MessageSource.class), Locale.ENGLISH, TEST_YEAR)
         );
 
         // Assert

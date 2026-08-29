@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
@@ -21,16 +20,16 @@ import java.util.concurrent.atomic.AtomicReference;
 @RequiredArgsConstructor
 public class BookingRowService {
 
-    public static final LocalDate FIRST_DAY = Year.now().atMonth(Month.JANUARY).atDay(1);
-
     private final MessageSource messageSource;
     private final DatesConfig bookingsConfig;
 
-    public List<BookingRow> generateRows(final Bookings bookings, final Locale locale) {
-        final String dateFormat = bookingsConfig.getMediumDateFormat();
-
+    public List<BookingRow> generateRows(
+            final Bookings bookings,
+            final Locale locale,
+            final Year year
+    ) {
         List<BookingRow> rows = new ArrayList<>();
-        rows.add(new OpeningBalanceBookingRow(bookings, FIRST_DAY.format(DateTimeFormatter.ofPattern(dateFormat))));
+        rows.add(new OpeningBalanceBookingRow(bookings, bookingsConfig.getMediumDateFormat(), year));
         rows.addAll(monthlySummaryRows(bookings, locale));
         return rows;
     }

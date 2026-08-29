@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,25 +43,25 @@ public class PdfViewDataExtractor {
 
     public PdfViewData extractData(
             final Shareholder shareholder,
-            final ExportViewName view
+            final ExportViewName view,
+            final Year year
     ) {
         switch (view) {
             case BOOKINGS -> {
-                return extractBookingsData(shareholder);
+                return extractBookingsData(shareholder, year);
             }
             case ACCOUNT_STATEMENTS -> {
-                return extractAccountStatementsData(shareholder);
+                return extractAccountStatementsData(shareholder, year);
             }
             case INTEREST -> {
-                return extractInterestData(shareholder);
+                return extractInterestData(shareholder, year);
             }
             case null, default -> {
-                final Integer year = request.startDate().getYear();
                 return new PdfViewData(
                         view,
                         shareholder.getFirstName() + " " + shareholder.getLastName(),
                         shareholder,
-                        year,
+                        year.getValue(),
                         null,
                         List.of(),
                         List.of()
@@ -69,7 +70,7 @@ public class PdfViewDataExtractor {
         }
     }
 
-    private PdfViewData extractBookingsData(final Shareholder shareholder) {
+    private PdfViewData extractBookingsData(final Shareholder shareholder, final Year year) {
         final List<String> headers = List.of(
                 messageSource.getMessage("export.pdf.bookings.table.id", null, locale),
                 messageSource.getMessage("export.pdf.bookings.table.date", null, locale),
@@ -83,11 +84,14 @@ public class PdfViewDataExtractor {
                 messageSource.getMessage("export.pdf.bookings.table.balance", null, locale)
         );
 
+        final LocalDate yearStart = year.atDay(1);
+        final LocalDate yearEnd = year.atMonth(12).atEndOfMonth();
+
         return new PdfViewData(
                 ExportViewName.BOOKINGS,
                 shareholder.getFirstName() + " " + shareholder.getLastName(),
                 shareholder,
-                Year.of(request.startDate().getYear()).getValue(),
+                year.getValue(),
                 null,
                 headers,
                 // Thymeleaf requires an ArrayList
@@ -95,16 +99,17 @@ public class PdfViewDataExtractor {
                         bookingRowService.generateRows(
                                 bookingsReader.bookingsForShareholderAndDates(
                                         shareholder.getId(),
-                                        request.startDate(),
-                                        request.endDate()
+                                        yearStart,
+                                        yearEnd
                                 ),
-                                locale
+                                locale,
+                                year
                         )
                 )
         );
     }
 
-    private PdfViewData extractAccountStatementsData(final Shareholder shareholder) {
+    private PdfViewData extractAccountStatementsData(final Shareholder shareholder, final Year year) {
         List<String> headers = List.of(
                 messageSource.getMessage("account-statements.table.date", null, locale),
                 messageSource.getMessage("account-statements.table.type", null, locale),
@@ -113,7 +118,6 @@ public class PdfViewDataExtractor {
                 messageSource.getMessage("account-statements.table.balance", null, locale)
         );
 
-        final Year year = Year.of(request.startDate().getYear());
         final RunningTotalAccountStatements statements = runningTotalAccountStatementService.runningTotalAccountStatements(
                 shareholder,
                 year,
@@ -135,7 +139,7 @@ public class PdfViewDataExtractor {
         );
     }
 
-    private PdfViewData extractInterestData(final Shareholder shareholder) {
+    private PdfViewData extractInterestData(final Shareholder shareholder, final Year year) {
         final List<String> headers = List.of(
                 messageSource.getMessage("interest.table.month", null, locale),
                 messageSource.getMessage("interest.table.transactions", null, locale),
@@ -146,7 +150,6 @@ public class PdfViewDataExtractor {
                 messageSource.getMessage("interest.table.interest-amount", null, locale)
         );
 
-        final Year year = Year.of(request.startDate().getYear());
         final InterestRate rate = interestRateService.interestRate(shareholder.getId(), year);
         final BigDecimal interestRate = rate != null ? rate.getInterestRate() : BigDecimal.ZERO;
 

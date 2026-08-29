@@ -27,7 +27,8 @@ class OpeningRunningTotalAccountStatementTest {
         final OpeningRunningTotalAccountStatement statement = new OpeningRunningTotalAccountStatement(
                 null,
                 Mockito.mock(MessageSource.class),
-                Locale.ENGLISH
+                Locale.ENGLISH,
+                TEST_YEAR
         );
         Assertions.assertEquals(MoneyAmount.ZERO, statement.currentBalance());
         Assertions.assertEquals(LocalDate.of(LocalDate.now().getYear(), Month.JANUARY, 1), statement.date());
@@ -42,7 +43,8 @@ class OpeningRunningTotalAccountStatementTest {
         final OpeningRunningTotalAccountStatement statement = new OpeningRunningTotalAccountStatement(
                 openingBalance,
                 messageSource,
-                Locale.ENGLISH
+                Locale.ENGLISH,
+                TEST_YEAR
         );
 
         Assertions.assertEquals(openingBalance.getOpeningBalance(), statement.currentBalance());
@@ -57,9 +59,27 @@ class OpeningRunningTotalAccountStatementTest {
 
     public static Stream<Arguments> openingBalanceArguments() {
         return Stream.of(
-                Arguments.of(new DefaultOpeningBalance(null, 1, MoneyAmount.ofCents(100L), TEST_YEAR, Source.USER)),
-                Arguments.of(new DefaultOpeningBalance(null, 2, MoneyAmount.ZERO, TEST_YEAR, Source.USER)),
-                Arguments.of(new DefaultOpeningBalance(null, 3, MoneyAmount.ofCents(-50L), TEST_YEAR.plusYears(1), Source.USER))
+                Arguments.of(new DefaultOpeningBalance(
+                        null,
+                        1,
+                        MoneyAmount.ofCents(100L),
+                        TEST_YEAR,
+                        Source.USER
+                )),
+                Arguments.of(new DefaultOpeningBalance(
+                        null,
+                        2,
+                        MoneyAmount.ZERO,
+                        TEST_YEAR,
+                        Source.USER
+                )),
+                Arguments.of(new DefaultOpeningBalance(
+                        null,
+                        3,
+                        MoneyAmount.ofCents(-50L),
+                        TEST_YEAR.plusYears(1),
+                        Source.USER
+                ))
         );
     }
 }

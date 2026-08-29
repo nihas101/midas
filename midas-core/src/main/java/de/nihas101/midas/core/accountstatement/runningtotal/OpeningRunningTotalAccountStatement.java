@@ -10,6 +10,7 @@ import org.springframework.context.MessageSource;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.Year;
 import java.util.Locale;
 
 @ToString
@@ -20,14 +21,21 @@ public class OpeningRunningTotalAccountStatement implements RunningTotalAccountS
     private final OpeningBalance openingBalance;
     private final String label;
 
+    /**
+     * Used as fallback in case opening balance is null
+     */
+    private final Year year;
+
     public OpeningRunningTotalAccountStatement(
             final OpeningBalance openingBalance,
             final MessageSource messageSource,
-            final Locale locale
+            final Locale locale,
+            final Year year
     ) {
         this(
                 openingBalance,
-                messageSource.getMessage("account-statement.opening-balance", null, locale)
+                messageSource.getMessage("account-statement.opening-balance", null, locale),
+                year
         );
     }
 
@@ -47,10 +55,10 @@ public class OpeningRunningTotalAccountStatement implements RunningTotalAccountS
 
     @Override
     public LocalDate date() {
-        if (openingBalance != null) {
+        if (openingBalance != null && openingBalance.getYear() != null) {
             return openingBalance.getYear().atMonth(Month.JANUARY).atDay(1);
         } else {
-            return LocalDate.of(LocalDate.now().getYear(), Month.JANUARY, 1);
+            return LocalDate.of(year.getValue(), Month.JANUARY, 1);
         }
     }
 

@@ -56,7 +56,6 @@ public class PdfExporter implements Export {
         );
     }
 
-    // TODO: This fails to consider exports that go over multiple years and would require multiple PDFs even for a single shareholder and view
     private PdfExporter(
             final ExportRequest request,
             final OutputStream outputStream,
@@ -64,27 +63,13 @@ public class PdfExporter implements Export {
             final PdfService pdfService,
             final PdfViewDataExtractor pdfViewDataExtractor
     ) {
-        final int totalFiles = request.shareholders().size() * request.views().size();
-        if (totalFiles == 0) {
-            throw new IllegalArgumentException("At least one shareholder and view are required for the PDF export");
-        }
-        if (totalFiles == 1) {
-            this.pdfGenerator = new SinglePdfGenerator(
-                    request,
-                    pdfService,
-                    locale,
-                    outputStream,
-                    pdfViewDataExtractor
-            );
-        } else {
-            this.pdfGenerator = new MultiPdfGenerator(
-                    request,
-                    pdfService,
-                    locale,
-                    outputStream,
-                    pdfViewDataExtractor
-            );
-        }
+        this.pdfGenerator = new PdfGeneratorFactory(
+                request,
+                pdfService,
+                locale,
+                outputStream,
+                pdfViewDataExtractor
+        ).createPdfGenerator();
     }
 
     @Override

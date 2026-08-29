@@ -157,7 +157,7 @@ public class TemplatePreviewGeneratorTest {
 
         final Year year = Year.of(startDate.getYear());
         final Bookings bookings = bookingsReader.bookingsForShareholderAndYear(shareholder.getId(), year);
-        final List<BookingRow> rows = bookingRowService.generateRows(bookings, locale);
+        final List<BookingRow> rows = bookingRowService.generateRows(bookings, locale, year);
 
         return new PdfViewData(
                 ExportViewName.BOOKINGS,
