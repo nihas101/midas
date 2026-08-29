@@ -1,234 +1,91 @@
 package de.nihas101.midas.vaadin.ui.bookings;
 
-import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.binder.Validator;
 import de.nihas101.midas.api.bookings.Booking;
-import de.nihas101.midas.api.bookings.BookingFactory;
-import de.nihas101.midas.api.bookings.BookingsReader;
-import de.nihas101.midas.api.bookings.BookingsWriter;
 import de.nihas101.midas.api.commenttemplate.CommentTemplatesReader;
 import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.api.shareholder.ShareholdersReader;
 import de.nihas101.midas.commons.BookingType;
-import de.nihas101.midas.commons.Source;
 import de.nihas101.midas.core.config.UIConfig;
 import de.nihas101.midas.core.lock.ShareholderLock;
-import de.nihas101.midas.vaadin.ui.common.CancelButton;
 import de.nihas101.midas.vaadin.ui.common.MoneyAmountField;
-import de.nihas101.midas.vaadin.ui.common.SaveButton;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.MessageSource;
 
 import java.time.LocalDate;
 import java.time.Year;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.function.Consumer;
 
 import static de.nihas101.midas.vaadin.ui.common.DatePickerI18nProvider.datePickerI18n;
+import static java.util.Collections.emptyList;
 
-// TODO: Add tests
-// TODO: Separate into edit and create variants
 public class BookingFormDialog extends Dialog {
 
-    private final BookingsReader bookingsReader;
-    private final BookingsWriter bookingsWriter;
-    private final CommentTemplatesReader commentTemplatesReader;
-    private final ShareholderLock shareholderLock;
-    private final Consumer<Booking> onSave;
-
-    private final Binder<Booking> binder = new Binder<>(Booking.class);
-    private final Checkbox addAnotherCheckbox;
-    private final MessageSource messageSource;
-    private final Locale locale;
-    private final ComboBox<Shareholder> shareholderPicker;
-    private final DatePicker datePicker;
-    private final BookingFactory bookingFactory;
-    private final UIConfig uiConfig;
+    protected final Binder<Booking> binder = new Binder<>(Booking.class);
+    protected final ComboBox<Shareholder> shareholderPicker;
+    protected final DatePicker datePicker;
+    protected final CommentTemplatesReader commentTemplatesReader;
+    protected final UIConfig config;
+    protected final FormLayout formLayout;
+    protected final ComboBox<String> commentPicker;
+    protected final ComboBox<BookingType> typePicker;
+    protected final ShareholderLock shareholderLock;
+    protected final MessageSource messageSource;
+    protected final Locale locale;
 
     public BookingFormDialog(
-            final ShareholdersReader shareholdersReader,
-            final BookingsReader bookingsReader,
-            final BookingsWriter bookingsWriter,
-            final MessageSource messageSource,
-            final Locale locale,
-            final Shareholder initialShareholder,
-            final Consumer<Booking> onSave,
-            final UIConfig uiConfig,
-            final BookingFactory bookingFactory
+            MessageSource messageSource,
+            String titleKey,
+            Locale locale,
+            ShareholdersReader shareholdersReader,
+            ShareholderLock shareholderLock,
+            CommentTemplatesReader commentTemplatesReader,
+            UIConfig config
     ) {
-        this(
-                shareholdersReader,
-                bookingsReader,
-                bookingsWriter,
-                null,
-                messageSource,
-                locale,
-                initialShareholder,
-                null,
-                null,
-                onSave,
-                uiConfig,
-                bookingFactory
-        );
-    }
-
-    public BookingFormDialog(
-            final ShareholdersReader shareholdersReader,
-            final BookingsReader bookingsReader,
-            final BookingsWriter bookingsWriter,
-            final MessageSource messageSource,
-            final Locale locale,
-            final Shareholder initialShareholder,
-            final ShareholderLock shareholderLock,
-            final Consumer<Booking> onSave,
-            final UIConfig uiConfig,
-            final BookingFactory bookingFactory
-    ) {
-        this(
-                shareholdersReader,
-                bookingsReader,
-                bookingsWriter,
-                null,
-                messageSource,
-                locale,
-                initialShareholder,
-                null,
-                shareholderLock,
-                onSave,
-                uiConfig,
-                bookingFactory
-        );
-    }
-
-    public BookingFormDialog(
-            final ShareholdersReader shareholdersReader,
-            final BookingsReader bookingsReader,
-            final BookingsWriter bookingsWriter,
-            final CommentTemplatesReader commentTemplatesReader,
-            final MessageSource messageSource,
-            final Locale locale,
-            final Shareholder initialShareholder,
-            final ShareholderLock shareholderLock,
-            final Consumer<Booking> onSave,
-            final UIConfig uiConfig,
-            final BookingFactory bookingFactory
-    ) {
-        this(
-                shareholdersReader,
-                bookingsReader,
-                bookingsWriter,
-                commentTemplatesReader,
-                messageSource,
-                locale,
-                initialShareholder,
-                null,
-                shareholderLock,
-                onSave,
-                uiConfig,
-                bookingFactory
-        );
-    }
-
-    public BookingFormDialog(
-            final ShareholdersReader shareholdersReader,
-            final BookingsReader bookingsReader,
-            final BookingsWriter bookingsWriter,
-            final MessageSource messageSource,
-            final Locale locale,
-            final Shareholder initialShareholder,
-            final Booking bookingToEdit,
-            final Consumer<Booking> onSave,
-            final UIConfig uiConfig,
-            final BookingFactory bookingFactory
-    ) {
-        this(
-                shareholdersReader,
-                bookingsReader,
-                bookingsWriter,
-                null,
-                messageSource,
-                locale,
-                initialShareholder,
-                bookingToEdit,
-                null,
-                onSave,
-                uiConfig,
-                bookingFactory
-        );
-    }
-
-    public BookingFormDialog(
-            final ShareholdersReader shareholdersReader,
-            final BookingsReader bookingsReader,
-            final BookingsWriter bookingsWriter,
-            final MessageSource messageSource,
-            final Locale locale,
-            final Shareholder initialShareholder,
-            final Booking bookingToEdit,
-            final ShareholderLock shareholderLock,
-            final Consumer<Booking> onSave,
-            final UIConfig uiConfig,
-            final BookingFactory bookingFactory
-    ) {
-        this(
-                shareholdersReader,
-                bookingsReader,
-                bookingsWriter,
-                null,
-                messageSource,
-                locale,
-                initialShareholder,
-                bookingToEdit,
-                shareholderLock,
-                onSave,
-                uiConfig,
-                bookingFactory
-        );
-    }
-
-    public BookingFormDialog(
-            final ShareholdersReader shareholdersReader,
-            final BookingsReader bookingsReader,
-            final BookingsWriter bookingsWriter,
-            final CommentTemplatesReader commentTemplatesReader,
-            final MessageSource messageSource,
-            final Locale locale,
-            final Shareholder initialShareholder,
-            final Booking bookingToEdit,
-            final ShareholderLock shareholderLock,
-            final Consumer<Booking> onSave,
-            final UIConfig uiConfig,
-            final BookingFactory bookingFactory
-    ) {
-        this.bookingsReader = bookingsReader;
-        this.bookingsWriter = bookingsWriter;
-        this.commentTemplatesReader = commentTemplatesReader;
-        this.shareholderLock = shareholderLock;
         this.messageSource = messageSource;
         this.locale = locale;
-        this.onSave = onSave;
-        this.bookingFactory = bookingFactory;
-        this.uiConfig = uiConfig != null ? uiConfig : new UIConfig();
+        this.config = config;
+        this.commentTemplatesReader = commentTemplatesReader;
+        this.shareholderLock = shareholderLock;
 
-        final boolean isEditMode = bookingToEdit != null;
-        final String titleKey = isEditMode ? "bookings.dialog.title.edit" : "bookings.dialog.title.add";
         setHeaderTitle(messageSource.getMessage(titleKey, null, locale));
 
-        final FormLayout formLayout = new FormLayout();
+        formLayout = new FormLayout();
 
+        shareholderPicker = shareholderPicker(shareholdersReader, messageSource, locale);
+
+        datePicker = datePicker(messageSource, locale, shareholderLock);
+        typePicker = typePicker(messageSource, locale);
+        commentPicker = commentPicker(messageSource, locale);
+        typePicker.addValueChangeListener(e -> updateCommentSuggestions(commentPicker, e.getValue()));
+
+        final MoneyAmountField<Booking> moneyAmountField = new MoneyAmountField<>(
+                messageSource,
+                this.binder,
+                messageSource.getMessage("bookings.amount", null, locale),
+                locale,
+                this.config,
+                Booking::getAmount,
+                Booking::setAmount
+        );
+
+        formLayout.add(shareholderPicker, datePicker, typePicker, commentPicker, moneyAmountField);
+        add(formLayout);
+    }
+
+    private ComboBox<Shareholder> shareholderPicker(
+            final ShareholdersReader shareholdersReader,
+            final MessageSource messageSource,
+            final Locale locale
+    ) {
+        final ComboBox<Shareholder> shareholderPicker;
         shareholderPicker = new ComboBox<>(messageSource.getMessage("bookings.shareholder", null, locale));
         final List<Shareholder> shareholders = shareholdersReader.shareholders().toList();
         shareholderPicker.setItems(shareholders);
@@ -243,77 +100,7 @@ public class BookingFormDialog extends Dialog {
                                 .orElse(null),
                         (b, s) -> b.setShareholderId(s != null ? s.getId() : null)
                 );
-
-        datePicker = datePicker(messageSource, locale, shareholderLock);
-        final ComboBox<BookingType> typePicker = typePicker(messageSource, locale);
-        final ComboBox<String> commentPicker = commentPicker(messageSource, locale);
-        final MoneyAmountField<Booking> moneyAmountField = new MoneyAmountField<>(
-                messageSource,
-                this.binder,
-                messageSource.getMessage("bookings.amount", null, locale),
-                locale,
-                this.uiConfig,
-                Booking::getAmount,
-                Booking::setAmount
-        );
-
-        typePicker.addValueChangeListener(e -> updateCommentSuggestions(commentPicker, e.getValue()));
-
-        formLayout.add(shareholderPicker, datePicker, typePicker, commentPicker, moneyAmountField);
-        add(formLayout);
-
-        addAnotherCheckbox = new Checkbox(messageSource.getMessage("bookings.add-another", null, locale));
-        addAnotherCheckbox.setValue(uiConfig.isDefaultAddAnotherCheckboxState());
-        final HorizontalLayout checkBoxLayout = setupCheckBoxes(isEditMode);
-        final HorizontalLayout buttonLayout = setupButtons(messageSource, locale);
-        setupFooter(checkBoxLayout, buttonLayout);
-
-        if (isEditMode) {
-            binder.setBean(bookingToEdit);
-            updateCommentSuggestions(commentPicker, bookingToEdit.getType());
-        } else {
-            final Booking booking = bookingFactory.create(
-                    LocalDate.now(),
-                    Source.USER
-            );
-            if (initialShareholder != null) {
-                booking.setShareholderId(initialShareholder.getId());
-                shareholderPicker.setValue(initialShareholder);
-            }
-            binder.setBean(booking);
-            updateCommentSuggestions(commentPicker, null);
-        }
-    }
-
-    private void updateCommentSuggestions(final ComboBox<String> commentPicker, final BookingType bookingType) {
-        if (commentTemplatesReader != null) {
-            commentPicker.setItems(commentTemplatesReader.getSuggestions(bookingType));
-        } else {
-            commentPicker.setItems(Collections.emptyList());
-        }
-    }
-
-    private ComboBox<String> commentPicker(
-            final MessageSource messageSource,
-            final Locale locale
-    ) {
-        final ComboBox<String> commentPicker = new ComboBox<>(messageSource.getMessage("bookings.comment", null, locale));
-        commentPicker.setAllowCustomValue(true);
-        commentPicker.addCustomValueSetListener(e -> commentPicker.setValue(e.getDetail()));
-        binder.forField(commentPicker)
-                .bind(Booking::getComment, Booking::setComment);
-        return commentPicker;
-    }
-
-    private ComboBox<BookingType> typePicker(final MessageSource messageSource, final Locale locale) {
-        final ComboBox<BookingType> typePicker = new ComboBox<>(messageSource.getMessage("bookings.type", null, locale));
-        typePicker.setItems(BookingType.creatableByUser());
-        typePicker.setItemLabelGenerator(t -> messageSource.getMessage(t.getI18nKey(), null, locale) + " (" + t.getId() + ")");
-        typePicker.setRequired(true);
-        binder.forField(typePicker)
-                .asRequired()
-                .bind(Booking::getType, Booking::setType);
-        return typePicker;
+        return shareholderPicker;
     }
 
     private DatePicker datePicker(final MessageSource messageSource, final Locale locale, final ShareholderLock shareholderLock) {
@@ -344,91 +131,34 @@ public class BookingFormDialog extends Dialog {
         return datePicker;
     }
 
-    private HorizontalLayout setupButtons(final MessageSource messageSource, final Locale locale) {
-        final SaveButton saveButton = new SaveButton(messageSource.getMessage("bookings.dialog.save", null, locale), e -> save());
-        CancelButton cancelButton = new CancelButton(messageSource.getMessage("bookings.dialog.cancel", null, locale), e -> close());
-        final HorizontalLayout buttonLayout = new HorizontalLayout();
-        buttonLayout.add(saveButton, cancelButton);
-        buttonLayout.setAlignItems(FlexComponent.Alignment.END);
-        return buttonLayout;
+    private ComboBox<String> commentPicker(
+            final MessageSource messageSource,
+            final Locale locale
+    ) {
+        final ComboBox<String> commentPicker = new ComboBox<>(messageSource.getMessage("bookings.comment", null, locale));
+        commentPicker.setAllowCustomValue(true);
+        commentPicker.addCustomValueSetListener(e -> commentPicker.setValue(e.getDetail()));
+        binder.forField(commentPicker)
+                .bind(Booking::getComment, Booking::setComment);
+        return commentPicker;
     }
 
-    private void setupFooter(final HorizontalLayout checkBoxLayout, final HorizontalLayout buttonLayout) {
-        final HorizontalLayout footer = new HorizontalLayout();
-        footer.setWidthFull();
-        footer.setFlexGrow(1, addAnotherCheckbox);
-        footer.add(checkBoxLayout, buttonLayout);
-        getFooter().add(footer);
+    private ComboBox<BookingType> typePicker(final MessageSource messageSource, final Locale locale) {
+        final ComboBox<BookingType> typePicker = new ComboBox<>(messageSource.getMessage("bookings.type", null, locale));
+        typePicker.setItems(BookingType.creatableByUser());
+        typePicker.setItemLabelGenerator(t -> messageSource.getMessage(t.getI18nKey(), null, locale) + " (" + t.getId() + ")");
+        typePicker.setRequired(true);
+        binder.forField(typePicker)
+                .asRequired()
+                .bind(Booking::getType, Booking::setType);
+        return typePicker;
     }
 
-    private HorizontalLayout setupCheckBoxes(final boolean isEditMode) {
-        addAnotherCheckbox.setVisible(!isEditMode);
-        final HorizontalLayout checkBoxLayout = new HorizontalLayout();
-        checkBoxLayout.add(addAnotherCheckbox);
-        checkBoxLayout.setWidthFull();
-        return checkBoxLayout;
-    }
-
-    private void save() {
-        final BinderValidationStatus<Booking> validationStatus = binder.validate();
-        if (!validationStatus.isOk()) {
-            validationStatus.getValidationErrors()
-                    .stream()
-                    .map(ValidationResult::getErrorMessage)
-                    .filter(StringUtils::isNotBlank)
-                    .findFirst()
-                    .ifPresent(Notification::show);
-            return;
-        }
-
-        final Booking booking = binder.getBean();
-        final Shareholder selectedShareholder = shareholderPicker.getValue();
-        if (shareholderLock != null && selectedShareholder != null && booking != null && booking.getDate() != null) {
-            if (shareholderLock.isLocked(selectedShareholder, Year.of(booking.getDate().getYear()))) {
-                Notification.show(messageSource.getMessage("bookings.save.error", new Object[]{"Year is locked"}, locale));
-                return;
-            }
-        }
-
-        if (bookingsReader.exists(booking)) {
-            final ConfirmDialog confirmDialog = new ConfirmDialog();
-            confirmDialog.setHeader(messageSource.getMessage("bookings.dialog.doublebooking.warning.title", null, locale));
-            confirmDialog.setText(messageSource.getMessage("bookings.dialog.doublebooking.warning.message", null, locale));
-            confirmDialog.setCancelable(true);
-            confirmDialog.setCancelText(messageSource.getMessage("global.cancel", null, locale));
-            confirmDialog.setConfirmText(messageSource.getMessage("bookings.dialog.doublebooking.warning.confirm", null, locale));
-            confirmDialog.addConfirmListener(e -> persistAndClose(booking));
-            confirmDialog.open();
+    protected void updateCommentSuggestions(final ComboBox<String> commentPicker, final BookingType bookingType) {
+        if (commentTemplatesReader != null) {
+            commentPicker.setItems(commentTemplatesReader.getSuggestions(bookingType));
         } else {
-            persistAndClose(booking);
+            commentPicker.setItems(emptyList());
         }
-    }
-
-    private void persistAndClose(final Booking booking) {
-        try {
-            if (booking.getId() == null) {
-                bookingsWriter.create(booking);
-            } else {
-                bookingsWriter.update(booking);
-            }
-            onSave.accept(booking);
-
-            if (addAnotherCheckbox.isVisible() && addAnotherCheckbox.getValue()) {
-                resetForm();
-            } else {
-                close();
-            }
-        } catch (Exception e) {
-            Notification.show(messageSource.getMessage("bookings.save.error", new Object[]{e.getMessage()}, locale));
-        }
-    }
-
-    private void resetForm() {
-        final Booking current = binder.getBean();
-        final Booking next = bookingFactory.create(
-                current.getShareholderId(),
-                current.getDate()
-        );
-        binder.setBean(next);
     }
 }

@@ -314,7 +314,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                 addBookingMessage,
                 addBookingMessage,
                 e -> {
-                    final BookingFormDialog bookingFormDialog = new BookingFormDialog(
+                    final CreateBookingFormDialog createBookingFormDialog = new CreateBookingFormDialog(
                             shareholdersService,
                             bookingsReader,
                             bookingsWriter,
@@ -327,7 +327,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                             this.getMidasConfig().getUi(),
                             bookingFactory
                     );
-                    bookingFormDialog.open();
+                    createBookingFormDialog.open();
                 }
         );
 
@@ -424,25 +424,25 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
     }
 
     private EditButton createEditBookingButton(final Booking booking, final boolean isLocked) {
+        final Locale locale = getLocale();
+
         final EditButton editButton = new EditButton(
-                messageSource.getMessage("global.edit", null, getLocale()), e -> {
+                messageSource.getMessage("global.edit", null, locale), e -> {
             if (BookingType.INTEREST.equals(booking.getType()) && Source.SYSTEM == booking.getSource()) {
                 final QueryParameters queryParameters = UI.getCurrent().getActiveViewLocation().getQueryParameters();
                 UI.getCurrent().navigate(InterestView.class, queryParameters);
             } else {
-                new BookingFormDialog(
+                new EditBookingFormDialog(
                         shareholdersService,
                         bookingsReader,
                         bookingsWriter,
                         commentTemplatesReader,
                         messageSource,
-                        getLocale(),
-                        headerActionBar.getSelectedShareholder(),
+                        locale,
                         booking,
                         shareholderLock,
                         b -> refreshGrid(),
-                        this.getMidasConfig().getUi(),
-                        bookingFactory
+                        this.getMidasConfig().getUi()
                 ).open();
             }
         });
