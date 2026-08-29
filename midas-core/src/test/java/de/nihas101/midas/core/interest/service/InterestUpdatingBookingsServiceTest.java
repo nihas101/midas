@@ -12,6 +12,7 @@ import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.commons.Source;
 import de.nihas101.midas.core.bookings.dto.DefaultBooking;
 import de.nihas101.midas.core.interest.service.bookingupdate.DefaultInterestUpdatingBookingsService;
+import de.nihas101.midas.core.interest.service.bookingupdate.InterestUpdate;
 import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
 import de.nihas101.midas.persistance.interest.InterestRateEntity;
 import de.nihas101.midas.persistance.interest.InterestRateRepository;
@@ -121,7 +122,11 @@ class InterestUpdatingBookingsServiceTest {
                 delegate,
                 bookingsReader,
                 shareholdersRepository,
-                interestRateRepository
+                new InterestUpdate(
+                        bookingsReader,
+                        interestRateRepository,
+                        delegate
+                )
         );
     }
 
