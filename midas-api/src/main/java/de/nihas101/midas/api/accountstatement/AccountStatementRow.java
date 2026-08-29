@@ -20,7 +20,6 @@ public interface AccountStatementRow {
         return MoneyAmount.ZERO;
     }
 
-
     default String partName() {
         if (isHidden()) {
             return "hidden no-separator-column";

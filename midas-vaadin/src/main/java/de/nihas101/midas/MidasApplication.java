@@ -3,7 +3,6 @@ package de.nihas101.midas;
 import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.component.page.Push;
-import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.Lumo;
 import de.nihas101.midas.core.browser.WebPage;
 import lombok.extern.slf4j.Slf4j;
