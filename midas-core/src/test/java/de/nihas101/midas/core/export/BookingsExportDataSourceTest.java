@@ -6,7 +6,7 @@ import de.nihas101.midas.api.bookings.BookingsReader;
 import de.nihas101.midas.api.bookings.FilteredBookings;
 import de.nihas101.midas.api.export.ExportTarget;
 import de.nihas101.midas.api.openingbalance.OpeningBalance;
-import de.nihas101.midas.api.openingbalance.OpeningBalanceService;
+import de.nihas101.midas.api.openingbalance.OpeningBalanceReader;
 import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.commons.MoneyAmount;
@@ -45,7 +45,7 @@ class BookingsExportDataSourceTest {
     private BookingsReader bookingsReader;
 
     @Mock
-    private OpeningBalanceService openingBalanceService;
+    private OpeningBalanceReader openingBalanceReader;
 
     @Mock
     private MessageSource messageSource;
@@ -69,7 +69,7 @@ class BookingsExportDataSourceTest {
                         startDate,
                         endDate,
                         bookingsReader,
-                        openingBalanceService,
+                        openingBalanceReader,
                         messageSource,
                         locale
                 ),
@@ -84,7 +84,7 @@ class BookingsExportDataSourceTest {
         // Given
         // Alice: 1 Opening Balance, 1 Booking
         final OpeningBalance aliceOb = new DefaultOpeningBalance(1, 1, MoneyAmount.of(new BigDecimal("1000.00")), Year.of(2023), Source.USER);
-        when(openingBalanceService.openingBalance(eq(1), eq(Year.of(2023)))).thenReturn(aliceOb);
+        when(openingBalanceReader.openingBalance(eq(1), eq(Year.of(2023)))).thenReturn(aliceOb);
 
         final Bookings aliceBookings = mock(Bookings.class);
         Booking aliceB1 = DefaultBooking.builder().id(101).date(LocalDate.of(2023, 5, 10)).type(BookingType.WITHDRAWAL).amount(MoneyAmount.of(new BigDecimal("-100.00"))).comment("Lunch").build();
@@ -92,7 +92,7 @@ class BookingsExportDataSourceTest {
         when(bookingsReader.bookingsForShareholderAndYear(eq(1), eq(Year.of(2023)))).thenReturn(aliceBookings);
 
         // Bob: No Opening Balance, 1 Booking
-        when(openingBalanceService.openingBalance(eq(2), any())).thenReturn(null);
+        when(openingBalanceReader.openingBalance(eq(2), any())).thenReturn(null);
         final Bookings bobBookings = mock(Bookings.class);
         Booking bobB1 = DefaultBooking.builder().id(201).date(LocalDate.of(2023, 6, 15)).type(BookingType.INTEREST).amount(MoneyAmount.of(new BigDecimal("5.50"))).comment("Interest June").build();
         when(bobBookings.filter(any())).thenReturn(new FilteredBookings(List.of(bobB1)));
@@ -137,7 +137,7 @@ class BookingsExportDataSourceTest {
                         LocalDate.of(2023, 6, 1),
                         LocalDate.of(2023, 6, 30),
                         bookingsReader,
-                        openingBalanceService,
+                        openingBalanceReader,
                         messageSource,
                         locale
                 ),
@@ -147,7 +147,7 @@ class BookingsExportDataSourceTest {
 
         // OB is 01.01.2023 -> should be excluded
         final OpeningBalance ob = new DefaultOpeningBalance(1, 1, MoneyAmount.of(new BigDecimal("100.00")), Year.of(2023), Source.USER);
-        when(openingBalanceService.openingBalance(any(), any())).thenReturn(ob);
+        when(openingBalanceReader.openingBalance(any(), any())).thenReturn(ob);
 
         final Bookings bookings = mock(Bookings.class);
         final Booking bIn = DefaultBooking.builder().id(1).date(LocalDate.of(2023, 6, 15)).type(BookingType.WITHDRAWAL).amount(MoneyAmount.ZERO).build();
@@ -173,7 +173,7 @@ class BookingsExportDataSourceTest {
                         LocalDate.of(2022, 12, 31),
                         LocalDate.of(2023, 1, 1),
                         bookingsReader,
-                        openingBalanceService,
+                        openingBalanceReader,
                         messageSource,
                         locale
                 ),
