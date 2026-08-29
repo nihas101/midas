@@ -81,7 +81,7 @@ public class InterestViewIT extends AbstractKaribuTest {
                 .orElseThrow(() -> new AssertionError("Expected interest booking not found in DB"));
 
         // 7. Verify the grid has rows
-        @SuppressWarnings("unchecked") final Grid<InterestCalculationRow> grid = _get(Grid.class);
+        final Grid<InterestCalculationRow> grid = _get(Grid.class);
         Assertions.assertTrue(GridKt._size(grid) > 0, "Grid should have rows");
     }
 }
