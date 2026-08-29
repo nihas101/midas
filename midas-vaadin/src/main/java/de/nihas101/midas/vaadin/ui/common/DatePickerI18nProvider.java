@@ -6,7 +6,7 @@ import org.springframework.context.MessageSource;
 import java.util.Arrays;
 import java.util.Locale;
 
-public class DatePickerI18nProvider { // TODO: Clean up and let spring boot handle the creation and injection
+public class DatePickerI18nProvider {
 
     public static final int MONDAY = 1;
 
