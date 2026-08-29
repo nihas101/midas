@@ -24,10 +24,10 @@ const loadOnDemand = (key) => {
   if (key === 'c13210b3013a2735dd6380c598f939d962b183b26ff944639dbddad2e8b15f5a') {
     pending.push(import('./chunks/chunk-3ecdcaa39f50099e185ae88482eae72a241572fd1b48c0eb5e030cfd8a8b5e49.js'));
   }
-  if (key === 'eb54e70712294a19c8b992820ec636da636d9842ee3c7bc5c52870ca295743c7') {
+  if (key === '3a4d361fbb219cef6332b4d9882ab0f7a8d7f8f00d662d1685db9ba28893ecd6') {
     pending.push(import('./chunks/chunk-3ecdcaa39f50099e185ae88482eae72a241572fd1b48c0eb5e030cfd8a8b5e49.js'));
   }
-  if (key === '3a4d361fbb219cef6332b4d9882ab0f7a8d7f8f00d662d1685db9ba28893ecd6') {
+  if (key === 'eb54e70712294a19c8b992820ec636da636d9842ee3c7bc5c52870ca295743c7') {
     pending.push(import('./chunks/chunk-3ecdcaa39f50099e185ae88482eae72a241572fd1b48c0eb5e030cfd8a8b5e49.js'));
   }
   if (key === 'ddeb0480098b829084cb93321f3880caa4416d6e9ecd683a53fe3af9107bfd19') {

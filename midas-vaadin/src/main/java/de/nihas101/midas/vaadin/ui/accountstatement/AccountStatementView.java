@@ -343,7 +343,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                 ColumnTextAlign.START
         );
         setupColumn(
-                accountStatementGrid.addColumn(AccountStatementRow::dateStr),
+                accountStatementGrid.addColumn(AccountStatementRow::formattedDate),
                 "account-statements.table.date",
                 ColumnTextAlign.START
         );

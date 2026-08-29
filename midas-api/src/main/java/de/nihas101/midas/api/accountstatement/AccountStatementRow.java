@@ -6,7 +6,7 @@ import de.nihas101.midas.commons.MoneyAmount;
 public interface AccountStatementRow {
     Integer displayId();
 
-    String dateStr();
+    String formattedDate();
 
     String label();
 

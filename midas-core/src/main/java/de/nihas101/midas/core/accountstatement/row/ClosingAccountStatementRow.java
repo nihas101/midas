@@ -42,7 +42,7 @@ public class ClosingAccountStatementRow implements AccountStatementRow {
     }
 
     @Override
-    public String dateStr() {
+    public String formattedDate() {
         return "";
     }
 

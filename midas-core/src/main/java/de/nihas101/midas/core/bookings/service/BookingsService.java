@@ -83,7 +83,7 @@ public class BookingsService implements BookingsWriter, BookingsReader {
     @Transactional
     @Override
     public void create(final Booking booking) {
-        if (booking.getId() != null) { // TODO: Move this into a wrapper, so this always happens first
+        if (booking.getId() != null) {
             throw new IllegalArgumentException("BookingService#create with booking.getId() != null");
         }
         upsertEntity(booking);

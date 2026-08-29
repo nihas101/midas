@@ -56,7 +56,7 @@ public record MonthlySummaryBookingRow(
     }
 
     @Override
-    public String dateStr() {
+    public String formattedDate() {
         return "";
     }
 

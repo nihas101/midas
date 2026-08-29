@@ -44,7 +44,7 @@ class DefaultBookingsToBookingRowConverterTest {
 
         assertEquals(1, captured.size());
         assertEquals("1", captured.getFirst().displayId());
-        assertEquals("15.03", captured.getFirst().dateStr());
+        assertEquals("15.03", captured.getFirst().formattedDate());
         assertEquals("Test withdrawal", captured.getFirst().comment());
         assertEquals(MoneyAmount.ofCents(-500L), captured.getFirst().total());
     }
@@ -118,8 +118,8 @@ class DefaultBookingsToBookingRowConverterTest {
         converter.generate();
 
         // The first emitted row must be the earlier date
-        assertEquals("05.03", captured.get(0).dateStr());
-        assertEquals("20.03", captured.get(1).dateStr());
+        assertEquals("05.03", captured.get(0).formattedDate());
+        assertEquals("20.03", captured.get(1).formattedDate());
     }
 
     @Test

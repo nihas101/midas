@@ -12,7 +12,7 @@ public interface BookingRow {
 
     String displayId();
 
-    String dateStr(); // TODO: Think of a better name dateStr is not good
+    String formattedDate();
 
     String comment();
 

@@ -28,7 +28,7 @@ public class RunningTotalAccountStatementRow implements AccountStatementRow {
     }
 
     @Override
-    public String dateStr() {
+    public String formattedDate() {
         final LocalDate date = accountStatement.date();
         if (date != null) {
             return date.format(DateTimeFormatter.ofPattern(dateFormat));

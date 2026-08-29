@@ -134,7 +134,7 @@
         <tbody>
         <th:block th:each="row : ${data.rows}">
             <tr th:if="${!(row instanceof T(de.nihas101.midas.core.accountstatement.row.ClosingAccountStatementRow))}">
-                <td th:text="${row.dateStr()}">Date</td>
+                <td th:text="${row.formattedDate()}">Date</td>
                 <td th:text="${row.label()}">Type</td>
 
                 <td class="text-right amount separator-column"

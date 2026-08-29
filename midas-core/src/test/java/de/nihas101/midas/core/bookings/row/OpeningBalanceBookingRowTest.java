@@ -30,7 +30,7 @@ class OpeningBalanceBookingRowTest {
         final OpeningBalanceBookingRow row = new OpeningBalanceBookingRow(bookings, "dd.MM.", TEST_YEAR);
 
         assertEquals("", row.displayId());
-        assertEquals("01.01.", row.dateStr());
+        assertEquals("01.01.", row.formattedDate());
         assertEquals("", row.comment());
         assertNotNull(row.amounts());
         assertEquals(MoneyAmount.ZERO, row.total());
@@ -45,6 +45,6 @@ class OpeningBalanceBookingRowTest {
 
         final OpeningBalanceBookingRow row = new OpeningBalanceBookingRow(bookings, "MM - dd", TEST_YEAR);
 
-        assertEquals("01 - 01", row.dateStr());
+        assertEquals("01 - 01", row.formattedDate());
     }
 }

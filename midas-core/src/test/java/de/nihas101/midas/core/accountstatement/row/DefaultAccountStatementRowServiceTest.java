@@ -39,6 +39,6 @@ class DefaultAccountStatementRowServiceTest {
         final List<AccountStatementRow> rows = service.generateRows(runningTotalAccountStatements, true);
 
         assertEquals(1, rows.size());
-        assertEquals("2026-08-15", rows.getFirst().dateStr());
+        assertEquals("2026-08-15", rows.getFirst().formattedDate());
     }
 }
