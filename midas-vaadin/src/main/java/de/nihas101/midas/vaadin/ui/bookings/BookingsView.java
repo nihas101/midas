@@ -6,14 +6,14 @@ import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.TabSheet;
-import com.vaadin.flow.component.textfield.BigDecimalField;
+import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
@@ -57,6 +57,7 @@ import de.nihas101.midas.vaadin.ui.common.Formatter;
 import de.nihas101.midas.vaadin.ui.common.GridHelper;
 import de.nihas101.midas.vaadin.ui.common.HeaderActionBar;
 import de.nihas101.midas.vaadin.ui.common.MidasView;
+import de.nihas101.midas.vaadin.ui.common.MoneyAmountField;
 import de.nihas101.midas.vaadin.ui.common.QueryParameter;
 import de.nihas101.midas.vaadin.ui.common.ShareholderPicker;
 import de.nihas101.midas.vaadin.ui.common.YearPicker;
@@ -102,7 +103,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
     private final OpeningBalanceFactory openingBalanceFactory;
 
     private Checkbox updateNextYearsBalanceAutomaticallyToggle;
-    private BigDecimalField openingBalanceField;
+    private MoneyAmountField<OpeningBalance> openingBalanceField;
     private HorizontalLayout actionRow;
     private Grid<BookingRow> grid;
     private HeaderActionBar headerActionBar;
@@ -246,13 +247,27 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
     }
 
     private HorizontalLayout createActionRow(final Locale locale) {
-        openingBalanceField = new BigDecimalField(messageSource.getMessage("bookings.type.opening-balance", null, locale));
+        Binder<OpeningBalance> binder = new Binder<>();
+        openingBalanceField = new MoneyAmountField<OpeningBalance>(
+                messageSource,
+                binder,
+                messageSource.getMessage("bookings.type.opening-balance", null, locale),
+                locale,
+                getMidasConfig().getUi(),
+                OpeningBalance::getOpeningBalance,
+                OpeningBalance::setOpeningBalance
+        );
         openingBalanceField.setMaxWidth("9em");
-        openingBalanceField.setLocale(locale);
-        openingBalanceField.setSuffixComponent(new Span(getMidasConfig().getUi().getCurrencySymbol()));
         openingBalanceField.addValueChangeListener(e -> {
             if (e.isFromClient()) {
-                saveOpeningBalance();
+                final BinderValidationStatus<OpeningBalance> validationStatus = binder.validate();
+                if (!validationStatus.isOk()) {
+                    openingBalanceField.setInvalid(true);
+                    return;
+                }
+
+                openingBalanceField.setInvalid(false);
+                saveOpeningBalance(openingBalanceField.getValue());
             }
         });
 
@@ -325,27 +340,26 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         return actions;
     }
 
-    private void saveOpeningBalance() {
+    private void saveOpeningBalance(final BigDecimal openingBalanceAmount) {
         final Shareholder shareholder = headerActionBar.getSelectedShareholder();
         final Year year = headerActionBar.getSelectedYear();
         if (shareholder == null || year == null) {
             return;
         }
 
-        final BigDecimal amount = openingBalanceField.getValue();
         final OpeningBalance openingBalance = openingBalanceService.openingBalance(shareholder.getId(), year);
         if (openingBalance == null) {
             openingBalanceService.create(
                     openingBalanceFactory.create(
                             null,
                             shareholder.getId(),
-                            MoneyAmount.of(amount),
+                            MoneyAmount.of(openingBalanceAmount),
                             year,
                             Source.USER
                     )
             );
         } else {
-            openingBalance.setOpeningBalance(MoneyAmount.of(amount));
+            openingBalance.setOpeningBalance(MoneyAmount.of(openingBalanceAmount));
             // The user may overwrite the system generated value
             // at that point we shouldn't consider it system generated anymore
             openingBalance.setSource(Source.USER);

@@ -8,7 +8,6 @@ import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dnd.GridDropLocation;
 import com.vaadin.flow.component.grid.dnd.GridDropMode;
@@ -16,11 +15,14 @@ import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.BinderValidationStatus;
+import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
@@ -52,6 +54,7 @@ import de.nihas101.midas.vaadin.ui.common.DownloadTrigger;
 import de.nihas101.midas.vaadin.ui.common.GridHelper;
 import de.nihas101.midas.vaadin.ui.common.HeaderActionBar;
 import de.nihas101.midas.vaadin.ui.common.MidasView;
+import de.nihas101.midas.vaadin.ui.common.MoneyAmountField;
 import de.nihas101.midas.vaadin.ui.common.QueryParameter;
 import de.nihas101.midas.vaadin.ui.common.ShareholderPicker;
 import de.nihas101.midas.vaadin.ui.common.YearPicker;
@@ -60,7 +63,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.MessageSource;
 
-import java.math.BigDecimal;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
@@ -523,44 +525,59 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
 
     private void openOverrideDialog(final AccountStatementRow row) {
         final Dialog dialog = new Dialog();
-        dialog.setHeaderTitle(messageSource.getMessage("bookings.dialog.title.edit", null, getLocale()));
+        final Locale locale = getLocale();
+        dialog.setHeaderTitle(messageSource.getMessage("bookings.dialog.title.edit", null, locale));
 
         final VerticalLayout layout = new VerticalLayout();
         layout.setPadding(true);
         layout.setSpacing(true);
 
         final TextField labelField = new TextField(
-                messageSource.getMessage("bookings.type", null, getLocale())
+                messageSource.getMessage("bookings.type", null, locale)
         );
         labelField.setValue(row.label());
         labelField.setWidthFull();
         labelField.setReadOnly(!row.isManualExtra());
 
-        final BigDecimalField amountField = new BigDecimalField(
-                messageSource.getMessage("bookings.amount", null, getLocale())
+        final Binder<Booking> binder = new Binder<>();
+        final MoneyAmountField<Booking> moneyAmountField = new MoneyAmountField<>(
+                messageSource,
+                binder,
+                messageSource.getMessage("bookings.amount", null, locale),
+                locale,
+                getMidasConfig().getUi(),
+                Booking::getAmount,
+                Booking::setAmount
         );
-        amountField.setLocale(getLocale());
-        amountField.setSuffixComponent(new Span(getMidasConfig().getUi().getCurrencySymbol()));
-        amountField.setValue(row.amount().toBigDecimalForInput());
-        amountField.setWidthFull();
 
-        layout.add(labelField, amountField);
+        moneyAmountField.setValue(row.amount().toBigDecimalForInput());
+        moneyAmountField.setWidthFull();
+
+        layout.add(labelField, moneyAmountField);
         dialog.add(layout);
 
         final Button saveBtn = new Button(
-                messageSource.getMessage("global.save", null, getLocale()),
+                messageSource.getMessage("global.save", null, locale),
                 e -> {
-                    final BigDecimal val = amountField.getValue();
-                    if (val == null) {
-                        amountField.setErrorMessage(messageSource.getMessage("bookings.amount.error", null, getLocale()));
-                        amountField.setInvalid(true);
+                    final BinderValidationStatus<Booking> validationStatus = binder.validate();
+                    if (!validationStatus.isOk()) {
+                        validationStatus.getValidationErrors()
+                                .stream()
+                                .map(ValidationResult::getErrorMessage)
+                                .filter(StringUtils::isNotBlank)
+                                .findFirst()
+                                .ifPresent(Notification::show);
+                        moneyAmountField.setErrorMessage(messageSource.getMessage("bookings.amount.error", null, locale));
+                        moneyAmountField.setInvalid(true);
                         return;
                     }
-                    final MoneyAmount newAmount = MoneyAmount.of(val);
+                    moneyAmountField.setInvalid(false);
+
+                    final MoneyAmount newAmount = MoneyAmount.of(moneyAmountField.getValue());
                     if (row.isManualExtra()) {
                         final String labelVal = labelField.getValue();
                         if (StringUtils.isBlank(labelVal)) {
-                            labelField.setErrorMessage(messageSource.getMessage("shareholder.last-name.required", null, getLocale()));
+                            labelField.setErrorMessage(messageSource.getMessage("shareholder.last-name.required", null, locale));
                             labelField.setInvalid(true);
                             return;
                         }
@@ -586,7 +603,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         );
         saveBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-        final Button cancelBtn = new Button(messageSource.getMessage("global.cancel", null, getLocale()), e -> dialog.close());
+        final Button cancelBtn = new Button(messageSource.getMessage("global.cancel", null, locale), e -> dialog.close());
 
         dialog.getFooter().add(saveBtn, cancelBtn);
         dialog.open();

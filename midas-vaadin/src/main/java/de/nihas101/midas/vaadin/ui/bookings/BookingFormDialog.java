@@ -6,11 +6,9 @@ import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.data.binder.ValidationResult;
@@ -23,16 +21,15 @@ import de.nihas101.midas.api.commenttemplate.CommentTemplatesReader;
 import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.api.shareholder.ShareholdersReader;
 import de.nihas101.midas.commons.BookingType;
-import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.commons.Source;
 import de.nihas101.midas.core.config.UIConfig;
 import de.nihas101.midas.core.lock.ShareholderLock;
 import de.nihas101.midas.vaadin.ui.common.CancelButton;
+import de.nihas101.midas.vaadin.ui.common.MoneyAmountField;
 import de.nihas101.midas.vaadin.ui.common.SaveButton;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.MessageSource;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Year;
 import java.util.Collections;
@@ -250,11 +247,19 @@ public class BookingFormDialog extends Dialog {
         datePicker = datePicker(messageSource, locale, shareholderLock);
         final ComboBox<BookingType> typePicker = typePicker(messageSource, locale);
         final ComboBox<String> commentPicker = commentPicker(messageSource, locale);
-        final BigDecimalField amountField = amountField(messageSource, locale);
+        final MoneyAmountField<Booking> moneyAmountField = new MoneyAmountField<>(
+                messageSource,
+                this.binder,
+                messageSource.getMessage("bookings.amount", null, locale),
+                locale,
+                this.uiConfig,
+                Booking::getAmount,
+                Booking::setAmount
+        );
 
         typePicker.addValueChangeListener(e -> updateCommentSuggestions(commentPicker, e.getValue()));
 
-        formLayout.add(shareholderPicker, datePicker, typePicker, commentPicker, amountField);
+        formLayout.add(shareholderPicker, datePicker, typePicker, commentPicker, moneyAmountField);
         add(formLayout);
 
         addAnotherCheckbox = new Checkbox(messageSource.getMessage("bookings.add-another", null, locale));
@@ -288,31 +293,10 @@ public class BookingFormDialog extends Dialog {
         }
     }
 
-    private BigDecimalField amountField(final MessageSource messageSource, final Locale locale) {
-        // TODO: Extract into class, so we dont have to set the local everywhere
-        BigDecimalField amountField = new BigDecimalField(messageSource.getMessage("bookings.amount", null, locale));
-        amountField.setLocale(locale);
-        amountField.setSuffixComponent(new Span(uiConfig.getCurrencySymbol()));
-        binder.forField(amountField)
-                .asRequired()
-                .withValidator((Validator<BigDecimal>) (value, context) -> value.longValue() != 0L
-                                ? ValidationResult.ok()
-                                : ValidationResult.error(
-                                messageSource.getMessage(
-                                        "bookings.amount.error",
-                                        null,
-                                        locale
-                                )
-                        )
-                ).withConverter(
-                        MoneyAmount::of,
-                        m -> m != null ? m.toBigDecimalForInput() : null
-                )
-                .bind(Booking::getAmount, Booking::setAmount);
-        return amountField;
-    }
-
-    private ComboBox<String> commentPicker(final MessageSource messageSource, final Locale locale) {
+    private ComboBox<String> commentPicker(
+            final MessageSource messageSource,
+            final Locale locale
+    ) {
         final ComboBox<String> commentPicker = new ComboBox<>(messageSource.getMessage("bookings.comment", null, locale));
         commentPicker.setAllowCustomValue(true);
         commentPicker.addCustomValueSetListener(e -> commentPicker.setValue(e.getDetail()));

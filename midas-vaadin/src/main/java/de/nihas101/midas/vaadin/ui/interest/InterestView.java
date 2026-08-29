@@ -4,13 +4,15 @@ import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.BigDecimalField;
+import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.BinderValidationStatus;
+import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
@@ -29,6 +31,7 @@ import de.nihas101.midas.api.interest.Transaction;
 import de.nihas101.midas.api.interest.TransactionType;
 import de.nihas101.midas.api.lock.LockService;
 import de.nihas101.midas.api.lock.LockWriter;
+import de.nihas101.midas.api.openingbalance.OpeningBalance;
 import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.api.userconfig.UserConfigFactory;
 import de.nihas101.midas.api.userconfig.UserConfigService;
@@ -47,6 +50,7 @@ import de.nihas101.midas.vaadin.ui.common.Formatter;
 import de.nihas101.midas.vaadin.ui.common.GridHelper;
 import de.nihas101.midas.vaadin.ui.common.HeaderActionBar;
 import de.nihas101.midas.vaadin.ui.common.MidasView;
+import de.nihas101.midas.vaadin.ui.common.PercentAmountField;
 import de.nihas101.midas.vaadin.ui.common.QueryParameter;
 import de.nihas101.midas.vaadin.ui.common.ShareholderPicker;
 import de.nihas101.midas.vaadin.ui.common.YearPicker;
@@ -85,7 +89,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
     private final BookingFactory bookingFactory;
     private final InterestCalculationFactory interestCalculationFactory;
 
-    private BigDecimalField interestRateField;
+    private PercentAmountField<OpeningBalance> interestRateField;
     private HorizontalLayout actionRow;
     private Grid<InterestCalculationRow> interestCalculationGrid;
     private Checkbox updateInterestAutomaticallyToggle;
@@ -215,12 +219,31 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
     }
 
     private HorizontalLayout createHeaderActionRow(final Locale locale) {
-        interestRateField = new BigDecimalField(messageSource.getMessage("interest.rate.label", null, locale));
+        Binder<OpeningBalance> binder = new Binder<>();
+        interestRateField = new PercentAmountField<>(
+                messageSource,
+                binder,
+                messageSource.getMessage("interest.rate.label", null, locale),
+                locale,
+                OpeningBalance::getOpeningBalance,
+                OpeningBalance::setOpeningBalance
+        );
         interestRateField.setMaxWidth("5em");
-        interestRateField.setLocale(locale);
-        interestRateField.setSuffixComponent(new Span("%"));
         interestRateField.addValueChangeListener(e -> {
             if (e.isFromClient()) {
+                log.info("Value from client {}", e.getValue());
+                final BinderValidationStatus<OpeningBalance> validationStatus = binder.validate();
+                if (!validationStatus.isOk()) {
+                    validationStatus.getValidationErrors()
+                            .stream()
+                            .map(ValidationResult::getErrorMessage)
+                            .filter(StringUtils::isNotBlank)
+                            .findFirst()
+                            .ifPresent(Notification::show);
+                    interestRateField.setInvalid(true);
+                    return;
+                }
+                interestRateField.setInvalid(false);
                 recalculateInterest();
             }
         });

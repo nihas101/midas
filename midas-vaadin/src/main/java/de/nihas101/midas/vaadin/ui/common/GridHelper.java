@@ -6,7 +6,6 @@ import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.function.SerializableFunction;
 import de.nihas101.midas.commons.BookingType;
-import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.core.bookings.row.BookingRow;
 import org.springframework.context.MessageSource;
 
