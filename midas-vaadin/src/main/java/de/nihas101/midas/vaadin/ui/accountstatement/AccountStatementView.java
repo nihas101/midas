@@ -49,6 +49,7 @@ import de.nihas101.midas.core.shareholders.service.ShareholdersService;
 import de.nihas101.midas.vaadin.ui.bookings.BookingsView;
 import de.nihas101.midas.vaadin.ui.common.AddButton;
 import de.nihas101.midas.vaadin.ui.common.DownloadTrigger;
+import de.nihas101.midas.vaadin.ui.common.GridHelper;
 import de.nihas101.midas.vaadin.ui.common.HeaderActionBar;
 import de.nihas101.midas.vaadin.ui.common.MidasView;
 import de.nihas101.midas.vaadin.ui.common.QueryParameter;
@@ -337,17 +338,18 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
             refreshContent();
         });
 
-        setupColumn(
+        final GridHelper gridHelper = this.getGridHelper();
+        gridHelper.setupColumn(
                 accountStatementGrid.addColumn(AccountStatementRow::displayId),
                 "account-statements.table.id",
                 ColumnTextAlign.START
         );
-        setupColumn(
+        gridHelper.setupColumn(
                 accountStatementGrid.addColumn(AccountStatementRow::formattedDate),
                 "account-statements.table.date",
                 ColumnTextAlign.START
         );
-        setupColumn(
+        gridHelper.setupColumn(
                 accountStatementGrid.addColumn(AccountStatementRow::label),
                 "account-statements.table.type",
                 ColumnTextAlign.START
@@ -359,7 +361,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                         .orElse("")
         );
         debitColumn.setPartNameGenerator(r -> "separator-column");
-        setupColumn(debitColumn, "account-statements.table.debit", ColumnTextAlign.END);
+        gridHelper.setupColumn(debitColumn, "account-statements.table.debit", ColumnTextAlign.END);
 
         final Grid.Column<AccountStatementRow> creditColumn = accountStatementGrid.addColumn(
                 accountStatementRow -> Optional.of(accountStatementRow)
@@ -368,7 +370,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                         .orElse("")
         );
         creditColumn.setPartNameGenerator(r -> "separator-column");
-        setupColumn(creditColumn, "account-statements.table.credit", ColumnTextAlign.END);
+        gridHelper.setupColumn(creditColumn, "account-statements.table.credit", ColumnTextAlign.END);
 
         final Grid.Column<AccountStatementRow> balanceColumn = accountStatementGrid.addColumn(
                 accountStatementRow -> Optional.of(accountStatementRow)
@@ -377,7 +379,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                         .orElse("")
         );
         balanceColumn.setPartNameGenerator(r -> "separator-column");
-        setupColumn(balanceColumn, "account-statements.table.balance", ColumnTextAlign.END);
+        gridHelper.setupColumn(balanceColumn, "account-statements.table.balance", ColumnTextAlign.END);
 
         accountStatementGrid.addComponentColumn(this::accountStatementEditBar)
                 .setHeader(
@@ -490,12 +492,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
     }
 
     private void setupClosingStatementGrid(final VerticalLayout content) {
-        content.setSpacing(false);
-        closingStatementGrid = new Grid<>();
-        closingStatementGrid.setWidthFull();
-        closingStatementGrid.setAllRowsVisible(true);
-        closingStatementGrid.setPartNameGenerator(AccountStatementRow::partName);
-        closingStatementGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.LUMO_COMPACT);
+        closingStatementGrid = getGridHelper().createGrid(AccountStatementRow::partName);
 
         final Grid.Column<AccountStatementRow> labelColumn = closingStatementGrid.addColumn(AccountStatementRow::label);
         labelColumn.setWidth("75%");
@@ -509,23 +506,8 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         closingAmountColumn.setWidth("25%");
         closingAmountColumn.setTextAlign(ColumnTextAlign.END);
 
+        content.setSpacing(false);
         content.add(closingStatementGrid);
-    }
-
-    // TODO: Extract this into a common class between all views
-    private void setupColumn(
-            final Grid.Column<?> column,
-            final String i18nKey,
-            final ColumnTextAlign columnTextAlign
-    ) {
-        final Span header = new Span(messageSource.getMessage(i18nKey, null, getLocale()));
-        header.getElement().setAttribute("part", "header-cell-content"); // To allow common header styling
-
-        column.setAutoWidth(true)
-                .setFrozen(true)
-                .setResizable(true)
-                .setTextAlign(columnTextAlign)
-                .setHeader(header);
     }
 
     private void toggleExclude(final AccountStatementRow row, final boolean hidden) {

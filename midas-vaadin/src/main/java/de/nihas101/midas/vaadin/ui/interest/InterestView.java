@@ -3,7 +3,6 @@ package de.nihas101.midas.vaadin.ui.interest;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
@@ -34,7 +33,6 @@ import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.api.userconfig.UserConfigFactory;
 import de.nihas101.midas.api.userconfig.UserConfigService;
 import de.nihas101.midas.commons.BookingType;
-import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.commons.Source;
 import de.nihas101.midas.core.config.CoreConfig;
 import de.nihas101.midas.core.export.ExportFactory;
@@ -45,6 +43,8 @@ import de.nihas101.midas.core.interest.service.InterestRateService;
 import de.nihas101.midas.core.lock.ShareholderLock;
 import de.nihas101.midas.core.shareholders.service.ShareholdersService;
 import de.nihas101.midas.vaadin.ui.common.DownloadTrigger;
+import de.nihas101.midas.vaadin.ui.common.Formatter;
+import de.nihas101.midas.vaadin.ui.common.GridHelper;
 import de.nihas101.midas.vaadin.ui.common.HeaderActionBar;
 import de.nihas101.midas.vaadin.ui.common.MidasView;
 import de.nihas101.midas.vaadin.ui.common.QueryParameter;
@@ -383,95 +383,66 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
     }
 
     private void setupInterestGrid(final VerticalLayout content) {
-        interestCalculationGrid = new Grid<>();
-        interestCalculationGrid.setEmptyStateText(messageSource.getMessage("bookings.table.empty-state-text", null, getLocale()));
-        interestCalculationGrid.setWidthFull();
-        interestCalculationGrid.setPartNameGenerator(InterestCalculationRow::partName);
-        interestCalculationGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.LUMO_NO_ROW_BORDERS, GridVariant.LUMO_COMPACT);
+        final Formatter formatter = this.getFormatter();
+        final GridHelper gridHelper = this.getGridHelper();
+        interestCalculationGrid = gridHelper.createGrid(InterestCalculationRow::partName);
 
-        setupColumn(interestCalculationGrid.addColumn(InterestCalculationRow::label), "interest.table.month", ColumnTextAlign.START);
-        setupColumn(
-                interestCalculationGrid.addColumn(
-                        i -> Optional.ofNullable(i)
-                                .map(InterestCalculationRow::totalTransaction)
-                                .map(Transaction::moneyAmount)
-                                .filter(t -> 0L != t.getCents())
-                                .map(m -> m.format(getLocale()))
-                                .orElse("")
-                ), "interest.table.transactions", ColumnTextAlign.END);
-        setupColumn(
-                interestCalculationGrid.addColumn(
-                        i -> Optional.ofNullable(i)
-                                .map(InterestCalculationRow::totalTransaction)
-                                .filter(t -> 0L != t.moneyAmount().getCents())
-                                .map(Transaction::type)
-                                .map(TransactionType::getValue)
-                                .orElse("")
-                ), "interest.table.sh", ColumnTextAlign.START);
-        setupColumn(interestCalculationGrid.addColumn(
-                i -> formatAmount(
+        final Grid.Column<?> column6 = interestCalculationGrid.addColumn(InterestCalculationRow::label);
+        gridHelper.setupColumn(column6, "interest.table.month", ColumnTextAlign.START);
+        final Grid.Column<?> column5 = interestCalculationGrid.addColumn(
+                i -> Optional.ofNullable(i)
+                        .map(InterestCalculationRow::totalTransaction)
+                        .map(Transaction::moneyAmount)
+                        .filter(t -> 0L != t.getCents())
+                        .map(m -> m.format(getLocale()))
+                        .orElse("")
+        );
+        gridHelper.setupColumn(column5, "interest.table.transactions", ColumnTextAlign.END);
+        final Grid.Column<?> column4 = interestCalculationGrid.addColumn(
+                i -> Optional.ofNullable(i)
+                        .map(InterestCalculationRow::totalTransaction)
+                        .filter(t -> 0L != t.moneyAmount().getCents())
+                        .map(Transaction::type)
+                        .map(TransactionType::getValue)
+                        .orElse("")
+        );
+        gridHelper.setupColumn(column4, "interest.table.sh", ColumnTextAlign.START);
+        final Grid.Column<?> column3 = interestCalculationGrid.addColumn(
+                i -> formatter.formatAmount(
                         Optional.ofNullable(i)
                                 .map(InterestCalculationRow::balanceAtEndOfMonth)
                                 .map(Transaction::moneyAmount)
                                 .orElse(null)
                 )
-        ), "interest.table.balance", ColumnTextAlign.END);
-        setupColumn(interestCalculationGrid.addColumn(
+        );
+        gridHelper.setupColumn(column3, "interest.table.balance", ColumnTextAlign.END);
+        final Grid.Column<?> column2 = interestCalculationGrid.addColumn(
                 i -> Optional.ofNullable(i)
                         .map(InterestCalculationRow::balanceAtEndOfMonth)
                         .map(Transaction::type)
                         .map(TransactionType::getValue)
                         .orElse("")
-        ), "interest.table.sh", ColumnTextAlign.START);
-        setupColumn(interestCalculationGrid.addColumn(
-                i -> formatDays(
+        );
+        gridHelper.setupColumn(column2, "interest.table.sh", ColumnTextAlign.START);
+        final Grid.Column<?> column1 = interestCalculationGrid.addColumn(
+                i -> formatter.formatDays(
                         Optional.ofNullable(i)
                                 .map(InterestCalculationRow::interestDaysCount)
                                 .orElse(null)
                 )
-        ), "interest.table.days", ColumnTextAlign.CENTER);
-        // TODO: We need to format the comma for the divisor in the summary only here -> Create a wrapper for this that handles this and only wrap the divisor
-        setupColumn(interestCalculationGrid.addColumn(
-                i -> formatInterestAmounts(
+        );
+        gridHelper.setupColumn(column1, "interest.table.days", ColumnTextAlign.CENTER);
+        final Grid.Column<?> column = interestCalculationGrid.addColumn(
+                i -> formatter.formatInterestAmounts(
                         Optional.ofNullable(i)
                                 .map(InterestCalculationRow::interestAmount)
                                 .filter(t -> 0L != t.longValue())
                                 .orElse(null)
                 )
-        ), "interest.table.interest-amount", ColumnTextAlign.CENTER);
+        );
+        gridHelper.setupColumn(column, "interest.table.interest-amount", ColumnTextAlign.CENTER);
 
         content.add(interestCalculationGrid);
-    }
-
-    private String formatInterestAmounts(final BigDecimal interestAmounts) {
-        // To display empty cells for empty amounts
-        return interestAmounts == null ? "" : interestAmounts.toString();
-    }
-
-    private String formatDays(final BigDecimal days) {
-        // To display empty cells for empty amounts
-        return days == null ? "" : String.valueOf(days.intValue());
-    }
-
-    private String formatAmount(final MoneyAmount amount) {
-        // To display empty cells for empty amounts
-        return amount == null || amount.equals(MoneyAmount.ZERO) ? "" : amount.format(getLocale());
-    }
-
-    // TODO: Extract into common class for bookings view and this?
-    private void setupColumn(
-            final Grid.Column<?> column,
-            final String i18nKey,
-            final ColumnTextAlign columnTextAlign
-    ) {
-        final Span header = new Span(messageSource.getMessage(i18nKey, null, getLocale()));
-        header.getElement().setAttribute("part", "header-cell-content"); // To allow common header styling
-
-        column.setAutoWidth(true)
-                .setFrozen(true)
-                .setResizable(true)
-                .setTextAlign(columnTextAlign)
-                .setHeader(header);
     }
 
     public static Icon icon() {

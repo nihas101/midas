@@ -33,9 +33,11 @@ import java.util.Optional;
 @Getter
 public class MidasView extends AppLayout {
 
+    private final GridHelper gridHelper;
     private final CoreConfig midasConfig;
     private final Locale locale;
     private final UserConfigFactory userConfigFactory;
+    private final Formatter formatter;
 
     public MidasView(
             final CoreConfig config,
@@ -48,6 +50,8 @@ public class MidasView extends AppLayout {
         final UserConfig userConfig = getUserConfig(userConfigService);
         applyTheme(userConfig.getTheme(), config.getTheme().getDefaultTheme());
         this.locale = midasLocaleResolver.resolve();
+        this.formatter = new Formatter(locale);
+        this.gridHelper = new GridHelper(messageSource, locale, formatter);
         this.midasConfig = config;
 
         HorizontalLayout navbarContent = new HorizontalLayout();

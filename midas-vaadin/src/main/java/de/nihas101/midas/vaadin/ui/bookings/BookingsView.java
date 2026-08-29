@@ -5,7 +5,6 @@ import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
@@ -54,6 +53,8 @@ import de.nihas101.midas.vaadin.ui.common.AddButton;
 import de.nihas101.midas.vaadin.ui.common.DeleteButton;
 import de.nihas101.midas.vaadin.ui.common.DownloadTrigger;
 import de.nihas101.midas.vaadin.ui.common.EditButton;
+import de.nihas101.midas.vaadin.ui.common.Formatter;
+import de.nihas101.midas.vaadin.ui.common.GridHelper;
 import de.nihas101.midas.vaadin.ui.common.HeaderActionBar;
 import de.nihas101.midas.vaadin.ui.common.MidasView;
 import de.nihas101.midas.vaadin.ui.common.QueryParameter;
@@ -354,29 +355,27 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
     }
 
     private void setupGrid(final VerticalLayout content) {
-        grid = new Grid<>();
-        grid.setSizeFull();
-        grid.setEmptyStateText(messageSource.getMessage("bookings.table.empty-state-text", null, getLocale()));
-        grid.setPartNameGenerator(BookingRow::partName);
-        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.LUMO_COMPACT);
+        final Formatter formatter = this.getFormatter();
+        final GridHelper gridHelper = this.getGridHelper();
+        grid = gridHelper.createGrid(BookingRow::partName);
 
-        setupColumn(grid.addColumn(BookingRow::displayId), "bookings.table.id", ColumnTextAlign.START);
-        setupColumn(grid.addColumn(BookingRow::formattedDate), "bookings.table.date", ColumnTextAlign.START);
-        setupColumn(grid.addColumn(BookingRow::comment), "bookings.table.comment", ColumnTextAlign.START);
+        gridHelper.setupColumn(grid.addColumn(BookingRow::displayId), "bookings.table.id", ColumnTextAlign.START);
+        gridHelper.setupColumn(grid.addColumn(BookingRow::formattedDate), "bookings.table.date", ColumnTextAlign.START);
+        gridHelper.setupColumn(grid.addColumn(BookingRow::comment), "bookings.table.comment", ColumnTextAlign.START);
 
-        final Grid.Column<BookingRow> totalColumn = grid.addColumn(r -> formatAmount(r.total()));
+        final Grid.Column<BookingRow> totalColumn = grid.addColumn(r -> formatter.formatAmount(r.total()));
         totalColumn.setPartNameGenerator(r -> "separator-column");
-        setupColumn(totalColumn, "bookings.table.total", ColumnTextAlign.END);
+        gridHelper.setupColumn(totalColumn, "bookings.table.total", ColumnTextAlign.END);
 
-        setupColumn(BookingType.WITHDRAWAL);
-        setupColumn(BookingType.TAX_PREVIOUS_YEAR);
-        setupColumn(BookingType.TAX_CREDIT);
-        setupColumn(BookingType.INTEREST);
-        setupColumn(BookingType.COMPENSATION);
+        gridHelper.setupColumn(grid, BookingType.WITHDRAWAL);
+        gridHelper.setupColumn(grid, BookingType.TAX_PREVIOUS_YEAR);
+        gridHelper.setupColumn(grid, BookingType.TAX_CREDIT);
+        gridHelper.setupColumn(grid, BookingType.INTEREST);
+        gridHelper.setupColumn(grid, BookingType.COMPENSATION);
 
-        final Grid.Column<BookingRow> balanceColumn = grid.addColumn(r -> formatAmount(r.balance()));
+        final Grid.Column<BookingRow> balanceColumn = grid.addColumn(r -> formatter.formatAmount(r.balance()));
         balanceColumn.setPartNameGenerator(r -> "balance-column"); // Header part for no vertical separators
-        setupColumn(balanceColumn, "bookings.table.balance", ColumnTextAlign.END);
+        gridHelper.setupColumn(balanceColumn, "bookings.table.balance", ColumnTextAlign.END);
 
         grid.addComponentColumn(row -> {
             final VerticalLayout actionsContainer = new VerticalLayout();
@@ -469,35 +468,6 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
             refreshGrid();
         });
         return dialog;
-    }
-
-    private String formatAmount(final MoneyAmount amount) {
-        if (amount == null || amount.equals(MoneyAmount.ZERO)) {
-            return ""; // To display empty cells for zero amounts
-        }
-        return amount.format(getLocale());
-    }
-
-    private void setupColumn(final BookingType bookingType) {
-        final Grid.Column<BookingRow> column = grid.addColumn(r -> formatAmount(r.amount(bookingType)));
-        column.setPartNameGenerator(r -> "separator-column");
-        setupColumn(column, bookingType.getI18nKey(), ColumnTextAlign.END);
-        grid.getHeaderRows().getFirst().getCell(column).setPartName("separator-column");
-    }
-
-    private void setupColumn(
-            final Grid.Column<?> column,
-            final String i18nKey,
-            final ColumnTextAlign columnTextAlign
-    ) {
-        final Span header = new Span(messageSource.getMessage(i18nKey, null, getLocale()));
-        header.getElement().setAttribute("part", "header-cell-content"); // To allow common header styling
-
-        column.setAutoWidth(true)
-                .setFrozen(true)
-                .setResizable(true)
-                .setTextAlign(columnTextAlign)
-                .setHeader(header);
     }
 
     private void refreshGridForInitialDisplay() {
