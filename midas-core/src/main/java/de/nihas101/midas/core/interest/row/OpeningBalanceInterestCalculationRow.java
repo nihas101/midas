@@ -86,7 +86,6 @@ public class OpeningBalanceInterestCalculationRow implements InterestCalculation
 
     @Override
     public BigDecimal interestAmount() {
-        // TODO: Extract the scaling etc into a wrapper to share the code where necessary
         return interestCalculationRow.interestAmount().setScale(0, RoundingMode.HALF_UP);
     }
 }
