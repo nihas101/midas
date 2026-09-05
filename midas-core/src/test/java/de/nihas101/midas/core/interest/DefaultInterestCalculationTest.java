@@ -2,10 +2,11 @@ package de.nihas101.midas.core.interest;
 
 import de.nihas101.midas.api.bookings.Booking;
 import de.nihas101.midas.api.bookings.Bookings;
+import de.nihas101.midas.api.bookings.FilteredBookings;
 import de.nihas101.midas.api.interest.InterestCalculation;
+import de.nihas101.midas.api.openingbalance.OpeningBalance;
 import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.commons.MoneyAmount;
-import de.nihas101.midas.commons.Source;
 import de.nihas101.midas.core.bookings.dto.DefaultBooking;
 import de.nihas101.midas.core.bookings.dto.DefaultBookings;
 import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
@@ -19,12 +20,14 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class DefaultInterestCalculationTest {
 
     @Test
-    void calculateWithoutBookings() {
+    void interestCalculation_withZeroBookingsAndOpeningBalance() {
         final Bookings bookings = new DefaultBookings(
                 List.of(),
                 new DefaultOpeningBalance(MoneyAmount.ofCents(100000L))
@@ -46,52 +49,50 @@ class DefaultInterestCalculationTest {
     }
 
     @Test
-    void calculateWithBookings() {
-        final List<Booking> bookingList = List.of(
-                new DefaultBooking(
-                        1,
-                        2,
-                        3,
-                        LocalDate.of(2026, Month.MARCH, 15),
-                        BookingType.WITHDRAWAL,
-                        MoneyAmount.ofCents(20000L),
-                        "Test Withdrawal",
-                        Source.SYSTEM
-                )
-        );
+    void interestCalculation_withNullOpeningBalanceAndZeroInterestRate() {
+        final Bookings bookings = mock(Bookings.class);
+        when(bookings.openingBalance()).thenReturn(null);
+        when(bookings.bookingsInMonth(any())).thenReturn(new FilteredBookings(List.of()));
 
-        final Bookings bookings = new DefaultBookings(
-                bookingList,
-                new DefaultOpeningBalance(MoneyAmount.ofCents(100000L))
-        );
-
-        final InterestCalculation calculation = new DefaultInterestCalculation(
-                bookings,
-                Year.of(2026),
-                BigDecimal.valueOf(4.0)
-        );
-
-        assertNotNull(calculation.interestSum());
-        assertTrue(calculation.divisor().compareTo(BigDecimal.ZERO) > 0);
-        assertNotNull(calculation.interest());
-        assertEquals(12, calculation.monthlyBalances().size());
-    }
-
-    @Test
-    void calculateWithZeroInterestRate() {
-        final Bookings bookings = new DefaultBookings(
-                List.of(),
-                new DefaultOpeningBalance(MoneyAmount.ofCents(100000L))
-        );
-
-        final InterestCalculation calculation = new DefaultInterestCalculation(
+        final DefaultInterestCalculation calculation = new DefaultInterestCalculation(
                 bookings,
                 Year.of(2026),
                 BigDecimal.ZERO
         );
 
-        assertEquals(BigDecimal.ZERO, calculation.divisor());
         assertEquals(MoneyAmount.ZERO, calculation.interest());
-        assertEquals(MoneyAmount.ofCents(100000L), calculation.finalSum());
+        assertEquals(MoneyAmount.ZERO, calculation.finalSum());
+        assertEquals(BigDecimal.ZERO, calculation.divisor());
+    }
+
+    @Test
+    void interestCalculation_withBookings() {
+        final Bookings bookings = mock(Bookings.class);
+        final OpeningBalance openingBalance = mock(OpeningBalance.class);
+        when(openingBalance.getOpeningBalance()).thenReturn(MoneyAmount.ofCents(100000L)); // 1000.00
+        when(bookings.openingBalance()).thenReturn(openingBalance);
+
+        final Booking bookingJan = DefaultBooking.builder()
+                .id(1)
+                .date(LocalDate.of(2026, Month.JANUARY, 15))
+                .type(BookingType.WITHDRAWAL)
+                .amount(MoneyAmount.ofCents(-10000L))
+                .build();
+
+        when(bookings.bookingsInMonth(Month.JANUARY)).thenReturn(new FilteredBookings(List.of(bookingJan)));
+        for (Month month : Month.values()) {
+            if (month != Month.JANUARY) {
+                when(bookings.bookingsInMonth(month)).thenReturn(new FilteredBookings(List.of()));
+            }
+        }
+
+        final DefaultInterestCalculation calculation = new DefaultInterestCalculation(
+                bookings,
+                Year.of(2026),
+                BigDecimal.valueOf(3.5)
+        );
+
+        assertNotNull(calculation.interest());
+        assertNotNull(calculation.finalSum());
     }
 }

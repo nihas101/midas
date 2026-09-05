@@ -4,6 +4,7 @@ import de.nihas101.midas.api.bookings.Booking;
 import de.nihas101.midas.api.bookings.Bookings;
 import de.nihas101.midas.api.bookings.FilteredBookings;
 import de.nihas101.midas.api.bookings.MonthlyTotalSum;
+import de.nihas101.midas.api.openingbalance.OpeningBalance;
 import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.commons.MoneyAmount;
 import lombok.EqualsAndHashCode;
@@ -60,7 +61,10 @@ public class DefaultMonthlyTotalSum implements MonthlyTotalSum {
         private final Month month;
 
         public Map<BookingType, MoneyAmount> monthlyTotals() {
-            final MoneyAmount initialBalance = bookings.openingBalance().getOpeningBalance();
+            final OpeningBalance openingBalance = bookings.openingBalance();
+            final MoneyAmount initialBalance = openingBalance != null
+                    ? openingBalance.getOpeningBalance()
+                    : MoneyAmount.ZERO;
             final FilteredBookings monthBookings = bookings.bookingsInMonth(month);
             final Map<String, List<Booking>> groupedBookings = groupByDate(monthBookings);
             final List<String> sortedDates = groupedBookings.keySet()
