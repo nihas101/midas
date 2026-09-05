@@ -10,7 +10,6 @@ import java.util.function.Consumer;
 
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 class SummarizingBookingsToBookingRowConverterTest {
 
@@ -25,7 +24,6 @@ class SummarizingBookingsToBookingRowConverterTest {
                 Collections.emptyList()
         );
         final CumulativeSummaryBookingRow cumulativeSummaryBookingRow = mock(CumulativeSummaryBookingRow.class);
-        @SuppressWarnings("unchecked")
         final Consumer<BookingRow> consumer = (Consumer<BookingRow>) mock(Consumer.class);
 
         final SummarizingBookingsToBookingRowConverter converter = new SummarizingBookingsToBookingRowConverter(
