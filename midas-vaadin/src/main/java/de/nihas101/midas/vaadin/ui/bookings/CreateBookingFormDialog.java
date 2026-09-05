@@ -1,7 +1,6 @@
 package de.nihas101.midas.vaadin.ui.bookings;
 
 import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -27,8 +26,6 @@ import java.time.LocalDate;
 import java.time.Year;
 import java.util.Locale;
 import java.util.function.Consumer;
-
-import static java.util.Collections.emptyList;
 
 // TODO: Add tests
 public class CreateBookingFormDialog extends BookingFormDialog {

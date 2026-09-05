@@ -6,6 +6,7 @@ import de.nihas101.midas.core.userconfig.entity.UserConfigEntity;
 import de.nihas101.midas.core.userconfig.repository.UserConfigRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -14,7 +15,6 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -28,22 +28,50 @@ class DefaultUserConfigServiceTest {
     private DefaultUserConfigService userConfigService;
 
     @Test
-    void findByUserIdentifierReturnsUserConfigWhenFound() {
-        final UserConfigEntity entity = new UserConfigEntity(1, "user123", "dark", "de");
-        when(userConfigRepository.findByUserIdentifier("user123")).thenReturn(Optional.of(entity));
+    void findByUserIdentifier_returnsMappedConfig() {
+        final UserConfigEntity entity = UserConfigEntity.builder()
+                .id(1)
+                .userIdentifier("user-123")
+                .theme("dark")
+                .locale("de")
+                .build();
+        when(userConfigRepository.findByUserIdentifier("user-123")).thenReturn(Optional.of(entity));
 
-        final Optional<UserConfig> result = userConfigService.findByUserIdentifier("user123");
+        final Optional<UserConfig> result = userConfigService.findByUserIdentifier("user-123");
 
         assertTrue(result.isPresent());
-        assertEquals("user123", result.get().getUserIdentifier());
+        assertEquals(1, result.get().getId());
+        assertEquals("user-123", result.get().getUserIdentifier());
+        assertEquals("dark", result.get().getTheme());
+        assertEquals("de", result.get().getLocale());
     }
 
     @Test
-    void saveSavesEntityCorrectly() {
-        final UserConfig userConfig = new DefaultUserConfig(1, "user123", "light", "en");
+    void findByUserIdentifier_whenNotFound_returnsEmpty() {
+        when(userConfigRepository.findByUserIdentifier("unknown")).thenReturn(Optional.empty());
 
-        userConfigService.save(userConfig);
+        final Optional<UserConfig> result = userConfigService.findByUserIdentifier("unknown");
 
-        verify(userConfigRepository).save(any(UserConfigEntity.class));
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void save_persistsConvertedEntity() {
+        final UserConfig config = DefaultUserConfig.builder()
+                .id(2)
+                .userIdentifier("user-456")
+                .theme("light")
+                .locale("en")
+                .build();
+
+        userConfigService.save(config);
+
+        final ArgumentCaptor<UserConfigEntity> captor = ArgumentCaptor.forClass(UserConfigEntity.class);
+        verify(userConfigRepository).save(captor.capture());
+        final UserConfigEntity saved = captor.getValue();
+        assertEquals(2, saved.getId());
+        assertEquals("user-456", saved.getUserIdentifier());
+        assertEquals("light", saved.getTheme());
+        assertEquals("en", saved.getLocale());
     }
 }
