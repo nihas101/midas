@@ -1,4 +1,4 @@
-package de.nihas101.midas.persistance.sqlite;
+package de.nihas101.midas.persistance.sqlite.config;
 
 import de.nihas101.midas.persistance.DbConfig;
 import lombok.Data;

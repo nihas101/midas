@@ -71,6 +71,9 @@ The application can be configured using `application.properties`. Below are some
 * `midas.db.sqlite.optimize`
     * `enabled`: Whether `PRAGMA optimize` is run on startup and shutdown to keep the SQLite query planner statistics up
       to date (default: `true`).
+    * `vacuum`
+      * `enabled`: Whether the sqlite database is compacted periodically (default: `true`).
+      * `interval`: The period (in [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601#Durations)) after which to compact (default: `PT30D`).
 * `spring`
     * `datasource.url`: The JDBC URL for the SQLite database (e.g., `jdbc:sqlite:midas.db`).
     * `jpa.show-sql`: If `true`, Hibernate will log all SQL statements to the console.

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+
+    <changeSet id="013-create-sqlite-optimization-status-table" author="midas">
+        <createTable tableName="midas_sqlite_optimization_status">
+            <column name="id" type="INTEGER">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="last_vacuum_at" type="BIGINT"/>
+        </createTable>
+
+        <insert tableName="midas_sqlite_optimization_status">
+            <column name="id" valueNumeric="1"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>
