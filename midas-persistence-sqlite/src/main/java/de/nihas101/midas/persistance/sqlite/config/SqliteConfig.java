@@ -1,4 +1,4 @@
-package de.nihas101.midas.persistance.sqlite;
+package de.nihas101.midas.persistance.sqlite.config;
 
 import lombok.Data;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -11,7 +11,4 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 public class SqliteConfig {
     private Optimize optimize = new Optimize();
 
-    private static class Optimize {
-        boolean enabled = true;
-    }
 }

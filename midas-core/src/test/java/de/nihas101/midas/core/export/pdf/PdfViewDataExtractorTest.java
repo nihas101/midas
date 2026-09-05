@@ -153,7 +153,7 @@ class PdfViewDataExtractorTest {
 
         final InterestRate mockRate = mock(InterestRate.class);
         when(interestRateService.interestRate(eq(1), any(Year.class))).thenReturn(mockRate);
-        when(mockRate.getInterestRate()).thenReturn(new BigDecimal("5.0"));
+        when(mockRate.getInterestRate()).thenReturn(BigDecimal.valueOf(5.0));
         when(interestBookingsReader.interestRelatedBookingsForShareholderAndYear(eq(1), any(Year.class)))
                 .thenReturn(bookings);
         when(interestRowService.generateRows(any(Year.class), eq(bookings), any(BigDecimal.class), any(), eq(locale)))
@@ -161,7 +161,7 @@ class PdfViewDataExtractorTest {
 
         final PdfViewData result = extractor.extractData(shareholder, ExportViewName.INTEREST, year);
         assertEquals(ExportViewName.INTEREST, result.viewName());
-        assertEquals(new BigDecimal("5.0"), result.interestRate());
+        assertEquals(BigDecimal.valueOf(5.0), result.interestRate());
         assertEquals(7, result.headers().size());
         assertEquals(1, result.rows().size());
     }

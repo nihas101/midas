@@ -78,6 +78,9 @@ Eigenschaften aufgeführt:
 * `midas.db.sqlite.optimize`
     * `enabled`: Gibt an, ob `PRAGMA optimize` beim Start und Herunterfahren ausgeführt wird, um die Statistiken des
       SQLite‑Query‑Planers aktuell zu halten (Standard: `true`).
+   * `vacuum`
+     * `enabled`: Gibt an, ob die Sqlite Datenbank periodisch komprimiert werden soll (default: `true`).
+     * `interval`: Die Dauer (in [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601#Durations)) zwischen Komprimierungsläufen (default: `PT30D`).
 * `spring`
     * `datasource.url`: Die JDBC‑URL für die SQLite‑Datenbank (z.B. `jdbc:sqlite:midas.db`).
     * `jpa.show-sql`: Wenn `true`, protokolliert Hibernate alle SQL‑Queries in der Konsole.
