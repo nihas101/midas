@@ -137,17 +137,16 @@
 <div th:fragment="content">
     <table class="bk-main-table">
         <colgroup>
-            <col style="width: 7%;"/> <!-- ID -->
             <col style="width: 6%;"/> <!-- Date -->
             <col style="width: 8%;"/>  <!-- Comment: Spans into the next row, so it's okay to have this smaller -->
             <col style="width: 15%;"/> <!-- Summary Label -->
-            <col style="width: 10%;"/> <!-- Total -->
+            <col style="width: 13%;"/> <!-- Total -->
             <col style="width: 11%;"/> <!-- Withdrawal -->
             <col style="width: 10%;"/> <!-- Tax Prev -->
             <col style="width: 10%;"/> <!-- Tax Credit -->
             <col style="width: 10%;"/> <!-- Interest -->
             <col style="width: 10%;"/> <!-- Comp -->
-            <col style="width: 10%;"/> <!-- Balance -->
+            <col style="width: 13%;"/> <!-- Balance -->
         </colgroup>
         <thead>
         <tr class="bk-header-repeat-row">
@@ -184,7 +183,6 @@
             </th>
         </tr>
         <tr>
-            <th th:text="${data.headers[0]}">ID</th>
             <th th:text="${data.headers[1]}">Date</th>
             <th class="bk-no-right-padding" th:text="${data.headers[2]}">Comment</th>
             <!-- Empty header for the Summary Label column, no separator -->
@@ -208,14 +206,12 @@
 
             <!-- Normal Data Columns -->
             <th:block th:if="${!isMonthly and !isCumulative}">
-                <td th:text="${row.displayId()}">ID</td>
                 <td th:text="${row.formattedDate()}">Date</td>
                 <td colspan="2" class="bk-truncate" th:text="${row.comment()}">Comment</td>
             </th:block>
 
             <!-- Summary Rows Columns -->
             <th:block th:if="${isMonthly or isCumulative}">
-                <td></td> <!-- ID -->
                 <td></td> <!-- Date -->
                 <td class="bk-no-right-padding"></td> <!-- Comment -->
                 <td class="bk-no-left-padding bk-truncate" th:text="${row.comment()}">Summary Label</td>
