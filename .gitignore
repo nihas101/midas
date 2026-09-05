@@ -36,3 +36,6 @@ build/
 ### DB files ###
 *.db
 *.db.bak
+
+### Logs ###
+/logs/
