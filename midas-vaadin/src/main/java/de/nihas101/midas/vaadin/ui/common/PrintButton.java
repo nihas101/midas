@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-public class PrintButton extends Button { // TODO: test
+public class PrintButton extends Button {
 
     public PrintButton(
             final MessageSource messageSource,
