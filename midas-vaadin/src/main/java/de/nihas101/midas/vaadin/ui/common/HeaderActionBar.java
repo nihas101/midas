@@ -18,8 +18,8 @@ import java.util.Set;
 @Slf4j
 public class HeaderActionBar extends HorizontalLayout {
 
-    private final ShareholderPicker shareholderPicker; // TODO: Store the selected shareholder somewhere so that we can use that in the same filter when switching views
-    private final YearPicker yearPicker; // TODO: Store the selected shareholder somewhere so that we can use that in the same filter when switching views
+    private final ShareholderPicker shareholderPicker;
+    private final YearPicker yearPicker;
     private final LockUnlockButton lockUnlockButton;
     private final HorizontalLayout actionRow;
     private final PrintButton printButton;
