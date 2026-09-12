@@ -499,14 +499,20 @@ public class BookingsViewIT extends AbstractKaribuTest {
 
         // Enter a custom comment
         _setValue(commentPicker, "My Custom Comment");
+
+        // Change booking type and verify comment remains intact
+        _setValue(typePicker, BookingType.COMPENSATION);
+        Assertions.assertEquals("My Custom Comment", commentPicker.getValue());
+
         _setValue(amountField, new BigDecimal("75.00"));
 
         final Button saveButton = _get(Button.class, spec -> spec.withText("Save"));
         _click(saveButton);
 
-        // Verify booking was created in DB with the custom comment
+        // Verify booking was created in DB with the custom comment and new type
         final Bookings bookings = bookingsService.bookingsForShareholderAndYear(savedSh.getId(), Year.of(2026));
         Assertions.assertEquals(1, bookings.filter(b -> true).bookings().size());
         Assertions.assertEquals("My Custom Comment", bookings.filter(b -> true).bookings().getFirst().getComment());
+        Assertions.assertEquals(BookingType.COMPENSATION, bookings.filter(b -> true).bookings().getFirst().getType());
     }
 }
