@@ -38,7 +38,7 @@ public class ShareholderPicker extends ComboBox<Shareholder> {
         );
     }
 
-    private ShareholderPicker(
+    public ShareholderPicker(
             final String label,
             final Shareholders shareholders,
             final QueryParameter<?, Shareholder> queryParameter,
