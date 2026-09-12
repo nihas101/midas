@@ -154,10 +154,14 @@ public class BookingFormDialog extends Dialog {
     }
 
     protected void updateCommentSuggestions(final ComboBox<String> commentPicker, final BookingType bookingType) {
+        final String currentComment = commentPicker.getValue();
         if (commentTemplatesReader != null) {
             commentPicker.setItems(commentTemplatesReader.getSuggestions(bookingType));
         } else {
             commentPicker.setItems(emptyList());
+        }
+        if (currentComment != null) {
+            commentPicker.setValue(currentComment);
         }
     }
 }
