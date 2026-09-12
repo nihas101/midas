@@ -290,7 +290,6 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
         );
         // TODO: Move this logic into the service. On interest update -> trigger
         if (booking != null) {
-            // TODO: This mutates the object! Handle this differently
             booking.setAmount(interestCalculation.interest());
             bookingsWriter.update(booking);
         } else {
@@ -313,7 +312,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
     ) {
         InterestRate interestRate = interestRateService.interestRate(shareholder.getId(), year);
         if (interestRate != null) {
-            interestRate.setInterestRate(rate); // TODO: This mutates the object! Do it differently
+            interestRate.setInterestRate(rate);
             interestRateService.update(interestRate);
         } else {
             interestRate = new InterestRate(null, shareholder.getId(), rate, year);
