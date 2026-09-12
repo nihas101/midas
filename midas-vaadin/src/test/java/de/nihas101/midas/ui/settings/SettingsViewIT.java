@@ -20,7 +20,6 @@ public class SettingsViewIT extends AbstractKaribuTest {
     void testSettingsViewRendersTableWithDescriptions() {
         UI.getCurrent().navigate(SettingsView.class);
 
-        @SuppressWarnings("unchecked")
         final Grid<SettingsView.SettingRow> grid = _get(Grid.class);
         Assertions.assertNotNull(grid);
 

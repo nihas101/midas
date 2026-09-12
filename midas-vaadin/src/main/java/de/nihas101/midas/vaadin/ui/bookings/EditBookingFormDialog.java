@@ -23,7 +23,6 @@ import java.time.Year;
 import java.util.Locale;
 import java.util.function.Consumer;
 
-// TODO: Add tests
 public class EditBookingFormDialog extends BookingFormDialog {
 
     private final BookingsReader bookingsReader;

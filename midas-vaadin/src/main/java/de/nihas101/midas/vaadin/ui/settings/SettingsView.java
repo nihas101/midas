@@ -102,19 +102,19 @@ public class SettingsView extends MidasView {
         grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
 
         grid.addComponentColumn(row -> {
-            final Div container = new Div();
-            final Span titleSpan = new Span(row.title());
-            titleSpan.getStyle().set("font-weight", "600");
-            titleSpan.getStyle().set("display", "block");
+                    final Div container = new Div();
+                    final Span titleSpan = new Span(row.title());
+                    titleSpan.getStyle().set("font-weight", "600");
+                    titleSpan.getStyle().set("display", "block");
 
-            final Span descSpan = new Span(row.description());
-            descSpan.getStyle().set("color", "var(--lumo-secondary-text-color)");
-            descSpan.getStyle().set("font-size", "var(--lumo-font-size-s)");
-            descSpan.getStyle().set("display", "block");
+                    final Span descSpan = new Span(row.description());
+                    descSpan.getStyle().set("color", "var(--lumo-secondary-text-color)");
+                    descSpan.getStyle().set("font-size", "var(--lumo-font-size-s)");
+                    descSpan.getStyle().set("display", "block");
 
-            container.add(titleSpan, descSpan);
-            return container;
-        }).setHeader(messageSource.getMessage("settings.table.description", null, getLocale()))
+                    container.add(titleSpan, descSpan);
+                    return container;
+                }).setHeader(messageSource.getMessage("settings.table.description", null, getLocale()))
                 .setFlexGrow(2)
                 .setAutoWidth(true);
 

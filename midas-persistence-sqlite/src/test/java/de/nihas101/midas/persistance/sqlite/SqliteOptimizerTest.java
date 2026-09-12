@@ -128,7 +128,6 @@ class SqliteOptimizerTest {
         verify(jdbcTemplate, never()).execute("VACUUM;");
     }
 
-    @SuppressWarnings("unchecked")
     private void mockLastVacuumAt(final Long value) {
         when(jdbcTemplate.query(
                 eq("SELECT last_vacuum_at FROM midas_sqlite_optimization_status WHERE id = ?"),
