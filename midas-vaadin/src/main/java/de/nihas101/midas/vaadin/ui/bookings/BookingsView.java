@@ -59,12 +59,13 @@ import de.nihas101.midas.vaadin.ui.common.HeaderActionBar;
 import de.nihas101.midas.vaadin.ui.common.MidasView;
 import de.nihas101.midas.vaadin.ui.common.MoneyAmountField;
 import de.nihas101.midas.vaadin.ui.common.QueryParameter;
+import de.nihas101.midas.vaadin.ui.common.SelectionStorage;
+import de.nihas101.midas.vaadin.ui.common.SelectionView;
 import de.nihas101.midas.vaadin.ui.common.ShareholderPicker;
 import de.nihas101.midas.vaadin.ui.common.YearPicker;
 import de.nihas101.midas.vaadin.ui.common.locale.MidasLocaleResolver;
 import de.nihas101.midas.vaadin.ui.interest.InterestView;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.MessageSource;
 
 import java.math.BigDecimal;
@@ -102,6 +103,9 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
     private final BookingFactory bookingFactory;
     private final OpeningBalanceFactory openingBalanceFactory;
 
+    private final SelectionView selectionView;
+    private final SelectionStorage selectionStorage;
+
     private Checkbox updateNextYearsBalanceAutomaticallyToggle;
     private MoneyAmountField<OpeningBalance> openingBalanceField;
     private HorizontalLayout actionRow;
@@ -134,6 +138,11 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                 userConfigFactory
         );
         this.shareholdersService = shareholdersService;
+        selectionStorage = new SelectionStorage();
+        this.selectionView = new SelectionView(
+                shareholdersService,
+                selectionStorage
+        );
         this.bookingsReader = bookingsReader;
         this.bookingsWriter = bookingsWriter;
         this.commentTemplatesReader = commentTemplatesService;
@@ -178,34 +187,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
 
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
-        // TODO: Move this logic into the query parameter?
-        event.getLocation().getQueryParameters().getSingleParameter(QueryParameter.QUERY_PARAM_SHAREHOLDER)
-                .ifPresent(shareholderId -> {
-                    try {
-                        if (StringUtils.isBlank(shareholderId)) {
-                            return;
-                        }
-                        final Shareholder shareholder = shareholdersService.shareholder(Integer.parseInt(shareholderId));
-                        if (shareholder == null) {
-                            log.warn("Unknown shareholderId: {}. Ignoring parameter.", shareholderId);
-                            return;
-                        }
-                        headerActionBar.setSelectedShareholder(shareholder);
-                    } catch (NumberFormatException e) {
-                        log.warn("Unparsable shareholderId in query parameter: {}. Ignoring parameter.", shareholderId);
-                    }
-                });
-        event.getLocation().getQueryParameters().getSingleParameter(QueryParameter.QUERY_PARAM_YEAR)
-                .ifPresent(year -> {
-                    if (StringUtils.isBlank(year)) {
-                        return;
-                    }
-                    try {
-                        headerActionBar.setSelectedYear(Integer.parseInt(year));
-                    } catch (NumberFormatException e) {
-                        log.warn("Unparsable year in query parameter: {}. Ignoring parameter.", year);
-                    }
-                });
+        selectionView.prepopulateSelection(event, headerActionBar, this::refreshGridForInitialDisplay);
     }
 
     private void setupHeader(final VerticalLayout content) {
@@ -223,7 +205,8 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                         shareholdersService,
                         QueryParameter.shareholderParameter(
                                 viewClass,
-                                onUpdate
+                                onUpdate,
+                                selectionStorage
                         )
                 ),
                 new YearPicker(
@@ -231,7 +214,8 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                         locale,
                         QueryParameter.yearParameter(
                                 viewClass,
-                                onUpdate
+                                onUpdate,
+                                selectionStorage
                         ),
                         getMidasConfig()
                 ),

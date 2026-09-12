@@ -56,6 +56,8 @@ import de.nihas101.midas.vaadin.ui.common.HeaderActionBar;
 import de.nihas101.midas.vaadin.ui.common.MidasView;
 import de.nihas101.midas.vaadin.ui.common.MoneyAmountField;
 import de.nihas101.midas.vaadin.ui.common.QueryParameter;
+import de.nihas101.midas.vaadin.ui.common.SelectionStorage;
+import de.nihas101.midas.vaadin.ui.common.SelectionView;
 import de.nihas101.midas.vaadin.ui.common.ShareholderPicker;
 import de.nihas101.midas.vaadin.ui.common.YearPicker;
 import de.nihas101.midas.vaadin.ui.common.locale.MidasLocaleResolver;
@@ -89,6 +91,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
     private final LockWriter lockWriter;
     private final ShareholderLock shareholderLock;
     private final ExportFactory exportFactory;
+    private final SelectionStorage selectionStorage;
 
     private HorizontalLayout warningBanner;
     private Span warningText;
@@ -100,6 +103,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
     private List<AccountStatementRow> currentRows;
     private HeaderActionBar headerActionBar;
     private final DownloadTrigger downloadTrigger;
+    private final SelectionView selectionView;
 
     public AccountStatementView(
             final ShareholdersService shareholdersService,
@@ -124,6 +128,11 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                 userConfigFactory
         );
         this.shareholdersService = shareholdersService;
+        selectionStorage = new SelectionStorage();
+        this.selectionView = new SelectionView(
+                shareholdersService,
+                selectionStorage
+        );
         this.accountStatementService = accountStatementService;
         this.runningTotalAccountStatementService = runningTotalAccountStatementService;
         this.messageSource = messageSource;
@@ -151,33 +160,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
 
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
-        event.getLocation().getQueryParameters().getSingleParameter(QueryParameter.QUERY_PARAM_SHAREHOLDER)
-                .ifPresent(shareholderId -> {
-                    try {
-                        if (StringUtils.isBlank(shareholderId)) {
-                            return;
-                        }
-                        final Shareholder shareholder = shareholdersService.shareholder(Integer.parseInt(shareholderId));
-                        if (shareholder == null) {
-                            log.warn("Unknown shareholderId: {}. Ignoring parameter.", shareholderId);
-                            return;
-                        }
-                        headerActionBar.setSelectedShareholder(shareholder);
-                    } catch (NumberFormatException e) {
-                        log.warn("Unparsable shareholderId in query parameter: {}. Ignoring parameter.", shareholderId);
-                    }
-                });
-        event.getLocation().getQueryParameters().getSingleParameter(QueryParameter.QUERY_PARAM_YEAR)
-                .ifPresent(year -> {
-                    if (StringUtils.isBlank(year)) {
-                        return;
-                    }
-                    try {
-                        headerActionBar.setSelectedYear(Integer.parseInt(year));
-                    } catch (NumberFormatException e) {
-                        log.warn("Unparsable year in query parameter: {}. Ignoring parameter.", year);
-                    }
-                });
+        selectionView.prepopulateSelection(event, headerActionBar, this::refreshContent);
     }
 
     private void setupHeader(final VerticalLayout content) {
@@ -195,7 +178,8 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                         shareholdersService,
                         QueryParameter.shareholderParameter(
                                 viewClass,
-                                onUpdate
+                                onUpdate,
+                                selectionStorage
                         )
                 ),
                 new YearPicker(
@@ -203,7 +187,8 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                         locale,
                         QueryParameter.yearParameter(
                                 viewClass,
-                                onUpdate
+                                onUpdate,
+                                selectionStorage
                         ),
                         getMidasConfig()
                 ),
