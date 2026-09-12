@@ -10,7 +10,6 @@ import org.springframework.context.MessageSource;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-// TODO: Separate this from AccountStatementRow
 @RequiredArgsConstructor
 public class ClosingAccountStatementRow implements AccountStatementRow {
     private final MoneyAmount closingBalance;

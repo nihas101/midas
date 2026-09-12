@@ -1,6 +1,12 @@
 package de.nihas101.midas.vaadin.ui.settings;
 
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.grid.ColumnTextAlign;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -15,12 +21,17 @@ import de.nihas101.midas.vaadin.ui.common.MidasView;
 import de.nihas101.midas.vaadin.ui.common.locale.MidasLocaleResolver;
 import org.springframework.context.MessageSource;
 
-// TODO: Add descriptions to the settings
+import java.util.ArrayList;
+import java.util.List;
+
 @Route("settings")
 @PageTitle("Settings")
 public class SettingsView extends MidasView {
 
     public static final VaadinIcon icon = VaadinIcon.COG;
+
+    public record SettingRow(String title, String description, Component component) {
+    }
 
     public SettingsView(
             final CoreConfig config,
@@ -44,41 +55,81 @@ public class SettingsView extends MidasView {
 
         content.add(new H2(messageSource.getMessage("settings", null, getLocale())));
 
-        final VerticalLayout formContainer = formContainer(config, i18NProvider, userConfigService);
-        content.add(formContainer);
-        content.setAlignSelf(FlexComponent.Alignment.CENTER, formContainer);
+        final Grid<SettingRow> settingsTable = settingsTable(config, i18NProvider, userConfigService, messageSource);
+        content.add(settingsTable);
+        content.setAlignSelf(FlexComponent.Alignment.CENTER, settingsTable);
 
         setContent(content);
     }
 
-    private VerticalLayout formContainer(
+    private Grid<SettingRow> settingsTable(
             final CoreConfig config,
             final I18NProvider i18NProvider,
-            final UserConfigService userConfigService
+            final UserConfigService userConfigService,
+            final MessageSource messageSource
     ) {
-        final VerticalLayout formContainer = new VerticalLayout();
-        formContainer.setWidth("550px"); // Consistent width with other views
-        formContainer.setPadding(false);
-        formContainer.setSpacing(true);
-        formContainer.setAlignItems(FlexComponent.Alignment.START);
+        final List<SettingRow> rows = new ArrayList<>();
 
-        final ThemeToggleButton themeToggleButton = new ThemeToggleButton(
-                config,
-                userConfigService
-        );
+        if (!config.getUi().isHideThemeToggle()) {
+            final ThemeToggleButton themeToggleButton = new ThemeToggleButton(
+                    config,
+                    userConfigService
+            );
+            rows.add(new SettingRow(
+                    messageSource.getMessage("settings.theme.title", null, getLocale()),
+                    messageSource.getMessage("settings.theme.description", null, getLocale()),
+                    themeToggleButton
+            ));
+        }
 
-        final LocaleSelect localeSelect = new LocaleSelect(
-                i18NProvider,
-                getLocale(),
-                config,
-                userConfigService
-        );
+        if (!config.getUi().isHideLanguageSelector() && !config.getI18n().isForceDefaultLanguage()) {
+            final LocaleSelect localeSelect = new LocaleSelect(
+                    i18NProvider,
+                    getLocale(),
+                    config,
+                    userConfigService
+            );
+            rows.add(new SettingRow(
+                    messageSource.getMessage("settings.language.title", null, getLocale()),
+                    messageSource.getMessage("settings.language.description", null, getLocale()),
+                    localeSelect
+            ));
+        }
 
-        formContainer.add(themeToggleButton, localeSelect);
-        return formContainer;
+        final Grid<SettingRow> grid = new Grid<>();
+        grid.setWidth("650px");
+        grid.setAllRowsVisible(true);
+        grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
+
+        grid.addComponentColumn(row -> {
+            final Div container = new Div();
+            final Span titleSpan = new Span(row.title());
+            titleSpan.getStyle().set("font-weight", "600");
+            titleSpan.getStyle().set("display", "block");
+
+            final Span descSpan = new Span(row.description());
+            descSpan.getStyle().set("color", "var(--lumo-secondary-text-color)");
+            descSpan.getStyle().set("font-size", "var(--lumo-font-size-s)");
+            descSpan.getStyle().set("display", "block");
+
+            container.add(titleSpan, descSpan);
+            return container;
+        }).setHeader(messageSource.getMessage("settings.table.description", null, getLocale()))
+                .setFlexGrow(2)
+                .setAutoWidth(true);
+
+        grid.addComponentColumn(SettingRow::component)
+                .setHeader(messageSource.getMessage("settings.table.setting", null, getLocale()))
+                .setTextAlign(ColumnTextAlign.END)
+                .setFlexGrow(1)
+                .setAutoWidth(true);
+
+        grid.setItems(rows);
+        return grid;
     }
 
     public static Icon icon() {
         return icon.create();
     }
 }
+

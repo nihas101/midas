@@ -25,9 +25,6 @@ import de.nihas101.midas.vaadin.ui.shareholders.ShareholdersView;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 
-// TODO: Add ability to set favicon
-// TODO: Add ability to set icon on main page
-// TODO: Redirect here for 404s
 @Slf4j
 @Route("main")
 @RouteAlias("")
