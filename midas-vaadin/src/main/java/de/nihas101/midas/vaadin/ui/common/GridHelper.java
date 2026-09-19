@@ -12,6 +12,8 @@ import org.springframework.context.MessageSource;
 import java.util.Locale;
 
 public class GridHelper {
+
+    public static final String ACTIONS_KEY = "actions";
     private final MessageSource messageSource;
     private final Locale locale;
     private final Formatter formatter;

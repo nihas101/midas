@@ -17,6 +17,7 @@ import de.nihas101.midas.vaadin.ui.common.AddButton;
 import de.nihas101.midas.vaadin.ui.common.CancelButton;
 import de.nihas101.midas.vaadin.ui.common.DeleteButton;
 import de.nihas101.midas.vaadin.ui.common.EditButton;
+import de.nihas101.midas.vaadin.ui.common.GridHelper;
 import de.nihas101.midas.vaadin.ui.common.SaveButton;
 import de.nihas101.midas.vaadin.ui.main.Dependant;
 import org.springframework.context.MessageSource;
@@ -130,7 +131,7 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
 
                     return actions;
                 }).setHeader(messageSource.getMessage("shareholders.table.actions", null, locale))
-                .setKey("actions")
+                .setKey(GridHelper.ACTIONS_KEY)
                 .setAutoWidth(true);
     }
 

@@ -8,6 +8,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.core.shareholders.service.ShareholdersService;
 import de.nihas101.midas.ui.AbstractKaribuTest;
+import de.nihas101.midas.vaadin.ui.common.GridHelper;
 import de.nihas101.midas.vaadin.ui.shareholders.ShareholdersTable;
 import de.nihas101.midas.vaadin.ui.shareholders.ShareholdersView;
 import org.junit.jupiter.api.Assertions;
@@ -39,7 +40,7 @@ public class ShareholderViewIT extends AbstractKaribuTest {
         // Click the "Add Shareholder" button in the last row (dummy row)
         // The button is inside a HorizontalLayout in the "actions" column
         final int lastRowIndex = GridKt._size(table) - 1;
-        HorizontalLayout actions = (HorizontalLayout) GridKt._getCellComponent(table, lastRowIndex, "actions");
+        HorizontalLayout actions = (HorizontalLayout) GridKt._getCellComponent(table, lastRowIndex, GridHelper.ACTIONS_KEY);
         Button addButton = _get(actions, Button.class);
         _click(addButton);
 
