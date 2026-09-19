@@ -398,7 +398,9 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                 actionsContainer.add(actionRow);
             }
             return actionsContainer;
-        }).setHeader(messageSource.getMessage("shareholders.table.actions", null, getLocale())).setAutoWidth(true);
+        }).setHeader(messageSource.getMessage("shareholders.table.actions", null, getLocale()))
+                .setKey(GridHelper.ACTIONS_KEY)
+                .setAutoWidth(true);
 
         content.add(grid);
 
@@ -448,18 +450,19 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
 
     private ConfirmDialog createDeleteBookingDialog(final Booking booking) {
         final ConfirmDialog dialog = new ConfirmDialog();
-        dialog.setHeader(messageSource.getMessage("bookings.table.delete.confirmation.title", null, getLocale()));
+        final Locale locale = getLocale();
+        dialog.setHeader(messageSource.getMessage("bookings.table.delete.confirmation.title", null, locale));
 
         final String[] args = new String[]{
-                messageSource.getMessage(booking.getType().getI18nKey(), null, getLocale()),
-                booking.getDate().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)),
-                booking.getAmount().format(getLocale())
+                messageSource.getMessage(booking.getType().getI18nKey(), null, locale),
+                booking.getDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)),
+                booking.getAmount().format(locale)
         };
-        dialog.setText(messageSource.getMessage("bookings.table.delete.confirmation.message", args, getLocale()));
+        dialog.setText(messageSource.getMessage("bookings.table.delete.confirmation.message", args, locale));
 
         dialog.setCancelable(true);
-        dialog.setCancelText(messageSource.getMessage("global.cancel", null, getLocale()));
-        dialog.setConfirmText(messageSource.getMessage("global.delete", null, getLocale()));
+        dialog.setCancelText(messageSource.getMessage("global.cancel", null, locale));
+        dialog.setConfirmText(messageSource.getMessage("global.delete", null, locale));
         dialog.setConfirmButtonTheme("error primary");
         dialog.addConfirmListener(event -> {
             bookingsWriter.delete(booking);

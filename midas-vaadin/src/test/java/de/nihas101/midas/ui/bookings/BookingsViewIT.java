@@ -1,6 +1,7 @@
 package de.nihas101.midas.ui.bookings;
 
 import com.github.mvysny.kaributesting.v10.GridKt;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -18,6 +19,7 @@ import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.commons.Source;
 import de.nihas101.midas.core.bookings.dto.DefaultBooking;
 import de.nihas101.midas.core.bookings.row.BookingRow;
+import de.nihas101.midas.core.bookings.row.DefaultBookingRow;
 import de.nihas101.midas.core.bookings.service.BookingsService;
 import de.nihas101.midas.core.commenttemplate.dto.DefaultCommentTemplate;
 import de.nihas101.midas.core.commenttemplate.service.CommentTemplatesService;
@@ -27,6 +29,8 @@ import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
 import de.nihas101.midas.core.shareholders.service.ShareholdersService;
 import de.nihas101.midas.ui.AbstractKaribuTest;
 import de.nihas101.midas.vaadin.ui.bookings.BookingsView;
+import de.nihas101.midas.vaadin.ui.common.DeleteButton;
+import de.nihas101.midas.vaadin.ui.common.GridHelper;
 import de.nihas101.midas.vaadin.ui.common.ShareholderPicker;
 import de.nihas101.midas.vaadin.ui.common.YearPicker;
 import org.junit.jupiter.api.Assertions;
@@ -36,7 +40,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Year;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.IntStream;
 
 import static com.github.mvysny.kaributesting.v10.LocatorJ._click;
 import static com.github.mvysny.kaributesting.v10.LocatorJ._get;
@@ -514,5 +520,58 @@ public class BookingsViewIT extends AbstractKaribuTest {
         Assertions.assertEquals(1, bookings.filter(b -> true).bookings().size());
         Assertions.assertEquals("My Custom Comment", bookings.filter(b -> true).bookings().getFirst().getComment());
         Assertions.assertEquals(BookingType.COMPENSATION, bookings.filter(b -> true).bookings().getFirst().getType());
+    }
+
+    @Test
+    void testDeleteBookingWorkflow() {
+        // 1. Prepopulate a shareholder in the DB
+        final Shareholder sh = new DefaultShareholder(null, 301, "Charlie", "Delete");
+        shareholdersService.create(sh);
+
+        final Shareholder savedSh = shareholdersService.shareholders().toList().stream()
+                .filter(s -> "Charlie".equals(s.getFirstName()) && "Delete".equals(s.getLastName()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Failed to find created shareholder"));
+
+        // 2. Prepopulate a booking in 2026
+        final Booking booking = DefaultBooking.builder()
+                .shareholderId(savedSh.getId())
+                .date(LocalDate.of(2026, 5, 10))
+                .type(BookingType.WITHDRAWAL)
+                .amount(MoneyAmount.of(new BigDecimal("120.00")))
+                .comment("Delete Me Booking")
+                .build();
+        bookingsService.create(booking);
+
+        // 3. Navigate and select shareholder and year
+        UI.getCurrent().navigate(BookingsView.class);
+        _setValue(_get(ShareholderPicker.class), savedSh);
+        _setValue(_get(YearPicker.class), 2026);
+
+        // Verify grid has row
+        final Grid<BookingRow> grid = _get(Grid.class);
+        Assertions.assertTrue(GridKt._size(grid) > 0, "Grid should have booking rows");
+
+        // 4. Click delete button on the booking row
+        final List<BookingRow> rows = GridKt._findAll(grid);
+        final int bookingRowIndex = IntStream.range(0, rows.size())
+                .filter(i -> rows.get(i) instanceof DefaultBookingRow)
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Expected DefaultBookingRow not found in grid"));
+
+        final Component actionsCell = GridKt._getCellComponent(grid, bookingRowIndex, GridHelper.ACTIONS_KEY);
+        final DeleteButton deleteButton = _get(actionsCell, DeleteButton.class);
+        _click(deleteButton);
+
+        // 5. Verify ConfirmDialog opens without exception
+        final ConfirmDialog confirmDialog = _get(ConfirmDialog.class);
+        Assertions.assertNotNull(confirmDialog);
+
+        // 6. Confirm deletion
+        _fireConfirm(confirmDialog);
+
+        // 7. Verify booking is deleted from DB
+        final Bookings bookings = bookingsService.bookingsForShareholderAndYear(savedSh.getId(), Year.of(2026));
+        Assertions.assertTrue(bookings.filter(b -> true).bookings().isEmpty(), "Booking should be deleted from DB");
     }
 }
