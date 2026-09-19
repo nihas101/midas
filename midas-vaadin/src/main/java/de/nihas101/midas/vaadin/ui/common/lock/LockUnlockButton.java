@@ -14,7 +14,6 @@ import org.springframework.context.MessageSource;
 import java.time.Year;
 import java.util.Locale;
 
-// TODO: tests
 public class LockUnlockButton extends Button {
 
     private final MessageSource messageSource;
