@@ -1,22 +1,24 @@
 package de.nihas101.midas.core.shareholders.service;
 
+import de.nihas101.midas.api.DeleteMode;
 import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.api.shareholder.Shareholders;
 import de.nihas101.midas.api.shareholder.ShareholdersReader;
 import de.nihas101.midas.api.shareholder.ShareholdersWriter;
 import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
 import de.nihas101.midas.core.shareholders.dto.DefaultShareholders;
+import de.nihas101.midas.persistance.bookings.BookingsRepository;
+import de.nihas101.midas.persistance.shareholders.ShareholderEntity;
 import de.nihas101.midas.persistance.shareholders.ShareholdersRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class ShareholdersService implements ShareholdersReader, ShareholdersWriter {
 
     private final ShareholdersRepository repository;
-
-    public ShareholdersService(final ShareholdersRepository repository) {
-        this.repository = repository;
-    }
+    private final BookingsRepository bookingsRepository;
 
     @Override
     public Shareholder shareholder(final int shareholderId) {
@@ -58,10 +60,15 @@ public class ShareholdersService implements ShareholdersReader, ShareholdersWrit
     }
 
     @Override
-    public void delete(final Shareholder shareholder) {
+    public void delete(final Shareholder shareholder, final DeleteMode deleteMode) {
         if (shareholder == null) {
             throw new IllegalArgumentException("ShareholdersService#delete with shareholder == null");
         }
-        repository.delete(DefaultShareholder.fromDto(shareholder));
+        final ShareholderEntity entity = DefaultShareholder.fromDto(shareholder);
+        if (deleteMode == DeleteMode.RESTRICT && bookingsRepository.existsByShareholder(entity)) {
+            throw new IllegalStateException("Shareholder " + shareholder.getId() + " cannot be safely deleted, due to associated bookings");
+        }
+
+        repository.delete(entity);
     }
 }

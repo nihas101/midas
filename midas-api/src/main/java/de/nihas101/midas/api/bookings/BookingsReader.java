@@ -1,5 +1,7 @@
 package de.nihas101.midas.api.bookings;
 
+import de.nihas101.midas.api.shareholder.Shareholder;
+
 import java.time.LocalDate;
 import java.time.Year;
 
@@ -13,4 +15,6 @@ public interface BookingsReader {
     );
 
     boolean exists(final Booking booking);
+
+    boolean hasBookings(final Shareholder shareholder);
 }

@@ -1,18 +1,24 @@
 package de.nihas101.midas.vaadin.ui.shareholders;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.editor.Editor;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.shared.Tooltip;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
+import de.nihas101.midas.api.DeleteMode;
+import de.nihas101.midas.api.bookings.BookingsReader;
 import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.api.shareholder.ShareholderFactory;
 import de.nihas101.midas.api.shareholder.ShareholdersReader;
 import de.nihas101.midas.api.shareholder.ShareholdersWriter;
+import de.nihas101.midas.core.config.CoreConfig;
 import de.nihas101.midas.vaadin.ui.common.AddButton;
 import de.nihas101.midas.vaadin.ui.common.CancelButton;
 import de.nihas101.midas.vaadin.ui.common.DeleteButton;
@@ -29,11 +35,15 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
 
     private final ShareholdersReader shareholdersReader;
     private final ShareholdersWriter shareholdersWriter;
+    private final BookingsReader bookingsReader;
+    private final CoreConfig config;
     private final ShareholderFactory shareholderFactory;
 
     public ShareholdersTable(
             final ShareholdersReader shareholdersReader,
             final ShareholdersWriter shareholdersWriter,
+            final BookingsReader bookingsReader,
+            final CoreConfig config,
             final MessageSource messageSource,
             final Locale locale,
             final ShareholderFactory shareholderFactory
@@ -41,6 +51,8 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
         super(Shareholder.class);
         this.shareholdersReader = shareholdersReader;
         this.shareholdersWriter = shareholdersWriter;
+        this.bookingsReader = bookingsReader;
+        this.config = config;
         this.shareholderFactory = shareholderFactory;
         this.setColumns(); // Clear auto-generated columns to manually add them with editors
         this.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.LUMO_COMPACT);
@@ -125,8 +137,8 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
                     actions.add(button);
 
                     if (!isDummy) {
-                        final DeleteButton deleteButton = createDeleteShareholderButton(messageSource, locale, shareholder);
-                        actions.add(deleteButton);
+                        final Component deleteButtonOrWrapper = createDeleteShareholderButton(messageSource, locale, shareholder);
+                        actions.add(deleteButtonOrWrapper);
                     }
 
                     return actions;
@@ -135,18 +147,37 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
                 .setAutoWidth(true);
     }
 
-    private DeleteButton createDeleteShareholderButton(
+    private Component createDeleteShareholderButton(
             final MessageSource messageSource,
             final Locale locale,
             final Shareholder shareholder
     ) {
-        return new DeleteButton(
+        final boolean cannotDelete = config.getShareholder().getDeleteMode() == DeleteMode.RESTRICT
+                && bookingsReader.hasBookings(shareholder);
+
+        final DeleteButton button = new DeleteButton(
                 messageSource.getMessage("global.delete", null, locale),
                 e -> {
                     final ConfirmDialog dialog = createDeleteShareholderDialog(messageSource, locale, shareholder);
                     dialog.open();
                 }
         );
+
+        if (cannotDelete) {
+            button.setEnabled(false);
+            // Disabled buttons do not receive mouse events, so the tooltip must be
+            // placed on an enabled wrapper element instead.
+            final String hasBookingsMessage = messageSource.getMessage(
+                    "shareholders.table.delete.error.has-bookings",
+                    null,
+                    locale
+            );
+            final Span wrapper = new Span(button);
+            Tooltip.forComponent(wrapper).setText(hasBookingsMessage);
+            return wrapper;
+        }
+
+        return button;
     }
 
     private ConfirmDialog createDeleteShareholderDialog(
@@ -169,7 +200,7 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
         dialog.setConfirmText(messageSource.getMessage("global.delete", null, locale));
         dialog.setConfirmButtonTheme("error primary");
         dialog.addConfirmListener(event -> {
-            shareholdersWriter.delete(shareholder);
+            shareholdersWriter.delete(shareholder, config.getShareholder().getDeleteMode());
             this.update();
         });
         return dialog;

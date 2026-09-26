@@ -12,6 +12,11 @@ public class UIConfig {
     private String currencySymbol;
 
     public UIConfig() {
-        this(false, false, false, "€");
+        this(
+                false,
+                false,
+                false,
+                "€"
+        );
     }
 }

@@ -19,6 +19,7 @@ public class CoreConfig {
     private final CleanupConfig cleanup;
     private final DbConfig db;
     private final DatesConfig dates;
+    private final ShareholderConfig shareholder;
 
     @Bean
     public ReloadableResourceBundleMessageSource messageSource() {

@@ -4,6 +4,7 @@ import de.nihas101.midas.core.cleanup.CleanupConfig;
 import de.nihas101.midas.core.config.CoreConfig;
 import de.nihas101.midas.core.config.DatesConfig;
 import de.nihas101.midas.core.config.I18nConfig;
+import de.nihas101.midas.core.config.ShareholderConfig;
 import de.nihas101.midas.core.config.ThemeConfig;
 import de.nihas101.midas.core.config.TitleConfig;
 import de.nihas101.midas.core.config.UIConfig;
@@ -52,7 +53,8 @@ class DefaultLanguageMidasLocaleResolverTest {
                                 new CleanupConfig(),
                                 new DbConfig() {
                                 },
-                                new DatesConfig()
+                                new DatesConfig(),
+                                new ShareholderConfig()
                         ), Locale.ENGLISH
                 ),
                 Arguments.of(
@@ -64,7 +66,8 @@ class DefaultLanguageMidasLocaleResolverTest {
                                 new CleanupConfig(),
                                 new DbConfig() {
                                 },
-                                new DatesConfig()
+                                new DatesConfig(),
+                                new ShareholderConfig()
                         ), null
                 ),
                 Arguments.of(
@@ -76,7 +79,8 @@ class DefaultLanguageMidasLocaleResolverTest {
                                 new CleanupConfig(),
                                 new DbConfig() {
                                 },
-                                new DatesConfig()
+                                new DatesConfig(),
+                                new ShareholderConfig()
                         ), null
                 ),
                 Arguments.of(
@@ -88,7 +92,8 @@ class DefaultLanguageMidasLocaleResolverTest {
                                 new CleanupConfig(),
                                 new DbConfig() {
                                 },
-                                new DatesConfig()
+                                new DatesConfig(),
+                                new ShareholderConfig()
                         ), null
                 ),
                 Arguments.of(
@@ -100,7 +105,8 @@ class DefaultLanguageMidasLocaleResolverTest {
                                 new CleanupConfig(),
                                 new DbConfig() {
                                 },
-                                new DatesConfig()
+                                new DatesConfig(),
+                                new ShareholderConfig()
                         ), Locale.ENGLISH
                 ),
                 Arguments.of(
@@ -112,7 +118,8 @@ class DefaultLanguageMidasLocaleResolverTest {
                                 new CleanupConfig(),
                                 new DbConfig() {
                                 },
-                                new DatesConfig()
+                                new DatesConfig(),
+                                new ShareholderConfig()
                         ), Locale.GERMAN
                 )
         );
