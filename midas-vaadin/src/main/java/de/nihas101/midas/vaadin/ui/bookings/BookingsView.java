@@ -376,29 +376,29 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         gridHelper.setupColumn(balanceColumn, "bookings.table.balance", ColumnTextAlign.END);
 
         grid.addComponentColumn(row -> {
-            final VerticalLayout actionsContainer = new VerticalLayout();
-            actionsContainer.setPadding(false);
-            actionsContainer.setSpacing(false);
+                    final VerticalLayout actionsContainer = new VerticalLayout();
+                    actionsContainer.setPadding(false);
+                    actionsContainer.setSpacing(false);
 
-            final Shareholder currentShareholder = headerActionBar.getSelectedShareholder();
-            final Year currentYear = headerActionBar.getSelectedYear();
-            final boolean isLocked = currentShareholder != null
-                    && currentYear != null
-                    && shareholderLock.isLocked(currentShareholder, currentYear);
+                    final Shareholder currentShareholder = headerActionBar.getSelectedShareholder();
+                    final Year currentYear = headerActionBar.getSelectedYear();
+                    final boolean isLocked = currentShareholder != null
+                            && currentYear != null
+                            && shareholderLock.isLocked(currentShareholder, currentYear);
 
-            for (final Booking booking : row.bookings()) {
-                final HorizontalLayout actionRow = new HorizontalLayout();
-                actionRow.setPadding(false);
-                actionRow.setSpacing(true);
+                    for (final Booking booking : row.bookings()) {
+                        final HorizontalLayout actionRow = new HorizontalLayout();
+                        actionRow.setPadding(false);
+                        actionRow.setSpacing(true);
 
-                final EditButton editButton = createEditBookingButton(booking, isLocked);
-                final DeleteButton deleteButton = createDeleteBookingButton(booking, isLocked);
+                        final EditButton editButton = createEditBookingButton(booking, isLocked);
+                        final DeleteButton deleteButton = createDeleteBookingButton(booking, isLocked);
 
-                actionRow.add(editButton, deleteButton);
-                actionsContainer.add(actionRow);
-            }
-            return actionsContainer;
-        }).setHeader(messageSource.getMessage("shareholders.table.actions", null, getLocale()))
+                        actionRow.add(editButton, deleteButton);
+                        actionsContainer.add(actionRow);
+                    }
+                    return actionsContainer;
+                }).setHeader(messageSource.getMessage("shareholders.table.actions", null, getLocale()))
                 .setKey(GridHelper.ACTIONS_KEY)
                 .setAutoWidth(true);
 
