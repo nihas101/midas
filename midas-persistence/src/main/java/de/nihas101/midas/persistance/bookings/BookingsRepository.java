@@ -15,6 +15,8 @@ import java.util.List;
 @Repository
 public interface BookingsRepository extends JpaRepository<BookingEntity, Integer> {
 
+    boolean existsByShareholder(final ShareholderEntity shareholder);
+
     List<BookingEntity> findByShareholderAndDateBetweenOrderByDateAsc(
             final ShareholderEntity shareholder,
             final LocalDate start,

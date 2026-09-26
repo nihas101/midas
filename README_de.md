@@ -53,6 +53,9 @@ Eigenschaften aufgeführt:
     * `default-add-another-checkbox-state`: setzt die Standartbelegung von Checkboxen der Art 'Weiter hinzufügen'
       (Standard: `false`)
     * `currency-symbol`: Legt das in der Benutzeroberfläche angezeigte Währungssymbol fest (Standard: `€`).
+    * `safe-shareholder-deletion`: Wenn `true`, wird vor dem Löschen geprüft, ob der Gesellschafter noch Buchungen
+      besitzt, der Löschen-Knopf wird mit einem erklärenden Tooltip deaktiviert und das Löschen verhindert (Standard:
+      `false`).
 * `midas.desktop`
     * `auto-shutdown-enabled`: Wenn `true`, wird die Anwendung automatisch heruntergefahren, sobald keine Browserfenster
       (und Sessions) mehr aktiv sind (Standard: `true`).
@@ -78,9 +81,13 @@ Eigenschaften aufgeführt:
 * `midas.db.sqlite.optimize`
     * `enabled`: Gibt an, ob `PRAGMA optimize` beim Start und Herunterfahren ausgeführt wird, um die Statistiken des
       SQLite‑Query‑Planers aktuell zu halten (Standard: `true`).
-   * `vacuum`
-     * `enabled`: Gibt an, ob die Sqlite Datenbank periodisch komprimiert werden soll (default: `true`).
-     * `interval`: Die Dauer (in [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601#Durations)) zwischen Komprimierungsläufen (default: `PT30D`).
+    * `vacuum`
+        * `enabled`: Gibt an, ob die Sqlite Datenbank periodisch komprimiert werden soll (default: `true`).
+        * `interval`: Die Dauer (in [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601#Durations)) zwischen
+          Komprimierungsläufen (default: `PT30D`).
+* `midas.shareholder.delete-mode`: Wenn `restrict` ist der Löschen-Knopf für Gesellschafter deaktiviert wenn noch
+  Buchungen mit diesem assoziiert sind (Standard: `cascade`, welches assoziierte Buchungen zusammen mit dem
+  Gesellschafter löscht).
 * `spring`
     * `datasource.url`: Die JDBC‑URL für die SQLite‑Datenbank (z.B. `jdbc:sqlite:midas.db`).
     * `jpa.show-sql`: Wenn `true`, protokolliert Hibernate alle SQL‑Queries in der Konsole.

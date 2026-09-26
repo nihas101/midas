@@ -7,6 +7,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import de.nihas101.midas.api.bookings.BookingsReader;
 import de.nihas101.midas.api.shareholder.ShareholderFactory;
 import de.nihas101.midas.api.userconfig.UserConfigFactory;
 import de.nihas101.midas.api.userconfig.UserConfigService;
@@ -19,13 +20,14 @@ import org.springframework.context.MessageSource;
 
 @Slf4j
 @Route("shareholders")
-@PageTitle("Shareholders") // TODO: Is it possible to add translations for the page title?
+@PageTitle("Shareholders")
 public class ShareholdersView extends MidasView {
 
     private static final VaadinIcon icon = VaadinIcon.USERS;
 
     public ShareholdersView(
             final ShareholdersService shareholdersService,
+            final BookingsReader bookingsReader,
             final CoreConfig config,
             final MessageSource messageSource,
             final UserConfigService userConfigService,
@@ -41,12 +43,14 @@ public class ShareholdersView extends MidasView {
                 userConfigFactory
         );
 
-        final VerticalLayout content = createContent(shareholdersService, messageSource, shareholderFactory);
+        final VerticalLayout content = createContent(shareholdersService, bookingsReader, config, messageSource, shareholderFactory);
         setContent(content);
     }
 
     private VerticalLayout createContent(
             final ShareholdersService shareholdersService,
+            final BookingsReader bookingsReader,
+            final CoreConfig config,
             final MessageSource messageSource,
             final ShareholderFactory shareholderFactory
     ) {
@@ -62,6 +66,8 @@ public class ShareholdersView extends MidasView {
                 new ShareholdersTable(
                         shareholdersService,
                         shareholdersService,
+                        bookingsReader,
+                        config,
                         messageSource,
                         getLocale(),
                         shareholderFactory

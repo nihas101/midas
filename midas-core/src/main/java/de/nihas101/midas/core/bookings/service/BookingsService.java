@@ -5,6 +5,7 @@ import de.nihas101.midas.api.bookings.Bookings;
 import de.nihas101.midas.api.bookings.BookingsReader;
 import de.nihas101.midas.api.bookings.BookingsWriter;
 import de.nihas101.midas.api.openingbalance.OpeningBalance;
+import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.core.bookings.dto.DefaultBooking;
 import de.nihas101.midas.core.bookings.dto.DefaultBookings;
 import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
@@ -78,6 +79,16 @@ public class BookingsService implements BookingsWriter, BookingsReader {
                 booking.getComment(),
                 booking.getId()
         );
+    }
+
+    @Override
+    public boolean hasBookings(final Shareholder shareholder) {
+        if (shareholder == null || shareholder.getId() == null) {
+            return false;
+        }
+        return shareholdersRepository.findById(shareholder.getId())
+                .map(bookingsRepository::existsByShareholder)
+                .orElse(false);
     }
 
     @Transactional

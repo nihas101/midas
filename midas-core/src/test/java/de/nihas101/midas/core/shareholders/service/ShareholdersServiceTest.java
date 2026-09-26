@@ -1,5 +1,6 @@
 package de.nihas101.midas.core.shareholders.service;
 
+import de.nihas101.midas.api.DeleteMode;
 import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.api.shareholder.Shareholders;
 import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
@@ -95,7 +96,7 @@ class ShareholdersServiceTest {
     void delete() {
         Shareholder dto = new DefaultShareholder(1, 100, "Max", "Mustermann");
 
-        service.delete(dto);
+        service.delete(dto, DeleteMode.CASCADE);
 
         ArgumentCaptor<ShareholderEntity> captor = ArgumentCaptor.forClass(ShareholderEntity.class);
         verify(repository).delete(captor.capture());
@@ -104,6 +105,6 @@ class ShareholdersServiceTest {
 
     @Test
     void delete_withNullFails() {
-        assertThrows(IllegalArgumentException.class, () -> service.delete(null));
+        assertThrows(IllegalArgumentException.class, () -> service.delete(null, DeleteMode.CASCADE));
     }
 }

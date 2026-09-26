@@ -2,6 +2,7 @@ package de.nihas101.midas.core.bookings.service;
 
 import de.nihas101.midas.api.bookings.Booking;
 import de.nihas101.midas.api.bookings.Bookings;
+import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.commons.Source;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
@@ -26,9 +28,11 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -164,5 +168,43 @@ class BookingsServiceTest {
     void update_withoutIdFails() {
         Booking dto = DefaultBooking.builder().id(null).build();
         assertThrows(IllegalArgumentException.class, () -> bookingsService.update(dto));
+    }
+
+    @Test
+    void hasBookings_nullOrNoId_returnsFalse() {
+        assertFalse(bookingsService.hasBookings(null));
+
+        Shareholder noId = Mockito.mock(Shareholder.class);
+        when(noId.getId()).thenReturn(null);
+        assertFalse(bookingsService.hasBookings(noId));
+    }
+
+    @Test
+    void hasBookings_shareholderNotFound_returnsFalse() {
+        Shareholder sh = Mockito.mock(Shareholder.class);
+        when(sh.getId()).thenReturn(99);
+        when(shareholdersRepository.findById(99)).thenReturn(Optional.empty());
+
+        assertFalse(bookingsService.hasBookings(sh));
+    }
+
+    @Test
+    void hasBookings_shareholderHasBookings_returnsTrue() {
+        Shareholder sh = Mockito.mock(Shareholder.class);
+        when(sh.getId()).thenReturn(1);
+        when(shareholdersRepository.findById(1)).thenReturn(Optional.of(shareholder));
+        when(bookingsRepository.existsByShareholder(shareholder)).thenReturn(true);
+
+        assertTrue(bookingsService.hasBookings(sh));
+    }
+
+    @Test
+    void hasBookings_shareholderHasNoBookings_returnsFalse() {
+        Shareholder sh = Mockito.mock(Shareholder.class);
+        when(sh.getId()).thenReturn(1);
+        when(shareholdersRepository.findById(1)).thenReturn(Optional.of(shareholder));
+        when(bookingsRepository.existsByShareholder(shareholder)).thenReturn(false);
+
+        assertFalse(bookingsService.hasBookings(sh));
     }
 }
