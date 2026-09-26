@@ -68,6 +68,14 @@
         <dependency>
             <groupId>org.jxls</groupId>
             <artifactId>jxls-jexcel</artifactId>
+            <exclusions>
+                <!-- jxl pulls in log4j (we exclude it here due to CVEs).
+                     The project uses SLF4J + Logback via Spring Boot, so log4j is not needed. -->
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.dhatim</groupId>
