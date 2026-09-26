@@ -5,6 +5,12 @@ import 'react';
 
 const loadOnDemand = (key) => {
   const pending = [];
+  if (key === '0c0ae74f6249c0370d9c04925460b5fc29a22bf49f2ae4b0e325d316aa7f34d2') {
+    pending.push(import('./chunks/chunk-abe3abbea5b1df6b717433914a667cf52d50f16557822da3d9a54fb15131855b.js'));
+  }
+  if (key === '4f122048b4e2b1aa57aed8b6dc5bca7ba9a1281d2628d2a2f995bd50d24ae418') {
+    pending.push(import('./chunks/chunk-9f6ee70f90e573ae9013a1f9ed8c696cfd56bca88c66a4fa6dcfd11071c3cd9b.js'));
+  }
   if (key === '1d34c2d5fbc03bd95779a0a19924bb02d69d8b2f7283e21a1710be3e701bc069') {
     pending.push(import('./chunks/chunk-fca3126b2ebb683d1ea4cc052c55876076afe92ca4f423c871d28b2c6dca1634.js'));
   }
@@ -22,12 +28,6 @@ const loadOnDemand = (key) => {
   }
   if (key === 'f87f6f62e3791029a12cdd3e21b3c8c28f5151ff33bdcb7a8b3e0d6ddcb1e453') {
     pending.push(import('./chunks/chunk-1cbcd1701567f7eab4522e32a5c3a1cb7a521001924068df25fdec47b1b92d20.js'));
-  }
-  if (key === '0c0ae74f6249c0370d9c04925460b5fc29a22bf49f2ae4b0e325d316aa7f34d2') {
-    pending.push(import('./chunks/chunk-abe3abbea5b1df6b717433914a667cf52d50f16557822da3d9a54fb15131855b.js'));
-  }
-  if (key === '4f122048b4e2b1aa57aed8b6dc5bca7ba9a1281d2628d2a2f995bd50d24ae418') {
-    pending.push(import('./chunks/chunk-9f6ee70f90e573ae9013a1f9ed8c696cfd56bca88c66a4fa6dcfd11071c3cd9b.js'));
   }
   return Promise.all(pending);
 }
