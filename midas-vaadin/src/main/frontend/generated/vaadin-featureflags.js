@@ -6,12 +6,13 @@ window.Vaadin.featureFlags.collaborationEngineBackend = false;
 window.Vaadin.featureFlags.accessibleDisabledButtons = false;
 window.Vaadin.featureFlags.themeComponentStyles = false;
 window.Vaadin.featureFlags.tailwindCss = false;
+window.Vaadin.featureFlags.ssePushTransport = false;
 window.Vaadin.featureFlags.fullstackSignals = false;
 window.Vaadin.featureFlags.layoutComponentImprovements = false;
 window.Vaadin.featureFlags.defaultAutoResponsiveFormLayout = false;
 window.Vaadin.featureFlags.copilotExperimentalFeatures = false;
 window.Vaadin.featureFlags.aiComponents = false;
-window.Vaadin.featureFlags.breadcrumbsComponent = false;
+window.Vaadin.featureFlags.messageListTypingIndicator = false;
 window.Vaadin.featureFlags.accessibleDisabledMenuItems = false;
 };
 if (window.Vaadin.featureFlagsUpdaters) { 

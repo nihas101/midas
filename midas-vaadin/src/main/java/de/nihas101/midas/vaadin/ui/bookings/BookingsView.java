@@ -181,6 +181,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         tabSheet.add(messageSource.getMessage("comment-templates", null, getLocale()), commentTemplatesTable);
 
         content.add(tabSheet);
+        content.setFlexGrow(1, tabSheet);
 
         setContent(content);
     }
