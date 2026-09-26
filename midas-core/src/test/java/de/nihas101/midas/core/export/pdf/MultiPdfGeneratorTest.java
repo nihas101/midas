@@ -64,7 +64,12 @@ class MultiPdfGeneratorTest {
         when(request.endDate()).thenReturn(year.atMonth(Month.DECEMBER).atEndOfMonth());
         when(shareholder.getFirstName()).thenReturn("John");
         when(shareholder.getLastName()).thenReturn("Doe");
-        when(pdfViewDataExtractor.extractData(eq(shareholder), eq(ExportViewName.BOOKINGS), eq(year))).thenReturn(pdfViewData);
+        when(pdfViewDataExtractor.extractData(
+                eq(shareholder),
+                eq(ExportViewName.BOOKINGS),
+                eq(year.atDay(1)),
+                eq(year.atMonth(Month.DECEMBER).atEndOfMonth()))
+        ).thenReturn(pdfViewData);
         // Mock pdfService to write dummy bytes
         doAnswer(invocation -> {
             final ByteArrayOutputStream baos = invocation.getArgument(2);
@@ -86,7 +91,12 @@ class MultiPdfGeneratorTest {
         generator.generate();
 
         // Verify service interactions
-        verify(pdfViewDataExtractor).extractData(eq(shareholder), eq(ExportViewName.BOOKINGS), eq(year));
+        verify(pdfViewDataExtractor).extractData(
+                eq(shareholder),
+                eq(ExportViewName.BOOKINGS),
+                eq(year.atDay(1)),
+                eq(year.atMonth(Month.DECEMBER).atEndOfMonth())
+        );
         verify(pdfService).generatePdf(eq(pdfViewData), any(Locale.class), any(ByteArrayOutputStream.class));
 
         // Read the zip content and verify entry name and content
@@ -109,7 +119,7 @@ class MultiPdfGeneratorTest {
         when(request.views()).thenReturn(new ExportViews(Set.of(ExportViewName.BOOKINGS)));
         when(request.startDate()).thenReturn(LocalDate.now());
         when(request.endDate()).thenReturn(LocalDate.now().plusDays(1));
-        when(pdfViewDataExtractor.extractData(any(), any(), any())).thenReturn(pdfViewData);
+        when(pdfViewDataExtractor.extractData(any(), any(), any(), any())).thenReturn(pdfViewData);
         doThrow(new PdfExportException("failed", new RuntimeException()))
                 .when(pdfService).generatePdf(any(), any(), any());
         ByteArrayOutputStream zipOut = new ByteArrayOutputStream();
