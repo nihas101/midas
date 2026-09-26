@@ -44,11 +44,13 @@ public class PdfViewDataExtractor {
     public PdfViewData extractData(
             final Shareholder shareholder,
             final ExportViewName view,
-            final Year year
+            final LocalDate startDate,
+            final LocalDate endDate
     ) {
+        final Year year = Year.of(startDate.getYear());
         switch (view) {
             case BOOKINGS -> {
-                return extractBookingsData(shareholder, year);
+                return extractBookingsData(shareholder, startDate, endDate, year);
             }
             case ACCOUNT_STATEMENTS -> {
                 return extractAccountStatementsData(shareholder, year);
@@ -70,7 +72,12 @@ public class PdfViewDataExtractor {
         }
     }
 
-    private PdfViewData extractBookingsData(final Shareholder shareholder, final Year year) {
+    private PdfViewData extractBookingsData(
+            final Shareholder shareholder,
+            final LocalDate startDate,
+            final LocalDate endDate,
+            final Year year
+    ) {
         final List<String> headers = List.of(
                 messageSource.getMessage("export.pdf.bookings.table.id", null, locale),
                 messageSource.getMessage("export.pdf.bookings.table.date", null, locale),
@@ -84,9 +91,6 @@ public class PdfViewDataExtractor {
                 messageSource.getMessage("export.pdf.bookings.table.balance", null, locale)
         );
 
-        final LocalDate yearStart = year.atDay(1);
-        final LocalDate yearEnd = year.atMonth(12).atEndOfMonth();
-
         return new PdfViewData(
                 ExportViewName.BOOKINGS,
                 shareholder.getFirstName() + " " + shareholder.getLastName(),
@@ -99,8 +103,8 @@ public class PdfViewDataExtractor {
                         bookingRowService.generateRows(
                                 bookingsReader.bookingsForShareholderAndDates(
                                         shareholder.getId(),
-                                        yearStart,
-                                        yearEnd
+                                        startDate,
+                                        endDate
                                 ),
                                 locale,
                                 year
