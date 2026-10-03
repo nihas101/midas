@@ -1,11 +1,13 @@
+<p align="center" style="text-align: center;">
+    <img src="midas.svg" alt="Midas Logo" width="100">
+</p>
+
 # Midas
 
 **Languages**: [English](README.md) | [Deutsch](README_de.md)
 
 Midas is a tool for creating financial reports for shareholders. It allows the entry of financial data and enables users
-to generate various reports.
-
-The primary goals are future-proofing, long-term compatibility, and a browser-based user interface.
+to generate various reports. The primary goal of the project is long-term compatibility.
 
 ## Usage
 
@@ -57,10 +59,16 @@ The application can be configured using `application.properties`. Below are some
 * `midas.dates`
     * `medium-date-format`: Sets the date string used for medium length date fields (default: `dd.MM.`).
     * `long-date-format`: Sets the date format pattern for long length date fields (default: `dd.MM.yyyy`).
-* `midas.export.pdf.template-path`: The path to HTML templates to be rendered
-  via [Thymeleaf](https://www.thymeleaf.org/) in the PDF export
-    * See `midas-core/src/main/resources/templates/export` for the default templates
-    * See `de.nihas101.midas.export.pdf.PdfViewData` for the data structure used as input
+* `midas.export.pdf`
+    * `template-path`: The path to HTML templates to be rendered
+      via [Thymeleaf](https://www.thymeleaf.org/) in the PDF export
+        * See `midas-core/src/main/resources/templates/export` for the default templates
+        * See `de.nihas101.midas.export.pdf.PdfViewData` for the data structure used as input
+    * `header-image-path`: The path to an image file (e.g. logo) displayed in the top-right corner of each PDF export
+      page. Supported formats include PNG, JPEG, and SVG.
+        * **SVG restrictions**: SVG rendering is handled by [Apache Batik](https://xmlgraphics.apache.org/batik/),
+          which only supports SVG 1.1. Some features are not supported and may cause rendering issues.
+          See [here](https://xmlgraphics.apache.org/batik/status.html)
 * `midas.cleanup`
     * `enabled`: Whether a cleanup of old bookings is triggered on startup of the application (default: `true`).
     * `cutoff`: The period after which a booking is considered 'old' and eligible for cleanup (default: `PT10Y`).

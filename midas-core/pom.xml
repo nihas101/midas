@@ -91,6 +91,10 @@
         </dependency>
         <dependency>
             <groupId>com.openhtmltopdf</groupId>
+            <artifactId>openhtmltopdf-svg-support</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.openhtmltopdf</groupId>
             <artifactId>openhtmltopdf-slf4j</artifactId>
         </dependency>
 
