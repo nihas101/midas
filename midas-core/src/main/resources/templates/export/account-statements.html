@@ -15,15 +15,15 @@
             text-align: center;
             font-size: 13pt;
             font-weight: bold;
-            width: 60%;
+            width: 70%;
         }
         .as-date {
             text-align: right;
             font-size: 9pt;
-            width: 20%;
+            width: 15%;
         }
         .as-spacer {
-            width: 20%;
+            width: 15%;
         }
         .as-double-line {
             border-top: 1px solid black;
@@ -100,7 +100,7 @@
         <tr>
             <td class="as-spacer"></td>
             <td class="as-title" th:text="#{account-statement.header.title(${#numbers.formatInteger(data.year, 0)})}">
-                Gesellschafter - Abrechnungskonto 2026
+                Gesellschafter – Abrechnungskonto – Jahresübersicht – 2026
             </td>
             <td class="as-date" th:text="${#temporals.format(#temporals.createNow(), 'dd.MM.yyyy')}">10.05.2026</td>
         </tr>
