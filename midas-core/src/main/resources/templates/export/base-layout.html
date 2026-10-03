@@ -7,9 +7,22 @@
         @page {
             size: A4;
             margin: 1.5cm;
+            @top-right {
+                content: element(headerRight);
+            }
             @bottom-left {
                 content: element(footerLeft);
             }
+        }
+        #headerRight {
+            position: running(headerRight);
+            text-align: right;
+        }
+        #headerRight img {
+            max-width: 4.0cm;
+            max-height: 1.0cm;
+            width: auto;
+            height: auto;
         }
         #footerLeft {
             position: running(footerLeft);
@@ -79,6 +92,9 @@
     <th:block th:replace="~{__${content}__ :: style} ?: ~{}"></th:block>
 </head>
 <body>
+<div id="headerRight" th:if="${headerImage != null}">
+    <img th:src="${headerImage}" alt="Header Logo"/>
+</div>
 <div id="footerLeft" th:text="${data.shareholderName}">Name</div>
 <div th:insert="~{__${content}__ :: content}">
     <!-- Content will be injected here -->

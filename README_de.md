@@ -1,10 +1,13 @@
+<p align="center" style="text-align: center;">
+    <img src="midas.svg" alt="Midas Logo" width="100">
+</p>
+
 # Midas
 
 **Sprachen**: [English](README.md) | [Deutsch](README_de.md)
 
 Midas ist ein Programm zur Erstellung von Finanzberichten für Gesellschafter. Es ermöglicht die Eingabe von Buchungen
-und das Erzeugen verschiedener Berichte. Die Hauptziele sind Zukunftssicherheit, langfristige Kompatibilität und eine
-browserbasierte Benutzeroberfläche.
+und das Erzeugen verschiedener Berichte. Das Hauptziel des Projekts ist langfristige Kompatibilität.
 
 ## Verwendung
 
@@ -65,10 +68,16 @@ Eigenschaften aufgeführt:
 * `midas.dates`
     * `medium-date-format`: Legt das Datumsformat-Muster für Datumsfelder mittlerer Länge fest (Standard: `dd.MM.`).
     * `long-date-format`: Legt das Datumsformat-Muster für lange Datumsfelder fest (Standard: `dd.MM.yyyy`).
-* `midas.export.pdf.template-path`: Pfad zu den HTML‑Templates, die über [Thymeleaf](https://www.thymeleaf.org/) für den
-  PDF‑Export gerendert werden.
-    * Siehe `midas-core/src/main/resources/templates/export` für die Standard‑Templates.
-    * Siehe `de.nihas101.midas.export.pdf.PdfViewData` für die Eingabedatenstruktur.
+* `midas.export.pdf`
+    * `template-path`: Pfad zu den HTML‑Templates, die über [Thymeleaf](https://www.thymeleaf.org/) für den
+      PDF‑Export gerendert werden.
+        * Siehe `midas-core/src/main/resources/templates/export` für die Standard‑Templates.
+        * Siehe `de.nihas101.midas.export.pdf.PdfViewData` für die Eingabedatenstruktur.
+    * `header-image-path`: Pfad zu einer Bilddatei (z.B. Logo), die in der oberen rechten Ecke jeder PDF-Exportseite
+      angezeigt wird. Unterstützte Formate: PNG, JPEG und SVG.
+        * **SVG-Einschränkungen**: Das SVG-Rendering erfolgt über [Apache Batik](https://xmlgraphics.apache.org/batik/),
+          das nur SVG 1.1 unterstützt. Einige Funktionen werden nicht unterstützt und können zu Darstellungsproblemen
+          führen. Siehe [hier](https://xmlgraphics.apache.org/batik/status.html)
 * `midas.cleanup`
     * `enabled`: Gibt an, ob beim Start der Applikation eine Bereinigung alter Buchungen ausgelöst wird (Standard:
       `true`)

@@ -19,6 +19,9 @@ public class PdfExportConfig {
     @Getter
     private String templatePath = null;
 
+    @Getter
+    private String headerImagePath = null;
+
     @Bean
     public SpringTemplateEngine springTemplateEngine() {
         final SpringTemplateEngine templateEngine = new SpringTemplateEngine();
