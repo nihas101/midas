@@ -3,6 +3,7 @@ package de.nihas101.midas.api.accountstatement;
 import de.nihas101.midas.api.openingbalance.OpeningBalance;
 import de.nihas101.midas.commons.BookingType;
 
+import java.util.Arrays;
 import java.util.List;
 
 public interface AccountStatements {
@@ -12,5 +13,11 @@ public interface AccountStatements {
 
     default List<LabeledAccountStatement> manualStatements() {
         return List.of();
+    }
+
+    default List<LabeledAccountStatement> accountStatements() {
+        return Arrays.stream(BookingType.values())
+                .map(this::forType)
+                .toList();
     }
 }
