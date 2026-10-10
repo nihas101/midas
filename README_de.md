@@ -108,3 +108,54 @@ Eigenschaften aufgeführt:
 * `server.port`: Der Port, auf dem die Anwendung ausgeführt wird (z.B. `8082`).
 * `vaadin.launch-browser`: Wenn auf `true` gesetzt, öffnet sich automatisch ein Browserfenster zur Anwendungs‑URL beim
   Start.
+
+## Screenshots
+
+### Hauptseite
+
+<p align="center" style="text-align: center;">
+    <img src="documentation/main/de/main.png" alt="Main Page">
+</p>
+
+### Gesellschafter
+
+<p align="center" style="text-align: center;">
+    <img src="documentation/shareholders/de/shareholder.png" alt="Main Page">
+</p>
+
+### Buchungen
+
+<p align="center" style="text-align: center;">
+    <img src="documentation/bookings/de/bookings_selection.png" alt="Bookings Page">
+</p>
+
+### Abrechnungskonto
+
+<p align="center" style="text-align: center;">
+    <img src="documentation/accountstatements/de/account_statements_selection.png" alt="Account Statements Page">
+</p>
+
+### Zinsrechnung
+
+<p align="center" style="text-align: center;">
+    <img src="documentation/interest/de/interest_selection.png" alt="Interest Page">
+</p>
+
+### Export
+
+<p align="center" style="text-align: center;">
+    <img src="documentation/export/de/export.png" alt="Export Page">
+</p>
+
+### Einstellungen
+
+<p align="center" style="text-align: center;">
+    <img src="documentation/settings/de/settings.png" alt="Settings Page">
+</p>
+
+## Beispiel Exports
+
+- [Account Statements PDF](documentation/export/de/Anna_Schmidt_(101-1)_Account%20Statements_2026-01-01_2026-12-31.pdf)
+- [Bookings PDF](documentation/export/de/Anna_Schmidt_(101-1)_Bookings_2026-01-01_2026-12-31.pdf)
+- [Interest PDF](documentation/export/de/Anna_Schmidt_(101-1)_Interest%20Calculation_2026-01-01_2026-12-31.pdf)
+- [XLSX Export](documentation/export/de/export_2026-01-01_2026-12-31.xlsx)

@@ -96,3 +96,54 @@ The application can be configured using `application.properties`. Below are some
 * `server.port`: The port on which the application will run (e.g., `8082`).
 * `vaadin.launch-browser`: If set to `true`, a browser window will automatically open to the application URL upon
   startup.
+
+## Screenshots
+
+### Main Page
+
+<p align="center" style="text-align: center;">
+    <img src="documentation/main/en/main.png" alt="Main Page">
+</p>
+
+### Shareholders
+
+<p align="center" style="text-align: center;">
+    <img src="documentation/shareholders/en/shareholder.png" alt="Main Page">
+</p>
+
+### Bookings
+
+<p align="center" style="text-align: center;">
+    <img src="documentation/bookings/en/bookings_selection.png" alt="Bookings Page">
+</p>
+
+### Account Statements
+
+<p align="center" style="text-align: center;">
+    <img src="documentation/accountstatements/en/account_statements_selection.png" alt="Account Statements Page">
+</p>
+
+### Interest
+
+<p align="center" style="text-align: center;">
+    <img src="documentation/interest/en/interest_selection.png" alt="Interest Page">
+</p>
+
+### Export
+
+<p align="center" style="text-align: center;">
+    <img src="documentation/export/en/export.png" alt="Export Page">
+</p>
+
+### Settings
+
+<p align="center" style="text-align: center;">
+    <img src="documentation/settings/en/settings.png" alt="Settings Page">
+</p>
+
+## Example Exports
+
+- [Account Statements PDF](documentation/export/en/Alice_Johnson_(101-1)_Account%20Statements_2026-01-01_2026-12-31.pdf)
+- [Bookings PDF](documentation/export/en/Alice_Johnson_(101-1)_Bookings_2026-01-01_2026-12-31.pdf)
+- [Interest PDF](documentation/export/en/Alice_Johnson_(101-1)_Interest%20Calculation_2026-01-01_2026-12-31.pdf)
+- [XLSX Export](documentation/export/en/export_2026-01-01_2026-12-31.xlsx)
