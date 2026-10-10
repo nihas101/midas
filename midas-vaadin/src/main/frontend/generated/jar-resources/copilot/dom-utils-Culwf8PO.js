@@ -1,5 +1,5 @@
 import { n as e } from "./chunk-DiqZc92J.js";
-import { l as t, o as n } from "./consts-B_BO2mll.js";
+import { l as t, o as n } from "./consts-CUwyMiZU.js";
 //#region frontend/copilot/shared/dom-utils.ts
 function r(e) {
 	return e.parentElement ?? e.parentNode?.host;
@@ -112,6 +112,7 @@ function y(e) {
 }
 function b(e) {
 	if (e.localName === "vaadin-login-overlay" || e.localName === "vaadin-dialog") return !1;
+	if (e.localName === "vaadin-form-row") return !0;
 	let t = l(e);
 	return t.width === 0 || t.height === 0;
 }

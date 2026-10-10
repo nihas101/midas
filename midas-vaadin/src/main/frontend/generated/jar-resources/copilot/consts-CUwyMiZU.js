@@ -1,7 +1,7 @@
 import { n as e } from "./chunk-DiqZc92J.js";
 //#region frontend/copilot/shared/consts.ts
 var t, n, r, i, a, o, s, c, l, u = e((() => {
-	t = "copilot-", n = "25.3.0", r = "undefined", i = r === "undefined" ? "" : r, a = "attention-required", o = "https://plugins.jetbrains.com/plugin/23758-vaadin", s = "https://marketplace.visualstudio.com/items?itemName=vaadin.vaadin-vscode", c = "https://marketplace.eclipse.org/content/vaadin-tools", l = {
+	t = "copilot-", n = "25.3.1", r = "undefined", i = r === "undefined" ? "" : r, a = "attention-required", o = "https://plugins.jetbrains.com/plugin/23758-vaadin", s = "https://marketplace.visualstudio.com/items?itemName=vaadin.vaadin-vscode", c = "https://marketplace.eclipse.org/content/vaadin-tools", l = {
 		sectionId: "custom-components",
 		sectionName: "Custom Components"
 	};

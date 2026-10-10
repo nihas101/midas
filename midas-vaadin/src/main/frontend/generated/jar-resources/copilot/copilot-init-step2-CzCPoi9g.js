@@ -1,19 +1,19 @@
 import { i as e, n as t, t as n } from "./chunk-DiqZc92J.js";
 import { $ as r, C as i, D as a, H as o, L as s, M as c, R as l, S as u, T as d, U as f, W as p, at as m, h, ht as g, i as _, it as v, k as y, n as b, o as x, pt as ee, r as S, t as C, u as w, ut as te } from "./icons-wGoYEurg.js";
-import { l as ne, o as T, t as re } from "./consts-B_BO2mll.js";
-import { n as ie, s as ae } from "./dom-utils-ChZR4WGk.js";
-import { a as oe, o as se } from "./copilot-tree-impl-BAchcGTF.js";
+import { l as ne, o as T, t as re } from "./consts-CUwyMiZU.js";
+import { n as ie, s as ae } from "./dom-utils-Culwf8PO.js";
+import { a as oe, o as se } from "./copilot-tree-impl-B7N3W4b1.js";
 import { a as E, c as ce, d as le, i as ue, l as D, n as O, o as de, r as fe, s as pe, t as me, u as he } from "./section-panel-ui-state-Dbt9i-HL.js";
 import { a as ge, i as k, n as A, r as j, t as _e } from "./copilot-ui-state-Dc6l_5DA.js";
-import { a as ve, g as ye, h as be, i as xe, l as Se, m as Ce, n as we, o as Te, r as Ee, s as De } from "./copilot-unsaved-operation-coordinator-DrLU6uYL.js";
+import { a as ve, g as ye, h as be, i as xe, l as Se, m as Ce, n as we, o as Te, r as Ee, s as De } from "./copilot-unsaved-operation-coordinator-c33G49kp.js";
 import { a as Oe, n as ke, r as Ae, t as je } from "./stats-rEPv3bOZ.js";
-import { a as Me, c as Ne, i as Pe, l as Fe, n as Ie, o as Le, r as Re, s as ze, t as Be, u as Ve } from "./copilot-userinfo-8PLjvFAp.js";
+import { a as Me, c as Ne, i as Pe, l as Fe, n as Ie, o as Le, r as Re, s as ze, t as Be, u as Ve } from "./copilot-userinfo-CmsUCdwN.js";
 import { t as He } from "./directive-CZ105jp5.js";
-import { a as Ue, c as We, d as Ge, f as Ke, o as qe, p as Je } from "./copilot-error-handler-B8dKSldg.js";
+import { a as Ue, c as We, d as Ge, f as Ke, o as qe, p as Je } from "./copilot-error-handler-sDuOm7hQ.js";
 import { n as Ye, t as Xe } from "./copilot-stored-machine-state-DS3t0BPl.js";
 import { n as Ze, r as Qe, t as $e } from "./copilot-notification-B9WA4gMj.js";
 import { n as et, t as M } from "./early-project-state-D-4_8bD-.js";
-import { i as tt, o as nt, s as rt } from "./copilot-development-setup-user-guide-utils-DXNVXaMQ.js";
+import { i as tt, o as nt, s as rt } from "./copilot-development-setup-user-guide-utils-DHoOu3hs.js";
 import { n as it, t as at } from "./track-active-mode-event-800lPe3C.js";
 import { n as ot, t as st } from "./copilot-all-components-state-CwAB5tjq.js";
 import { n as ct, r as lt, t as ut } from "./lit-renderer-CALYLbWL.js";
@@ -2298,17 +2298,18 @@ var Cr, wr, Tr, Er, Dr, Or, kr, Ar, jr, Mr, V, Nr, Pr, Fr, Ir, H, U, W, G, K, Lr
 		constructor(...t) {
 			super(...t), this.lastDocumentMouseClientX = 0, this.lastDocumentMouseClientY = 0, this.ticking = !1, this.handlePointerProximity = (e) => {
 				this.toolbar && (this.lastDocumentMouseClientX = e.clientX, this.lastDocumentMouseClientY = e.clientY, this.ticking ||= (requestAnimationFrame(() => {
-					let t = this.toolbar;
-					if (t) {
-						if (t.isDragging || t.matches(":hover") || t.matches(":focus-within") || this.isDevToolsPopoverOpen) {
-							t.expandRadioButtons(), this.ticking = !1;
+					this.ticking = !1;
+					let e = this.toolbar;
+					if (e) {
+						if (e.isDragging || e.matches(":hover") || e.matches(":focus-within") || this.isDevToolsPopoverOpen) {
+							e.expandRadioButtons();
 							return;
 						}
 						if (A.activeMode !== "play") {
-							t.expandRadioButtons(), this.ticking = !1;
+							e.expandRadioButtons();
 							return;
 						}
-						this.updateRadioButtonExpandAndStylingByPointerLocation(e.clientX, e.clientY), this.ticking = !1;
+						this.updateRadioButtonExpandAndStylingByPointerLocation(this.lastDocumentMouseClientX, this.lastDocumentMouseClientY);
 					}
 				}), !0));
 			}, this.updateRadioButtonExpandAndStylingByPointerLocation = (t, n) => {
@@ -2595,7 +2596,7 @@ var Cr, wr, Tr, Er, Dr, Or, kr, Ar, jr, Mr, V, Nr, Pr, Fr, Ir, H, U, W, G, K, Lr
         </vaadin-button>
         <vaadin-popover
           @opened-changed="${(e) => {
-				this.expandModeHandler.devToolsPopoverOpenClosedChanged(e.detail.value), e.detail.value && !this.devToolsDataLoaded && (this.devToolsDataLoading = !0, import("./copilot-devtools-CJYQ4W1q.js").then(() => {
+				this.expandModeHandler.devToolsPopoverOpenClosedChanged(e.detail.value), e.detail.value && !this.devToolsDataLoaded && (this.devToolsDataLoading = !0, import("./copilot-devtools-nq53By6U.js").then(() => {
 					Ce(), O.restorePanelsFromStorage(), ye(), Ie(), this.devToolsDataLoading = !1, this.devToolsDataLoaded = !0;
 				}));
 			}}"
