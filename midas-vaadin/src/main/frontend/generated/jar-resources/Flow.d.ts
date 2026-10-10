@@ -1,8 +1,3 @@
-import './Clipboard';
-import './Download';
-import './ElementResize';
-import './Geolocation';
-import './WakeLock';
 export interface FlowConfig {
     imports?: () => Promise<any>;
 }
@@ -75,7 +70,6 @@ export declare class Flow {
     private injectAppIdScript;
     private flowInitClient;
     private flowInitUi;
-    private collectBrowserDetails;
     private addConnectionIndicator;
     private offlineStubAction;
     private isFlowClientLoaded;

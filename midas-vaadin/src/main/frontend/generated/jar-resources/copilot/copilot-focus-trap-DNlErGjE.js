@@ -1,5 +1,5 @@
 import { n as e } from "./chunk-DiqZc92J.js";
-import { d as t, s as n } from "./dom-utils-ChZR4WGk.js";
+import { d as t, s as n } from "./dom-utils-Culwf8PO.js";
 //#region frontend/copilot/copilot-focus-trap.ts
 function r() {
 	return document.body.querySelector("copilot-main");

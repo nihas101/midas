@@ -1,19 +1,19 @@
 import { i as e, n as t } from "./copilot/chunk-DiqZc92J.js";
 import { D as n, E as r, H as i, N as ee, U as te, _ as a, at as ne, b as o, ct as s, dt as c, ft as l, g as u, h as d, ht as re, i as ie, j as ae, l as oe, m as se, n as ce, o as f, ot as le, r as p, t as m, u as h, ut as g, v as ue, w as de, x as _, y as fe } from "./copilot/icons-wGoYEurg.js";
-import { l as v, o as pe, r as y } from "./copilot/consts-B_BO2mll.js";
-import { d as b, f as me, p as he, r as ge, s as x } from "./copilot/dom-utils-ChZR4WGk.js";
-import { a as S, o as _e } from "./copilot/copilot-tree-impl-BAchcGTF.js";
+import { l as v, o as pe, r as y } from "./copilot/consts-CUwyMiZU.js";
+import { d as b, f as me, p as he, r as ge, s as x } from "./copilot/dom-utils-Culwf8PO.js";
+import { a as S, o as _e } from "./copilot/copilot-tree-impl-B7N3W4b1.js";
 import { a as C, c as w, d as ve, i as ye, l as T, n as E, o as D, r as be, s as O, t as xe, u as k } from "./copilot/section-panel-ui-state-Dbt9i-HL.js";
 import { a as Se, i as A, n as j, r as Ce } from "./copilot/copilot-ui-state-Dc6l_5DA.js";
-import { i as we, n as M, r as Te, t as Ee } from "./copilot/copilot-server-communicator-impl-CVhpQMVG.js";
+import { i as we, n as M, r as Te, t as Ee } from "./copilot/copilot-server-communicator-impl-CSFv_kGJ.js";
 import { n as De, t as Oe } from "./copilot/copilot-message-box-krJnoslR.js";
-import { c as N, d as ke, f as Ae, g as je, h as Me, l as Ne, m as Pe, p as Fe, s as P, u as Ie } from "./copilot/copilot-unsaved-operation-coordinator-DrLU6uYL.js";
+import { c as N, d as ke, f as Ae, g as je, h as Me, l as Ne, m as Pe, p as Fe, s as P, u as Ie } from "./copilot/copilot-unsaved-operation-coordinator-c33G49kp.js";
 import { i as Le, n as Re } from "./copilot/stats-rEPv3bOZ.js";
-import { a as ze, c as Be, i as Ve, l as He, n as Ue, o as We, s as Ge, t as Ke, u as qe } from "./copilot/copilot-userinfo-8PLjvFAp.js";
-import { i as Je, o as Ye, s as Xe } from "./copilot/copilot-error-handler-B8dKSldg.js";
+import { a as ze, c as Be, i as Ve, l as He, n as Ue, o as We, s as Ge, t as Ke, u as qe } from "./copilot/copilot-userinfo-CmsUCdwN.js";
+import { i as Je, o as Ye, s as Xe } from "./copilot/copilot-error-handler-sDuOm7hQ.js";
 import { n as F, t as Ze } from "./copilot/copilot-stored-machine-state-DS3t0BPl.js";
-import { n as Qe, s as $e } from "./copilot/copilot-development-setup-user-guide-utils-DXNVXaMQ.js";
-import { i as et, n as tt, r as nt, t as rt } from "./copilot/copilot-shortcuts-BTULYp50.js";
+import { n as Qe, s as $e } from "./copilot/copilot-development-setup-user-guide-utils-DHoOu3hs.js";
+import { i as et, n as tt, r as nt, t as rt } from "./copilot/copilot-shortcuts-BR0Gq1eD.js";
 //#region frontend/copilot/copilot-eventbus-impl.ts
 var it, at = t((() => {
 	it = class {
@@ -1163,6 +1163,7 @@ var K, q, Ct = t((() => {
 				let { overlay: t } = e.detail, n = t?.owner, r = n instanceof HTMLElement && (n.hasAttribute("modal") || n.modal === !0);
 				if (n && b(n) && r) {
 					let e = t;
+					if (!e.isConnected) return;
 					typeof e.hidePopover == "function" && typeof e.showPopover == "function" && (e.hidePopover(), e.showPopover());
 					return;
 				}
@@ -1278,7 +1279,7 @@ var K, q, Ct = t((() => {
 			this.isConnected && (this.hidePopover(), this.showPopover(), this.panelManager?.promoteOpenPanels(), this.promoteToolbar());
 		}
 		promoteToolbar() {
-			this.toolbar && (this.toolbar.hidePopover && typeof this.toolbar.hidePopover == "function" && this.toolbar.hidePopover(), this.toolbar.showPopover && typeof this.toolbar.showPopover == "function" && this.toolbar.showPopover());
+			this.toolbar?.isConnected && (this.toolbar.hidePopover && typeof this.toolbar.hidePopover == "function" && this.toolbar.hidePopover(), this.toolbar.showPopover && typeof this.toolbar.showPopover == "function" && this.toolbar.showPopover());
 		}
 		async init() {
 			if (this.initialized) return;
@@ -1287,9 +1288,9 @@ var K, q, Ct = t((() => {
 			let t = performance.now();
 			await window.Vaadin.copilot._machineState.initializer.promise, _(`init() blocked ${Math.round(performance.now() - t)} ms waiting for machine state`);
 			let n = performance.now();
-			await import("./copilot/copilot-global-vars-later-CubWv5jY.js"), _(`import(copilot-global-vars-later) took ${Math.round(performance.now() - n)} ms`);
+			await import("./copilot/copilot-global-vars-later-DfbfGJFA.js"), _(`import(copilot-global-vars-later) took ${Math.round(performance.now() - n)} ms`);
 			let r = performance.now();
-			await import("./copilot/copilot-init-step2-bn4qDKzH.js"), _(`import(copilot-init-step2) took ${Math.round(performance.now() - r)} ms`), Le(), this.tabIndex = 0, window.addEventListener("keydown", rt), this.addEventListener("keydown", nt), this.addEventListener("keyup", tt), A.onSend(this.handleSendEvent), this.removers.push(A.on("set-pointer-events", (e) => {
+			await import("./copilot/copilot-init-step2-CzCPoi9g.js"), _(`import(copilot-init-step2) took ${Math.round(performance.now() - r)} ms`), Le(), this.tabIndex = 0, window.addEventListener("keydown", rt), this.addEventListener("keydown", nt), this.addEventListener("keyup", tt), A.onSend(this.handleSendEvent), this.removers.push(A.on("set-pointer-events", (e) => {
 				this.style.pointerEvents = e.detail.enable ? "" : "none";
 			})), this.removers.push(A.on("typescript-load-requested", async (e) => {
 				try {
