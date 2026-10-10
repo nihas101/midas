@@ -32,7 +32,6 @@ public class GridHelper {
         final Grid<T> grid = new Grid<>();
         grid.setSizeFull();
         grid.setWidthFull();
-        grid.setEmptyStateText(messageSource.getMessage("bookings.table.empty-state-text", null, locale));
         grid.setPartNameGenerator(partName);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.LUMO_NO_ROW_BORDERS, GridVariant.LUMO_COMPACT);
         return grid;

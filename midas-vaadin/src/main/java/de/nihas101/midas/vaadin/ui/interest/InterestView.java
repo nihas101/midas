@@ -390,6 +390,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
         final Formatter formatter = this.getFormatter();
         final GridHelper gridHelper = this.getGridHelper();
         interestCalculationGrid = gridHelper.createGrid(InterestCalculationRow::partName);
+        interestCalculationGrid.setEmptyStateText(messageSource.getMessage("bookings.table.empty-state-text", null, getLocale()));
 
         final Grid.Column<?> column6 = interestCalculationGrid.addColumn(InterestCalculationRow::label);
         gridHelper.setupColumn(column6, "interest.table.month", ColumnTextAlign.START);
