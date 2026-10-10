@@ -357,6 +357,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         final Formatter formatter = this.getFormatter();
         final GridHelper gridHelper = this.getGridHelper();
         grid = gridHelper.createGrid(BookingRow::partName);
+        grid.setEmptyStateText(messageSource.getMessage("bookings.table.empty-state-text", null, getLocale()));
 
         gridHelper.setupColumn(grid.addColumn(BookingRow::displayId), "bookings.table.id", ColumnTextAlign.START);
         gridHelper.setupColumn(grid.addColumn(BookingRow::formattedDate), "bookings.table.date", ColumnTextAlign.START);

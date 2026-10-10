@@ -9,6 +9,11 @@
 Midas ist ein Programm zur Erstellung von Finanzberichten für Gesellschafter. Es ermöglicht die Eingabe von Buchungen
 und das Erzeugen verschiedener Berichte. Das Hauptziel des Projekts ist langfristige Kompatibilität.
 
+## Dokumentation
+
+- [Benutzerdokumentation](https://github.com/nihas101/midas/wiki/Benutzerdokumentation-%5BDE%5D)
+- [Administrator-Dokumentation](https://github.com/nihas101/midas/wiki/Administrator%E2%80%90Dokumentation-%5BDE%5D)
+
 ## Verwendung
 
 Um Midas auszuführen, können Sie die JAR-Datei verwenden.

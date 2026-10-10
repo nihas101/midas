@@ -9,6 +9,11 @@
 Midas is a tool for creating financial reports for shareholders. It allows the entry of financial data and enables users
 to generate various reports. The primary goal of the project is long-term compatibility.
 
+## Documentation
+
+- [User Documentation](https://github.com/nihas101/midas/wiki/User-Documentation-%5BEN%5D)
+- [Administrator Documentation](https://github.com/nihas101/midas/wiki/Admin-Documentation-%5BEN%5D)
+
 ## Usage
 
 To run Midas, you can use the standalone JAR or the launcher scripts provided in the releases.

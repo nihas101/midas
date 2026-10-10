@@ -40,7 +40,8 @@ The app will be available at `http://localhost:8082`
 
 ### 3.2. Database Migrations
 
-Database schema changes are managed via Liquibase. Changelogs are located in `midas-persistence-sqlite/src/main/resources/db/changelog`
+Database schema changes are managed via Liquibase. Changelogs are located in
+`midas-persistence-sqlite/src/main/resources/db/changelog`
 
 * **Never** modify an existing changelog file
 * Always create a new XML file for changes and register it in `db.changelog-master.xml`
@@ -89,13 +90,17 @@ For testing system responsiveness under heavy load, the project includes a dedic
 ### 7.1. Configuration and Database Isolation
 
 Running under the `stress` profile activates the configuration in `application-stress.properties` which:
+
 * Points to a separate database file: `midas-stress.db` (so your development and unit test databases remain untouched).
 * Disables automatic browser launching and Vaadin UI auto-shutdown (to prevent JVM termination during headless testing).
-* Prevents the test database initializer from clearing database records on startup, allowing you to persist and reuse populated stress data.
+* Prevents the test database initializer from clearing database records on startup, allowing you to persist and reuse
+  populated stress data.
 
 ### 7.2. Data Populator
 
-The `DataPopulator` is a test utility that populates the database with massive amounts of mock data (~500,000 records) to stress test UI rendering and database queries.
+The `DataPopulator` is a test utility that populates the database with massive amounts of mock data (~500,000 records)
+to stress test UI rendering and database queries.
+
 * **Volume**: 100 shareholders, 1,000 bookings per shareholder per year, spanning 5 years.
 * **Idempotency**: Skips insertion if the shareholders already exist in the database.
 * **How to run**:
@@ -109,3 +114,24 @@ The `DataPopulator` is a test utility that populates the database with massive a
   ```bash
   mvn verify -Dspring.profiles.active=stress
   ```
+
+## 8. Generating Documentation Screenshots (`midas-demo`)
+
+The `midas-demo` module provides an isolated demo environment pre-seeded with consistent data across views
+(shareholders, bookings, opening balances, interest calculation, account statements, locks, comment templates, and
+backup status) for documentation screenshots in different languages.
+
+Build via
+
+```bash
+  mvn clean install -DskipTests -Dspring-boot.repackage.skip=true
+  mvn -f midas-demo/pom.xml clean package
+```
+
+Start an instance with
+
+```bash
+  java -jar midas-demo/target/midas-demo.jar
+```
+
+The application is available at `http://localhost:8082`. All data is stored in a dedicated database: `midas-demo.db`.
