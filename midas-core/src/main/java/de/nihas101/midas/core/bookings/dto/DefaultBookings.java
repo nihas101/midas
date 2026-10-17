@@ -7,6 +7,7 @@ import de.nihas101.midas.api.openingbalance.OpeningBalance;
 import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.list.UnmodifiableList;
 
 import java.time.Month;
 import java.util.List;
@@ -28,6 +29,13 @@ public class DefaultBookings implements Bookings {
     @Override
     public FilteredBookings bookingsInMonth(final Month month) {
         return filter(b -> month.equals(b.getDate().getMonth()));
+    }
+
+    @Override
+    public <T> List<T> map(Function<Booking, T> mapper) {
+        return bookings.stream()
+                .map(mapper)
+                .toList();
     }
 
     @Override
