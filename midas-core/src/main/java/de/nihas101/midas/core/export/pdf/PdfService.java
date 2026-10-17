@@ -2,6 +2,7 @@ package de.nihas101.midas.core.export.pdf;
 
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import com.openhtmltopdf.svgsupport.BatikSVGDrawer;
+import de.nihas101.midas.api.export.HeaderImageResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package de.nihas101.midas.core.export.pdf;
+package de.nihas101.midas.api.export;
 
 public interface HeaderImageResolver {
     String dataUri();

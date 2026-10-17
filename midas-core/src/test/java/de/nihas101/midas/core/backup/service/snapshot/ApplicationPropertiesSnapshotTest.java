@@ -1,5 +1,6 @@
 package de.nihas101.midas.core.backup.service.snapshot;
 
+import de.nihas101.midas.core.backup.service.MidasHeaderImageResolver;
 import de.nihas101.midas.core.backup.service.MidasTemplatesResolver;
 import de.nihas101.midas.persistance.backup.ArchiveWriter;
 import de.nihas101.midas.persistance.backup.DatabaseLocation;
@@ -23,6 +24,7 @@ class ApplicationPropertiesSnapshotTest {
     private ArchiveWriter archiveWriter;
     private DatabaseLocation databaseLocation;
     private MidasTemplatesResolver templatesResolver;
+    private MidasHeaderImageResolver headerImageResolver;
     private PropertiesLoader propertiesLoader;
     private ApplicationPropertiesSnapshot snapshot;
 
@@ -31,11 +33,13 @@ class ApplicationPropertiesSnapshotTest {
         archiveWriter = mock(ArchiveWriter.class);
         databaseLocation = mock(DatabaseLocation.class);
         templatesResolver = mock(MidasTemplatesResolver.class);
+        headerImageResolver = mock(MidasHeaderImageResolver.class);
         propertiesLoader = mock(PropertiesLoader.class);
         snapshot = new ApplicationPropertiesSnapshot(
                 archiveWriter,
                 databaseLocation,
                 templatesResolver,
+                headerImageResolver,
                 propertiesLoader
         );
     }
@@ -104,5 +108,24 @@ class ApplicationPropertiesSnapshotTest {
 
         final Properties capturedProps = captor.getValue();
         assertEquals("jdbc:sqlite:midas.db", capturedProps.getProperty("spring.datasource.url"));
+    }
+
+    @Test
+    void createWithHeaderImagePathAdjustment() throws IOException {
+        final Properties props = new Properties();
+        props.setProperty("midas.export.pdf.header-image-path", "/some/custom/path/my-logo.png");
+
+        when(propertiesLoader.load()).thenReturn(props);
+        final File file = mock(File.class);
+        when(file.getName()).thenReturn("my-logo.png");
+        when(headerImageResolver.resolveHeaderImage()).thenReturn(Optional.of(file));
+
+        snapshot.create();
+
+        final ArgumentCaptor<Properties> captor = ArgumentCaptor.forClass(Properties.class);
+        verify(archiveWriter).add(captor.capture());
+
+        final Properties capturedProps = captor.getValue();
+        assertEquals("my-logo.png", capturedProps.getProperty("midas.export.pdf.header-image-path"));
     }
 }

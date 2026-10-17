@@ -1,39 +1,35 @@
 package de.nihas101.midas.core.export.pdf;
 
-import de.nihas101.midas.core.export.pdf.config.PdfExportConfig;
+import de.nihas101.midas.api.export.HeaderImageResolver;
+import de.nihas101.midas.core.backup.service.MidasHeaderImageResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Base64;
+import java.util.Optional;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class HeaderImageData implements HeaderImageResolver {
-    private final PdfExportConfig pdfExportConfig;
-    private final ResourceLoader resourceLoader = new DefaultResourceLoader();
+    private final MidasHeaderImageResolver headerImageResolver;
 
     @Override
     public String dataUri() {
-        if (pdfExportConfig == null) {
-            return null;
-        }
-        final String imagePath = pdfExportConfig.getHeaderImagePath();
-        if (imagePath == null || imagePath.isBlank()) {
+        final Optional<File> file = headerImageResolver.resolveHeaderImage();
+        if (file.isEmpty()) {
             return null;
         }
 
         try {
-            final ImageFile imageFile = loadImage(imagePath, imagePath);
-            if (imageFile.bytes() == null || imageFile.bytes().length == 0) {
+            final ImageFile imageFile = loadImage(file.get());
+            if (imageFile == null || imageFile.bytes() == null || imageFile.bytes().length == 0) {
                 log.warn("Header image is empty");
                 return null;
             }
@@ -47,28 +43,14 @@ public class HeaderImageData implements HeaderImageResolver {
         }
     }
 
-    private ImageFile loadImage(final String imagePath, String fileName) throws IOException {
-        byte[] bytes = null;
-
-        // Try direct file path first
-        final Path path = Path.of(imagePath);
-        if (Files.exists(path) && Files.isRegularFile(path)) {
-            bytes = Files.readAllBytes(path);
-            fileName = path.getFileName().toString();
-        } else {
-            // Try via ResourceLoader (classpath or file protocol)
-            final Resource resource = resourceLoader.getResource(imagePath);
-            if (resource.exists() && resource.isReadable()) {
-                try (final InputStream inputStream = resource.getInputStream()) {
-                    bytes = inputStream.readAllBytes();
-                    if (resource.getFilename() != null) {
-                        fileName = resource.getFilename();
-                    }
-                }
-            }
+    private ImageFile loadImage(final File file) throws IOException {
+        final Path path = file.toPath();
+        final Path fileName = path.getFileName();
+        if (StringUtils.isBlank(fileName.toString())) {
+            return null;
         }
 
-        return new ImageFile(bytes, fileName);
+        return new ImageFile(Files.readAllBytes(path), fileName.toString());
     }
 
     private record ImageFile(byte[] bytes, String fileName) {

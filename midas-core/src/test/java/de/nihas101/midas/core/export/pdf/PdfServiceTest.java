@@ -1,5 +1,6 @@
 package de.nihas101.midas.core.export.pdf;
 
+import de.nihas101.midas.api.export.HeaderImageResolver;
 import de.nihas101.midas.core.export.ExportViewName;
 import de.nihas101.midas.core.export.pdf.config.PdfExportConfig;
 import org.junit.jupiter.api.Test;

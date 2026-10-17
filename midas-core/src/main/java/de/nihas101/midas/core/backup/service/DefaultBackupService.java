@@ -25,6 +25,7 @@ public class DefaultBackupService implements BackupService {
     private final BackupStatusWriter backupStatusWriter;
     private final MidasExecutableResolver executableResolver;
     private final MidasTemplatesResolver templatesResolver;
+    private final MidasHeaderImageResolver headerImageResolver;
     private final DatabaseLocationFactory databaseLocationFactory;
     private final DbSnapshotFactory dbSnapshotFactory;
 
@@ -33,6 +34,7 @@ public class DefaultBackupService implements BackupService {
             final BackupStatusWriter backupStatusWriter,
             final MidasExecutableResolver executableResolver,
             final MidasTemplatesResolver templatesResolver,
+            final MidasHeaderImageResolver headerImageResolver,
             final DatabaseLocationFactory databaseLocationFactory,
             final DbSnapshotFactory dbSnapshotFactory
     ) {
@@ -40,6 +42,7 @@ public class DefaultBackupService implements BackupService {
         this.backupStatusWriter = backupStatusWriter;
         this.executableResolver = executableResolver;
         this.templatesResolver = templatesResolver;
+        this.headerImageResolver = headerImageResolver;
         this.databaseLocationFactory = databaseLocationFactory;
         this.dbSnapshotFactory = dbSnapshotFactory;
     }
@@ -70,7 +73,8 @@ public class DefaultBackupService implements BackupService {
                 new ApplicationPropertiesSnapshot(
                         zipArchive,
                         databaseLocation,
-                        templatesResolver
+                        templatesResolver,
+                        headerImageResolver
                 ),
                 new JarSnapshot(
                         zipArchive,
@@ -79,6 +83,10 @@ public class DefaultBackupService implements BackupService {
                 new TemplatesSnapshot(
                         zipArchive,
                         templatesResolver
+                ),
+                new HeaderImageSnapshot(
+                        zipArchive,
+                        headerImageResolver
                 )
         );
     }
