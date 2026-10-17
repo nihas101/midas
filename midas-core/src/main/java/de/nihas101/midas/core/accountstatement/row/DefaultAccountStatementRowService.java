@@ -27,11 +27,9 @@ public class DefaultAccountStatementRowService implements AccountStatementRowSer
             final RunningTotalAccountStatements accountStatements,
             final boolean withHidden
     ) {
-        final String dateFormat = dateFormat();
-
         Stream<RunningTotalAccountStatementRow> runningTotalAccountStatementRowStream = accountStatements.runningTotalAccountStatements()
                 .stream()
-                .map(statement -> new RunningTotalAccountStatementRow(statement, dateFormat));
+                .map(statement -> new RunningTotalAccountStatementRow(statement, dateFormat()));
 
         if (!withHidden) {
             runningTotalAccountStatementRowStream = runningTotalAccountStatementRowStream

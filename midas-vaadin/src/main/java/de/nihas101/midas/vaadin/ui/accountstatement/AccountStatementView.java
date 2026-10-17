@@ -270,7 +270,8 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         dragHandleColumn.setWidth("40px");
         dragHandleColumn.setResizable(false);
 
-        accountStatementGrid.setEmptyStateText(messageSource.getMessage("bookings.table.empty-state-text", null, getLocale()));
+        final Locale locale = getLocale();
+        accountStatementGrid.setEmptyStateText(messageSource.getMessage("bookings.table.empty-state-text", null, locale));
         accountStatementGrid.setWidthFull();
         accountStatementGrid.setAllRowsVisible(true);
         accountStatementGrid.setPartNameGenerator(AccountStatementRow::partName);
@@ -344,7 +345,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         final Grid.Column<AccountStatementRow> debitColumn = accountStatementGrid.addColumn(
                 accountStatementRow -> Optional.of(accountStatementRow)
                         .map(AccountStatementRow::debit)
-                        .map(m -> m.format(getLocale()))
+                        .map(m -> m.format(locale))
                         .orElse("")
         );
         debitColumn.setPartNameGenerator(r -> "separator-column");
@@ -353,7 +354,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         final Grid.Column<AccountStatementRow> creditColumn = accountStatementGrid.addColumn(
                 accountStatementRow -> Optional.of(accountStatementRow)
                         .map(AccountStatementRow::credit)
-                        .map(m -> m.format(getLocale()))
+                        .map(m -> m.format(locale))
                         .orElse("")
         );
         creditColumn.setPartNameGenerator(r -> "separator-column");
@@ -361,8 +362,9 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
 
         final Grid.Column<AccountStatementRow> balanceColumn = accountStatementGrid.addColumn(
                 accountStatementRow -> Optional.of(accountStatementRow)
+                        .filter(as -> !as.isHidden())
                         .map(AccountStatementRow::balance)
-                        .map(m -> m.format(getLocale()))
+                        .map(m -> m.format(locale))
                         .orElse("")
         );
         balanceColumn.setPartNameGenerator(r -> "separator-column");
@@ -373,7 +375,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                         messageSource.getMessage(
                                 "shareholders.table.actions",
                                 null,
-                                getLocale()
+                                locale
                         )
                 ).setAutoWidth(true);
 
@@ -611,11 +613,12 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         final boolean isLocked = shareholderLock.isLocked(shareholder, year);
         applyLockState(isLocked);
 
+        final Locale locale = getLocale();
         final RunningTotalAccountStatements accountStatements = runningTotalAccountStatementService.runningTotalAccountStatements(
                 shareholder,
                 year,
                 messageSource,
-                getLocale()
+                locale
         );
         if (accountStatements.isEmpty()) {
             accountStatementGrid.setItems(emptyList());
@@ -627,7 +630,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         final List<AccountStatementRow> rows = accountStatementRowService.generateRows(accountStatements, displayHiddenEntriesCheckbox.getValue());
         this.currentRows = rows;
         accountStatementGrid.setItems(rows);
-        closingStatementGrid.setItems(accountStatementRowService.generateClosingRow(accountStatements, getLocale()));
+        closingStatementGrid.setItems(accountStatementRowService.generateClosingRow(accountStatements, locale));
         checkForDivergence(shareholder, year, rows);
     }
 
@@ -653,32 +656,32 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
             final List<AccountStatementRow> rows
     ) {
         final Bookings bookings = bookingsReader.bookingsForShareholderAndYear(shareholder.getId(), year);
-        final MoneyAmount bookingsSum = bookings.filter(b -> true).bookings()
+        final MoneyAmount bookingsSum = bookings.map(Booking::getAmount)
                 .stream()
-                .map(Booking::getAmount)
                 .reduce(MoneyAmount.ZERO, MoneyAmount::plus);
 
         final MoneyAmount typeRowsSum = rows.stream()
-                .filter(row -> !row.isOpeningBalance())
-                .filter(row -> !row.isHidden())
+                .filter(row -> !row.isOpeningBalance() && !row.isHidden())
                 .map(AccountStatementRow::amount)
                 .reduce(MoneyAmount.ZERO, MoneyAmount::plus);
 
-        if (!bookingsSum.equals(typeRowsSum)) {
-            final MoneyAmount difference = typeRowsSum.minus(bookingsSum);
-            final String formattedDiff = difference.abs().format(getLocale());
-            final String formattedStatement = typeRowsSum.format(getLocale());
-            final String formattedBookings = bookingsSum.format(getLocale());
-
-            warningText.setText(messageSource.getMessage(
-                    "account-statements.warning.divergent-message",
-                    new Object[]{formattedDiff, formattedStatement, formattedBookings},
-                    getLocale()
-            ));
-            warningBanner.setVisible(true);
-        } else {
+        if (bookingsSum.equals(typeRowsSum)) {
             warningBanner.setVisible(false);
+            return;
         }
+
+        final Locale locale = getLocale();
+        final MoneyAmount difference = typeRowsSum.minus(bookingsSum);
+        final String formattedDiff = difference.abs().format(locale);
+        final String formattedStatement = typeRowsSum.format(locale);
+        final String formattedBookings = bookingsSum.format(locale);
+
+        warningText.setText(messageSource.getMessage(
+                "account-statements.warning.divergent-message",
+                new Object[]{formattedDiff, formattedStatement, formattedBookings},
+                locale
+        ));
+        warningBanner.setVisible(true);
     }
 
     public static Icon icon() {

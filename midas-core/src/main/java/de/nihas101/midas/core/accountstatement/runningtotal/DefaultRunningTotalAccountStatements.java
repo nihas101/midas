@@ -1,11 +1,10 @@
 package de.nihas101.midas.core.accountstatement.runningtotal;
 
-import de.nihas101.midas.api.accountstatement.AccountStatements;
 import de.nihas101.midas.api.accountstatement.LabeledAccountStatement;
+import de.nihas101.midas.api.accountstatement.NextRunningStatementFactory;
 import de.nihas101.midas.api.accountstatement.RunningTotalAccountStatement;
 import de.nihas101.midas.api.accountstatement.RunningTotalAccountStatements;
 import de.nihas101.midas.api.openingbalance.OpeningBalance;
-import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.commons.MoneyAmount;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -24,63 +23,24 @@ public class DefaultRunningTotalAccountStatements implements RunningTotalAccount
     private final List<RunningTotalAccountStatement> runningTotalAccountStatements;
 
     public DefaultRunningTotalAccountStatements(
-            final AccountStatements accountStatements,
-            final List<BookingType> typeOrder,
-            final OpeningRunningTotalAccountStatement openingRunningTotalAccountStatement
-    ) {
-        final OpeningBalance openingBalance = accountStatements.openingBalance();
-        this.runningTotalAccountStatements = new ArrayList<>();
-        if (openingBalance == null) {
-            return;
-        }
-
-        runningTotalAccountStatements.add(openingRunningTotalAccountStatement);
-        final List<LabeledAccountStatement> statements = typeOrder.stream()
-                .map(accountStatements::forType)
-                .toList();
-
-        MoneyAmount currentBalance = openingBalance.getOpeningBalance();
-        for (final LabeledAccountStatement statement : statements) {
-            currentBalance = currentBalance.plus(statement.amount());
-            runningTotalAccountStatements.add(
-                    new DefaultRunningTotalAccountStatement(
-                            statement,
-                            currentBalance
-                    )
-            );
-        }
-
-        for (final LabeledAccountStatement statement : accountStatements.manualStatements()) {
-            currentBalance = currentBalance.plus(statement.amount());
-            runningTotalAccountStatements.add(
-                    new DefaultRunningTotalAccountStatement(
-                            statement,
-                            currentBalance
-                    )
-            );
-        }
-    }
-
-    public DefaultRunningTotalAccountStatements(
-            final List<LabeledAccountStatement> orderedStatements,
+            final List<LabeledAccountStatement> statements,
             final OpeningBalance openingBalance,
-            final OpeningRunningTotalAccountStatement openingRunningTotalAccountStatement
+            final OpeningRunningTotalAccountStatement openingRunningTotalAccountStatement,
+            final NextRunningStatementFactory nextRunningStatementFactory
     ) {
-        log.info("Opening Balance: {}", openingBalance);
-        this.runningTotalAccountStatements = new ArrayList<>();
-
-        runningTotalAccountStatements.add(openingRunningTotalAccountStatement);
+        final ArrayList<RunningTotalAccountStatement> runningTotalStatements = new ArrayList<>();
+        runningTotalStatements.add(openingRunningTotalAccountStatement);
 
         MoneyAmount currentBalance = ensureOpeningBalanceAmount(openingBalance);
-        for (final LabeledAccountStatement statement : orderedStatements) {
-            currentBalance = currentBalance.plus(statement.amount());
-            runningTotalAccountStatements.add(
-                    new DefaultRunningTotalAccountStatement(
-                            statement,
-                            currentBalance
-                    )
-            );
+        for (final LabeledAccountStatement statement : statements) {
+            final RunningTotalAccountStatement nextRunningTotal = nextRunningStatementFactory.nextRunningStatement(
+                    statement,
+                    currentBalance
+            ).nextRunningTotal();
+            currentBalance = nextRunningTotal.currentBalance();
+            runningTotalStatements.add(nextRunningTotal);
         }
+        this.runningTotalAccountStatements = runningTotalStatements;
     }
 
     private MoneyAmount ensureOpeningBalanceAmount(final OpeningBalance openingBalance) {

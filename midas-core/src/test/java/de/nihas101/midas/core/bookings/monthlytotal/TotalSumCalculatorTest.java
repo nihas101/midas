@@ -56,6 +56,11 @@ class TotalSumCalculatorTest {
             }
 
             @Override
+            public <T> List<T> map(final Function<Booking, T> mapper) {
+                return List.of();
+            }
+
+            @Override
             public FilteredBookings filter(final Function<Booking, Boolean> condition) {
                 return new FilteredBookings(List.of());
             }
@@ -108,6 +113,11 @@ class TotalSumCalculatorTest {
             @Override
             public FilteredBookings bookingsInMonth(Month m) {
                 return m == Month.MARCH ? filteredBookings : new FilteredBookings(List.of());
+            }
+
+            @Override
+            public <T> List<T> map(final Function<Booking, T> mapper) {
+                return List.of();
             }
 
             @Override
