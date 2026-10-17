@@ -1,21 +1,16 @@
 package de.nihas101.midas.core.accountstatement.service;
 
-import de.nihas101.midas.api.accountstatement.AccountStatements;
-import de.nihas101.midas.api.accountstatement.LabeledAccountStatement;
+import de.nihas101.midas.api.accountstatement.AccountStatementSort;
+import de.nihas101.midas.api.accountstatement.NextRunningStatementFactory;
 import de.nihas101.midas.api.accountstatement.RunningTotalAccountStatements;
-import de.nihas101.midas.api.openingbalance.OpeningBalance;
 import de.nihas101.midas.api.shareholder.Shareholder;
-import de.nihas101.midas.commons.BookingType;
-import de.nihas101.midas.core.accountstatement.runningtotal.DefaultRunningTotalAccountStatements;
-import de.nihas101.midas.core.accountstatement.runningtotal.OpeningRunningTotalAccountStatement;
+import de.nihas101.midas.core.accountstatement.runningtotal.OrderedRunningTotalAccountStatements;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
 import java.time.Year;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 @Slf4j
@@ -25,6 +20,7 @@ public class RunningTotalAccountStatementService {
 
     private final DefaultAccountStatementService accountStatementService;
     private final AccountStatementSort accountStatementSort;
+    private final NextRunningStatementFactory nextRunningStatementFactory;
 
     public RunningTotalAccountStatements runningTotalAccountStatements(
             final Shareholder shareholder,
@@ -32,42 +28,20 @@ public class RunningTotalAccountStatementService {
             final MessageSource messageSource,
             final Locale locale
     ) {
-        final AccountStatements accountStatements = accountStatementService.accountStatements(
+        return new OrderedRunningTotalAccountStatements(
                 shareholder,
                 year,
+                accountStatementService.accountStatements(
+                        shareholder,
+                        year,
+                        messageSource,
+                        locale
+                ),
+                accountStatementSort,
+                nextRunningStatementFactory,
                 messageSource,
                 locale
         );
-        final OpeningBalance openingBalance = accountStatements.openingBalance();
-
-        final List<LabeledAccountStatement> allStatements = accountStatementSort.sort(
-                statementPerBookingType(accountStatements),
-                shareholder,
-                year
-        );
-
-        return new DefaultRunningTotalAccountStatements(
-                allStatements,
-                openingBalance,
-                new OpeningRunningTotalAccountStatement(
-                        openingBalance,
-                        messageSource,
-                        locale,
-                        year
-                )
-        );
-    }
-
-    private List<LabeledAccountStatement> statementPerBookingType(final AccountStatements accountStatements) {
-        final List<LabeledAccountStatement> allStatements = new ArrayList<>();
-        for (final BookingType type : BookingType.values()) {
-            final LabeledAccountStatement stmt = accountStatements.forType(type);
-            if (stmt != null) {
-                allStatements.add(stmt);
-            }
-        }
-        allStatements.addAll(accountStatements.manualStatements());
-        return allStatements;
     }
 
 }

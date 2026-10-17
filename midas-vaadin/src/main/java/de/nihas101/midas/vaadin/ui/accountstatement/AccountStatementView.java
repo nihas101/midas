@@ -270,7 +270,8 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         dragHandleColumn.setWidth("40px");
         dragHandleColumn.setResizable(false);
 
-        accountStatementGrid.setEmptyStateText(messageSource.getMessage("bookings.table.empty-state-text", null, getLocale()));
+        final Locale locale = getLocale();
+        accountStatementGrid.setEmptyStateText(messageSource.getMessage("bookings.table.empty-state-text", null, locale));
         accountStatementGrid.setWidthFull();
         accountStatementGrid.setAllRowsVisible(true);
         accountStatementGrid.setPartNameGenerator(AccountStatementRow::partName);
@@ -344,7 +345,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         final Grid.Column<AccountStatementRow> debitColumn = accountStatementGrid.addColumn(
                 accountStatementRow -> Optional.of(accountStatementRow)
                         .map(AccountStatementRow::debit)
-                        .map(m -> m.format(getLocale()))
+                        .map(m -> m.format(locale))
                         .orElse("")
         );
         debitColumn.setPartNameGenerator(r -> "separator-column");
@@ -353,7 +354,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         final Grid.Column<AccountStatementRow> creditColumn = accountStatementGrid.addColumn(
                 accountStatementRow -> Optional.of(accountStatementRow)
                         .map(AccountStatementRow::credit)
-                        .map(m -> m.format(getLocale()))
+                        .map(m -> m.format(locale))
                         .orElse("")
         );
         creditColumn.setPartNameGenerator(r -> "separator-column");
@@ -361,8 +362,9 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
 
         final Grid.Column<AccountStatementRow> balanceColumn = accountStatementGrid.addColumn(
                 accountStatementRow -> Optional.of(accountStatementRow)
+                        .filter(as -> !as.isHidden())
                         .map(AccountStatementRow::balance)
-                        .map(m -> m.format(getLocale()))
+                        .map(m -> m.format(locale))
                         .orElse("")
         );
         balanceColumn.setPartNameGenerator(r -> "separator-column");
@@ -373,7 +375,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                         messageSource.getMessage(
                                 "shareholders.table.actions",
                                 null,
-                                getLocale()
+                                locale
                         )
                 ).setAutoWidth(true);
 
