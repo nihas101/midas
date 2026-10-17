@@ -1,5 +1,6 @@
 package de.nihas101.midas.core.backup.service.snapshot;
 
+import de.nihas101.midas.core.backup.service.MidasHeaderImageResolver;
 import de.nihas101.midas.core.backup.service.MidasTemplatesResolver;
 import de.nihas101.midas.persistance.backup.ArchiveWriter;
 import de.nihas101.midas.persistance.backup.DatabaseLocation;
@@ -19,17 +20,20 @@ public class ApplicationPropertiesSnapshot implements Snapshot {
     private final ArchiveWriter archiveWriter;
     private final DatabaseLocation databaseLocation;
     private final MidasTemplatesResolver templatesResolver;
+    private final MidasHeaderImageResolver headerImageResolver;
     private final PropertiesLoader propertiesLoader;
 
     public ApplicationPropertiesSnapshot(
             final ArchiveWriter archiveWriter,
             final DatabaseLocation databaseLocation,
-            final MidasTemplatesResolver templatesResolver
+            final MidasTemplatesResolver templatesResolver,
+            final MidasHeaderImageResolver headerImageResolver
     ) {
         this(
                 archiveWriter,
                 databaseLocation,
                 templatesResolver,
+                headerImageResolver,
                 new FilePropertiesLoader()
         );
     }
@@ -46,6 +50,7 @@ public class ApplicationPropertiesSnapshot implements Snapshot {
 
         correctDataSourceUrl(props);
         correctTemplatesDirectory(props);
+        correctHeaderImagePath(props);
 
         archiveWriter.add(props);
     }
@@ -67,6 +72,21 @@ public class ApplicationPropertiesSnapshot implements Snapshot {
         if (!templatesDirectoryPath.equals(props.getProperty("midas.export.pdf.template-path"))) {
             log.info("Adjusting midas.export.pdf.template-path to '{}' for portability", templatesDirectoryPath);
             props.setProperty("midas.export.pdf.template-path", templatesDirectoryPath);
+        }
+    }
+
+    private void correctHeaderImagePath(final Properties props) {
+        if (headerImageResolver == null) {
+            return;
+        }
+        final Optional<File> headerImage = headerImageResolver.resolveHeaderImage();
+        if (headerImage.isEmpty()) {
+            return;
+        }
+        final String imageFileName = headerImage.get().getName();
+        if (!imageFileName.equals(props.getProperty("midas.export.pdf.header-image-path"))) {
+            log.info("Adjusting midas.export.pdf.header-image-path to '{}' for portability", imageFileName);
+            props.setProperty("midas.export.pdf.header-image-path", imageFileName);
         }
     }
 

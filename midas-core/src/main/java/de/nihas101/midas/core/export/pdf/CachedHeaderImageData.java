@@ -1,5 +1,6 @@
 package de.nihas101.midas.core.export.pdf;
 
+import de.nihas101.midas.api.export.HeaderImageResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
