@@ -4,6 +4,7 @@ import de.nihas101.midas.api.shareholder.Shareholder;
 
 import java.time.LocalDate;
 import java.time.Year;
+import java.util.List;
 
 public interface BookingsReader {
     Bookings bookingsForShareholderAndYear(final Integer shareholderId, final Year year);
@@ -15,6 +16,8 @@ public interface BookingsReader {
     );
 
     boolean exists(final Booking booking);
+
+    List<Year> yearsWithBookings(final Shareholder shareholder);
 
     boolean hasBookings(final Shareholder shareholder);
 }

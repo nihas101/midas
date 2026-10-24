@@ -17,6 +17,20 @@ public interface BookingsRepository extends JpaRepository<BookingEntity, Integer
 
     boolean existsByShareholder(final ShareholderEntity shareholder);
 
+    @Query(
+            value = """
+                    SELECT DISTINCT CAST(
+                        strftime('%Y', datetime(b.date / 1000, 'unixepoch'))
+                        AS INTEGER
+                    ) AS booking_year
+                    FROM bookings b
+                    WHERE shareholder_id = :#{#shareholder.id}
+                    ORDER BY booking_year DESC
+                    """,
+            nativeQuery = true
+    )
+    List<Integer> findYearsWithBookingsByShareholder(final ShareholderEntity shareholder);
+
     List<BookingEntity> findByShareholderAndDateBetweenOrderByDateAsc(
             final ShareholderEntity shareholder,
             final LocalDate start,
