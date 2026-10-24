@@ -9,8 +9,17 @@ import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.api.shareholder.Shareholders;
 import de.nihas101.midas.api.shareholder.ShareholdersReader;
 import de.nihas101.midas.commons.Source;
+import de.nihas101.midas.core.cleanup.CleanupConfig;
+import de.nihas101.midas.core.config.DatesConfig;
+import de.nihas101.midas.core.config.I18nConfig;
+import de.nihas101.midas.core.config.ShareholderConfig;
+import de.nihas101.midas.core.config.ThemeConfig;
+import de.nihas101.midas.core.config.TitleConfig;
 import de.nihas101.midas.core.config.UIConfig;
 import de.nihas101.midas.core.lock.ShareholderLock;
+import de.nihas101.midas.persistance.DbConfig;
+import de.nihas101.midas.vaadin.config.DesktopConfig;
+import de.nihas101.midas.vaadin.config.MidasConfig;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -120,7 +129,7 @@ class CreateBookingFormDialogTest {
                 null,
                 b -> {
                 },
-                uiConfig,
+                config(),
                 bookingFactory
         );
 
@@ -172,8 +181,23 @@ class CreateBookingFormDialogTest {
                 shareholderLock,
                 b -> {
                 },
-                uiConfig,
+                config(),
                 bookingFactory
+        );
+    }
+
+    private MidasConfig config() {
+        return new MidasConfig(
+                new TitleConfig(),
+                new ThemeConfig(),
+                uiConfig,
+                new I18nConfig(),
+                new DesktopConfig(),
+                new CleanupConfig(),
+                new DbConfig() {
+                },
+                new DatesConfig(),
+                new ShareholderConfig()
         );
     }
 }

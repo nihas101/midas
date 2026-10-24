@@ -14,7 +14,7 @@ import com.vaadin.flow.router.RouterLink;
 import de.nihas101.midas.api.userconfig.UserConfig;
 import de.nihas101.midas.api.userconfig.UserConfigFactory;
 import de.nihas101.midas.api.userconfig.UserConfigService;
-import de.nihas101.midas.core.config.CoreConfig;
+import de.nihas101.midas.vaadin.config.MidasConfig;
 import de.nihas101.midas.vaadin.ui.accountstatement.AccountStatementView;
 import de.nihas101.midas.vaadin.ui.backup.BackupView;
 import de.nihas101.midas.vaadin.ui.bookings.BookingsView;
@@ -34,13 +34,13 @@ import java.util.Optional;
 public class MidasView extends AppLayout {
 
     private final GridHelper gridHelper;
-    private final CoreConfig midasConfig;
+    private final MidasConfig midasConfig;
     private final Locale locale;
     private final UserConfigFactory userConfigFactory;
     private final Formatter formatter;
 
     public MidasView(
-            final CoreConfig config,
+            final MidasConfig config,
             final UserConfigService userConfigService,
             final MessageSource messageSource,
             final MidasLocaleResolver midasLocaleResolver,

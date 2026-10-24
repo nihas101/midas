@@ -16,7 +16,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.nihas101.midas.api.userconfig.UserConfigFactory;
 import de.nihas101.midas.api.userconfig.UserConfigService;
-import de.nihas101.midas.core.config.CoreConfig;
+import de.nihas101.midas.vaadin.config.MidasConfig;
 import de.nihas101.midas.vaadin.ui.common.MidasView;
 import de.nihas101.midas.vaadin.ui.common.locale.MidasLocaleResolver;
 import org.springframework.context.MessageSource;
@@ -34,7 +34,7 @@ public class SettingsView extends MidasView {
     }
 
     public SettingsView(
-            final CoreConfig config,
+            final MidasConfig config,
             final I18NProvider i18NProvider,
             final UserConfigService userConfigService,
             final MessageSource messageSource,
@@ -63,7 +63,7 @@ public class SettingsView extends MidasView {
     }
 
     private Grid<SettingRow> settingsTable(
-            final CoreConfig config,
+            final MidasConfig config,
             final I18NProvider i18NProvider,
             final UserConfigService userConfigService,
             final MessageSource messageSource

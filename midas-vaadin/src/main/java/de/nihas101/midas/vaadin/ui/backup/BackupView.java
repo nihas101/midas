@@ -21,7 +21,7 @@ import de.nihas101.midas.api.userconfig.UserConfigFactory;
 import de.nihas101.midas.api.userconfig.UserConfigService;
 import de.nihas101.midas.core.backup.service.BackupFileNameProvider;
 import de.nihas101.midas.core.backup.service.BackupStatusService;
-import de.nihas101.midas.core.config.CoreConfig;
+import de.nihas101.midas.vaadin.config.MidasConfig;
 import de.nihas101.midas.vaadin.ui.common.MidasView;
 import de.nihas101.midas.vaadin.ui.common.locale.MidasLocaleResolver;
 import lombok.extern.slf4j.Slf4j;
@@ -44,13 +44,10 @@ public class BackupView extends MidasView {
     private final MessageSource messageSource;
 
     private final Span lastBackupLabel;
-    private final Button backupButton;
-    private final ProgressBar progressBar;
-    private final Span statusText;
     private final VerticalLayout content;
 
     public BackupView(
-            final CoreConfig midasConfig,
+            final MidasConfig midasConfig,
             final UserConfigService userConfigService,
             final MidasLocaleResolver midasLocaleResolver,
             final BackupService backupService,
@@ -90,17 +87,17 @@ public class BackupView extends MidasView {
         updateLastBackupLabel();
         formContainer.add(lastBackupLabel);
 
-        progressBar = new ProgressBar();
+        final ProgressBar progressBar = new ProgressBar();
         progressBar.setIndeterminate(true);
         progressBar.setVisible(false);
         progressBar.setWidthFull();
         formContainer.add(progressBar);
 
-        statusText = new Span();
+        final Span statusText = new Span();
         statusText.setVisible(false);
         formContainer.add(statusText);
 
-        backupButton = new Button(messageSource.getMessage("backup.create", null, getLocale()), VaadinIcon.DOWNLOAD.create());
+        final Button backupButton = new Button(messageSource.getMessage("backup.create", null, getLocale()), VaadinIcon.DOWNLOAD.create());
         backupButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         backupButton.addClickListener(e -> runBackup());
 

@@ -11,8 +11,8 @@ import de.nihas101.midas.api.bookings.BookingsReader;
 import de.nihas101.midas.api.shareholder.ShareholderFactory;
 import de.nihas101.midas.api.userconfig.UserConfigFactory;
 import de.nihas101.midas.api.userconfig.UserConfigService;
-import de.nihas101.midas.core.config.CoreConfig;
 import de.nihas101.midas.core.shareholders.service.ShareholdersService;
+import de.nihas101.midas.vaadin.config.MidasConfig;
 import de.nihas101.midas.vaadin.ui.common.MidasView;
 import de.nihas101.midas.vaadin.ui.common.locale.MidasLocaleResolver;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +28,7 @@ public class ShareholdersView extends MidasView {
     public ShareholdersView(
             final ShareholdersService shareholdersService,
             final BookingsReader bookingsReader,
-            final CoreConfig config,
+            final MidasConfig config,
             final MessageSource messageSource,
             final UserConfigService userConfigService,
             final MidasLocaleResolver midasLocaleResolver,
@@ -50,7 +50,7 @@ public class ShareholdersView extends MidasView {
     private VerticalLayout createContent(
             final ShareholdersService shareholdersService,
             final BookingsReader bookingsReader,
-            final CoreConfig config,
+            final MidasConfig config,
             final MessageSource messageSource,
             final ShareholderFactory shareholderFactory
     ) {

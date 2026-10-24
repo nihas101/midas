@@ -12,8 +12,8 @@ import de.nihas101.midas.api.bookings.BookingsWriter;
 import de.nihas101.midas.api.commenttemplate.CommentTemplatesReader;
 import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.api.shareholder.ShareholdersReader;
-import de.nihas101.midas.core.config.UIConfig;
 import de.nihas101.midas.core.lock.ShareholderLock;
+import de.nihas101.midas.vaadin.config.MidasConfig;
 import de.nihas101.midas.vaadin.ui.common.CancelButton;
 import de.nihas101.midas.vaadin.ui.common.SaveButton;
 import org.apache.commons.lang3.StringUtils;
@@ -39,7 +39,7 @@ public class EditBookingFormDialog extends BookingFormDialog {
             final Booking bookingToEdit,
             final ShareholderLock shareholderLock,
             final Consumer<Booking> onSave,
-            final UIConfig uiConfig
+            final MidasConfig config
     ) {
         super(
                 messageSource,
@@ -48,7 +48,7 @@ public class EditBookingFormDialog extends BookingFormDialog {
                 shareholdersReader,
                 shareholderLock,
                 commentTemplatesReader,
-                uiConfig
+                config
         );
         this.bookingsReader = bookingsReader;
         this.bookingsWriter = bookingsWriter;

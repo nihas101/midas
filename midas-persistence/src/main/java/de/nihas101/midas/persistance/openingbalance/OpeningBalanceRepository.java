@@ -3,7 +3,10 @@ package de.nihas101.midas.persistance.openingbalance;
 import de.nihas101.midas.commons.Source;
 import de.nihas101.midas.persistance.shareholders.ShareholderEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -17,4 +20,19 @@ public interface OpeningBalanceRepository extends JpaRepository<OpeningBalanceEn
             final LocalDate localDate,
             final Source source
     );
+
+    // Remove statement ordering for years that cannot be edited anymore
+    @Modifying
+    @Transactional
+    @Query(
+            value = """
+                    DELETE FROM opening_balances
+                    WHERE id IN (
+                        SELECT ob.id FROM opening_balances ob
+                        WHERE ob.date < :cutoffDate
+                    )
+                    """,
+            nativeQuery = true
+    )
+    int deleteOrphanedOpeningBalances(LocalDate cutoffDate);
 }

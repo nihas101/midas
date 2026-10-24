@@ -25,7 +25,6 @@ import de.nihas101.midas.api.bookings.Bookings;
 import de.nihas101.midas.api.bookings.BookingsReader;
 import de.nihas101.midas.api.bookings.BookingsWriter;
 import de.nihas101.midas.api.commenttemplate.CommentTemplatesReader;
-import de.nihas101.midas.api.commenttemplate.CommentTemplatesWriter;
 import de.nihas101.midas.api.interest.InterestUpdatingBookingsService;
 import de.nihas101.midas.api.interest.InterestUpdatingOpeningBalanceService;
 import de.nihas101.midas.api.lock.LockService;
@@ -43,11 +42,11 @@ import de.nihas101.midas.core.bookings.row.BookingRow;
 import de.nihas101.midas.core.bookings.row.BookingRowService;
 import de.nihas101.midas.core.bookings.service.BookingsService;
 import de.nihas101.midas.core.commenttemplate.service.CommentTemplatesService;
-import de.nihas101.midas.core.config.CoreConfig;
 import de.nihas101.midas.core.export.ExportFactory;
 import de.nihas101.midas.core.export.ExportViewName;
 import de.nihas101.midas.core.lock.ShareholderLock;
 import de.nihas101.midas.core.shareholders.service.ShareholdersService;
+import de.nihas101.midas.vaadin.config.MidasConfig;
 import de.nihas101.midas.vaadin.ui.commenttemplate.CommentTemplatesTable;
 import de.nihas101.midas.vaadin.ui.common.AddButton;
 import de.nihas101.midas.vaadin.ui.common.DeleteButton;
@@ -92,7 +91,6 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
     private final BookingsReader bookingsReader;
     private final BookingsWriter bookingsWriter;
     private final CommentTemplatesReader commentTemplatesReader;
-    private final CommentTemplatesWriter commentTemplatesWriter;
     private final OpeningBalanceService openingBalanceService;
     private final MessageSource messageSource;
     private final BookingRowService bookingRowService;
@@ -118,7 +116,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
             final InterestUpdatingBookingsService bookingsWriter,
             final InterestUpdatingOpeningBalanceService openingBalanceService,
             final CommentTemplatesService commentTemplatesService,
-            final CoreConfig config,
+            final MidasConfig config,
             final MessageSource messageSource,
             final UserConfigService userConfigService,
             final MidasLocaleResolver midasLocaleResolver,
@@ -146,7 +144,6 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         this.bookingsReader = bookingsReader;
         this.bookingsWriter = bookingsWriter;
         this.commentTemplatesReader = commentTemplatesService;
-        this.commentTemplatesWriter = commentTemplatesService;
         this.openingBalanceService = openingBalanceService;
         this.messageSource = messageSource;
         this.bookingRowService = bookingRowService;
@@ -170,7 +167,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
 
         CommentTemplatesTable commentTemplatesTable = new CommentTemplatesTable(
                 commentTemplatesReader,
-                commentTemplatesWriter,
+                commentTemplatesService,
                 messageSource,
                 getLocale()
         );
@@ -309,7 +306,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                             headerActionBar.getSelectedShareholder(),
                             shareholderLock,
                             booking -> refreshGrid(),
-                            this.getMidasConfig().getUi(),
+                            this.getMidasConfig(),
                             bookingFactory
                     );
                     createBookingFormDialog.open();
@@ -430,7 +427,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                         booking,
                         shareholderLock,
                         b -> refreshGrid(),
-                        this.getMidasConfig().getUi()
+                        this.getMidasConfig()
                 ).open();
             }
         });
@@ -540,9 +537,6 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
             grid.setItems(emptyList());
             return;
         }
-        // TODO: We currently mix two responsibilities here, the creation of the display rows and the logic for calculating them,
-        //       we should separate those concerns in the future, so that updateNextYearsBalance does not depend on ui related
-        //       classes for business logic
         final List<BookingRow> bookingRows = bookingRowService.generateRows(bookings, getLocale(), year);
         if (!isLocked) {
             updateNextYearsBalanceIfNeeded(shareholder, year, bookingRows);

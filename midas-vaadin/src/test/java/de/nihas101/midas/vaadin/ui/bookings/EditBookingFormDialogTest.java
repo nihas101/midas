@@ -8,8 +8,17 @@ import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.api.shareholder.Shareholders;
 import de.nihas101.midas.api.shareholder.ShareholdersReader;
 import de.nihas101.midas.commons.MoneyAmount;
+import de.nihas101.midas.core.cleanup.CleanupConfig;
+import de.nihas101.midas.core.config.DatesConfig;
+import de.nihas101.midas.core.config.I18nConfig;
+import de.nihas101.midas.core.config.ShareholderConfig;
+import de.nihas101.midas.core.config.ThemeConfig;
+import de.nihas101.midas.core.config.TitleConfig;
 import de.nihas101.midas.core.config.UIConfig;
 import de.nihas101.midas.core.lock.ShareholderLock;
+import de.nihas101.midas.persistance.DbConfig;
+import de.nihas101.midas.vaadin.config.DesktopConfig;
+import de.nihas101.midas.vaadin.config.MidasConfig;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,9 +28,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.MessageSource;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.Locale;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -57,7 +67,7 @@ class EditBookingFormDialogTest {
         uiConfig = new UIConfig();
 
         when(shareholdersReader.shareholders()).thenReturn(shareholders);
-        when(shareholders.toList()).thenReturn(Collections.emptyList());
+        when(shareholders.toList()).thenReturn(emptyList());
 
         when(bookingToEdit.getDate()).thenReturn(LocalDate.now());
     }
@@ -122,7 +132,7 @@ class EditBookingFormDialogTest {
         when(shareholder.getFirstName()).thenReturn("Erika");
         when(shareholder.getLastName()).thenReturn("Musterfrau");
         when(shareholder.getDisplayId()).thenReturn(2);
-        when(shareholders.toList()).thenReturn(Collections.singletonList(shareholder));
+        when(shareholders.toList()).thenReturn(singletonList(shareholder));
         when(bookingToEdit.getShareholderId()).thenReturn(7);
 
         // Dialog must be created without errors even when a matching shareholder exists
@@ -158,7 +168,7 @@ class EditBookingFormDialogTest {
                 b -> {
 
                 },
-                uiConfig
+                config()
         );
 
         assertNotNull(dialog);
@@ -177,7 +187,22 @@ class EditBookingFormDialogTest {
                 b -> {
 
                 },
-                uiConfig
+                config()
+        );
+    }
+
+    private MidasConfig config() {
+        return new MidasConfig(
+                new TitleConfig(),
+                new ThemeConfig(),
+                uiConfig,
+                new I18nConfig(),
+                new DesktopConfig(),
+                new CleanupConfig(),
+                new DbConfig() {
+                },
+                new DatesConfig(),
+                new ShareholderConfig()
         );
     }
 }

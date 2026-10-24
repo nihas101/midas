@@ -19,12 +19,13 @@ import de.nihas101.midas.api.export.Export;
 import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.api.userconfig.UserConfigFactory;
 import de.nihas101.midas.api.userconfig.UserConfigService;
-import de.nihas101.midas.core.config.CoreConfig;
 import de.nihas101.midas.core.export.ExportFactory;
 import de.nihas101.midas.core.export.ExportRequest;
 import de.nihas101.midas.core.export.ExportViewName;
 import de.nihas101.midas.core.export.ExportViews;
 import de.nihas101.midas.core.shareholders.service.ShareholdersService;
+import de.nihas101.midas.vaadin.config.MidasConfig;
+import de.nihas101.midas.vaadin.ui.bookings.MidasDatePicker;
 import de.nihas101.midas.vaadin.ui.common.DatePickerI18nProvider;
 import de.nihas101.midas.vaadin.ui.common.DownloadTrigger;
 import de.nihas101.midas.vaadin.ui.common.MidasView;
@@ -38,6 +39,7 @@ import java.time.Year;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 @Slf4j
@@ -59,11 +61,10 @@ public class ExportView extends MidasView {
     private DatePicker endDatePicker;
     private CheckboxGroup<String> formatPicker;
     private Button exportButton;
-    private final VerticalLayout mainContent;
 
     public ExportView(
             final ShareholdersService shareholdersService,
-            final CoreConfig config,
+            final MidasConfig config,
             final MessageSource messageSource,
             final UserConfigService userConfigService,
             final MidasLocaleResolver midasLocaleResolver,
@@ -81,7 +82,7 @@ public class ExportView extends MidasView {
         this.messageSource = messageSource;
         this.exportFactory = exportFactory;
 
-        mainContent = new VerticalLayout();
+        final VerticalLayout mainContent = new VerticalLayout();
         mainContent.setSizeFull();
         mainContent.setSpacing(true);
         mainContent.setPadding(true);
@@ -198,19 +199,27 @@ public class ExportView extends MidasView {
         dateLayout.setWidthFull();
         dateLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
 
+        final Locale locale = getLocale();
         final DatePicker.DatePickerI18n i18n = DatePickerI18nProvider.datePickerI18n(
                 messageSource,
-                getLocale()
+                locale
         );
-        startDatePicker = new DatePicker(messageSource.getMessage("export.start-date.label", null, getLocale()));
-        startDatePicker.setLocale(getLocale());
-        startDatePicker.setI18n(i18n);
+        final MidasConfig midasConfig = getMidasConfig();
+        startDatePicker = new MidasDatePicker(
+                midasConfig,
+                locale,
+                i18n,
+                messageSource.getMessage("export.start-date.label", null, locale)
+        );
         startDatePicker.setValue(LocalDate.of(Year.now().getValue(), 1, 1));
         startDatePicker.addValueChangeListener(e -> updateExportButtonState());
 
-        endDatePicker = new DatePicker(messageSource.getMessage("export.end-date.label", null, getLocale()));
-        endDatePicker.setLocale(getLocale());
-        endDatePicker.setI18n(i18n);
+        endDatePicker = new MidasDatePicker(
+                midasConfig,
+                locale,
+                i18n,
+                messageSource.getMessage("export.end-date.label", null, locale)
+        );
         endDatePicker.setValue(LocalDate.of(Year.now().getValue(), 12, 31));
         endDatePicker.addValueChangeListener(e -> updateExportButtonState());
 

@@ -14,12 +14,12 @@ import org.springframework.stereotype.Service;
         matchIfMissing = true
 )
 @RequiredArgsConstructor
-public class ScheduledBookingsCleanup {
+public class ScheduledCleanup {
 
-    private final BookingsCleanup bookingsCleanup;
+    private final Cleanup cleanup;
 
     @Scheduled(fixedDelayString = "#{@midasConfig.cleanup.delayBetweenCleanups}")
     public void cleanUp() {
-        bookingsCleanup.cleanUp();
+        cleanup.cleanUp();
     }
 }
