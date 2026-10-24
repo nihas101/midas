@@ -28,8 +28,10 @@ import de.nihas101.midas.vaadin.ui.common.SaveButton;
 import de.nihas101.midas.vaadin.ui.main.Dependant;
 import org.springframework.context.MessageSource;
 
+import java.time.Year;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
 
@@ -152,9 +154,6 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
             final Locale locale,
             final Shareholder shareholder
     ) {
-        final boolean cannotDelete = config.getShareholder().getDeleteMode() == DeleteMode.RESTRICT
-                && bookingsReader.hasBookings(shareholder);
-
         final DeleteButton button = new DeleteButton(
                 messageSource.getMessage("global.delete", null, locale),
                 e -> {
@@ -163,18 +162,25 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
                 }
         );
 
-        if (cannotDelete) {
-            button.setEnabled(false);
-            // Disabled buttons do not receive mouse events, so the tooltip must be
-            // placed on an enabled wrapper element instead.
-            final String hasBookingsMessage = messageSource.getMessage(
-                    "shareholders.table.delete.error.has-bookings",
-                    null,
-                    locale
-            );
-            final Span wrapper = new Span(button);
-            Tooltip.forComponent(wrapper).setText(hasBookingsMessage);
-            return wrapper;
+        if (config.getShareholder().getDeleteMode() == DeleteMode.RESTRICT) {
+            final List<Year> bookingYears = bookingsReader.yearsWithBookings(shareholder);
+            if (!bookingYears.isEmpty()) {
+                button.setEnabled(false);
+                // Disabled buttons do not receive mouse events, so the tooltip must be
+                // placed on an enabled wrapper element instead.
+                final String hasBookingsMessage = messageSource.getMessage(
+                        "shareholders.table.delete.error.has-bookings",
+                        new Object[]{
+                                bookingYears.stream()
+                                        .map(String::valueOf)
+                                        .collect(Collectors.joining(", "))
+                        },
+                        locale
+                );
+                final Span wrapper = new Span(button);
+                Tooltip.forComponent(wrapper).setText(hasBookingsMessage);
+                return wrapper;
+            }
         }
 
         return button;

@@ -2,11 +2,11 @@ package de.nihas101.midas.core.bookings.service;
 
 import de.nihas101.midas.api.bookings.Booking;
 import de.nihas101.midas.api.bookings.Bookings;
-import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.commons.Source;
 import de.nihas101.midas.core.bookings.dto.DefaultBooking;
+import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
 import de.nihas101.midas.persistance.bookings.BookingEntity;
 import de.nihas101.midas.persistance.bookings.BookingsRepository;
 import de.nihas101.midas.persistance.openingbalance.OpeningBalanceRepository;
@@ -18,7 +18,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
@@ -27,6 +26,7 @@ import java.time.Year;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -174,37 +174,86 @@ class BookingsServiceTest {
     void hasBookings_nullOrNoId_returnsFalse() {
         assertFalse(bookingsService.hasBookings(null));
 
-        Shareholder noId = Mockito.mock(Shareholder.class);
-        when(noId.getId()).thenReturn(null);
-        assertFalse(bookingsService.hasBookings(noId));
+        assertFalse(bookingsService.hasBookings(new DefaultShareholder()));
     }
 
     @Test
     void hasBookings_shareholderNotFound_returnsFalse() {
-        Shareholder sh = Mockito.mock(Shareholder.class);
-        when(sh.getId()).thenReturn(99);
         when(shareholdersRepository.findById(99)).thenReturn(Optional.empty());
 
-        assertFalse(bookingsService.hasBookings(sh));
+        assertFalse(
+                bookingsService.hasBookings(
+                        new DefaultShareholder(99, null, null, null)
+                )
+        );
     }
 
     @Test
     void hasBookings_shareholderHasBookings_returnsTrue() {
-        Shareholder sh = Mockito.mock(Shareholder.class);
-        when(sh.getId()).thenReturn(1);
         when(shareholdersRepository.findById(1)).thenReturn(Optional.of(shareholder));
         when(bookingsRepository.existsByShareholder(shareholder)).thenReturn(true);
 
-        assertTrue(bookingsService.hasBookings(sh));
+        assertTrue(
+                bookingsService.hasBookings(
+                        new DefaultShareholder(1, null, null, null)
+                )
+        );
     }
 
     @Test
     void hasBookings_shareholderHasNoBookings_returnsFalse() {
-        Shareholder sh = Mockito.mock(Shareholder.class);
-        when(sh.getId()).thenReturn(1);
         when(shareholdersRepository.findById(1)).thenReturn(Optional.of(shareholder));
         when(bookingsRepository.existsByShareholder(shareholder)).thenReturn(false);
 
-        assertFalse(bookingsService.hasBookings(sh));
+        assertFalse(
+                bookingsService.hasBookings(
+                        new DefaultShareholder(1, null, null, null)
+                )
+        );
+    }
+
+    @Test
+    void yearsWithBookings_shareholderHasBookings_returnsYears() {
+        when(shareholdersRepository.findById(1)).thenReturn(Optional.of(shareholder));
+        when(bookingsRepository.findYearsWithBookingsByShareholder(shareholder)).thenReturn(List.of(2025, 2026));
+
+        assertEquals(
+                List.of(Year.of(2025), Year.of(2026)),
+                bookingsService.yearsWithBookings(
+                        new DefaultShareholder(1, null, null, null)
+                )
+        );
+    }
+
+    @Test
+    void yearsWithBookings_shareholderHasNoBookings_returnsEmptyList() {
+        when(shareholdersRepository.findById(1)).thenReturn(Optional.of(shareholder));
+        when(bookingsRepository.findYearsWithBookingsByShareholder(shareholder)).thenReturn(List.of());
+
+        assertEquals(
+                emptyList(),
+                bookingsService.yearsWithBookings(
+                        new DefaultShareholder(1, null, null, null)
+                )
+        );
+    }
+
+    @Test
+    void yearsWithBookings_nullShareholder_returnsEmptyList() {
+        assertEquals(
+                emptyList(),
+                bookingsService.yearsWithBookings(null)
+        );
+    }
+
+    @Test
+    void yearsWithBookings_noShareholderId_returnsEmptyList() {
+
+        assertEquals(
+                emptyList(),
+                bookingsService.yearsWithBookings(
+                        new DefaultShareholder(null, null, null, null)
+                )
+        );
     }
 }

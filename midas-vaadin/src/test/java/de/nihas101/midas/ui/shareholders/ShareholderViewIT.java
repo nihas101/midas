@@ -133,7 +133,7 @@ public class ShareholderViewIT extends AbstractKaribuTest {
             Assertions.assertFalse(deleteButton.isEnabled(), "Delete button should be disabled when shareholder has bookings");
 
             // Tooltip on the wrapper should explain why deletion is blocked
-            Assertions.assertEquals("This shareholder cannot be deleted because there are still bookings associated with this shareholder.", Tooltip.forComponent(deleteWrapper).getText());
+            Assertions.assertEquals("This shareholder cannot be deleted because bookings associated with this shareholder for 2026.", Tooltip.forComponent(deleteWrapper).getText());
 
             // Shareholder still exists in database
             Assertions.assertNotNull(shareholdersService.shareholder(savedSh.getId()), "Shareholder should not be deleted");

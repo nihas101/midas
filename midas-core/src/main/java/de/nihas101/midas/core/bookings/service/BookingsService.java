@@ -14,6 +14,7 @@ import de.nihas101.midas.persistance.openingbalance.OpeningBalanceRepository;
 import de.nihas101.midas.persistance.shareholders.ShareholderEntity;
 import de.nihas101.midas.persistance.shareholders.ShareholdersRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +22,11 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
 import java.util.List;
+import java.util.Objects;
 
+import static java.util.Collections.emptyList;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BookingsService implements BookingsWriter, BookingsReader {
@@ -89,6 +94,20 @@ public class BookingsService implements BookingsWriter, BookingsReader {
         return shareholdersRepository.findById(shareholder.getId())
                 .map(bookingsRepository::existsByShareholder)
                 .orElse(false);
+    }
+
+    @Override
+    public List<Year> yearsWithBookings(final Shareholder shareholder) {
+        if (shareholder == null || shareholder.getId() == null) {
+            return emptyList();
+        }
+        return shareholdersRepository.findById(shareholder.getId())
+                .map(bookingsRepository::findYearsWithBookingsByShareholder)
+                .map(years -> years.stream()
+                        .filter(Objects::nonNull)
+                        .map(Year::of)
+                        .toList())
+                .orElse(emptyList());
     }
 
     @Transactional

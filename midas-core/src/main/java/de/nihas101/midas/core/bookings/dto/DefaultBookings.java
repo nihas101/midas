@@ -7,7 +7,6 @@ import de.nihas101.midas.api.openingbalance.OpeningBalance;
 import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.collections4.list.UnmodifiableList;
 
 import java.time.Month;
 import java.util.List;
