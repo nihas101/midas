@@ -18,7 +18,7 @@ import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.api.shareholder.ShareholderFactory;
 import de.nihas101.midas.api.shareholder.ShareholdersReader;
 import de.nihas101.midas.api.shareholder.ShareholdersWriter;
-import de.nihas101.midas.core.config.CoreConfig;
+import de.nihas101.midas.vaadin.config.MidasConfig;
 import de.nihas101.midas.vaadin.ui.common.AddButton;
 import de.nihas101.midas.vaadin.ui.common.CancelButton;
 import de.nihas101.midas.vaadin.ui.common.DeleteButton;
@@ -38,14 +38,14 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
     private final ShareholdersReader shareholdersReader;
     private final ShareholdersWriter shareholdersWriter;
     private final BookingsReader bookingsReader;
-    private final CoreConfig config;
+    private final MidasConfig config;
     private final ShareholderFactory shareholderFactory;
 
     public ShareholdersTable(
             final ShareholdersReader shareholdersReader,
             final ShareholdersWriter shareholdersWriter,
             final BookingsReader bookingsReader,
-            final CoreConfig config,
+            final MidasConfig config,
             final MessageSource messageSource,
             final Locale locale,
             final ShareholderFactory shareholderFactory

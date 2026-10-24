@@ -12,8 +12,9 @@ import de.nihas101.midas.api.commenttemplate.CommentTemplatesReader;
 import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.api.shareholder.ShareholdersReader;
 import de.nihas101.midas.commons.BookingType;
-import de.nihas101.midas.core.config.UIConfig;
 import de.nihas101.midas.core.lock.ShareholderLock;
+import de.nihas101.midas.vaadin.config.MidasConfig;
+import de.nihas101.midas.vaadin.ui.common.DatePickerI18nProvider;
 import de.nihas101.midas.vaadin.ui.common.MoneyAmountField;
 import org.springframework.context.MessageSource;
 
@@ -22,7 +23,6 @@ import java.time.Year;
 import java.util.List;
 import java.util.Locale;
 
-import static de.nihas101.midas.vaadin.ui.common.DatePickerI18nProvider.datePickerI18n;
 import static java.util.Collections.emptyList;
 
 public class BookingFormDialog extends Dialog {
@@ -31,7 +31,7 @@ public class BookingFormDialog extends Dialog {
     protected final ComboBox<Shareholder> shareholderPicker;
     protected final DatePicker datePicker;
     protected final CommentTemplatesReader commentTemplatesReader;
-    protected final UIConfig config;
+    protected final MidasConfig config;
     protected final FormLayout formLayout;
     protected final ComboBox<String> commentPicker;
     protected final ComboBox<BookingType> typePicker;
@@ -40,17 +40,17 @@ public class BookingFormDialog extends Dialog {
     protected final Locale locale;
 
     public BookingFormDialog(
-            MessageSource messageSource,
-            String titleKey,
-            Locale locale,
-            ShareholdersReader shareholdersReader,
-            ShareholderLock shareholderLock,
-            CommentTemplatesReader commentTemplatesReader,
-            UIConfig config
+            final MessageSource messageSource,
+            final String titleKey,
+            final Locale locale,
+            final ShareholdersReader shareholdersReader,
+            final ShareholderLock shareholderLock,
+            final CommentTemplatesReader commentTemplatesReader,
+            final MidasConfig midasConfig
     ) {
         this.messageSource = messageSource;
         this.locale = locale;
-        this.config = config;
+        this.config = midasConfig;
         this.commentTemplatesReader = commentTemplatesReader;
         this.shareholderLock = shareholderLock;
 
@@ -60,7 +60,7 @@ public class BookingFormDialog extends Dialog {
 
         shareholderPicker = shareholderPicker(shareholdersReader, messageSource, locale);
 
-        datePicker = datePicker(messageSource, locale, shareholderLock);
+        datePicker = datePicker(messageSource, locale, shareholderLock, midasConfig);
         typePicker = typePicker(messageSource, locale);
         commentPicker = commentPicker(messageSource, locale);
         typePicker.addValueChangeListener(e -> updateCommentSuggestions(commentPicker, e.getValue()));
@@ -70,13 +70,49 @@ public class BookingFormDialog extends Dialog {
                 this.binder,
                 messageSource.getMessage("bookings.amount", null, locale),
                 locale,
-                this.config,
+                this.config.getUi(),
                 Booking::getAmount,
                 Booking::setAmount
         );
 
-        formLayout.add(shareholderPicker, datePicker, typePicker, commentPicker, moneyAmountField);
+        formLayout.add(shareholderPicker, this.datePicker, typePicker, commentPicker, moneyAmountField);
         add(formLayout);
+    }
+
+    private DatePicker datePicker(
+            final MessageSource messageSource,
+            final Locale locale,
+            final ShareholderLock shareholderLock,
+            final MidasConfig midasConfig
+    ) {
+        final DatePicker.DatePickerI18n i18n = DatePickerI18nProvider.datePickerI18n(messageSource, locale);
+        final String label = messageSource.getMessage("bookings.date", null, locale);
+        final DatePicker datePicker = new MidasDatePicker(
+                midasConfig,
+                locale,
+                i18n,
+                label
+        );
+        binder.forField(datePicker)
+                .asRequired()
+                .withValidator((Validator<LocalDate>) (value, context) -> {
+                    final Shareholder shareholder = shareholderPicker.getValue();
+                    final Year year = Year.of(datePicker.getValue().getYear());
+                    final boolean isLocked = shareholderLock != null && shareholderLock.isLocked(shareholder, year);
+                    return isLocked ? ValidationResult.error(
+                            messageSource.getMessage(
+                                    "bookings.lock.error.year-locked",
+                                    new Object[]{
+                                            year.toString(),
+                                            shareholder.getFirstName(),
+                                            shareholder.getLastName()
+                                    },
+                                    locale
+                            ))
+                            : ValidationResult.ok();
+                })
+                .bind(Booking::getDate, Booking::setDate);
+        return datePicker;
     }
 
     private ComboBox<Shareholder> shareholderPicker(
@@ -100,34 +136,6 @@ public class BookingFormDialog extends Dialog {
                         (b, s) -> b.setShareholderId(s != null ? s.getId() : null)
                 );
         return shareholderPicker;
-    }
-
-    private DatePicker datePicker(final MessageSource messageSource, final Locale locale, final ShareholderLock shareholderLock) {
-        // TODO: Extract into class, so we dont have to set the local everywhere
-        final DatePicker datePicker = new DatePicker(messageSource.getMessage("bookings.date", null, locale));
-        datePicker.setLocale(locale);
-        datePicker.setI18n(datePickerI18n(messageSource, locale));
-        datePicker.setRequired(true);
-        binder.forField(datePicker)
-                .asRequired()
-                .withValidator((Validator<LocalDate>) (value, context) -> {
-                    final Shareholder shareholder = shareholderPicker.getValue();
-                    final Year year = Year.of(this.datePicker.getValue().getYear());
-                    final boolean isLocked = shareholderLock != null && shareholderLock.isLocked(shareholder, year);
-                    return isLocked ? ValidationResult.error(
-                            messageSource.getMessage(
-                                    "bookings.lock.error.year-locked",
-                                    new Object[]{
-                                            year.toString(),
-                                            shareholder.getFirstName(),
-                                            shareholder.getLastName()
-                                    },
-                                    locale
-                            ))
-                            : ValidationResult.ok();
-                })
-                .bind(Booking::getDate, Booking::setDate);
-        return datePicker;
     }
 
     private ComboBox<String> commentPicker(

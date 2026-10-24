@@ -15,8 +15,8 @@ import de.nihas101.midas.api.commenttemplate.CommentTemplatesReader;
 import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.api.shareholder.ShareholdersReader;
 import de.nihas101.midas.commons.Source;
-import de.nihas101.midas.core.config.UIConfig;
 import de.nihas101.midas.core.lock.ShareholderLock;
+import de.nihas101.midas.vaadin.config.MidasConfig;
 import de.nihas101.midas.vaadin.ui.common.CancelButton;
 import de.nihas101.midas.vaadin.ui.common.SaveButton;
 import org.apache.commons.lang3.StringUtils;
@@ -45,7 +45,7 @@ public class CreateBookingFormDialog extends BookingFormDialog {
             final Shareholder initialShareholder,
             final ShareholderLock shareholderLock,
             final Consumer<Booking> onSave,
-            final UIConfig uiConfig,
+            final MidasConfig config,
             final BookingFactory bookingFactory
     ) {
         super(
@@ -55,7 +55,7 @@ public class CreateBookingFormDialog extends BookingFormDialog {
                 shareholdersReader,
                 shareholderLock,
                 commentTemplatesReader,
-                uiConfig
+                config
         );
         this.bookingsReader = bookingsReader;
         this.bookingsWriter = bookingsWriter;
@@ -63,7 +63,7 @@ public class CreateBookingFormDialog extends BookingFormDialog {
         this.bookingFactory = bookingFactory;
 
         this.addAnotherCheckbox = new Checkbox(messageSource.getMessage("bookings.add-another", null, locale));
-        addAnotherCheckbox.setValue(uiConfig.isDefaultAddAnotherCheckboxState());
+        addAnotherCheckbox.setValue(config.getUi().isDefaultAddAnotherCheckboxState());
         final HorizontalLayout checkBoxLayout = setupCheckBoxes();
         final HorizontalLayout buttonLayout = setupButtons(messageSource, locale);
         setupFooter(checkBoxLayout, buttonLayout);
@@ -81,8 +81,14 @@ public class CreateBookingFormDialog extends BookingFormDialog {
     }
 
     private HorizontalLayout setupButtons(final MessageSource messageSource, final Locale locale) {
-        final SaveButton saveButton = new SaveButton(messageSource.getMessage("bookings.dialog.save", null, locale), e -> save());
-        CancelButton cancelButton = new CancelButton(messageSource.getMessage("bookings.dialog.cancel", null, locale), e -> close());
+        final SaveButton saveButton = new SaveButton(
+                messageSource.getMessage("bookings.dialog.save", null, locale),
+                e -> save()
+        );
+        final CancelButton cancelButton = new CancelButton(
+                messageSource.getMessage("bookings.dialog.cancel", null, locale),
+                e -> close()
+        );
         final HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.add(saveButton, cancelButton);
         buttonLayout.setAlignItems(FlexComponent.Alignment.END);
@@ -165,5 +171,6 @@ public class CreateBookingFormDialog extends BookingFormDialog {
                 current.getDate()
         );
         binder.setBean(next);
+        commentPicker.setValue("");
     }
 }

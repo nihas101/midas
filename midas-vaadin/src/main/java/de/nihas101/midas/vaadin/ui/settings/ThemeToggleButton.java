@@ -3,12 +3,12 @@ package de.nihas101.midas.vaadin.ui.settings;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import de.nihas101.midas.api.userconfig.UserConfigService;
-import de.nihas101.midas.core.config.CoreConfig;
+import de.nihas101.midas.vaadin.config.MidasConfig;
 
 public class ThemeToggleButton extends Button {
 
     public ThemeToggleButton(
-            final CoreConfig config,
+            final MidasConfig config,
             final UserConfigService userConfigService
     ) {
         this.setVisible(!config.getUi().isHideThemeToggle());

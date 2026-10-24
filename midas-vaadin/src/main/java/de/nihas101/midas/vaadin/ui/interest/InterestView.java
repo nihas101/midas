@@ -37,7 +37,6 @@ import de.nihas101.midas.api.userconfig.UserConfigFactory;
 import de.nihas101.midas.api.userconfig.UserConfigService;
 import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.commons.Source;
-import de.nihas101.midas.core.config.CoreConfig;
 import de.nihas101.midas.core.export.ExportFactory;
 import de.nihas101.midas.core.export.ExportViewName;
 import de.nihas101.midas.core.interest.DefaultInterestCalculation;
@@ -45,6 +44,7 @@ import de.nihas101.midas.core.interest.dto.InterestRate;
 import de.nihas101.midas.core.interest.service.InterestRateService;
 import de.nihas101.midas.core.lock.ShareholderLock;
 import de.nihas101.midas.core.shareholders.service.ShareholdersService;
+import de.nihas101.midas.vaadin.config.MidasConfig;
 import de.nihas101.midas.vaadin.ui.common.DownloadTrigger;
 import de.nihas101.midas.vaadin.ui.common.Formatter;
 import de.nihas101.midas.vaadin.ui.common.GridHelper;
@@ -94,7 +94,6 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
     private final SelectionStorage selectionStorage;
 
     private PercentAmountField<OpeningBalance> interestRateField;
-    private HorizontalLayout actionRow;
     private Grid<InterestCalculationRow> interestCalculationGrid;
     private Checkbox updateInterestAutomaticallyToggle;
     private HeaderActionBar headerActionBar;
@@ -104,7 +103,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
             final ShareholdersService shareholdersService,
             final InterestBookingsService bookingsService,
             final InterestRateService interestRateService,
-            final CoreConfig config,
+            final MidasConfig config,
             final MessageSource messageSource,
             final UserConfigService userConfigService,
             final MidasLocaleResolver midasLocaleResolver,
@@ -161,7 +160,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
     private void setupHeader(final VerticalLayout content) {
         final Locale locale = getLocale();
 
-        actionRow = createHeaderActionRow(locale);
+        final HorizontalLayout actionRow = createHeaderActionRow(locale);
 
         final Class<InterestView> viewClass = InterestView.class;
         final Runnable onUpdate = this::recalculateInterestForInitialDisplay;

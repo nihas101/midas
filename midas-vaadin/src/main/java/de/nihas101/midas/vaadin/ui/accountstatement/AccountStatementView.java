@@ -43,11 +43,11 @@ import de.nihas101.midas.api.userconfig.UserConfigService;
 import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.core.accountstatement.service.RunningTotalAccountStatementService;
 import de.nihas101.midas.core.bookings.service.BookingsService;
-import de.nihas101.midas.core.config.CoreConfig;
 import de.nihas101.midas.core.export.ExportFactory;
 import de.nihas101.midas.core.export.ExportViewName;
 import de.nihas101.midas.core.lock.ShareholderLock;
 import de.nihas101.midas.core.shareholders.service.ShareholdersService;
+import de.nihas101.midas.vaadin.config.MidasConfig;
 import de.nihas101.midas.vaadin.ui.bookings.BookingsView;
 import de.nihas101.midas.vaadin.ui.common.AddButton;
 import de.nihas101.midas.vaadin.ui.common.DownloadTrigger;
@@ -109,7 +109,7 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
             final ShareholdersService shareholdersService,
             final AccountStatementService accountStatementService,
             final RunningTotalAccountStatementService runningTotalAccountStatementService,
-            final CoreConfig config,
+            final MidasConfig config,
             final MessageSource messageSource,
             final UserConfigService userConfigService,
             final MidasLocaleResolver midasLocaleResolver,

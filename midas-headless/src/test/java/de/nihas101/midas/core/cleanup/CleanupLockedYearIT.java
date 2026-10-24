@@ -7,12 +7,15 @@ import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.commons.Source;
 import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
+import de.nihas101.midas.persistance.accountstatements.AccountStatementOrdersRepository;
+import de.nihas101.midas.persistance.accountstatements.AccountStatementOverridesRepository;
 import de.nihas101.midas.persistance.bookings.BookingEntity;
 import de.nihas101.midas.persistance.bookings.BookingsRepository;
+import de.nihas101.midas.persistance.interest.InterestRateRepository;
 import de.nihas101.midas.persistance.lock.LockRepository;
+import de.nihas101.midas.persistance.openingbalance.OpeningBalanceRepository;
 import de.nihas101.midas.persistance.shareholders.ShareholderEntity;
 import de.nihas101.midas.persistance.shareholders.ShareholdersRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,10 +27,14 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.time.Year;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class BookingsCleanupLockedYearIT {
+class CleanupLockedYearIT {
 
     @Autowired
     private ShareholdersRepository shareholdersRepository;
@@ -37,6 +44,18 @@ class BookingsCleanupLockedYearIT {
 
     @Autowired
     private LockRepository lockRepository;
+
+    @Autowired
+    private AccountStatementOrdersRepository accountStatementOrdersRepository;
+
+    @Autowired
+    private AccountStatementOverridesRepository accountStatementOverridesRepository;
+
+    @Autowired
+    private InterestRateRepository interestRateRepository;
+
+    @Autowired
+    private OpeningBalanceRepository openingBalanceRepository;
 
     @Autowired
     private LockWriter lockWriter;
@@ -59,8 +78,8 @@ class BookingsCleanupLockedYearIT {
         // 2.2. Lock the year five years ago for this shareholder
         final Year fiveYearsAgo = Year.now().minusYears(5);
         lockWriter.lock(shareholder, fiveYearsAgo);
-        Assertions.assertTrue(lockReader.isLocked(shareholder, fiveYearsAgo), "The year 5 years ago should be locked before cleanup");
-        Assertions.assertTrue(lockReader.isLocked(shareholder, sevenYearsAgo), "The year 6 years ago should be locked before cleanup");
+        assertTrue(lockReader.isLocked(shareholder, fiveYearsAgo), "The year 5 years ago should be locked before cleanup");
+        assertTrue(lockReader.isLocked(shareholder, sevenYearsAgo), "The year 6 years ago should be locked before cleanup");
 
         // 3. Create a booking directly in the DB five years ago
         final LocalDate oldDate = LocalDate.of(fiveYearsAgo.getValue(), 3, 10);
@@ -76,32 +95,40 @@ class BookingsCleanupLockedYearIT {
         );
         bookingsRepository.save(oldBooking);
 
-        Assertions.assertFalse(bookingsRepository.findAll().isEmpty(), "Old booking should exist before cleanup");
+        assertFalse(bookingsRepository.findAll().isEmpty(), "Old booking should exist before cleanup");
 
         // 4. Configure cleanup with cutoff of 5 years
         final CleanupConfig cleanupConfig = new CleanupConfig();
         cleanupConfig.setCutoff(Period.ofYears(5));
         cleanupConfig.setLimit(-1);
 
-        final BookingsCleanup cleanup = new BookingsCleanup(bookingsRepository, lockRepository, cleanupConfig);
+        final Cleanup cleanup = new Cleanup(
+                bookingsRepository,
+                lockRepository,
+                accountStatementOrdersRepository,
+                accountStatementOverridesRepository,
+                interestRateRepository,
+                openingBalanceRepository,
+                cleanupConfig
+        );
 
         // 5. Execute cleanup and verify it succeeds despite the year being locked
-        Assertions.assertDoesNotThrow(cleanup::cleanUp);
+        assertDoesNotThrow(cleanup::cleanUp);
 
         // 6. Verify the booking was cleaned up
-        Assertions.assertTrue(
+        assertTrue(
                 bookingsRepository.findAll().stream().noneMatch(b -> b.getDate().equals(oldDate)),
                 "Old booking in locked year should have been cleaned up"
         );
 
         // 7. Verify the lock for five years ago was not removed
-        Assertions.assertTrue(
+        assertTrue(
                 lockReader.isLocked(shareholder, fiveYearsAgo),
                 "Lock five years ago should stay"
         );
 
         // 8. Verify the lock for seven years ago was removed
-        Assertions.assertFalse(
+        assertFalse(
                 lockReader.isLocked(shareholder, sevenYearsAgo),
                 "Lock six years ago should be removed"
         );
