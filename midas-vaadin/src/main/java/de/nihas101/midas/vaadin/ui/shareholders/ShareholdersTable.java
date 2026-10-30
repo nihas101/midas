@@ -163,7 +163,11 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
         );
 
         if (config.getShareholder().getDeleteMode() == DeleteMode.RESTRICT) {
-            final List<Year> bookingYears = bookingsReader.yearsWithBookings(shareholder);
+            final List<Year> bookingYears = bookingsReader.yearsWithBookings(
+                    shareholder,
+                    config.bookingActivePeriodStart(),
+                    config.bookingActivePeriodEnd()
+            );
             if (!bookingYears.isEmpty()) {
                 button.setEnabled(false);
                 // Disabled buttons do not receive mouse events, so the tooltip must be
@@ -206,7 +210,12 @@ public class ShareholdersTable extends Grid<Shareholder> implements Dependant {
         dialog.setConfirmText(messageSource.getMessage("global.delete", null, locale));
         dialog.setConfirmButtonTheme("error primary");
         dialog.addConfirmListener(event -> {
-            shareholdersWriter.delete(shareholder, config.getShareholder().getDeleteMode());
+            shareholdersWriter.delete(
+                    shareholder,
+                    config.getShareholder().getDeleteMode(),
+                    config.bookingActivePeriodStart(),
+                    config.bookingActivePeriodEnd()
+            );
             this.update();
         });
         return dialog;

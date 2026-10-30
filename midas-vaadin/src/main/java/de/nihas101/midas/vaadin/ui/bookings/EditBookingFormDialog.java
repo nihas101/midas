@@ -113,11 +113,7 @@ public class EditBookingFormDialog extends BookingFormDialog {
 
     private void persistAndClose(final Booking booking) {
         try {
-            if (booking.getId() == null) {
-                bookingsWriter.create(booking);
-            } else {
-                bookingsWriter.update(booking);
-            }
+            bookingsWriter.update(booking);
             onSave.accept(booking);
             close();
         } catch (Exception e) {

@@ -13,6 +13,8 @@ import de.nihas101.midas.persistance.shareholders.ShareholdersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+
 @Service
 @RequiredArgsConstructor
 public class ShareholdersService implements ShareholdersReader, ShareholdersWriter {
@@ -60,15 +62,30 @@ public class ShareholdersService implements ShareholdersReader, ShareholdersWrit
     }
 
     @Override
-    public void delete(final Shareholder shareholder, final DeleteMode deleteMode) {
+    public void delete(
+            final Shareholder shareholder,
+            final DeleteMode deleteMode,
+            final LocalDate start,
+            final LocalDate end
+    ) {
         if (shareholder == null) {
             throw new IllegalArgumentException("ShareholdersService#delete with shareholder == null");
         }
         final ShareholderEntity entity = DefaultShareholder.fromDto(shareholder);
-        if (deleteMode == DeleteMode.RESTRICT && bookingsRepository.existsByShareholder(entity)) {
+        if (notAllowedToDeleteShareholder(deleteMode, start, end, entity)) {
             throw new IllegalStateException("Shareholder " + shareholder.getId() + " cannot be safely deleted, due to associated bookings");
         }
 
         repository.delete(entity);
+    }
+
+    private boolean notAllowedToDeleteShareholder(
+            final DeleteMode deleteMode,
+            final LocalDate start,
+            final LocalDate end,
+            final ShareholderEntity entity
+    ) {
+        return deleteMode == DeleteMode.RESTRICT
+                && bookingsRepository.existsByShareholderAndDateBetween(entity, start, end);
     }
 }

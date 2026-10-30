@@ -15,7 +15,11 @@ import java.util.List;
 @Repository
 public interface BookingsRepository extends JpaRepository<BookingEntity, Integer> {
 
-    boolean existsByShareholder(final ShareholderEntity shareholder);
+    boolean existsByShareholderAndDateBetween(
+            final ShareholderEntity shareholder,
+            final LocalDate start,
+            final LocalDate end
+    );
 
     @Query(
             value = """
@@ -25,11 +29,17 @@ public interface BookingsRepository extends JpaRepository<BookingEntity, Integer
                     ) AS booking_year
                     FROM bookings b
                     WHERE shareholder_id = :#{#shareholder.id}
+                    AND :start < b.date
+                    AND b.date < :end
                     ORDER BY booking_year DESC
                     """,
             nativeQuery = true
     )
-    List<Integer> findYearsWithBookingsByShareholder(final ShareholderEntity shareholder);
+    List<Integer> findYearsWithBookingsByShareholder(
+            final ShareholderEntity shareholder,
+            final LocalDate start,
+            final LocalDate end
+    );
 
     List<BookingEntity> findByShareholderAndDateBetweenOrderByDateAsc(
             final ShareholderEntity shareholder,

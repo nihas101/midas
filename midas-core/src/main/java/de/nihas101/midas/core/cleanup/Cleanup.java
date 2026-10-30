@@ -9,7 +9,6 @@ import de.nihas101.midas.persistance.lock.LockRepository;
 import de.nihas101.midas.persistance.openingbalance.OpeningBalanceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -25,32 +24,11 @@ public class Cleanup {
     private final AccountStatementOverridesRepository accountStatementOverridesRepository;
     private final InterestRateRepository interestRateRepository;
     private final OpeningBalanceRepository openingBalanceRepository;
-    private final CleanupConfig cleanupConfig;
-
-    @Autowired
-    public Cleanup(
-            final BookingsRepository bookingsRepository,
-            final LockRepository lockRepository,
-            final AccountStatementOrdersRepository accountStatementOrdersRepository,
-            final AccountStatementOverridesRepository accountStatementOverridesRepository,
-            final InterestRateRepository interestRateRepository,
-            final OpeningBalanceRepository openingBalanceRepository,
-            final CoreConfig midasConfig
-    ) {
-        this(
-                bookingsRepository,
-                lockRepository,
-                accountStatementOrdersRepository,
-                accountStatementOverridesRepository,
-                interestRateRepository,
-                openingBalanceRepository,
-                midasConfig.getCleanup()
-        );
-    }
+    private final CoreConfig config;
 
     public void cleanUp() {
-        final LocalDate cutoff = LocalDate.now().minus(cleanupConfig.getCutoff());
-        final int limit = cleanupConfig.getLimit();
+        final LocalDate cutoff = config.cleanupStart();
+        final int limit = config.getCleanup().getLimit();
 
         final int deletedBookingsCount = deletedBookings(limit, cutoff);
         log.info("Removed {} bookings (limit: {}), because they were made before the cutoff ({})",

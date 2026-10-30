@@ -13,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,25 +33,25 @@ class ShareholdersServiceTest {
 
     @Test
     void shareholders() {
-        ShareholderEntity entity = new ShareholderEntity(1, 100, "Max", "Mustermann");
+        final ShareholderEntity entity = new ShareholderEntity(1, 100, "Max", "Mustermann");
         when(repository.findAll()).thenReturn(List.of(entity));
 
-        Shareholders result = service.shareholders();
+        final Shareholders result = service.shareholders();
 
         final List<Shareholder> shareholders = result.toList();
         assertEquals(1, shareholders.size());
-        Shareholder dto = shareholders.getFirst();
+        final Shareholder dto = shareholders.getFirst();
         assertEquals(1, dto.getId());
         assertEquals("Max", dto.getFirstName());
     }
 
     @Test
     void create_success() {
-        Shareholder dto = new DefaultShareholder(null, 0, "Max", "Mustermann");
+        final Shareholder dto = new DefaultShareholder(null, 0, "Max", "Mustermann");
 
         service.create(dto);
 
-        ArgumentCaptor<ShareholderEntity> captor = ArgumentCaptor.forClass(ShareholderEntity.class);
+        final ArgumentCaptor<ShareholderEntity> captor = ArgumentCaptor.forClass(ShareholderEntity.class);
         verify(repository).save(captor.capture());
         ShareholderEntity saved = captor.getValue();
         assertNull(saved.getId());
@@ -64,19 +65,19 @@ class ShareholdersServiceTest {
 
     @Test
     void create_withIdFails() {
-        Shareholder dto = new DefaultShareholder(1, 0, "Max", "Mustermann");
+        final Shareholder dto = new DefaultShareholder(1, 0, "Max", "Mustermann");
         assertThrows(IllegalArgumentException.class, () -> service.create(dto));
     }
 
     @Test
     void update_success() {
-        Shareholder dto = new DefaultShareholder(1, 100, "Max", "Mustermann");
+        final Shareholder dto = new DefaultShareholder(1, 100, "Max", "Mustermann");
 
         service.update(dto);
 
-        ArgumentCaptor<ShareholderEntity> captor = ArgumentCaptor.forClass(ShareholderEntity.class);
+        final ArgumentCaptor<ShareholderEntity> captor = ArgumentCaptor.forClass(ShareholderEntity.class);
         verify(repository).save(captor.capture());
-        ShareholderEntity saved = captor.getValue();
+        final ShareholderEntity saved = captor.getValue();
         assertEquals(1, saved.getId());
         assertEquals("Max", saved.getFirstName());
     }
@@ -88,23 +89,36 @@ class ShareholdersServiceTest {
 
     @Test
     void update_withoutIdFails() {
-        Shareholder dto = new DefaultShareholder(null, 0, "Max", "Mustermann");
+        final Shareholder dto = new DefaultShareholder(null, 0, "Max", "Mustermann");
         assertThrows(IllegalArgumentException.class, () -> service.update(dto));
     }
 
     @Test
     void delete() {
-        Shareholder dto = new DefaultShareholder(1, 100, "Max", "Mustermann");
+        final Shareholder dto = new DefaultShareholder(1, 100, "Max", "Mustermann");
 
-        service.delete(dto, DeleteMode.CASCADE);
+        service.delete(
+                dto,
+                DeleteMode.CASCADE,
+                LocalDate.of(2026, 1, 1),
+                LocalDate.of(2026, 12, 31)
+        );
 
-        ArgumentCaptor<ShareholderEntity> captor = ArgumentCaptor.forClass(ShareholderEntity.class);
+        final ArgumentCaptor<ShareholderEntity> captor = ArgumentCaptor.forClass(ShareholderEntity.class);
         verify(repository).delete(captor.capture());
         assertEquals(1, captor.getValue().getId());
     }
 
     @Test
     void delete_withNullFails() {
-        assertThrows(IllegalArgumentException.class, () -> service.delete(null, DeleteMode.CASCADE));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> service.delete(
+                        null,
+                        DeleteMode.CASCADE,
+                        LocalDate.of(2026, 1, 1),
+                        LocalDate.of(2026, 12, 31)
+                )
+        );
     }
 }

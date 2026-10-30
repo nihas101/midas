@@ -1,6 +1,7 @@
 package de.nihas101.midas.headless.config;
 
 import de.nihas101.midas.core.cleanup.CleanupConfig;
+import de.nihas101.midas.core.config.ActiveBookingPeriod;
 import de.nihas101.midas.core.config.DatesConfig;
 import de.nihas101.midas.core.config.I18nConfig;
 import de.nihas101.midas.core.config.ShareholderConfig;
@@ -13,6 +14,8 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.time.LocalDate;
 
 @Data
 @Configuration
@@ -27,18 +30,47 @@ public class MidasConfig {
     private DbConfig db;
     private DatesConfig dates;
     private ShareholderConfig shareholder;
+    private ActiveBookingPeriod activeBookingPeriod;
 
     public MidasConfig() {
+        this(new CleanupConfig());
+    }
+
+    private MidasConfig(final CleanupConfig cleanupConfig) {
         this(
                 new TitleConfig(),
                 new ThemeConfig(),
                 new UIConfig(),
                 new I18nConfig(),
-                new CleanupConfig(),
+                cleanupConfig,
                 new DbConfig() {
                 },
                 new DatesConfig(),
-                new ShareholderConfig()
+                new ShareholderConfig(),
+                new ActiveBookingPeriod(cleanupConfig)
+        );
+    }
+
+    public MidasConfig(
+            final TitleConfig title,
+            final ThemeConfig theme,
+            final UIConfig ui,
+            final I18nConfig i18n,
+            final CleanupConfig cleanup,
+            final DbConfig db,
+            final DatesConfig dates,
+            final ShareholderConfig shareholder
+    ) {
+        this(
+                title,
+                theme,
+                ui,
+                i18n,
+                cleanup,
+                db,
+                dates,
+                shareholder,
+                new ActiveBookingPeriod(cleanup)
         );
     }
 
@@ -80,5 +112,18 @@ public class MidasConfig {
     @Bean
     public ShareholderConfig shareholderConfig() {
         return shareholder;
+    }
+
+    @Bean
+    public ActiveBookingPeriod activeBookingPeriod() {
+        return activeBookingPeriod;
+    }
+
+    public LocalDate bookingActivePeriodStart() {
+        return activeBookingPeriod.start();
+    }
+
+    public LocalDate bookingActivePeriodEnd() {
+        return activeBookingPeriod.end();
     }
 }

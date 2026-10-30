@@ -17,7 +17,9 @@ public interface BookingsReader {
 
     boolean exists(final Booking booking);
 
-    List<Year> yearsWithBookings(final Shareholder shareholder);
-
-    boolean hasBookings(final Shareholder shareholder);
+    List<Year> yearsWithBookings(
+            final Shareholder shareholder,
+            final LocalDate start,
+            final LocalDate end
+    );
 }
