@@ -6,7 +6,15 @@ import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.commons.Source;
+import de.nihas101.midas.core.config.CoreConfig;
+import de.nihas101.midas.core.config.DatesConfig;
+import de.nihas101.midas.core.config.I18nConfig;
+import de.nihas101.midas.core.config.ShareholderConfig;
+import de.nihas101.midas.core.config.ThemeConfig;
+import de.nihas101.midas.core.config.TitleConfig;
+import de.nihas101.midas.core.config.UIConfig;
 import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
+import de.nihas101.midas.persistance.DbConfig;
 import de.nihas101.midas.persistance.accountstatements.AccountStatementOrdersRepository;
 import de.nihas101.midas.persistance.accountstatements.AccountStatementOverridesRepository;
 import de.nihas101.midas.persistance.bookings.BookingEntity;
@@ -98,9 +106,9 @@ class CleanupLockedYearIT {
         assertFalse(bookingsRepository.findAll().isEmpty(), "Old booking should exist before cleanup");
 
         // 4. Configure cleanup with cutoff of 5 years
-        final CleanupConfig cleanupConfig = new CleanupConfig();
-        cleanupConfig.setCutoff(Period.ofYears(5));
-        cleanupConfig.setLimit(-1);
+        final CoreConfig config = createConfig();
+        config.getCleanup().setCutoff(Period.ofYears(5));
+        config.getCleanup().setLimit(-1);
 
         final Cleanup cleanup = new Cleanup(
                 bookingsRepository,
@@ -109,7 +117,7 @@ class CleanupLockedYearIT {
                 accountStatementOverridesRepository,
                 interestRateRepository,
                 openingBalanceRepository,
-                cleanupConfig
+                config
         );
 
         // 5. Execute cleanup and verify it succeeds despite the year being locked
@@ -131,6 +139,20 @@ class CleanupLockedYearIT {
         assertFalse(
                 lockReader.isLocked(shareholder, sevenYearsAgo),
                 "Lock six years ago should be removed"
+        );
+    }
+
+    private static CoreConfig createConfig() {
+        return new CoreConfig(
+                new TitleConfig(),
+                new ThemeConfig(),
+                new UIConfig(),
+                new I18nConfig(),
+                new CleanupConfig(),
+                new DbConfig() {
+                },
+                new DatesConfig(),
+                new ShareholderConfig()
         );
     }
 }

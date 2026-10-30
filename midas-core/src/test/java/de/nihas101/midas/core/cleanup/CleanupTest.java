@@ -46,7 +46,7 @@ class CleanupTest {
 
     @Test
     void defaultCleanUp() {
-        final CleanupConfig config = new CleanupConfig();
+        final CoreConfig config = createConfig();
 
         final Cleanup cleanup = new Cleanup(
                 bookingsRepository,
@@ -118,9 +118,9 @@ class CleanupTest {
 
     @Test
     void cleanUpWithCustomCutoff() {
-        final CleanupConfig config = new CleanupConfig();
+        final CoreConfig config = createConfig();
         final Period cutoff = Period.ofDays(7);
-        config.setCutoff(cutoff);
+        config.getCleanup().setCutoff(cutoff);
 
         final Cleanup cleanup = new Cleanup(
                 bookingsRepository,
@@ -159,8 +159,8 @@ class CleanupTest {
 
     @Test
     void cleanUpWithoutLimit() {
-        final CleanupConfig config = new CleanupConfig();
-        config.setLimit(-1);
+        final CoreConfig config = createConfig();
+        config.getCleanup().setLimit(-1);
 
         final Cleanup cleanup = new Cleanup(
                 bookingsRepository,
@@ -191,6 +191,20 @@ class CleanupTest {
         );
         Mockito.verify(openingBalanceRepository, Mockito.times(1)).deleteOrphanedOpeningBalances(
                 expectedOrphanCutoff
+        );
+    }
+
+    private static CoreConfig createConfig() {
+        return new CoreConfig(
+                new TitleConfig(),
+                new ThemeConfig(),
+                new UIConfig(),
+                new I18nConfig(),
+                new CleanupConfig(),
+                new DbConfig() {
+                },
+                new DatesConfig(),
+                new ShareholderConfig()
         );
     }
 }

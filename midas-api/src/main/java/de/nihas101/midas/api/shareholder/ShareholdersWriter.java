@@ -3,6 +3,8 @@ package de.nihas101.midas.api.shareholder;
 import de.nihas101.midas.api.DeleteMode;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+
 @Transactional
 public interface ShareholdersWriter {
 
@@ -10,6 +12,11 @@ public interface ShareholdersWriter {
 
     void update(final Shareholder shareholder);
 
-    void delete(final Shareholder shareholder, final DeleteMode deleteMode);
+    void delete(
+            final Shareholder shareholder,
+            final DeleteMode deleteMode,
+            final LocalDate start,
+            final LocalDate end
+    );
 
 }

@@ -622,7 +622,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
     }
 
     private MoneyAmount getNextYearsOpening(final List<BookingRow> bookings) {
-        // TODO: This .getLast is a bad assumption, see comment in caller
+        // TODO: This .getLast is a bad assumption
         return bookings.isEmpty() ? MoneyAmount.ZERO : bookings.getLast().balance();
     }
 

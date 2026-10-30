@@ -3,7 +3,6 @@ package de.nihas101.midas.vaadin.ui.bookings;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import de.nihas101.midas.vaadin.config.MidasConfig;
 
-import java.time.LocalDate;
 import java.util.Locale;
 
 public class MidasDatePicker extends DatePicker {
@@ -16,8 +15,8 @@ public class MidasDatePicker extends DatePicker {
     ) {
         super(label);
         this.setLocale(locale);
-        this.setMin(LocalDate.now().minus(midasConfig.getCleanup().getCutoff()));
-        this.setMax(LocalDate.now().plusYears(1).withMonth(12).withDayOfMonth(31));
+        this.setMin(midasConfig.bookingActivePeriodStart());
+        this.setMax(midasConfig.bookingActivePeriodEnd());
         this.setI18n(i18n);
         this.setRequired(true);
     }

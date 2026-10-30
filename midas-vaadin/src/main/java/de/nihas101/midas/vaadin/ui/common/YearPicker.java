@@ -29,18 +29,6 @@ public class YearPicker extends ComboBox<Integer> {
     private YearPicker(
             final String label,
             final QueryParameter<?, Integer> queryParameter,
-            final MidasConfig midasConfig
-    ) {
-        this(
-                label,
-                queryParameter,
-                Math.max(1, midasConfig.getCleanup().getCutoff().getYears())
-        );
-    }
-
-    private YearPicker(
-            final String label,
-            final QueryParameter<?, Integer> queryParameter,
             final int maxRange
     ) {
         this(

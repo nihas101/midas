@@ -147,13 +147,8 @@ public class CreateBookingFormDialog extends BookingFormDialog {
 
     private void persistAndClose(final Booking booking) {
         try {
-            if (booking.getId() == null) {
-                bookingsWriter.create(booking);
-            } else {
-                bookingsWriter.update(booking);
-            }
+            bookingsWriter.create(booking);
             onSave.accept(booking);
-
             if (addAnotherCheckbox.getValue()) {
                 resetForm();
             } else {

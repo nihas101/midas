@@ -28,11 +28,9 @@ import java.util.Optional;
 
 import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -171,89 +169,69 @@ class BookingsServiceTest {
     }
 
     @Test
-    void hasBookings_nullOrNoId_returnsFalse() {
-        assertFalse(bookingsService.hasBookings(null));
-
-        assertFalse(bookingsService.hasBookings(new DefaultShareholder()));
-    }
-
-    @Test
-    void hasBookings_shareholderNotFound_returnsFalse() {
-        when(shareholdersRepository.findById(99)).thenReturn(Optional.empty());
-
-        assertFalse(
-                bookingsService.hasBookings(
-                        new DefaultShareholder(99, null, null, null)
-                )
-        );
-    }
-
-    @Test
-    void hasBookings_shareholderHasBookings_returnsTrue() {
-        when(shareholdersRepository.findById(1)).thenReturn(Optional.of(shareholder));
-        when(bookingsRepository.existsByShareholder(shareholder)).thenReturn(true);
-
-        assertTrue(
-                bookingsService.hasBookings(
-                        new DefaultShareholder(1, null, null, null)
-                )
-        );
-    }
-
-    @Test
-    void hasBookings_shareholderHasNoBookings_returnsFalse() {
-        when(shareholdersRepository.findById(1)).thenReturn(Optional.of(shareholder));
-        when(bookingsRepository.existsByShareholder(shareholder)).thenReturn(false);
-
-        assertFalse(
-                bookingsService.hasBookings(
-                        new DefaultShareholder(1, null, null, null)
-                )
-        );
-    }
-
-    @Test
     void yearsWithBookings_shareholderHasBookings_returnsYears() {
+        final LocalDate start = LocalDate.of(2000, 1, 1);
+        final LocalDate end = LocalDate.of(2030, 1, 1);
         when(shareholdersRepository.findById(1)).thenReturn(Optional.of(shareholder));
-        when(bookingsRepository.findYearsWithBookingsByShareholder(shareholder)).thenReturn(List.of(2025, 2026));
+        when(bookingsRepository.findYearsWithBookingsByShareholder(
+                shareholder,
+                start,
+                end
+        )).thenReturn(List.of(2025, 2026));
+
+        final List<Year> actual = bookingsService.yearsWithBookings(
+                new DefaultShareholder(1, null, null, null),
+                start,
+                end
+        );
 
         assertEquals(
-                List.of(Year.of(2025), Year.of(2026)),
-                bookingsService.yearsWithBookings(
-                        new DefaultShareholder(1, null, null, null)
-                )
+                List.of(
+                        Year.of(2025),
+                        Year.of(2026)
+                ),
+                actual
         );
     }
 
     @Test
     void yearsWithBookings_shareholderHasNoBookings_returnsEmptyList() {
+        final LocalDate start = LocalDate.of(2000, 1, 1);
+        final LocalDate end = LocalDate.of(2030, 1, 1);
         when(shareholdersRepository.findById(1)).thenReturn(Optional.of(shareholder));
-        when(bookingsRepository.findYearsWithBookingsByShareholder(shareholder)).thenReturn(List.of());
+        when(bookingsRepository.findYearsWithBookingsByShareholder(shareholder, start, end)).thenReturn(List.of());
 
-        assertEquals(
-                emptyList(),
-                bookingsService.yearsWithBookings(
-                        new DefaultShareholder(1, null, null, null)
-                )
+        final List<Year> actual = bookingsService.yearsWithBookings(
+                new DefaultShareholder(1, null, null, null),
+                start,
+                end
         );
+
+        assertEquals(emptyList(), actual);
     }
 
     @Test
     void yearsWithBookings_nullShareholder_returnsEmptyList() {
+        final LocalDate start = LocalDate.of(2000, 1, 1);
+        final LocalDate end = LocalDate.of(2030, 1, 1);
+
         assertEquals(
                 emptyList(),
-                bookingsService.yearsWithBookings(null)
+                bookingsService.yearsWithBookings(null, start, end)
         );
     }
 
     @Test
     void yearsWithBookings_noShareholderId_returnsEmptyList() {
+        final LocalDate start = LocalDate.of(2000, 1, 1);
+        final LocalDate end = LocalDate.of(2030, 1, 1);
 
-        assertEquals(
-                emptyList(),
-                bookingsService.yearsWithBookings(
-                        new DefaultShareholder(null, null, null, null)
-                )
+        final List<Year> actual = bookingsService.yearsWithBookings(
+                new DefaultShareholder(null, null, null, null),
+                start,
+                end
         );
+
+        assertEquals(emptyList(), actual);
     }
 }

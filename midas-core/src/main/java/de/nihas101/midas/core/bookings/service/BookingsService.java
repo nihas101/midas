@@ -87,23 +87,20 @@ public class BookingsService implements BookingsWriter, BookingsReader {
     }
 
     @Override
-    public boolean hasBookings(final Shareholder shareholder) {
-        if (shareholder == null || shareholder.getId() == null) {
-            return false;
-        }
-        return shareholdersRepository.findById(shareholder.getId())
-                .map(bookingsRepository::existsByShareholder)
-                .orElse(false);
-    }
-
-    @Override
-    public List<Year> yearsWithBookings(final Shareholder shareholder) {
+    public List<Year> yearsWithBookings(
+            final Shareholder shareholder,
+            final LocalDate start,
+            final LocalDate end
+    ) {
         if (shareholder == null || shareholder.getId() == null) {
             return emptyList();
         }
         return shareholdersRepository.findById(shareholder.getId())
-                .map(bookingsRepository::findYearsWithBookingsByShareholder)
-                .map(years -> years.stream()
+                .map(sh -> bookingsRepository.findYearsWithBookingsByShareholder(
+                        sh,
+                        start,
+                        end
+                )).map(years -> years.stream()
                         .filter(Objects::nonNull)
                         .map(Year::of)
                         .toList())
