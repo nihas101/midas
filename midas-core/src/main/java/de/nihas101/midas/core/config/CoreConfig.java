@@ -61,4 +61,12 @@ public class CoreConfig {
         return activeBookingPeriod.cleanupStart();
     }
 
+    public LocalDate bookingActivePeriodStart() {
+        return activeBookingPeriod.start();
+    }
+
+    public LocalDate bookingActivePeriodEnd() {
+        return activeBookingPeriod.end();
+    }
+
 }
