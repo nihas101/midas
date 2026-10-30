@@ -46,9 +46,10 @@ public class YearPicker extends ComboBox<Integer> {
         this(
                 label,
                 IntStream.rangeClosed(0, maxRange)
-                        .map(i -> LocalDate.now(ZoneId.systemDefault()).getYear() - i)
+                        .map(i -> LocalDate.now(ZoneId.systemDefault()).plusYears(1).getYear() - i)
                         .boxed()
-                        .toList(), queryParameter
+                        .toList(),
+                queryParameter
         );
     }
 
