@@ -24,7 +24,7 @@ public class ActiveBookingPeriod {
     public LocalDate end() {
         return LocalDate.now()
                 .plusYears(1)
-                .withDayOfMonth(31)
-                .withMonth(12);
+                .withMonth(12)
+                .withDayOfMonth(31);
     }
 }

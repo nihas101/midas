@@ -1,5 +1,6 @@
 package de.nihas101.midas.core.interest.dto;
 
+import de.nihas101.midas.api.interest.InterestRate;
 import de.nihas101.midas.persistance.interest.InterestRateEntity;
 import de.nihas101.midas.persistance.shareholders.ShareholderEntity;
 import lombok.AllArgsConstructor;
@@ -11,13 +12,15 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Year;
 
+import static java.math.BigDecimal.valueOf;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class InterestRate {
+public class DefaultInterestRate implements InterestRate {
 
-    private static final BigDecimal MULTIPLIER = BigDecimal.valueOf(100);
+    private static final BigDecimal MULTIPLIER = valueOf(100);
 
     private Integer id;
     private Integer shareholderId;
@@ -29,7 +32,7 @@ public class InterestRate {
             return null;
         }
 
-        return new InterestRate(
+        return new DefaultInterestRate(
                 interestRateEntity.getId(),
                 interestRateEntity.getShareholder().getId(),
                 scaleDownFromDatabase(interestRateEntity),
@@ -42,7 +45,7 @@ public class InterestRate {
                 interestRate.getId(),
                 shareholder,
                 interestRate.getYear().atDay(1),
-                interestRate.toEntity()
+                toEntity(interestRate)
         );
     }
 
@@ -52,8 +55,8 @@ public class InterestRate {
                 .divide(MULTIPLIER, RoundingMode.HALF_UP);
     }
 
-    public Long toEntity() {
-        return interestRate.multiply(MULTIPLIER)
+    private static Long toEntity(final InterestRate interestRate) {
+        return interestRate.getInterestRate().multiply(MULTIPLIER)
                 .longValue();
     }
 }

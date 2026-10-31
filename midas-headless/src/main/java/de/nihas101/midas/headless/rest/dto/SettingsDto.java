@@ -12,6 +12,6 @@ import java.util.Locale;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SettingsDto {
-    private String theme;
+    private String theme; // TODO: Turn into enum
     private Locale locale;
 }

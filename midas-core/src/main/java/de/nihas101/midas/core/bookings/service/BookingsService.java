@@ -36,6 +36,13 @@ public class BookingsService implements BookingsWriter, BookingsReader {
     private final OpeningBalanceRepository openingBalanceRepository;
 
     @Override
+    public Booking bookingForId(final Integer id) {
+        return bookingsRepository.findById(id)
+                .map(DefaultBooking::fromEntity)
+                .orElseThrow(() -> new IllegalArgumentException("Unknown booking ID: " + id));
+    }
+
+    @Override
     public Bookings bookingsForShareholderAndYear(final Integer shareholderId, final Year year) {
         return bookingsForShareholderAndDates(
                 shareholderId,
@@ -109,31 +116,37 @@ public class BookingsService implements BookingsWriter, BookingsReader {
 
     @Transactional
     @Override
-    public void create(final Booking booking) {
+    public Booking create(final Booking booking) {
         if (booking.getId() != null) {
             throw new IllegalArgumentException("BookingService#create with booking.getId() != null");
         }
-        upsertEntity(booking);
+        return upsertEntity(booking);
     }
 
     @Transactional
     @Override
-    public void update(final Booking booking) {
+    public Booking update(final Booking booking) {
         if (booking.getId() == null) {
             throw new IllegalArgumentException("BookingService#udpate with booking.getId() == null");
         }
-
-        upsertEntity(booking);
+        return upsertEntity(booking);
     }
 
-    private void upsertEntity(final Booking booking) {
-        ShareholderEntity shareholder = shareholdersRepository.findById(booking.getShareholderId())
+    private Booking upsertEntity(final Booking booking) {
+        final ShareholderEntity shareholder = shareholdersRepository.findById(booking.getShareholderId())
                 .orElseThrow(() -> new IllegalArgumentException("Shareholder not found"));
-        bookingsRepository.save(DefaultBooking.fromDto(booking, shareholder));
+        return DefaultBooking.fromEntity(
+                bookingsRepository.save(
+                        DefaultBooking.fromDto(
+                                booking,
+                                shareholder
+                        )
+                )
+        );
     }
 
     public void delete(final Booking booking) {
-        ShareholderEntity shareholder = shareholdersRepository.findById(booking.getShareholderId())
+        final ShareholderEntity shareholder = shareholdersRepository.findById(booking.getShareholderId())
                 .orElseThrow(() -> new IllegalArgumentException("Shareholder not found"));
         bookingsRepository.delete(DefaultBooking.fromDto(booking, shareholder));
     }

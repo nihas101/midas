@@ -1,20 +1,26 @@
 package de.nihas101.midas.headless.rest;
 
 import de.nihas101.midas.api.bookings.Bookings;
+import de.nihas101.midas.api.bookings.BookingsReader;
 import de.nihas101.midas.api.openingbalance.OpeningBalance;
+import de.nihas101.midas.api.openingbalance.OpeningBalanceService;
 import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.commons.Source;
-import de.nihas101.midas.core.bookings.service.BookingsService;
-import de.nihas101.midas.core.interest.service.openingbalanceupdate.DefaultInterestUpdatingOpeningBalanceService;
-import de.nihas101.midas.core.lock.ShareholderLock;
 import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
 import de.nihas101.midas.headless.rest.dto.CarryOverRequest;
-import de.nihas101.midas.headless.rest.dto.OpeningBalanceDto;
+import de.nihas101.midas.headless.rest.dto.RequestOpeningBalance;
+import de.nihas101.midas.headless.rest.dto.ResponseOpeningBalance;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,57 +32,106 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/opening-balances")
 @RequiredArgsConstructor
+@Tag(name = "Opening Balances", description = "Controller for opening balances CRUD")
 public class OpeningBalancesController {
 
-    private final DefaultInterestUpdatingOpeningBalanceService openingBalanceService;
-    private final BookingsService bookingsService;
-    private final ShareholderLock shareholderLock;
+    private final OpeningBalanceService openingBalanceService;
+    private final BookingsReader bookingsReader;
 
+    @Operation(
+            summary = "Get the opening balance for a shareholder and year",
+            description = "Returns the opening balance for the specified shareholder and year."
+    )
     @GetMapping
-    public ResponseEntity<OpeningBalanceDto> getOpeningBalance(
+    public ResponseEntity<ResponseOpeningBalance> getOpeningBalance(
+            @NotNull
+            @Positive
             @RequestParam final Integer shareholderId,
+
+            @NotNull
+            @Positive
             @RequestParam final Integer year
     ) {
-        final OpeningBalance ob = openingBalanceService.openingBalance(shareholderId, Year.of(year));
-        if (ob == null) {
-            return ResponseEntity.notFound().build();
+        final OpeningBalance balance = openingBalanceService.openingBalance(shareholderId, Year.of(year));
+        if (balance == null) {
+            return ResponseEntity.notFound()
+                    .build();
         }
-        return ResponseEntity.ok(toDto(ob));
+        return ResponseEntity.ok(ResponseOpeningBalance.toDto(balance));
     }
 
+    @Operation(
+            summary = "Create an opening balance for a shareholder and year",
+            description = "Creates an opening balance for the specified shareholder and year."
+    )
     @PostMapping
-    public ResponseEntity<OpeningBalanceDto> setOpeningBalance(@RequestBody final OpeningBalanceDto dto) {
-        shareholderLock.assertUnlocked(dto.getShareholderId(), dto.getYear());
-
-        final OpeningBalance existing = openingBalanceService.openingBalance(dto.getShareholderId(), dto.getYear());
-        final Source source = dto.getSource() != null ? dto.getSource() : Source.USER;
-        final DefaultOpeningBalance balance = new DefaultOpeningBalance(
-                existing != null ? existing.getId() : null,
-                dto.getShareholderId(),
-                dto.getOpeningBalance(),
-                dto.getYear(),
-                source
+    public ResponseEntity<ResponseOpeningBalance> createOpeningBalance(
+            @NotNull
+            @RequestBody final RequestOpeningBalance openingBalance
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                ResponseOpeningBalance.toDto(
+                        openingBalanceService.create(
+                                openingBalance.toDomain()
+                        )
+                )
         );
-
-        if (existing == null) {
-            openingBalanceService.create(balance);
-        } else {
-            openingBalanceService.update(balance);
-        }
-
-        final OpeningBalance saved = openingBalanceService.openingBalance(dto.getShareholderId(), dto.getYear());
-        return ResponseEntity.ok(toDto(saved));
     }
 
-    @PostMapping("/carry-over")
-    public ResponseEntity<?> carryOverToNextYear(@RequestBody final CarryOverRequest request) {
-        final Year nextYear = request.getFromYear().plusYears(1);
-        shareholderLock.assertUnlocked(request.getShareholderId(), nextYear);
+    @Operation(
+            summary = "Update an opening balance for a shareholder and year",
+            description = "Updates an opening balance for the specified shareholder and year."
+    )
+    @PutMapping("/{id}")
+    public ResponseEntity<ResponseOpeningBalance> updateOpeningBalance(
+            @NotNull
+            @Positive
+            @PathVariable final Integer id,
 
+            @NotNull
+            @RequestBody final RequestOpeningBalance openingBalance
+    ) {
+        return ResponseEntity.ok(
+                ResponseOpeningBalance.toDto(
+                        openingBalanceService.update(openingBalance.toDomain(id))
+                )
+        );
+    }
+
+    @Operation(
+            summary = "Check carry over status for a shareholder and year",
+            description = "Checks whether the closing balance of the given year is automatically carried over to next year."
+    )
+    @GetMapping("/carry-over")
+    public ResponseEntity<Map<String, Boolean>> getCarryOverStatus(
+            @NotNull
+            @Positive
+            @RequestParam final Integer shareholderId,
+
+            @NotNull
+            @Positive
+            @RequestParam final Integer fromYear
+    ) {
+        final Year nextYear = Year.of(fromYear).plusYears(1);
+        final OpeningBalance nextYearBalance = openingBalanceService.openingBalance(shareholderId, nextYear);
+        final boolean active = nextYearBalance != null && Source.SYSTEM.equals(nextYearBalance.getSource());
+        return ResponseEntity.ok(Map.of("active", active));
+    }
+
+    @Operation(
+            summary = "Carry over a closing balance to next year",
+            description = "Toggles whether or not the closing balance of this year should be carried over as opening balance in the next year."
+    )
+    @PostMapping("/carry-over")
+    public ResponseEntity<?> carryOverToNextYear(
+            @NotNull
+            @RequestBody final CarryOverRequest request
+    ) {
+        final Year nextYear = request.getFromYear().plusYears(1);
         final OpeningBalance nextYearBalance = openingBalanceService.openingBalance(request.getShareholderId(), nextYear);
 
         // If toggling carry over off (active == false)
-        if (Boolean.FALSE.equals(request.getActive())) {
+        if (!request.isActive()) {
             if (nextYearBalance != null) {
                 final DefaultOpeningBalance userBalance = new DefaultOpeningBalance(
                         nextYearBalance.getId(),
@@ -86,19 +141,14 @@ public class OpeningBalancesController {
                         Source.USER
                 );
                 openingBalanceService.update(userBalance);
-                return ResponseEntity.ok(toDto(openingBalanceService.openingBalance(request.getShareholderId(), nextYear)));
+                return ResponseEntity.ok(
+                        ResponseOpeningBalance.toDto(
+                                openingBalanceService.openingBalance(request.getShareholderId(), nextYear)
+                        )
+                );
             }
-            return ResponseEntity.ok().build();
-        }
-
-        // Calculate closing balance of fromYear
-        final Bookings bookings = bookingsService.bookingsForShareholderAndYear(request.getShareholderId(), request.getFromYear());
-        MoneyAmount closingBalance = MoneyAmount.ZERO;
-        if (bookings.openingBalance() != null && bookings.openingBalance().getOpeningBalance() != null) {
-            closingBalance = closingBalance.plus(bookings.openingBalance().getOpeningBalance());
-        }
-        for (var b : bookings.filter(x -> true).bookings()) {
-            closingBalance = closingBalance.plus(b.getAmount());
+            return ResponseEntity.ok()
+                    .build();
         }
 
         // Check if next year already has an opening balance and overwrite wasn't forced
@@ -110,31 +160,47 @@ public class OpeningBalancesController {
                     ));
         }
 
-        final DefaultOpeningBalance newNextYearBalance = new DefaultOpeningBalance(
+        final OpeningBalance newNextYearBalance = new DefaultOpeningBalance(
                 nextYearBalance != null ? nextYearBalance.getId() : null,
                 request.getShareholderId(),
-                closingBalance,
+                calculateClosingBalance(
+                        request.getShareholderId(),
+                        request.getFromYear()
+                ),
                 nextYear,
                 Source.SYSTEM
         );
 
-        if (nextYearBalance == null) {
-            openingBalanceService.create(newNextYearBalance);
-        } else {
-            openingBalanceService.update(newNextYearBalance);
-        }
-
-        final OpeningBalance saved = openingBalanceService.openingBalance(request.getShareholderId(), nextYear);
-        return ResponseEntity.ok(toDto(saved));
+        return ResponseEntity.ok(
+                ResponseOpeningBalance.toDto(
+                        upsertOpeningBalance(nextYearBalance, newNextYearBalance)
+                )
+        );
     }
 
-    private OpeningBalanceDto toDto(final OpeningBalance ob) {
-        return OpeningBalanceDto.builder()
-                .id(ob.getId())
-                .shareholderId(ob.getShareholderId())
-                .openingBalance(ob.getOpeningBalance())
-                .year(ob.getYear())
-                .source(ob.getSource())
-                .build();
+    private MoneyAmount calculateClosingBalance(final Integer shareholderId, final Year year) {
+        final Bookings bookings = bookingsReader.bookingsForShareholderAndYear(shareholderId, year);
+        MoneyAmount closingBalance = MoneyAmount.ZERO;
+        final OpeningBalance openingBalance = bookings.openingBalance();
+        if (openingBalance != null && openingBalance.getOpeningBalance() != null) {
+            closingBalance = closingBalance.plus(openingBalance.getOpeningBalance());
+        }
+
+        return bookings.reduce(
+                closingBalance,
+                (balance, booking) -> balance.plus(booking.getAmount()),
+                MoneyAmount::plus
+        );
+    }
+
+    private OpeningBalance upsertOpeningBalance(
+            final OpeningBalance existing,
+            final OpeningBalance newBalance
+    ) {
+        if (existing == null) {
+            return openingBalanceService.create(newBalance);
+        } else {
+            return openingBalanceService.update(newBalance);
+        }
     }
 }

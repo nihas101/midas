@@ -12,6 +12,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookingsResponse {
-    private OpeningBalanceDto openingBalance;
-    private List<BookingDto> bookings;
+    private ResponseOpeningBalance openingBalance;
+    private List<ResponseBooking> bookings;
 }

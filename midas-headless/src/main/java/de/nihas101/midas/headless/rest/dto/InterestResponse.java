@@ -13,6 +13,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class InterestResponse {
-    private InterestRateDto interestRate;
+    private ResponseInterestRate interestRate;
     private List<InterestCalculationRow> rows;
 }

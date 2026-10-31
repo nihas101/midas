@@ -5,8 +5,8 @@ import org.springframework.transaction.annotation.Transactional;
 public interface OpeningBalanceWriter {
 
     @Transactional
-    void create(OpeningBalance openingBalance);
+    OpeningBalance create(OpeningBalance openingBalance);
 
     @Transactional
-    void update(OpeningBalance openingBalance);
+    OpeningBalance update(OpeningBalance openingBalance);
 }

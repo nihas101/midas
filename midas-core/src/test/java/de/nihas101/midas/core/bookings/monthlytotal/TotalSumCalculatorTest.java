@@ -17,6 +17,8 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
 import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,17 +28,13 @@ class TotalSumCalculatorTest {
     @ParameterizedTest
     @EnumSource(Month.class)
     void monthlyTotals_sumsAmountsByType(Month testMonth) {
-        // Arrange
-        Booking b1 = createBooking(BookingType.WITHDRAWAL, 1000L, testMonth, "A");
-        Booking b2 = createBooking(BookingType.WITHDRAWAL, 500L, testMonth, "B");
-        Booking b3 = createBooking(BookingType.INTEREST, 200L, testMonth, "C");
+        final Booking b1 = createBooking(BookingType.WITHDRAWAL, 1000L, testMonth, "A");
+        final Booking b2 = createBooking(BookingType.WITHDRAWAL, 500L, testMonth, "B");
+        final Booking b3 = createBooking(BookingType.INTEREST, 200L, testMonth, "C");
+        final DefaultMonthlyTotalSum.MonthlySumTotalCalculator calculator = createCalculator(new FilteredBookings(List.of(b1, b2, b3)));
 
-        DefaultMonthlyTotalSum.MonthlySumTotalCalculator calculator = createCalculator(new FilteredBookings(List.of(b1, b2, b3)));
+        final MonthlyTotal totals = new DefaultMonthlyTotalSum(calculator);
 
-        // Act
-        MonthlyTotal totals = new DefaultMonthlyTotalSum(calculator);
-
-        // Assert
         assertEquals(MoneyAmount.ofCents(1500L), totals.monthlyTotal(BookingType.WITHDRAWAL));
         assertEquals(MoneyAmount.ofCents(200L), totals.monthlyTotal(BookingType.INTEREST));
         assertEquals(MoneyAmount.ZERO, totals.monthlyTotal(BookingType.TAX_PREVIOUS_YEAR));
@@ -56,6 +54,15 @@ class TotalSumCalculatorTest {
             }
 
             @Override
+            public <T> T reduce(
+                    final T identity,
+                    final BiFunction<T, ? super Booking, T> accumulator,
+                    final BinaryOperator<T> combiner
+            ) {
+                return identity;
+            }
+
+            @Override
             public <T> List<T> map(final Function<Booking, T> mapper) {
                 return List.of();
             }
@@ -71,8 +78,8 @@ class TotalSumCalculatorTest {
             }
         };
 
-        DefaultMonthlyTotalSum.MonthlySumTotalCalculator calculator = new DefaultMonthlyTotalSum.MonthlySumTotalCalculator(mockBookings, Month.JANUARY);
-        Map<BookingType, MoneyAmount> totals = calculator.monthlyTotals();
+        final DefaultMonthlyTotalSum.MonthlySumTotalCalculator calculator = new DefaultMonthlyTotalSum.MonthlySumTotalCalculator(mockBookings, Month.JANUARY);
+        final Map<BookingType, MoneyAmount> totals = calculator.monthlyTotals();
 
         for (BookingType type : BookingType.values()) {
             assertEquals(MoneyAmount.ZERO, totals.get(type), "Type " + type + " should be ZERO");
@@ -81,16 +88,13 @@ class TotalSumCalculatorTest {
 
     @Test
     void monthlyTotals_handlesNegativeAmounts() {
-        // Arrange
-        Booking pos = createBooking(BookingType.WITHDRAWAL, 1000L, Month.MARCH, "Plus");
-        Booking neg = createBooking(BookingType.WITHDRAWAL, -400L, Month.MARCH, "Minus");
+        final Booking pos = createBooking(BookingType.WITHDRAWAL, 1000L, Month.MARCH, "Plus");
+        final Booking neg = createBooking(BookingType.WITHDRAWAL, -400L, Month.MARCH, "Minus");
 
         final DefaultMonthlyTotalSum.MonthlySumTotalCalculator calculator = createCalculator(new FilteredBookings(List.of(pos, neg)));
 
-        // Act
-        Map<BookingType, MoneyAmount> totals = calculator.monthlyTotals();
+        final Map<BookingType, MoneyAmount> totals = calculator.monthlyTotals();
 
-        // Assert
         assertEquals(MoneyAmount.ofCents(600L), totals.get(BookingType.WITHDRAWAL));
     }
 
@@ -98,7 +102,7 @@ class TotalSumCalculatorTest {
     void monthlyTotals_null() {
         final DefaultMonthlyTotalSum.MonthlySumTotalCalculator calculator = createCalculator(null);
 
-        Map<BookingType, MoneyAmount> totals = calculator.monthlyTotals();
+        final Map<BookingType, MoneyAmount> totals = calculator.monthlyTotals();
 
         assertEquals(MoneyAmount.ZERO, totals.get(BookingType.WITHDRAWAL));
     }
@@ -113,6 +117,15 @@ class TotalSumCalculatorTest {
             @Override
             public FilteredBookings bookingsInMonth(Month m) {
                 return m == Month.MARCH ? filteredBookings : new FilteredBookings(List.of());
+            }
+
+            @Override
+            public <T> T reduce(
+                    final T identity,
+                    final BiFunction<T, ? super Booking, T> accumulator,
+                    final BinaryOperator<T> combiner
+            ) {
+                return identity;
             }
 
             @Override

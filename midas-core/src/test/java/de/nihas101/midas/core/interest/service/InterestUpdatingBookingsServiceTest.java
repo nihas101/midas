@@ -29,6 +29,8 @@ import java.time.Month;
 import java.time.Year;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
 import java.util.function.Function;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -85,6 +87,15 @@ class InterestUpdatingBookingsServiceTest {
             @Override
             public FilteredBookings bookingsInMonth(final Month month) {
                 return new FilteredBookings(List.of(booking));
+            }
+
+            @Override
+            public <T> T reduce(
+                    final T identity,
+                    final BiFunction<T, ? super Booking, T> accumulator,
+                    final BinaryOperator<T> combiner
+            ) {
+                return identity;
             }
 
             @Override

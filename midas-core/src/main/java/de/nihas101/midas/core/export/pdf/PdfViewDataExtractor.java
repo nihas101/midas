@@ -6,15 +6,14 @@ import de.nihas101.midas.api.bookings.Bookings;
 import de.nihas101.midas.api.bookings.BookingsReader;
 import de.nihas101.midas.api.interest.InterestBookingsReader;
 import de.nihas101.midas.api.interest.InterestCalculation;
+import de.nihas101.midas.api.interest.InterestRate;
+import de.nihas101.midas.api.interest.InterestRateService;
 import de.nihas101.midas.api.interest.InterestRowService;
 import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.core.accountstatement.service.RunningTotalAccountStatementService;
 import de.nihas101.midas.core.bookings.row.BookingRowService;
-import de.nihas101.midas.core.export.ExportRequest;
 import de.nihas101.midas.core.export.ExportViewName;
 import de.nihas101.midas.core.interest.DefaultInterestCalculation;
-import de.nihas101.midas.core.interest.dto.InterestRate;
-import de.nihas101.midas.core.interest.service.InterestRateService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -30,7 +29,6 @@ import java.util.Locale;
 @RequiredArgsConstructor
 public class PdfViewDataExtractor {
 
-    private final ExportRequest request;
     private final MessageSource messageSource;
     private final Locale locale;
     private final BookingsReader bookingsReader;

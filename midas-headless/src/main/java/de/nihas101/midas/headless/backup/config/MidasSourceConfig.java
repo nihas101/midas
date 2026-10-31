@@ -14,13 +14,13 @@ import java.net.URISyntaxException;
 public class MidasSourceConfig {
 
     @Bean
-    @Profile("dev")
+    @Profile({"dev", "test"})
     public MidasSource developmentMidasSource() {
         return new DevelopmentMidasSource();
     }
 
     @Bean
-    @Profile("!dev")
+    @Profile({"!dev & !test"})
     public MidasSource productionMidasSource() throws URISyntaxException {
         return new ProductionMidasSource(MidasApplication.class);
     }

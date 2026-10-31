@@ -3,10 +3,13 @@ package de.nihas101.midas.headless.rest;
 import de.nihas101.midas.api.userconfig.UserConfig;
 import de.nihas101.midas.api.userconfig.UserConfigFactory;
 import de.nihas101.midas.api.userconfig.UserConfigService;
-import de.nihas101.midas.core.config.I18nConfig;
-import de.nihas101.midas.core.config.ThemeConfig;
 import de.nihas101.midas.core.userconfig.dto.DefaultUserConfig;
-import de.nihas101.midas.headless.rest.dto.SettingsDto;
+import de.nihas101.midas.headless.config.MidasConfig;
+import de.nihas101.midas.headless.rest.dto.RequestSettings;
+import de.nihas101.midas.headless.rest.dto.ResponseSettings;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,38 +23,46 @@ import java.util.Locale;
 @RestController
 @RequestMapping("/api/v1/settings")
 @RequiredArgsConstructor
+@Tag(name = "Settings", description = "Controller for settings CRUD")
 public class SettingsController {
 
     private final UserConfigService userConfigService;
     private final UserConfigFactory userConfigFactory;
-    private final ThemeConfig themeConfig;
-    private final I18nConfig i18nConfig;
+    private final MidasConfig config;
 
+    @Operation(
+            summary = "Get settings for the default user",
+            description = "Returns the settings for the default user."
+    )
     @GetMapping
-    public ResponseEntity<SettingsDto> getSettings() {
+    public ResponseEntity<ResponseSettings> getSettings() {
         final UserConfig userConfig = userConfigService.findByUserIdentifier(UserConfigService.DEFAULT_USER)
                 .orElseGet(() -> userConfigFactory.create(UserConfigService.DEFAULT_USER));
-        final String theme = resolveTheme(userConfig);
-        final Locale locale = resolveLocale(userConfig);
 
-        return ResponseEntity.ok(SettingsDto.builder()
+        final String theme = userConfig.getTheme() != null
+                ? userConfig.getTheme()
+                : config.getTheme().getDefaultTheme();
+        final String localeStr = userConfig.getLocale() != null && !userConfig.getLocale().isEmpty()
+                ? userConfig.getLocale()
+                : config.getI18n().getDefaultLocale();
+
+        final ResponseSettings dto = ResponseSettings.builder()
+                .id(userConfig.getId())
                 .theme(theme)
-                .locale(locale)
-                .build());
+                .locale(Locale.of(localeStr))
+                .build();
+        return ResponseEntity.ok(dto);
     }
 
-    private String resolveTheme(final UserConfig userConfig) {
-        final String theme = userConfig.getTheme();
-        return theme != null ? theme : themeConfig.getDefaultTheme();
-    }
-
-    private Locale resolveLocale(final UserConfig userConfig) {
-        final String locale = userConfig.getLocale();
-        return locale != null ? Locale.of(locale) : Locale.of(i18nConfig.getDefaultLocale());
-    }
-
+    @Operation(
+            summary = "Update settings for the default user",
+            description = "Updates the settings for the default user."
+    )
     @PutMapping
-    public ResponseEntity<SettingsDto> updateSettings(@RequestBody final SettingsDto dto) {
+    public ResponseEntity<ResponseSettings> updateSettings(
+            @NotNull
+            @RequestBody final RequestSettings dto
+    ) {
         final UserConfig existing = userConfigService.findByUserIdentifier(UserConfigService.DEFAULT_USER)
                 .orElseGet(() -> userConfigFactory.create(UserConfigService.DEFAULT_USER));
         final UserConfig updated = new DefaultUserConfig(
@@ -62,6 +73,12 @@ public class SettingsController {
         );
         userConfigService.save(updated);
 
-        return getSettings();
+        final ResponseSettings response = ResponseSettings.builder()
+                .id(updated.getId())
+                .theme(updated.getTheme())
+                .locale(updated.getLocale() != null ? Locale.of(updated.getLocale()) : null)
+                .build();
+
+        return ResponseEntity.ok(response);
     }
 }

@@ -7,8 +7,8 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.TextField;
 import de.nihas101.midas.api.accountstatement.AccountStatementRow;
+import de.nihas101.midas.api.accountstatement.AccountStatementService;
 import de.nihas101.midas.api.shareholder.Shareholder;
-import de.nihas101.midas.core.accountstatement.service.DefaultAccountStatementService;
 import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
 import de.nihas101.midas.core.shareholders.service.ShareholdersService;
 import de.nihas101.midas.persistance.accountstatements.AccountStatementOverrideEntity;
@@ -35,7 +35,7 @@ public class AccountStatementViewIT extends AbstractKaribuTest {
     private ShareholdersService shareholdersService;
 
     @Autowired
-    private DefaultAccountStatementService accountStatementService;
+    private AccountStatementService accountStatementService;
 
     @Autowired
     private AccountStatementOverridesRepository overridesRepository;

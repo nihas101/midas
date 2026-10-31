@@ -433,7 +433,11 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
         button.setTooltipText(messageSource.getMessage("account-statements.delete", null, getLocale()));
         button.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE, ButtonVariant.LUMO_ERROR);
         button.addClickListener(e -> {
-            accountStatementService.deleteOverride(row.displayId());
+            accountStatementService.deleteOverride(
+                    headerActionBar.getSelectedShareholder(),
+                    headerActionBar.getSelectedYear(),
+                    row.displayId()
+            );
             refreshContent();
         });
         button.setEnabled(!isLocked);
@@ -500,11 +504,10 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
     }
 
     private void toggleExclude(final AccountStatementRow row, final boolean hidden) {
-        accountStatementService.saveOverride(
+        accountStatementService.saveExclusion(
                 headerActionBar.getSelectedShareholder(),
                 headerActionBar.getSelectedYear(),
                 row.bookingType(),
-                row.amount(),
                 hidden
         );
         refreshContent();
@@ -576,11 +579,10 @@ public class AccountStatementView extends MidasView implements BeforeEnterObserv
                                 newAmount
                         );
                     } else {
-                        accountStatementService.saveOverride(
+                        accountStatementService.saveExclusion(
                                 headerActionBar.getSelectedShareholder(),
                                 headerActionBar.getSelectedYear(),
                                 row.bookingType(),
-                                newAmount,
                                 false
                         );
                     }

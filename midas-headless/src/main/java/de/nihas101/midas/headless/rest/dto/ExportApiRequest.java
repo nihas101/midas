@@ -1,6 +1,7 @@
 package de.nihas101.midas.headless.rest.dto;
 
 import de.nihas101.midas.core.export.ExportViewName;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,9 +16,15 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ExportApiRequest {
+
     private List<Integer> shareholderIds;
     private Set<ExportViewName> views;
+
+    @NotNull
     private LocalDate from;
+
+    @NotNull
     private LocalDate until;
+
     private Set<String> formats; // e.g. "pdf", "xlsx"
 }

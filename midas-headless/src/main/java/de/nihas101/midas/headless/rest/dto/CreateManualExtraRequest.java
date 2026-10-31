@@ -1,7 +1,7 @@
 package de.nihas101.midas.headless.rest.dto;
 
-import de.nihas101.midas.commons.MoneyAmount;
-import de.nihas101.midas.commons.Source;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,10 +13,17 @@ import java.time.Year;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class OpeningBalanceDto {
-    private Integer id;
+public class CreateManualExtraRequest {
+
+    @NotNull
+    @Positive
     private Integer shareholderId;
-    private MoneyAmount openingBalance;
+
+    @NotNull
     private Year year;
-    private Source source;
+
+    private String labelOverride;
+
+    @NotNull
+    private MoneyAmountDto amount;
 }

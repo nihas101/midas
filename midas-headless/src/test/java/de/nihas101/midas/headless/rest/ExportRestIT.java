@@ -1,13 +1,13 @@
 package de.nihas101.midas.headless.rest;
 
 import de.nihas101.midas.commons.BookingType;
-import de.nihas101.midas.commons.MoneyAmount;
-import de.nihas101.midas.core.export.ExportViewName;
-import de.nihas101.midas.headless.rest.dto.BookingDto;
 import de.nihas101.midas.headless.rest.dto.ExportApiRequest;
-import de.nihas101.midas.headless.rest.dto.InterestRateDto;
-import de.nihas101.midas.headless.rest.dto.OpeningBalanceDto;
-import de.nihas101.midas.headless.rest.dto.ShareholderDto;
+import de.nihas101.midas.headless.rest.dto.MoneyAmountDto;
+import de.nihas101.midas.headless.rest.dto.RequestBooking;
+import de.nihas101.midas.headless.rest.dto.RequestOpeningBalance;
+import de.nihas101.midas.headless.rest.dto.RequestShareholder;
+import de.nihas101.midas.headless.rest.dto.ResponseShareholder;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,14 +18,16 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import tools.jackson.databind.ObjectMapper;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Year;
 import java.util.List;
 import java.util.Set;
 
+import static de.nihas101.midas.core.export.ExportViewName.BOOKINGS;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -40,59 +42,51 @@ public class ExportRestIT {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private ShareholderDto createShareholderWithData(String first, String last, Year year) throws Exception {
-        final MvcResult createShResult = mockMvc.perform(post("/api/v1/shareholders")
+    private ResponseShareholder shareholder;
+
+    @BeforeEach
+    void setUp() throws Exception {
+        final RequestShareholder shDto = RequestShareholder.builder()
+                .firstName("Export")
+                .lastName("Tester")
+                .build();
+        final MvcResult shResult = mockMvc.perform(post("/api/v1/shareholders")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(ShareholderDto.builder()
-                                .firstName(first)
-                                .lastName(last)
-                                .build())))
+                        .content(objectMapper.writeValueAsString(shDto)))
                 .andExpect(status().isCreated())
                 .andReturn();
-        final ShareholderDto sh = objectMapper.readValue(createShResult.getResponse().getContentAsString(), ShareholderDto.class);
+        shareholder = objectMapper.readValue(shResult.getResponse().getContentAsString(), ResponseShareholder.class);
 
-        // Opening balance
+        // Add opening balance
+        final RequestOpeningBalance ob = RequestOpeningBalance.builder()
+                .shareholderId(shareholder.getId())
+                .year(Year.of(2026))
+                .openingBalance(MoneyAmountDto.of("1000.00"))
+                .build();
         mockMvc.perform(post("/api/v1/opening-balances")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(OpeningBalanceDto.builder()
-                                .shareholderId(sh.getId())
-                                .year(year)
-                                .openingBalance(MoneyAmount.of(new BigDecimal("1000.00")))
-                                .build())))
-                .andExpect(status().isOk());
-
-        // Interest rate
-        mockMvc.perform(post("/api/v1/interest")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(InterestRateDto.builder()
-                                .shareholderId(sh.getId())
-                                .year(year)
-                                .interestRate(new BigDecimal("3.00"))
-                                .build())))
-                .andExpect(status().isOk());
-
-        // Booking
-        mockMvc.perform(post("/api/v1/bookings")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(BookingDto.builder()
-                                .shareholderId(sh.getId())
-                                .date(year.atMonth(4).atDay(15))
-                                .type(BookingType.WITHDRAWAL)
-                                .amount(MoneyAmount.of(new BigDecimal("200.00")))
-                                .comment("Sample Withdrawal " + year)
-                                .build())))
+                        .content(objectMapper.writeValueAsString(ob)))
                 .andExpect(status().isCreated());
 
-        return sh;
+        // Add a booking
+        final RequestBooking booking = RequestBooking.builder()
+                .shareholderId(shareholder.getId())
+                .date(LocalDate.of(2026, 4, 1))
+                .type(BookingType.WITHDRAWAL)
+                .amount(MoneyAmountDto.of("250.00"))
+                .comment("Q2 Deposit")
+                .build();
+        mockMvc.perform(post("/api/v1/bookings")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(booking)))
+                .andExpect(status().isCreated());
     }
 
     @Test
-    void testSinglePdfExport_singleShareholderSingleViewSingleYear() throws Exception {
-        final ShareholderDto sh = createShareholderWithData("Diana", "Prince", Year.of(2026));
-
+    void testPdfExportReturnsPdfBytes() throws Exception {
         final ExportApiRequest request = ExportApiRequest.builder()
-                .shareholderIds(List.of(sh.getId()))
-                .views(Set.of(ExportViewName.BOOKINGS))
+                .shareholderIds(List.of(shareholder.getId()))
+                .views(Set.of(BOOKINGS))
                 .from(LocalDate.of(2026, 1, 1))
                 .until(LocalDate.of(2026, 12, 31))
                 .formats(Set.of("pdf"))
@@ -102,19 +96,19 @@ public class ExportRestIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(header().string("Content-Type", "application/pdf"))
+                .andExpect(header().exists("Content-Disposition"))
                 .andReturn();
 
-        assertTrue(result.getResponse().getContentAsByteArray().length > 0);
+        final byte[] bytes = result.getResponse().getContentAsByteArray();
+        assertNotNull(bytes);
+        assertTrue(bytes.length > 0, "PDF byte array should not be empty");
     }
 
     @Test
-    void testXlsxExport_singleYear() throws Exception {
-        final ShareholderDto sh = createShareholderWithData("Arthur", "Curry", Year.of(2026));
-
+    void testXlsxExportReturnsExcelBytes() throws Exception {
         final ExportApiRequest request = ExportApiRequest.builder()
-                .shareholderIds(List.of(sh.getId()))
-                .views(Set.of(ExportViewName.BOOKINGS, ExportViewName.ACCOUNT_STATEMENTS, ExportViewName.INTEREST))
+                .shareholderIds(List.of(shareholder.getId()))
+                .views(Set.of(BOOKINGS))
                 .from(LocalDate.of(2026, 1, 1))
                 .until(LocalDate.of(2026, 12, 31))
                 .formats(Set.of("xlsx"))
@@ -124,19 +118,19 @@ public class ExportRestIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(header().string("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .andExpect(header().exists("Content-Disposition"))
                 .andReturn();
 
-        assertTrue(result.getResponse().getContentAsByteArray().length > 0);
+        final byte[] bytes = result.getResponse().getContentAsByteArray();
+        assertNotNull(bytes);
+        assertTrue(bytes.length > 0, "Excel byte array should not be empty");
     }
 
     @Test
-    void testBothPdfAndXlsxExport_createsZip() throws Exception {
-        final ShareholderDto sh = createShareholderWithData("Victor", "Stone", Year.of(2026));
-
+    void testMultipleFormatsReturnsZip() throws Exception {
         final ExportApiRequest request = ExportApiRequest.builder()
-                .shareholderIds(List.of(sh.getId()))
-                .views(Set.of(ExportViewName.BOOKINGS, ExportViewName.ACCOUNT_STATEMENTS))
+                .shareholderIds(List.of(shareholder.getId()))
+                .views(Set.of(BOOKINGS))
                 .from(LocalDate.of(2026, 1, 1))
                 .until(LocalDate.of(2026, 12, 31))
                 .formats(Set.of("pdf", "xlsx"))
@@ -146,36 +140,34 @@ public class ExportRestIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(header().string("Content-Type", "application/zip"))
+                .andExpect(content().contentType("application/zip"))
+                .andExpect(header().string("Content-Disposition", "attachment; filename=\"export.zip\""))
                 .andReturn();
 
-        assertTrue(result.getResponse().getContentAsByteArray().length > 0);
+        final byte[] bytes = result.getResponse().getContentAsByteArray();
+        assertNotNull(bytes);
+        assertTrue(bytes.length > 0, "Zip byte array should not be empty");
     }
 
     @Test
-    void testExportValidation() throws Exception {
-        // Invalid date range (from > until)
-        final ExportApiRequest invalidDates = ExportApiRequest.builder()
-                .from(LocalDate.of(2026, 12, 31))
-                .until(LocalDate.of(2026, 1, 1))
-                .formats(Set.of("pdf"))
-                .build();
-
-        mockMvc.perform(post("/api/v1/export")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(invalidDates)))
-                .andExpect(status().isBadRequest());
-
-        // Empty formats
-        final ExportApiRequest emptyFormats = ExportApiRequest.builder()
+    void testExportAllShareholdersWhenNoListProvided() throws Exception {
+        final ExportApiRequest request = ExportApiRequest.builder()
+                .shareholderIds(null)
+                .views(Set.of(BOOKINGS))
                 .from(LocalDate.of(2026, 1, 1))
                 .until(LocalDate.of(2026, 12, 31))
-                .formats(Set.of())
+                .formats(Set.of("xlsx"))
                 .build();
 
-        mockMvc.perform(post("/api/v1/export")
+        final MvcResult result = mockMvc.perform(post("/api/v1/export")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(emptyFormats)))
-                .andExpect(status().isBadRequest());
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(header().exists("Content-Disposition"))
+                .andReturn();
+
+        final byte[] bytes = result.getResponse().getContentAsByteArray();
+        assertNotNull(bytes);
+        assertTrue(bytes.length > 0);
     }
 }

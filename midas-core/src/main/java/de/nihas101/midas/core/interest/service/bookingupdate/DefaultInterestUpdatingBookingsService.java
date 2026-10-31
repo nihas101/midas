@@ -44,15 +44,17 @@ public class DefaultInterestUpdatingBookingsService implements InterestUpdatingB
     }
 
     @Override
-    public void create(final Booking booking) {
-        delegate.create(booking);
+    public Booking create(final Booking booking) {
+        final Booking b = delegate.create(booking);
         updateInterest(booking);
+        return b;
     }
 
     @Override
-    public void update(final Booking booking) {
-        delegate.update(booking);
+    public Booking update(final Booking booking) {
+        final Booking b = delegate.update(booking);
         updateInterest(booking);
+        return b;
     }
 
     @Override

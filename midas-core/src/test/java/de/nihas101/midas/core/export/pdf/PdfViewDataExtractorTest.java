@@ -8,6 +8,8 @@ import de.nihas101.midas.api.bookings.BookingsReader;
 import de.nihas101.midas.api.bookings.FilteredBookings;
 import de.nihas101.midas.api.interest.InterestBookingsReader;
 import de.nihas101.midas.api.interest.InterestCalculationRow;
+import de.nihas101.midas.api.interest.InterestRate;
+import de.nihas101.midas.api.interest.InterestRateService;
 import de.nihas101.midas.api.interest.InterestRowService;
 import de.nihas101.midas.api.openingbalance.OpeningBalance;
 import de.nihas101.midas.api.shareholder.Shareholder;
@@ -17,8 +19,7 @@ import de.nihas101.midas.core.bookings.row.BookingRow;
 import de.nihas101.midas.core.bookings.row.BookingRowService;
 import de.nihas101.midas.core.export.ExportRequest;
 import de.nihas101.midas.core.export.ExportViewName;
-import de.nihas101.midas.core.interest.dto.InterestRate;
-import de.nihas101.midas.core.interest.service.InterestRateService;
+import de.nihas101.midas.core.interest.dto.DefaultInterestRate;
 import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -162,7 +163,7 @@ class PdfViewDataExtractorTest {
         when(emptyFiltered.bookings()).thenReturn(emptyList());
         when(bookings.bookingsInMonth(any())).thenReturn(emptyFiltered);
 
-        final InterestRate mockRate = mock(InterestRate.class);
+        final InterestRate mockRate = mock(DefaultInterestRate.class);
         when(interestRateService.interestRate(eq(1), any(Year.class))).thenReturn(mockRate);
         when(mockRate.getInterestRate()).thenReturn(BigDecimal.valueOf(5.0));
         when(interestBookingsReader.interestRelatedBookingsForShareholderAndYear(eq(1), any(Year.class)))

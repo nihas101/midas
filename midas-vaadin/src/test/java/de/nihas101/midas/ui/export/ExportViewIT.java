@@ -6,6 +6,7 @@ import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.html.Anchor;
+import de.nihas101.midas.api.interest.InterestRateService;
 import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.commons.MoneyAmount;
@@ -13,8 +14,7 @@ import de.nihas101.midas.commons.Source;
 import de.nihas101.midas.core.bookings.dto.DefaultBooking;
 import de.nihas101.midas.core.bookings.service.BookingsService;
 import de.nihas101.midas.core.export.ExportViewName;
-import de.nihas101.midas.core.interest.dto.InterestRate;
-import de.nihas101.midas.core.interest.service.InterestRateService;
+import de.nihas101.midas.core.interest.dto.DefaultInterestRate;
 import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
 import de.nihas101.midas.core.openingbalance.service.DefaultOpeningBalanceService;
 import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
@@ -73,7 +73,7 @@ public class ExportViewIT extends AbstractKaribuTest {
                         Source.USER)
         );
         interestRateService.create(
-                new InterestRate(
+                new DefaultInterestRate(
                         null,
                         shareholder.getId(),
                         new BigDecimal("3.00"),

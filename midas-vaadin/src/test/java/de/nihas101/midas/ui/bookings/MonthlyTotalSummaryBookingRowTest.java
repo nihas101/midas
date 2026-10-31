@@ -23,6 +23,8 @@ import java.time.Month;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -310,6 +312,15 @@ class MonthlyTotalSummaryBookingRowTest {
             @Override
             public FilteredBookings bookingsInMonth(final Month month) {
                 return new FilteredBookings(bookingsInMonth);
+            }
+
+            @Override
+            public <T> T reduce(
+                    final T identity,
+                    final BiFunction<T, ? super Booking, T> accumulator,
+                    final BinaryOperator<T> combiner
+            ) {
+                return identity;
             }
 
             @Override

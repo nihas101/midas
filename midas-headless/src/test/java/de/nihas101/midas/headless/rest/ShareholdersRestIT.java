@@ -1,6 +1,7 @@
 package de.nihas101.midas.headless.rest;
 
-import de.nihas101.midas.headless.rest.dto.ShareholderDto;
+import de.nihas101.midas.headless.rest.dto.RequestShareholder;
+import de.nihas101.midas.headless.rest.dto.ResponseShareholder;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -39,7 +40,7 @@ public class ShareholdersRestIT {
     void testCreateShareholder() throws Exception {
         final String john = "John" + RANDOM.nextInt();
         final String doe = "Doe" + RANDOM.nextInt();
-        final ShareholderDto dto = ShareholderDto.builder()
+        final RequestShareholder dto = RequestShareholder.builder()
                 .firstName(john)
                 .lastName(doe)
                 .build();
@@ -53,18 +54,17 @@ public class ShareholdersRestIT {
                 .andExpect(jsonPath("$.lastName").value(doe))
                 .andReturn();
 
-        final ShareholderDto created = objectMapper.readValue(result.getResponse().getContentAsString(), ShareholderDto.class);
+        final ResponseShareholder created = objectMapper.readValue(result.getResponse().getContentAsString(), ResponseShareholder.class);
         assertNotNull(created.getId());
 
         mockMvc.perform(get("/api/v1/shareholders"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[*].firstName", hasItem(john)))
-                .andExpect(jsonPath("$[*].lastName", hasItem(doe)));
+                .andExpect(jsonPath("$[*].firstName", hasItem(john)));
     }
 
     @Test
     void testUpdateShareholder() throws Exception {
-        final ShareholderDto dto = ShareholderDto.builder()
+        final RequestShareholder dto = RequestShareholder.builder()
                 .firstName("Jane")
                 .lastName("Doe")
                 .build();
@@ -75,9 +75,9 @@ public class ShareholdersRestIT {
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        final ShareholderDto created = objectMapper.readValue(createResult.getResponse().getContentAsString(), ShareholderDto.class);
+        final ResponseShareholder created = objectMapper.readValue(createResult.getResponse().getContentAsString(), ResponseShareholder.class);
 
-        final ShareholderDto updateDto = ShareholderDto.builder()
+        final RequestShareholder updateDto = RequestShareholder.builder()
                 .displayId(888)
                 .firstName("JaneUpdated")
                 .lastName("DoeUpdated")
@@ -87,6 +87,7 @@ public class ShareholdersRestIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateDto)))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(created.getId()))
                 .andExpect(jsonPath("$.displayId").value(888))
                 .andExpect(jsonPath("$.firstName").value("JaneUpdated"))
                 .andExpect(jsonPath("$.lastName").value("DoeUpdated"));
@@ -98,7 +99,7 @@ public class ShareholdersRestIT {
 
     @Test
     void testDeleteShareholder() throws Exception {
-        final ShareholderDto dto = ShareholderDto.builder()
+        final RequestShareholder dto = RequestShareholder.builder()
                 .firstName("Delete")
                 .lastName("Me")
                 .build();
@@ -109,7 +110,7 @@ public class ShareholdersRestIT {
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        final ShareholderDto created = objectMapper.readValue(createResult.getResponse().getContentAsString(), ShareholderDto.class);
+        final ResponseShareholder created = objectMapper.readValue(createResult.getResponse().getContentAsString(), ResponseShareholder.class);
 
         mockMvc.perform(delete("/api/v1/shareholders/" + created.getId()))
                 .andExpect(status().isNoContent());

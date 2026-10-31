@@ -2,8 +2,10 @@ package de.nihas101.midas.headless.rest;
 
 import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.headless.rest.dto.BookingsResponse;
-import de.nihas101.midas.headless.rest.dto.InterestRateDto;
-import de.nihas101.midas.headless.rest.dto.ShareholderDto;
+import de.nihas101.midas.headless.rest.dto.CreateInterestRate;
+import de.nihas101.midas.headless.rest.dto.RequestShareholder;
+import de.nihas101.midas.headless.rest.dto.RequestToggleAutomaticInterestBooking;
+import de.nihas101.midas.headless.rest.dto.ResponseShareholder;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -38,24 +40,23 @@ public class InterestRestIT {
 
     @Test
     void testInterestCalculationWorkflow() throws Exception {
-        // 1. Create shareholder
-        final ShareholderDto dto = ShareholderDto.builder()
-                .firstName("Charlie")
-                .lastName("Brown")
+        // 1. Create a shareholder
+        final RequestShareholder shDto = RequestShareholder.builder()
+                .firstName("Interest")
+                .lastName("Tester")
                 .build();
         final MvcResult createShResult = mockMvc.perform(post("/api/v1/shareholders")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
+                        .content(objectMapper.writeValueAsString(shDto)))
                 .andExpect(status().isCreated())
                 .andReturn();
-        final ShareholderDto sh = objectMapper.readValue(createShResult.getResponse().getContentAsString(), ShareholderDto.class);
+        final ResponseShareholder sh = objectMapper.readValue(createShResult.getResponse().getContentAsString(), ResponseShareholder.class);
 
-        // 2. Set interest rate with updateInterest: true
-        final InterestRateDto rateDto = InterestRateDto.builder()
+        // 2. Set interest rate
+        final CreateInterestRate rateDto = CreateInterestRate.builder()
                 .shareholderId(sh.getId())
                 .year(Year.of(2026))
                 .interestRate(new BigDecimal("2.50"))
-                .updateInterest(true)
                 .build();
 
         mockMvc.perform(post("/api/v1/interest")
@@ -70,7 +71,19 @@ public class InterestRestIT {
                 .andExpect(jsonPath("$.interestRate.interestRate").value(2.50))
                 .andExpect(jsonPath("$.rows", hasSize(greaterThan(0))));
 
-        // 4. Verify that an interest booking is generated
+        // 4. Toggle the generation of interest booking
+        final RequestToggleAutomaticInterestBooking toggleRequest = RequestToggleAutomaticInterestBooking.builder()
+                .shareholderId(sh.getId())
+                .year(Year.of(2026))
+                .toggleAutomaticBooking(true)
+                .build();
+
+        mockMvc.perform(post("/api/v1/interest/booking")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(toggleRequest)))
+                .andExpect(status().isOk());
+
+        // 5. Verify that an interest booking is generated
         final MvcResult bookingsResult = mockMvc.perform(get("/api/v1/bookings?shareholderId=" + sh.getId() + "&year=2026"))
                 .andExpect(status().isOk())
                 .andReturn();
