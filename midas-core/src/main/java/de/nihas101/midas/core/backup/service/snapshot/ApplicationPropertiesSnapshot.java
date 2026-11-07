@@ -1,5 +1,7 @@
 package de.nihas101.midas.core.backup.service.snapshot;
 
+import de.nihas101.midas.api.backup.MidasFileFactory;
+import de.nihas101.midas.api.backup.PropertiesLoader;
 import de.nihas101.midas.core.backup.service.MidasHeaderImageResolver;
 import de.nihas101.midas.core.backup.service.MidasTemplatesResolver;
 import de.nihas101.midas.persistance.backup.ArchiveWriter;

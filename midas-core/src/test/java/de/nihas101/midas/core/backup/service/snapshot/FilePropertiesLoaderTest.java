@@ -1,8 +1,8 @@
 package de.nihas101.midas.core.backup.service.snapshot;
 
-import org.junit.jupiter.api.Assertions;
+import de.nihas101.midas.api.backup.MidasFile;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import java.io.ByteArrayInputStream;
@@ -11,37 +11,40 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Properties;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 
 class FilePropertiesLoaderTest {
 
-    private final FilePropertiesLoader loader = new FilePropertiesLoader();
-
     @Test
     void loadWhenFileDoesNotExist() throws IOException {
-        try (MockedStatic<Files> files = Mockito.mockStatic(Files.class)) {
-            files.when(() -> Files.exists(any())).thenReturn(false);
+        final LocalMidasFileFactory localMidasFileFactory = Mockito.mock(LocalMidasFileFactory.class);
+        final FilePropertiesLoader loader = new FilePropertiesLoader(localMidasFileFactory);
+        final MidasFile file = Mockito.mock(MidasFile.class);
+        Mockito.when(localMidasFileFactory.create(any())).thenReturn(file);
+        Mockito.when(file.exists()).thenReturn(false);
 
-            Properties result = loader.load();
+        Properties result = loader.load();
 
-            Assertions.assertNull(result);
-        }
+        assertNull(result);
     }
 
     @Test
     void loadWhenFileExists() throws IOException {
+        final LocalMidasFileFactory localMidasFileFactory = Mockito.mock(LocalMidasFileFactory.class);
+        final FilePropertiesLoader loader = new FilePropertiesLoader(localMidasFileFactory);
+        final MidasFile file = Mockito.mock(MidasFile.class);
+        Mockito.when(localMidasFileFactory.create(any())).thenReturn(file);
+        Mockito.when(file.exists()).thenReturn(true);
         String content = "test.key=test.value\nspring.datasource.url=jdbc:sqlite:test.db";
-        // TODO: Introduce a new class for this in the FilePropertiesLoader to avoid having to do this and increase isolation
-        try (MockedStatic<Files> files = Mockito.mockStatic(Files.class)) {
-            files.when(() -> Files.exists(any())).thenReturn(true);
-            files.when(() -> Files.newInputStream(any()))
-                    .thenReturn(new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)));
+        Mockito.when(file.inputStream()).thenReturn(new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)));
 
-            Properties result = loader.load();
+        Properties result = loader.load();
 
-            Assertions.assertNotNull(result);
-            Assertions.assertEquals("test.value", result.getProperty("test.key"));
-            Assertions.assertEquals("jdbc:sqlite:test.db", result.getProperty("spring.datasource.url"));
-        }
+        assertNotNull(result);
+        assertEquals("test.value", result.getProperty("test.key"));
+        assertEquals("jdbc:sqlite:test.db", result.getProperty("spring.datasource.url"));
     }
 }
