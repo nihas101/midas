@@ -10,10 +10,17 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
+import static java.math.BigDecimal.ZERO;
+
 @Getter
 @EqualsAndHashCode
 @NoArgsConstructor
-@Schema(type = "number", format = "decimal", example = "100.50", description = "Money amount represented as decimal")
+@Schema(
+        type = "number",
+        format = "decimal",
+        example = "100.50",
+        description = "Money amount represented as decimal"
+)
 public class MoneyAmountDto {
 
     @JsonValue
@@ -21,7 +28,11 @@ public class MoneyAmountDto {
 
     @JsonCreator
     public MoneyAmountDto(final BigDecimal value) {
-        this.value = value != null ? value : BigDecimal.ZERO;
+        this.value = value != null ? value : ZERO;
+    }
+
+    public MoneyAmountDto(final MoneyAmount moneyAmount) {
+        this(moneyAmount != null ? moneyAmount.toBigDecimalForInput() : ZERO);
     }
 
     public static MoneyAmountDto of(final BigDecimal value) {
@@ -29,14 +40,14 @@ public class MoneyAmountDto {
     }
 
     public static MoneyAmountDto of(final String value) {
-        return new MoneyAmountDto(value != null ? new BigDecimal(value) : BigDecimal.ZERO);
+        return new MoneyAmountDto(value != null ? new BigDecimal(value) : ZERO);
     }
 
     public static MoneyAmountDto fromDomain(final MoneyAmount moneyAmount) {
         if (moneyAmount == null) {
             return null;
         }
-        return new MoneyAmountDto(moneyAmount.toBigDecimalForInput());
+        return new MoneyAmountDto(moneyAmount);
     }
 
     public MoneyAmount toDomain() {
@@ -45,6 +56,6 @@ public class MoneyAmountDto {
 
     @Override
     public String toString() {
-        return value != null ? value.toPlainString() : "0";
+        return value.toPlainString();
     }
 }

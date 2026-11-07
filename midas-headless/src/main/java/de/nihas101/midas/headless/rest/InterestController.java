@@ -8,21 +8,26 @@ import de.nihas101.midas.api.bookings.BookingsWriter;
 import de.nihas101.midas.api.interest.InterestBookingsReader;
 import de.nihas101.midas.api.interest.InterestCalculation;
 import de.nihas101.midas.api.interest.InterestCalculationFactory;
-import de.nihas101.midas.api.interest.InterestCalculationRow;
 import de.nihas101.midas.api.interest.InterestRate;
 import de.nihas101.midas.api.interest.InterestRateService;
 import de.nihas101.midas.api.interest.InterestRowService;
 import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.api.shareholder.ShareholdersReader;
 import de.nihas101.midas.commons.MoneyAmount;
+import de.nihas101.midas.commons.Source;
 import de.nihas101.midas.core.interest.dto.DefaultInterestRate;
 import de.nihas101.midas.headless.config.MidasConfig;
 import de.nihas101.midas.headless.rest.dto.CreateInterestRate;
 import de.nihas101.midas.headless.rest.dto.InterestResponse;
 import de.nihas101.midas.headless.rest.dto.RequestToggleAutomaticInterestBooking;
 import de.nihas101.midas.headless.rest.dto.ResponseInterestRate;
+import de.nihas101.midas.headless.rest.dto.ResponseInterestRow;
 import de.nihas101.midas.headless.rest.dto.UpdateInterestRate;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -64,6 +69,30 @@ public class InterestController {
             summary = "Get the calculated interest for a shareholder and year",
             description = "Returns the calculated interest and calculation rows for the specified shareholder and year."
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Success"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad Request",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Invalid request parameter\"}"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Internal Server Error\"}"
+                            )
+                    )
+            )
+    })
     @GetMapping
     public ResponseEntity<InterestResponse> getInterest(
             @NotNull
@@ -95,17 +124,21 @@ public class InterestController {
         );
 
         final Locale loc = locale != null ? locale : Locale.of(config.getI18n().getDefaultLocale());
-        final List<InterestCalculationRow> rows = interestRowService.generateRows(
-                y,
-                bookings,
-                interestRate.getInterestRate(),
-                calculation,
-                loc
-        );
+        final List<ResponseInterestRow> rows = interestRowService.generateRows(
+                        y,
+                        bookings,
+                        interestRate.getInterestRate(),
+                        calculation,
+                        loc
+                ).stream()
+                .map(ResponseInterestRow::toDto)
+                .toList();
 
         return ResponseEntity.ok(
                 InterestResponse.builder()
-                        .interestRate(ResponseInterestRate.toDto(interestRate))
+                        .shareholderId(interestRate.getShareholderId())
+                        .year(interestRate.getYear())
+                        .interestRate(interestRate.getInterestRate())
                         .rows(rows)
                         .build()
         );
@@ -115,6 +148,30 @@ public class InterestController {
             summary = "Create an interest rate for a shareholder and year",
             description = "Creates an interest rate for the specified shareholder and year."
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Success"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad Request",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Invalid request parameter\"}"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Internal Server Error\"}"
+                            )
+                    )
+            )
+    })
     @PostMapping
     public ResponseEntity<ResponseInterestRate> createInterestRate(
             @NotNull
@@ -131,10 +188,35 @@ public class InterestController {
         return ResponseEntity.ok(ResponseInterestRate.toDto(saved));
     }
 
+    // TODO: Also need a get endpoint for the toggle state + return the current state in this endpoint
     @Operation(
             summary = "Toggle the automatic generation of the interest booking",
             description = "Toggles weather or not a booking for the interest should be generated automatically."
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Success"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad Request",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Invalid request parameter\"}"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Internal Server Error\"}"
+                            )
+                    )
+            )
+    })
     @PostMapping("/booking")
     public ResponseEntity<Void> toggleInterestBooking(
             @NotNull
@@ -148,7 +230,7 @@ public class InterestController {
         final Shareholder shareholder = shareholdersReader.shareholder(shareholderId);
         final Booking booking = interestBookingsReader.systemGeneratedInterestForShareholderAndYear(shareholder, year);
         if (booking != null) {
-            booking.setSource(request.getSource());
+            booking.setSource(determineSource(request));
             bookingsWriter.update(booking);
         } else if (request.isToggleAutomaticBooking()) {
             final InterestRate interestRate = interestRateService.interestRate(shareholderId, year);
@@ -159,10 +241,42 @@ public class InterestController {
                 .build();
     }
 
+    private Source determineSource(final RequestToggleAutomaticInterestBooking request) {
+        return request.isToggleAutomaticBooking() ? Source.SYSTEM : Source.USER;
+    }
+
     @Operation(
             summary = "Update the interest rate of a shareholder and year",
             description = "Updates the interest rate of the specified shareholder and year."
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Success"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Interest rate not found"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad Request",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Invalid request parameter\"}"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Internal Server Error\"}"
+                            )
+                    )
+            )
+    })
     @PutMapping
     public ResponseEntity<ResponseInterestRate> updateInterestRate(
             @NotNull
@@ -171,8 +285,13 @@ public class InterestController {
         final Year year = updateRequest.getYear();
 
         final InterestRate existing = interestRateService.interestRate(updateRequest.getShareholderId(), year);
+        if (existing == null) {
+            return ResponseEntity.notFound()
+                    .build();
+        }
+
         final InterestRate toSave = new DefaultInterestRate(
-                existing != null ? existing.getId() : null,
+                existing.getId(),
                 updateRequest.getShareholderId(),
                 updateRequest.getInterestRate(),
                 year

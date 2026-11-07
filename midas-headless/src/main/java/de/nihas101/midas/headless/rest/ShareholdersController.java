@@ -9,6 +9,10 @@ import de.nihas101.midas.headless.config.MidasConfig;
 import de.nihas101.midas.headless.rest.dto.RequestShareholder;
 import de.nihas101.midas.headless.rest.dto.ResponseShareholder;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -40,6 +44,21 @@ public class ShareholdersController {
             summary = "Get all shareholders",
             description = "Returns a list of all shareholders."
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Success"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Internal Server Error\"}"
+                            )
+                    )
+            )
+    })
     @GetMapping
     public ResponseEntity<List<ResponseShareholder>> getAllShareholders() {
         final Shareholders shareholders = shareholdersService.shareholders();
@@ -54,6 +73,25 @@ public class ShareholdersController {
             summary = "Get a shareholder by ID",
             description = "Returns a shareholder by the specified ID."
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Success"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Shareholder not found"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Internal Server Error\"}"
+                            )
+                    )
+            )
+    })
     @GetMapping("/{id}")
     public ResponseEntity<ResponseShareholder> getShareholder(
             @NotNull
@@ -72,6 +110,29 @@ public class ShareholdersController {
             summary = "Create a new shareholder",
             description = "Creates a new shareholder."
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Shareholder created"),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad Request",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Invalid request parameter\"}"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Internal Server Error\"}"
+                            )
+                    )
+            )
+    })
     @PostMapping
     public ResponseEntity<ResponseShareholder> createShareholder(
             @NotNull
@@ -97,6 +158,34 @@ public class ShareholdersController {
             summary = "Update a shareholder",
             description = "Updates the info of the shareholder with the specified ID."
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Success"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad Request",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Invalid request parameter\"}"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Shareholder not found"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Internal Server Error\"}"
+                            )
+                    )
+            )
+    })
     @PutMapping("/{id}")
     public ResponseEntity<ResponseShareholder> updateShareholder(
             @NotNull
@@ -144,6 +233,25 @@ public class ShareholdersController {
             summary = "Delete a shareholder",
             description = "Deletes the shareholder with the specified ID."
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Shareholder deleted"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Shareholder not found"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Internal Server Error\"}"
+                            )
+                    )
+            )
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteShareholder(
             @NotNull

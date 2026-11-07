@@ -7,6 +7,10 @@ import de.nihas101.midas.api.shareholder.ShareholdersReader;
 import de.nihas101.midas.headless.rest.dto.RequestLock;
 import de.nihas101.midas.headless.rest.dto.ResponseLock;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -35,6 +39,25 @@ public class LocksController {
             summary = "Get the lock status of a shareholder and year",
             description = "Returns the lock status for the specified shareholder and year."
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Success"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Shareholder not found"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Internal Server Error\"}"
+                            )
+                    )
+            )
+    })
     @GetMapping
     public ResponseEntity<ResponseLock> getLockStatus(
             @NotNull
@@ -65,6 +88,34 @@ public class LocksController {
             summary = "Lock/Unlock a year for a shareholder",
             description = "Locks/Unlocks the lock for the specified shareholder and year."
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Success"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad Request — missing shareholderId or year",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Invalid request parameter\"}"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Shareholder not found"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Internal Server Error\"}"
+                            )
+                    )
+            )
+    })
     @PostMapping
     public ResponseEntity<Void> lockUnlock(
             @NotNull

@@ -9,6 +9,10 @@ import de.nihas101.midas.headless.rest.dto.RequestBooking;
 import de.nihas101.midas.headless.rest.dto.ResponseBooking;
 import de.nihas101.midas.headless.rest.dto.ResponseOpeningBalance;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -42,6 +46,30 @@ public class BookingsController {
             summary = "Get bookings for a shareholder and year",
             description = "Returns a list of bookings for the specified shareholder and year."
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Success"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad Request",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Invalid request parameter\"}"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Internal Server Error\"}"
+                            )
+                    )
+            )
+    })
     @GetMapping
     public ResponseEntity<BookingsResponse> getBookings(
             @NotNull
@@ -69,6 +97,39 @@ public class BookingsController {
             summary = "Create a booking for a shareholder and year",
             description = "Creates a booking for the specified shareholder and year."
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Booking created"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad Request",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Invalid request parameter\"}"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Duplicate booking detected",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"warning\":\"DUPLICATE_BOOKING\",\"message\":\"A booking with identical date, type, and comment already exists.\"}"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Internal Server Error\"}"
+                            )
+                    )
+            )
+    })
     @PostMapping
     public ResponseEntity<?> createBooking(
             @NotNull
@@ -98,6 +159,30 @@ public class BookingsController {
             summary = "Update a booking for a shareholder and year",
             description = "Updates a booking for the specified shareholder and year."
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Success"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad Request",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Invalid request parameter\"}"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Internal Server Error\"}"
+                            )
+                    )
+            )
+    })
     @PutMapping("/{id}")
     public ResponseEntity<ResponseBooking> updateBooking(
             @PathVariable
@@ -120,6 +205,25 @@ public class BookingsController {
             summary = "Delete a booking for a shareholder and year",
             description = "Deletes a booking for the specified shareholder and year."
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Booking deleted"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Booking not found"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Internal Server Error\"}"
+                            )
+                    )
+            )
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBooking(
             @NotNull

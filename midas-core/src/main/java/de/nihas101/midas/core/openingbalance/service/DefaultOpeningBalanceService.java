@@ -34,6 +34,15 @@ public class DefaultOpeningBalanceService implements OpeningBalanceService {
             throw new IllegalArgumentException("OpeningBalanceService#create with openingBalance.getId() != null");
         }
 
+        // TODO: Ensure this integrity on a database level
+        // TODO: This will require a migration to ensure we only have one opening balance for a year and shareholder, before we enforce it
+        final Integer shareholderId = openingBalance.getShareholderId();
+        final Year year = openingBalance.getYear();
+        final OpeningBalance existing = openingBalance(shareholderId, year);
+        if (existing != null) {
+            throw new IllegalStateException("Opening balance for shareholder with id " + shareholderId + " and year " + year + " already exists");
+        }
+
         return upsertEntity(openingBalance);
     }
 

@@ -14,6 +14,10 @@ import de.nihas101.midas.headless.rest.dto.ExcludeAccountStatementRequest;
 import de.nihas101.midas.headless.rest.dto.ManualStatementDto;
 import de.nihas101.midas.headless.rest.dto.MoneyAmountDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -49,6 +53,25 @@ public class AccountStatementsController {
             summary = "Get the account statements for the shareholder and year",
             description = "Returns the account statements for the specified shareholder and year."
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Success"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Shareholder not found"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Internal Server Error\"}"
+                            )
+                    )
+            )
+    })
     @GetMapping
     public ResponseEntity<AccountStatementsResponse> getAccountStatements(
             @RequestParam
@@ -81,21 +104,19 @@ public class AccountStatementsController {
 
         final List<AccountStatementDto> stmtDtos = sorted.stream()
                 .map(item -> AccountStatementDto.builder()
-                        .id(item.id())
                         .type(item.type())
                         .date(item.date())
                         .amount(MoneyAmountDto.fromDomain(item.amount()))
                         .label(item.label())
                         .hidden(item.isHidden())
                         .manualExtra(item.isManualExtra())
-                        .rowKey(item.rowKey())
                         .build())
                 .toList();
 
         final List<ManualStatementDto> overrideDtos = statements.manualStatements().stream()
                 .map(m -> ManualStatementDto.builder()
                         .id(m.id())
-                        .labelOverride(m.label())
+                        .label(m.label())
                         .amount(MoneyAmountDto.fromDomain(m.amount()))
                         .build())
                 .toList();
@@ -112,6 +133,30 @@ public class AccountStatementsController {
             summary = "Update the order of account statements for a shareholder and year",
             description = "Updates the order of account statements for the specified shareholder and year."
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Success"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad Request",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Invalid request parameter\"}"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Internal Server Error\"}"
+                            )
+                    )
+            )
+    })
     @PutMapping("/order")
     public ResponseEntity<Void> updateOrder(
             @NotNull
@@ -126,10 +171,39 @@ public class AccountStatementsController {
                 .build();
     }
 
+    // TODO: Also need a delete endpoint for manual extras + test this
     @Operation(
             summary = "Create a manual statement for a shareholder and year",
             description = "Creates a manual statement for the specified shareholder and year."
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Success"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad Request",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Invalid request parameter\"}"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Shareholder not found"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Internal Server Error\"}"
+                            )
+                    )
+            )
+    })
     @PostMapping("/manual-extra")
     public ResponseEntity<Void> createManualExtra(
             @NotNull
@@ -145,7 +219,7 @@ public class AccountStatementsController {
                 null,
                 shareholder,
                 request.getYear(),
-                request.getLabelOverride(),
+                request.getLabel(),
                 request.getAmount() != null ? request.getAmount().toDomain() : null
         );
         return ResponseEntity.ok()
@@ -156,6 +230,34 @@ public class AccountStatementsController {
             summary = "Set whether an account statement is excluded for a shareholder and year",
             description = "Sets whether an account statement is excluded for the specified shareholder and year."
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Success"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad Request",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Invalid request parameter\"}"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Shareholder not found"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Internal Server Error\"}"
+                            )
+                    )
+            )
+    })
     @PostMapping("/exclude")
     public ResponseEntity<Void> excludeStatement(
             @NotNull

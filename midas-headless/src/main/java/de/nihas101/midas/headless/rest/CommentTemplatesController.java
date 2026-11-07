@@ -6,6 +6,10 @@ import de.nihas101.midas.api.commenttemplate.CommentTemplatesWriter;
 import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.headless.rest.dto.RequestCommentTemplate;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -35,15 +39,57 @@ public class CommentTemplatesController {
             summary = "Get suggestions for the comment of a booking type",
             description = "Returns suggestions for the comment of a booking type."
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Success"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Internal Server Error\"}"
+                            )
+                    )
+            )
+    })
     @GetMapping("/suggestions")
     public List<String> getSuggestions(@RequestParam(required = false) final BookingType bookingType) {
         return commentTemplatesReader.getSuggestions(bookingType);
     }
 
+    // TODO: Get endpoint for listing all comment templates
+    // TODO: Test this controller
+
     @Operation(
             summary = "Save a comment template",
             description = "Saves a comment template."
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Success"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad Request",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Invalid request parameter\"}"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Internal Server Error\"}"
+                            )
+                    )
+            )
+    })
     @PostMapping
     public ResponseEntity<Void> saveTemplate(
             @NotNull
@@ -58,6 +104,25 @@ public class CommentTemplatesController {
             summary = "Delete a comment template",
             description = "Deletes a comment template."
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Success"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Comment template not found"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Internal Server Error\"}"
+                            )
+                    )
+            )
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTemplate(
             @NotNull

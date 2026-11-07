@@ -14,8 +14,8 @@ import java.util.Locale;
 @AllArgsConstructor
 public class ResponseSettings {
 
-    @Schema(description = "Settings ID", example = "1")
-    private Integer id;
+    @Schema(description = "User identifier", example = "default-user")
+    private String userIdentifier;
 
     @Schema(description = "UI Theme", example = "dark")
     private String theme;

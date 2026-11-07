@@ -24,8 +24,4 @@ public class RequestToggleAutomaticInterestBooking {
     private Year year;
 
     private boolean toggleAutomaticBooking;
-
-    public Source getSource() {
-        return toggleAutomaticBooking ? Source.SYSTEM : Source.USER;
-    }
 }

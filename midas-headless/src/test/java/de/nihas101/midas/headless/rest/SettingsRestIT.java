@@ -41,6 +41,7 @@ public class SettingsRestIT {
 
         // 2. Update settings
         final RequestSettings updateDto = RequestSettings.builder()
+                .userIdentifier("default-user")
                 .theme("dark")
                 .locale(Locale.GERMAN)
                 .build();
@@ -60,6 +61,7 @@ public class SettingsRestIT {
         // 3. Verify changes persist
         mockMvc.perform(get("/api/v1/settings"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.userIdentifier").value("default-user"))
                 .andExpect(jsonPath("$.theme").value("dark"))
                 .andExpect(jsonPath("$.locale").value("de"));
     }

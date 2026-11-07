@@ -3,6 +3,7 @@ package de.nihas101.midas.headless.rest.dto;
 import de.nihas101.midas.api.openingbalance.OpeningBalance;
 import de.nihas101.midas.commons.Source;
 import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
@@ -20,12 +21,15 @@ public class RequestOpeningBalance {
 
     @NotNull
     @Positive
+    @Schema(description = "ID of the associated shareholder", example = "1")
     private Integer shareholderId;
 
     @NotNull
+    @Schema(description = "Opening balance amount", example = "1000.00")
     private MoneyAmountDto openingBalance;
 
     @NotNull
+    @Schema(description = "Year of the opening balance", example = "2026")
     private Year year;
 
     public OpeningBalance toDomain(final Integer id) {

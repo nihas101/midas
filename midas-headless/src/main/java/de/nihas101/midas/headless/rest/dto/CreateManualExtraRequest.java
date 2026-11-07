@@ -22,7 +22,7 @@ public class CreateManualExtraRequest {
     @NotNull
     private Year year;
 
-    private String labelOverride;
+    private String label;
 
     @NotNull
     private MoneyAmountDto amount;

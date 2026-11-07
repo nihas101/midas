@@ -14,6 +14,9 @@ import java.util.Locale;
 @AllArgsConstructor
 public class RequestSettings {
 
+    @Schema(description = "User identifier", example = "default-user")
+    private String userIdentifier;
+
     @Schema(description = "UI Theme", example = "dark")
     private String theme;
 

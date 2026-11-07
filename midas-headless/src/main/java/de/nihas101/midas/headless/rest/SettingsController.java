@@ -8,6 +8,10 @@ import de.nihas101.midas.headless.config.MidasConfig;
 import de.nihas101.midas.headless.rest.dto.RequestSettings;
 import de.nihas101.midas.headless.rest.dto.ResponseSettings;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +38,21 @@ public class SettingsController {
             summary = "Get settings for the default user",
             description = "Returns the settings for the default user."
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Success"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Internal Server Error\"}"
+                            )
+                    )
+            )
+    })
     @GetMapping
     public ResponseEntity<ResponseSettings> getSettings() {
         final UserConfig userConfig = userConfigService.findByUserIdentifier(UserConfigService.DEFAULT_USER)
@@ -47,7 +66,7 @@ public class SettingsController {
                 : config.getI18n().getDefaultLocale();
 
         final ResponseSettings dto = ResponseSettings.builder()
-                .id(userConfig.getId())
+                .userIdentifier(userConfig.getUserIdentifier())
                 .theme(theme)
                 .locale(Locale.of(localeStr))
                 .build();
@@ -58,23 +77,47 @@ public class SettingsController {
             summary = "Update settings for the default user",
             description = "Updates the settings for the default user."
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Success"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad Request",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Invalid request parameter\"}"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Internal Server Error\"}"
+                            )
+                    )
+            )
+    })
     @PutMapping
     public ResponseEntity<ResponseSettings> updateSettings(
             @NotNull
-            @RequestBody final RequestSettings dto
+            @RequestBody final RequestSettings requestSettings
     ) {
-        final UserConfig existing = userConfigService.findByUserIdentifier(UserConfigService.DEFAULT_USER)
-                .orElseGet(() -> userConfigFactory.create(UserConfigService.DEFAULT_USER));
+        final UserConfig existing = userConfigService.findByUserIdentifier(requestSettings.getUserIdentifier())
+                .orElseGet(() -> userConfigFactory.create(requestSettings.getUserIdentifier()));
         final UserConfig updated = new DefaultUserConfig(
                 existing.getId(),
-                UserConfigService.DEFAULT_USER,
-                dto.getTheme() != null ? dto.getTheme() : existing.getTheme(),
-                dto.getLocale() != null ? dto.getLocale().toString() : existing.getLocale()
+                requestSettings.getUserIdentifier(),
+                requestSettings.getTheme() != null ? requestSettings.getTheme() : existing.getTheme(),
+                requestSettings.getLocale() != null ? requestSettings.getLocale().toString() : existing.getLocale()
         );
         userConfigService.save(updated);
 
         final ResponseSettings response = ResponseSettings.builder()
-                .id(updated.getId())
+                .userIdentifier(updated.getUserIdentifier())
                 .theme(updated.getTheme())
                 .locale(updated.getLocale() != null ? Locale.of(updated.getLocale()) : null)
                 .build();

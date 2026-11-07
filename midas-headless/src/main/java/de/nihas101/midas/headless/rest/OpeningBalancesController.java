@@ -11,6 +11,10 @@ import de.nihas101.midas.headless.rest.dto.CarryOverRequest;
 import de.nihas101.midas.headless.rest.dto.RequestOpeningBalance;
 import de.nihas101.midas.headless.rest.dto.ResponseOpeningBalance;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -42,6 +46,25 @@ public class OpeningBalancesController {
             summary = "Get the opening balance for a shareholder and year",
             description = "Returns the opening balance for the specified shareholder and year."
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Success"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Opening balance not found"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Internal Server Error\"}"
+                            )
+                    )
+            )
+    })
     @GetMapping
     public ResponseEntity<ResponseOpeningBalance> getOpeningBalance(
             @NotNull
@@ -64,6 +87,30 @@ public class OpeningBalancesController {
             summary = "Create an opening balance for a shareholder and year",
             description = "Creates an opening balance for the specified shareholder and year."
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Opening balance created"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad Request",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Invalid request parameter\"}"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Internal Server Error\"}"
+                            )
+                    )
+            )
+    })
     @PostMapping
     public ResponseEntity<ResponseOpeningBalance> createOpeningBalance(
             @NotNull
@@ -82,6 +129,30 @@ public class OpeningBalancesController {
             summary = "Update an opening balance for a shareholder and year",
             description = "Updates an opening balance for the specified shareholder and year."
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Success"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad Request",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Invalid request parameter\"}"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Internal Server Error\"}"
+                            )
+                    )
+            )
+    })
     @PutMapping("/{id}")
     public ResponseEntity<ResponseOpeningBalance> updateOpeningBalance(
             @NotNull
@@ -102,6 +173,21 @@ public class OpeningBalancesController {
             summary = "Check carry over status for a shareholder and year",
             description = "Checks whether the closing balance of the given year is automatically carried over to next year."
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Success"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Internal Server Error\"}"
+                            )
+                    )
+            )
+    })
     @GetMapping("/carry-over")
     public ResponseEntity<Map<String, Boolean>> getCarryOverStatus(
             @NotNull
@@ -122,6 +208,39 @@ public class OpeningBalancesController {
             summary = "Carry over a closing balance to next year",
             description = "Toggles whether or not the closing balance of this year should be carried over as opening balance in the next year."
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Success"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad Request",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Invalid request parameter\"}"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Opening balance for next year already exists",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"warning\":\"OPENING_BALANCE_EXISTS\",\"message\":\"Opening balance for 2027 already exists. Overwrite?\"}"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Internal Server Error\"}"
+                            )
+                    )
+            )
+    })
     @PostMapping("/carry-over")
     public ResponseEntity<?> carryOverToNextYear(
             @NotNull

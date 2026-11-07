@@ -34,6 +34,8 @@ public class DefaultInterestRateService implements InterestRateService {
             throw new IllegalArgumentException("InterestRateService#create with interestRate.getId() != null");
         }
 
+        // TODO: Check if an interest rate already exists
+
         return upsert(interestRate);
     }
 

@@ -68,7 +68,7 @@ public class InterestRestIT {
         // 3. Verify interest rate and rows
         mockMvc.perform(get("/api/v1/interest?shareholderId=" + sh.getId() + "&year=2026"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.interestRate.interestRate").value(2.50))
+                .andExpect(jsonPath("$.interestRate").value(2.50))
                 .andExpect(jsonPath("$.rows", hasSize(greaterThan(0))));
 
         // 4. Toggle the generation of interest booking

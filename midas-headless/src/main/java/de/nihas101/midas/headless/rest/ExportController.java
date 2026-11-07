@@ -11,10 +11,16 @@ import de.nihas101.midas.core.export.ExportViews;
 import de.nihas101.midas.headless.config.MidasConfig;
 import de.nihas101.midas.headless.rest.dto.ExportApiRequest;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,14 +42,45 @@ import java.util.stream.Collectors;
 @Tag(name = "Export", description = "Controller for exporting reports")
 public class ExportController {
 
+    private static final Logger log = LoggerFactory.getLogger(ExportController.class);
     private final ExportFactory exportFactory;
     private final ShareholdersReader shareholdersReader;
     private final MidasConfig config;
 
     @Operation(
             summary = "Trigger an export",
-            description = "Triggers an export of the specified views and formats."
+            description = "Triggers an export of the specified views in PDF or XLSX format. "
+                    + "Returns application/pdf (single PDF), application/vnd.openxmlformats-officedocument.spreadsheetml.sheet (Excel), "
+                    + "or application/zip when multiple PDFs (e.g. multiple shareholders or years) are generated."
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Export file",
+                    content = {
+                            @Content(mediaType = "application/pdf"),
+                            @Content(mediaType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
+                            @Content(mediaType = "application/zip")
+                    }),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad Request",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Invalid request parameter\"}"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Internal Server Error\"}"
+                            )
+                    )
+            )
+    })
     @PostMapping
     public void export(
             @NotNull
@@ -81,6 +118,7 @@ public class ExportController {
         }
     }
 
+    // TODO: Request the set of shareholders instead of post-filtering
     private List<Shareholder> shareholders(final List<Integer> shareholderIds) {
         if (shareholderIds == null || shareholderIds.isEmpty()) {
             return shareholdersReader.shareholders()
