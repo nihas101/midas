@@ -13,6 +13,7 @@ import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.commons.Source;
 import de.nihas101.midas.core.bookings.dto.DefaultBooking;
 import de.nihas101.midas.core.bookings.service.BookingsService;
+import de.nihas101.midas.api.export.ExportFormat;
 import de.nihas101.midas.core.export.ExportViewName;
 import de.nihas101.midas.core.interest.dto.DefaultInterestRate;
 import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
@@ -70,14 +71,16 @@ public class ExportViewIT extends AbstractKaribuTest {
                         shareholder.getId(),
                         MoneyAmount.of(new BigDecimal("1000.00")),
                         year1,
-                        Source.USER)
+                        Source.USER
+                )
         );
         interestRateService.create(
                 new DefaultInterestRate(
                         null,
                         shareholder.getId(),
                         new BigDecimal("3.00"),
-                        year1)
+                        year1
+                )
         );
         bookingsService.create(
                 new DefaultBooking(
@@ -109,7 +112,7 @@ public class ExportViewIT extends AbstractKaribuTest {
                 LocalDate.of(2026, 12, 31)
         );
 
-        selectFormats(Set.of("pdf"));
+        selectFormats(Set.of(ExportFormat.PDF));
 
         triggerExport();
 
@@ -134,7 +137,7 @@ public class ExportViewIT extends AbstractKaribuTest {
                 LocalDate.of(2026, 12, 31)
         );
 
-        selectFormats(Set.of("pdf"));
+        selectFormats(Set.of(ExportFormat.PDF));
 
         triggerExport();
 
@@ -165,7 +168,7 @@ public class ExportViewIT extends AbstractKaribuTest {
                 LocalDate.of(2026, 12, 31)
         );
 
-        selectFormats(Set.of("pdf"));
+        selectFormats(Set.of(ExportFormat.PDF));
 
         triggerExport();
 
@@ -194,7 +197,7 @@ public class ExportViewIT extends AbstractKaribuTest {
                 LocalDate.of(2026, 12, 31)
         );
 
-        selectFormats(Set.of("xlsx"));
+        selectFormats(Set.of(ExportFormat.XLSX));
 
         triggerExport();
 
@@ -225,7 +228,7 @@ public class ExportViewIT extends AbstractKaribuTest {
                 LocalDate.of(2026, 12, 31)
         );
 
-        selectFormats(Set.of("xlsx"));
+        selectFormats(Set.of(ExportFormat.XLSX));
 
         triggerExport();
 
@@ -253,7 +256,7 @@ public class ExportViewIT extends AbstractKaribuTest {
                 LocalDate.of(2026, 12, 31)
         );
 
-        selectFormats(Set.of("pdf", "xlsx"));
+        selectFormats(Set.of(ExportFormat.PDF, ExportFormat.XLSX));
 
         triggerExport();
 
@@ -277,8 +280,8 @@ public class ExportViewIT extends AbstractKaribuTest {
         _setValue(endDatePicker, until);
     }
 
-    private static void selectFormats(final Set<String> pdf) {
-        final CheckboxGroup<String> formatPicker = _get(CheckboxGroup.class, spec -> spec.withLabel("Formats"));
+    private static void selectFormats(final Set<ExportFormat> pdf) {
+        final CheckboxGroup<ExportFormat> formatPicker = _get(CheckboxGroup.class, spec -> spec.withLabel("Formats"));
         _setValue(formatPicker, pdf);
     }
 

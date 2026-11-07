@@ -20,6 +20,7 @@ import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.api.userconfig.UserConfigFactory;
 import de.nihas101.midas.api.userconfig.UserConfigService;
 import de.nihas101.midas.core.export.ExportFactory;
+import de.nihas101.midas.api.export.ExportFormat;
 import de.nihas101.midas.core.export.ExportRequest;
 import de.nihas101.midas.core.export.ExportViewName;
 import de.nihas101.midas.core.export.ExportViews;
@@ -59,7 +60,7 @@ public class ExportView extends MidasView {
     private CheckboxGroup<ExportViewName> viewPicker;
     private DatePicker startDatePicker;
     private DatePicker endDatePicker;
-    private CheckboxGroup<String> formatPicker;
+    private CheckboxGroup<ExportFormat> formatPicker;
     private Button exportButton;
 
     public ExportView(
@@ -232,13 +233,13 @@ public class ExportView extends MidasView {
         layout.setWidthFull();
         layout.setAlignItems(FlexComponent.Alignment.END);
 
-        final List<String> allFormats = List.of("xlsx", "pdf");
+        final List<ExportFormat> allFormats = List.of(ExportFormat.XLSX, ExportFormat.PDF);
 
         formatPicker = new CheckboxGroup<>(messageSource.getMessage("export.formats.label", null, getLocale()));
         formatPicker.setItems(allFormats);
-        formatPicker.setItemLabelGenerator(key -> messageSource.getMessage("export.format." + key, null, getLocale()));
+        formatPicker.setItemLabelGenerator(key -> messageSource.getMessage("export.format." + key.getMessageKey(), null, getLocale()));
         formatPicker.addThemeVariants(CheckboxGroupVariant.LUMO_VERTICAL);
-        formatPicker.select("pdf");
+        formatPicker.select(ExportFormat.PDF);
         formatPicker.addValueChangeListener(e -> updateExportButtonState());
 
         exportButton = new Button(
@@ -268,10 +269,11 @@ public class ExportView extends MidasView {
                     formatPicker.getValue()
             );
 
-            if (request.formats().contains("xlsx")) {
+            final Set<ExportFormat> formats = request.formats();
+            if (formats.contains(ExportFormat.XLSX)) {
                 runXlsxExport(request);
             }
-            if (request.formats().contains("pdf")) {
+            if (formats.contains(ExportFormat.PDF)) {
                 runPdfExport(request);
             }
 

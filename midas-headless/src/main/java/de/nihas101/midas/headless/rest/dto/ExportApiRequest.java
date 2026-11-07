@@ -1,5 +1,6 @@
 package de.nihas101.midas.headless.rest.dto;
 
+import de.nihas101.midas.api.export.ExportFormat;
 import de.nihas101.midas.core.export.ExportViewName;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -26,5 +27,6 @@ public class ExportApiRequest {
     @NotNull
     private LocalDate until;
 
-    private Set<String> formats; // e.g. "pdf", "xlsx"
+    @NotNull
+    private ExportFormat format;
 }

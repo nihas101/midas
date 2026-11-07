@@ -1,14 +1,13 @@
 package de.nihas101.midas.headless.rest;
 
 import de.nihas101.midas.api.export.Export;
-import de.nihas101.midas.api.export.ZipExport;
 import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.api.shareholder.ShareholdersReader;
 import de.nihas101.midas.core.export.ExportFactory;
+import de.nihas101.midas.api.export.ExportFormat;
 import de.nihas101.midas.core.export.ExportRequest;
 import de.nihas101.midas.core.export.ExportViewName;
 import de.nihas101.midas.core.export.ExportViews;
-import de.nihas101.midas.core.export.ZipExportStream;
 import de.nihas101.midas.headless.config.MidasConfig;
 import de.nihas101.midas.headless.rest.dto.ExportApiRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.ByteArrayOutputStream;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -66,51 +64,16 @@ public class ExportController {
                 ),
                 request.getFrom(),
                 request.getUntil(),
-                request.getFormats()
+                request.getFormat()
         );
 
-        final boolean hasPdf = exportRequest.formats().contains("pdf");
-        final boolean hasXlsx = exportRequest.formats().contains("xlsx");
-
-        // TODO: We are missing the check for multiple shareholders here (and multiple years)
-        // If both formats (pdf and xlsx) are requested, package them into a single zip
-        final boolean multipleFormats = hasPdf && hasXlsx;
-        if (multipleFormats) {
-            try (
-                    final ZipExport zipExport = new ZipExportStream(
-                            exportRequest.startDate(),
-                            exportRequest.endDate(),
-                            response.getOutputStream()
-                    )
-            ) {
-                response.setContentType(zipExport.mimeType());
-                response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + zipExport.name() + "\"");
-                if (hasPdf) {
-                    final ByteArrayOutputStream pdfBaos = new ByteArrayOutputStream();
-                    final Export pdfExport = exportFactory.createPdfExport(exportRequest, pdfBaos, loc);
-                    pdfExport.trigger();
-                    zipExport.putEntry(
-                            pdfExport.fileName(),
-                            pdfBaos.toByteArray()
-                    );
-                }
-                if (hasXlsx) {
-                    final ByteArrayOutputStream xlsxBaos = new ByteArrayOutputStream();
-                    final Export xlsxExport = exportFactory.createXlsxExport(exportRequest, xlsxBaos, loc);
-                    xlsxExport.trigger();
-                    zipExport.putEntry(
-                            xlsxExport.fileName(),
-                            xlsxBaos.toByteArray()
-                    );
-
-                }
-            }
-        } else if (hasPdf) {
+        final Set<ExportFormat> formats = exportRequest.formats();
+        if (formats.contains(ExportFormat.PDF)) {
             final Export pdfExport = exportFactory.createPdfExport(exportRequest, response.getOutputStream(), loc);
             response.setContentType(pdfExport.mimeType());
             response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + pdfExport.fileName() + "\"");
             pdfExport.trigger();
-        } else if (hasXlsx) {
+        } else if (formats.contains(ExportFormat.XLSX)) {
             final Export xlsxExport = exportFactory.createXlsxExport(exportRequest, response.getOutputStream(), loc);
             response.setContentType(xlsxExport.mimeType());
             response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + xlsxExport.fileName() + "\"");

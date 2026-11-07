@@ -16,7 +16,7 @@ import java.time.Year;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ResponseInterestRate {
-    private Integer id; // TODO: Not need in request
+    private Integer id;
 
     @NotNull
     @Positive

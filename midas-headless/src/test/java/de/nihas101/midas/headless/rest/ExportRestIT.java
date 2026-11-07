@@ -1,5 +1,6 @@
 package de.nihas101.midas.headless.rest;
 
+import de.nihas101.midas.api.export.ExportFormat;
 import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.headless.rest.dto.ExportApiRequest;
 import de.nihas101.midas.headless.rest.dto.MoneyAmountDto;
@@ -89,7 +90,7 @@ public class ExportRestIT {
                 .views(Set.of(BOOKINGS))
                 .from(LocalDate.of(2026, 1, 1))
                 .until(LocalDate.of(2026, 12, 31))
-                .formats(Set.of("pdf"))
+                .format(ExportFormat.PDF)
                 .build();
 
         final MvcResult result = mockMvc.perform(post("/api/v1/export")
@@ -111,7 +112,7 @@ public class ExportRestIT {
                 .views(Set.of(BOOKINGS))
                 .from(LocalDate.of(2026, 1, 1))
                 .until(LocalDate.of(2026, 12, 31))
-                .formats(Set.of("xlsx"))
+                .format(ExportFormat.XLSX)
                 .build();
 
         final MvcResult result = mockMvc.perform(post("/api/v1/export")
@@ -127,36 +128,13 @@ public class ExportRestIT {
     }
 
     @Test
-    void testMultipleFormatsReturnsZip() throws Exception {
-        final ExportApiRequest request = ExportApiRequest.builder()
-                .shareholderIds(List.of(shareholder.getId()))
-                .views(Set.of(BOOKINGS))
-                .from(LocalDate.of(2026, 1, 1))
-                .until(LocalDate.of(2026, 12, 31))
-                .formats(Set.of("pdf", "xlsx"))
-                .build();
-
-        final MvcResult result = mockMvc.perform(post("/api/v1/export")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType("application/zip"))
-                .andExpect(header().string("Content-Disposition", "attachment; filename=\"export_2026-01-01_2026-12-31.zip\""))
-                .andReturn();
-
-        final byte[] bytes = result.getResponse().getContentAsByteArray();
-        assertNotNull(bytes);
-        assertTrue(bytes.length > 0, "Zip byte array should not be empty");
-    }
-
-    @Test
     void testExportAllShareholdersWhenNoListProvided() throws Exception {
         final ExportApiRequest request = ExportApiRequest.builder()
                 .shareholderIds(null)
                 .views(Set.of(BOOKINGS))
                 .from(LocalDate.of(2026, 1, 1))
                 .until(LocalDate.of(2026, 12, 31))
-                .formats(Set.of("xlsx"))
+                .format(ExportFormat.XLSX)
                 .build();
 
         final MvcResult result = mockMvc.perform(post("/api/v1/export")
