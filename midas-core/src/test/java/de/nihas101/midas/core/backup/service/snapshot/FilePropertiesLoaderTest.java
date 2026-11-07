@@ -2,13 +2,11 @@ package de.nihas101.midas.core.backup.service.snapshot;
 
 import de.nihas101.midas.api.backup.MidasFile;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

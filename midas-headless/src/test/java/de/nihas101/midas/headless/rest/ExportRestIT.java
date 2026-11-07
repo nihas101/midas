@@ -141,7 +141,7 @@ public class ExportRestIT {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/zip"))
-                .andExpect(header().string("Content-Disposition", "attachment; filename=\"export.zip\""))
+                .andExpect(header().string("Content-Disposition", "attachment; filename=\"export_2026-01-01_2026-12-31.zip\""))
                 .andReturn();
 
         final byte[] bytes = result.getResponse().getContentAsByteArray();

@@ -28,12 +28,6 @@ public class BackupController {
     private final BackupStatusReader backupStatusReader;
     private final BackupFileNameProvider fileNameProvider;
 
-    /* TODO: Investigate the following
-     * {
-     *   "message": "File '/home/deck/code/java/midas/midas-headless/target/classes' is not a jar",
-     *   "error": "Internal Server Error"
-     * }
-     */
     @Operation(
             summary = "Create a backup",
             description = "Creates a backup."

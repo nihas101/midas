@@ -1,12 +1,14 @@
 package de.nihas101.midas.headless.rest;
 
 import de.nihas101.midas.api.export.Export;
+import de.nihas101.midas.api.export.ZipExport;
 import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.api.shareholder.ShareholdersReader;
 import de.nihas101.midas.core.export.ExportFactory;
 import de.nihas101.midas.core.export.ExportRequest;
 import de.nihas101.midas.core.export.ExportViewName;
 import de.nihas101.midas.core.export.ExportViews;
+import de.nihas101.midas.core.export.ZipExportStream;
 import de.nihas101.midas.headless.config.MidasConfig;
 import de.nihas101.midas.headless.rest.dto.ExportApiRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,8 +31,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 @RestController
 @RequestMapping("/api/v1/export")
@@ -75,41 +75,42 @@ public class ExportController {
         // TODO: We are missing the check for multiple shareholders here (and multiple years)
         // If both formats (pdf and xlsx) are requested, package them into a single zip
         final boolean multipleFormats = hasPdf && hasXlsx;
-
         if (multipleFormats) {
-            response.setContentType("application/zip");
-            // TODO: Check filename
-            response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"export.zip\"");
-            try (final ZipOutputStream zos = new ZipOutputStream(response.getOutputStream())) {
+            try (
+                    final ZipExport zipExport = new ZipExportStream(
+                            exportRequest.startDate(),
+                            exportRequest.endDate(),
+                            response.getOutputStream()
+                    )
+            ) {
+                response.setContentType(zipExport.mimeType());
+                response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + zipExport.name() + "\"");
                 if (hasPdf) {
                     final ByteArrayOutputStream pdfBaos = new ByteArrayOutputStream();
                     final Export pdfExport = exportFactory.createPdfExport(exportRequest, pdfBaos, loc);
                     pdfExport.trigger();
-                    zos.putNextEntry(new ZipEntry(pdfExport.fileName()));
-                    zos.write(pdfBaos.toByteArray());
-                    zos.closeEntry();
+                    zipExport.putEntry(
+                            pdfExport.fileName(),
+                            pdfBaos.toByteArray()
+                    );
                 }
                 if (hasXlsx) {
                     final ByteArrayOutputStream xlsxBaos = new ByteArrayOutputStream();
                     final Export xlsxExport = exportFactory.createXlsxExport(exportRequest, xlsxBaos, loc);
                     xlsxExport.trigger();
-                    zos.putNextEntry(new ZipEntry(xlsxExport.fileName()));
-                    zos.write(xlsxBaos.toByteArray());
-                    zos.closeEntry();
+                    zipExport.putEntry(
+                            xlsxExport.fileName(),
+                            xlsxBaos.toByteArray()
+                    );
+
                 }
             }
-            return;
-        }
-
-        if (hasPdf) {
+        } else if (hasPdf) {
             final Export pdfExport = exportFactory.createPdfExport(exportRequest, response.getOutputStream(), loc);
             response.setContentType(pdfExport.mimeType());
             response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + pdfExport.fileName() + "\"");
             pdfExport.trigger();
-            return;
-        }
-
-        if (hasXlsx) {
+        } else if (hasXlsx) {
             final Export xlsxExport = exportFactory.createXlsxExport(exportRequest, response.getOutputStream(), loc);
             response.setContentType(xlsxExport.mimeType());
             response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + xlsxExport.fileName() + "\"");
