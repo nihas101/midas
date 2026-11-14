@@ -10,8 +10,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -70,8 +70,33 @@ public class ZipExportStreamTest {
 
     @Test
     void testPutEntryAndCloseWritesValidZip() throws Exception {
+        final byte[] zipBytes = zipBytes();
+        assertNotNull(zipBytes);
+
+        try (final ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(zipBytes))) {
+            assertNextEntry(zis, "test1.txt", "Hello World");
+            assertNextEntry(zis, "nested/test2.txt", "Second File");
+            assertNull(zis.getNextEntry());
+        }
+    }
+
+    private static void assertNextEntry(
+            final ZipInputStream zis,
+            final String filePath,
+            final String expectedContent
+    ) throws IOException {
+        final ZipEntry entry1 = zis.getNextEntry();
+        assertNotNull(entry1);
+        assertEquals(filePath, entry1.getName());
+        assertEquals(expectedContent, new String(zis.readAllBytes(), StandardCharsets.UTF_8));
+    }
+
+    private static byte[] zipBytes() throws Exception {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (final ZipExport zipExport = new ZipExportStream(LocalDate.of(2026, 1, 1), LocalDate.of(2026, 12, 31), baos)) {
+        try (final ZipExport zipExport = new ZipExportStream(
+                LocalDate.of(2026, 1, 1),
+                LocalDate.of(2026, 12, 31), baos)
+        ) {
             final byte[] content1 = "Hello World".getBytes(StandardCharsets.UTF_8);
             zipExport.putEntry("test1.txt", content1);
 
@@ -79,21 +104,6 @@ public class ZipExportStreamTest {
             zipExport.putEntry("nested/test2.txt", content2);
         }
 
-        final byte[] zipBytes = baos.toByteArray();
-        assertNotNull(zipBytes);
-
-        try (final ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(zipBytes))) {
-            final java.util.zip.ZipEntry entry1 = zis.getNextEntry();
-            assertNotNull(entry1);
-            assertEquals("test1.txt", entry1.getName());
-            assertEquals("Hello World", new String(zis.readAllBytes(), StandardCharsets.UTF_8));
-
-            final java.util.zip.ZipEntry entry2 = zis.getNextEntry();
-            assertNotNull(entry2);
-            assertEquals("nested/test2.txt", entry2.getName());
-            assertEquals("Second File", new String(zis.readAllBytes(), StandardCharsets.UTF_8));
-
-            assertNull(zis.getNextEntry());
-        }
+        return baos.toByteArray();
     }
 }

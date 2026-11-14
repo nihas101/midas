@@ -19,7 +19,6 @@ import de.nihas101.midas.core.bookings.row.BookingRow;
 import de.nihas101.midas.core.bookings.row.BookingRowService;
 import de.nihas101.midas.core.export.ExportRequest;
 import de.nihas101.midas.core.export.ExportViewName;
-import de.nihas101.midas.core.interest.dto.DefaultInterestRate;
 import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -163,7 +162,7 @@ class PdfViewDataExtractorTest {
         when(emptyFiltered.bookings()).thenReturn(emptyList());
         when(bookings.bookingsInMonth(any())).thenReturn(emptyFiltered);
 
-        final InterestRate mockRate = mock(DefaultInterestRate.class);
+        final InterestRate mockRate = mock(InterestRate.class);
         when(interestRateService.interestRate(eq(1), any(Year.class))).thenReturn(mockRate);
         when(mockRate.getInterestRate()).thenReturn(BigDecimal.valueOf(5.0));
         when(interestBookingsReader.interestRelatedBookingsForShareholderAndYear(eq(1), any(Year.class)))
