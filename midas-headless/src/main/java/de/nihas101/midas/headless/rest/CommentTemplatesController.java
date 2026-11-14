@@ -5,6 +5,7 @@ import de.nihas101.midas.api.commenttemplate.CommentTemplatesReader;
 import de.nihas101.midas.api.commenttemplate.CommentTemplatesWriter;
 import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.headless.rest.dto.RequestCommentTemplate;
+import de.nihas101.midas.headless.rest.dto.ResponseCommentTemplate;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -59,8 +60,33 @@ public class CommentTemplatesController {
         return commentTemplatesReader.getSuggestions(bookingType);
     }
 
-    // TODO: Get endpoint for listing all comment templates
-    // TODO: Test this controller
+    @Operation(
+            summary = "Get all comment templates",
+            description = "Returns a list of all configured comment templates."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Success"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Internal Server Error\"}"
+                            )
+                    )
+            )
+    })
+    @GetMapping
+    public List<ResponseCommentTemplate> getTemplates() {
+        return commentTemplatesReader.getTemplates()
+                .toList()
+                .stream()
+                .map(ResponseCommentTemplate::toDto)
+                .toList();
+    }
 
     @Operation(
             summary = "Save a comment template",
@@ -91,13 +117,12 @@ public class CommentTemplatesController {
             )
     })
     @PostMapping
-    public ResponseEntity<Void> saveTemplate(
+    public ResponseEntity<ResponseCommentTemplate> saveTemplate(
             @NotNull
             @RequestBody final RequestCommentTemplate commentTemplate
     ) {
-        commentTemplatesWriter.save(commentTemplate.toDomain());
-        return ResponseEntity.ok()
-                .build();
+        final CommentTemplate saved = commentTemplatesWriter.save(commentTemplate.toDomain());
+        return ResponseEntity.ok(ResponseCommentTemplate.toDto(saved));
     }
 
     @Operation(
@@ -129,15 +154,20 @@ public class CommentTemplatesController {
             @Positive
             @PathVariable final Integer id
     ) {
-        final CommentTemplate toDelete = commentTemplatesReader.getTemplate(id);
-        if (toDelete == null) {
+        try {
+            final CommentTemplate toDelete = commentTemplatesReader.getTemplate(id);
+            if (toDelete == null) {
+                return ResponseEntity.notFound()
+                        .build();
+            }
+
+            commentTemplatesWriter.delete(toDelete.getId());
+            return ResponseEntity.ok()
+                    .build();
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound()
                     .build();
         }
-
-        commentTemplatesWriter.delete(toDelete.getId());
-        return ResponseEntity.ok()
-                .build();
     }
 
 }

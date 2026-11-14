@@ -1,10 +1,10 @@
 package de.nihas101.midas.headless.rest;
 
 import de.nihas101.midas.commons.BookingType;
-import de.nihas101.midas.headless.rest.dto.AccountStatementOrderRequest;
 import de.nihas101.midas.headless.rest.dto.AccountStatementsResponse;
 import de.nihas101.midas.headless.rest.dto.CreateManualExtraRequest;
 import de.nihas101.midas.headless.rest.dto.ExcludeAccountStatementRequest;
+import de.nihas101.midas.headless.rest.dto.ManualStatementDto;
 import de.nihas101.midas.headless.rest.dto.MoneyAmountDto;
 import de.nihas101.midas.headless.rest.dto.RequestBooking;
 import de.nihas101.midas.headless.rest.dto.RequestOpeningBalance;
@@ -22,15 +22,14 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDate;
 import java.time.Year;
-import java.util.List;
 
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -113,7 +112,26 @@ public class AccountStatementRestIT {
                 .anyMatch(s -> "Bonus adjustment".equals(s.getLabel()));
         assertTrue(hasManual);
 
-        // 7. Update Statement Order
+        // 7. Delete manual extra override
+        final Integer manualExtraId = updatedResp.getOverrides().stream()
+                .filter(m -> "Bonus adjustment".equals(m.getLabel()))
+                .map(ManualStatementDto::getId)
+                .findFirst()
+                .orElseThrow();
+
+        mockMvc.perform(delete("/api/v1/account-statements/manual/" + manualExtraId + "?shareholderId=" + sh.getId() + "&year=2026"))
+                .andExpect(status().isOk());
+
+        // Verify manual extra is deleted
+        final MvcResult afterDeleteStmts = mockMvc.perform(get("/api/v1/account-statements?shareholderId=" + sh.getId() + "&year=2026"))
+                .andExpect(status().isOk())
+                .andReturn();
+        final AccountStatementsResponse afterDeleteResp = objectMapper.readValue(afterDeleteStmts.getResponse().getContentAsString(), AccountStatementsResponse.class);
+        final boolean stillHasManual = afterDeleteResp.getAccountStatements().stream()
+                .anyMatch(s -> "Bonus adjustment".equals(s.getLabel()));
+        assertFalse(stillHasManual);
+
+        // 8. Update Statement Order
         // TODO: Do not base this order update on the rowKey
         /*
         final String firstKey = updatedResp.getAccountStatements().getFirst().getRowKey();

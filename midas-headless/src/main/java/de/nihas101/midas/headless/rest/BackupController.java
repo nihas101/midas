@@ -52,8 +52,8 @@ public class BackupController {
                     responseCode = "200",
                     description = "Backup ZIP file",
                     content = @Content(
-                    mediaType = "application/zip"
-            )
+                            mediaType = "application/zip"
+                    )
             ),
             @ApiResponse(
                     responseCode = "500",

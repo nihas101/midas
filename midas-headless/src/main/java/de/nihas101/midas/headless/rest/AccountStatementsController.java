@@ -25,7 +25,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -171,7 +173,60 @@ public class AccountStatementsController {
                 .build();
     }
 
-    // TODO: Also need a delete endpoint for manual extras + test this
+    @Operation(
+            summary = "Delete a manual statement override for a shareholder and year",
+            description = "Deletes the manual statement override with the specified ID."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Success"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad Request",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Invalid request parameter\"}"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Shareholder not found"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Internal Server Error\"}"
+                            )
+                    )
+            )
+    })
+    @DeleteMapping("/manual/{id}")
+    public ResponseEntity<Void> deleteManualExtra(
+            @NotNull
+            @Positive
+            @PathVariable final Integer id,
+
+            @NotNull
+            @Positive
+            @RequestParam final Integer shareholderId,
+
+            @NotNull
+            @RequestParam final Year year
+    ) {
+        final Shareholder shareholder = shareholdersReader.shareholder(shareholderId);
+        if (shareholder == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        accountStatementService.deleteOverride(shareholder, year, id);
+        return ResponseEntity.ok().build();
+    }
+
     @Operation(
             summary = "Create a manual statement for a shareholder and year",
             description = "Creates a manual statement for the specified shareholder and year."

@@ -34,7 +34,12 @@ public class DefaultInterestRateService implements InterestRateService {
             throw new IllegalArgumentException("InterestRateService#create with interestRate.getId() != null");
         }
 
-        // TODO: Check if an interest rate already exists
+        final Integer shareholderId = interestRate.getShareholderId();
+        final Year year = interestRate.getYear();
+        final InterestRate existing = interestRate(shareholderId, year);
+        if (existing != null) {
+            throw new IllegalStateException("Interest rate for shareholder with id " + shareholderId + " and year " + year + " already exists");
+        }
 
         return upsert(interestRate);
     }

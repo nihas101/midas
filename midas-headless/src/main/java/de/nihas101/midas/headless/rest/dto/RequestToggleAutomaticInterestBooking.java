@@ -1,6 +1,5 @@
 package de.nihas101.midas.headless.rest.dto;
 
-import de.nihas101.midas.commons.Source;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;

@@ -71,7 +71,12 @@ public class InterestRestIT {
                 .andExpect(jsonPath("$.interestRate").value(2.50))
                 .andExpect(jsonPath("$.rows", hasSize(greaterThan(0))));
 
-        // 4. Toggle the generation of interest booking
+        // 4. Check initial toggle status (should be false)
+        mockMvc.perform(get("/api/v1/interest/booking?shareholderId=" + sh.getId() + "&year=2026"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.active").value(false));
+
+        // 5. Toggle the generation of interest booking
         final RequestToggleAutomaticInterestBooking toggleRequest = RequestToggleAutomaticInterestBooking.builder()
                 .shareholderId(sh.getId())
                 .year(Year.of(2026))
@@ -81,9 +86,15 @@ public class InterestRestIT {
         mockMvc.perform(post("/api/v1/interest/booking")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(toggleRequest)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.active").value(true));
 
-        // 5. Verify that an interest booking is generated
+        // 6. Check toggle status after toggling (should be true)
+        mockMvc.perform(get("/api/v1/interest/booking?shareholderId=" + sh.getId() + "&year=2026"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.active").value(true));
+
+        // 7. Verify that an interest booking is generated
         final MvcResult bookingsResult = mockMvc.perform(get("/api/v1/bookings?shareholderId=" + sh.getId() + "&year=2026"))
                 .andExpect(status().isOk())
                 .andReturn();

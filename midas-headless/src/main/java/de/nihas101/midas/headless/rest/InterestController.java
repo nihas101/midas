@@ -22,6 +22,7 @@ import de.nihas101.midas.headless.rest.dto.InterestResponse;
 import de.nihas101.midas.headless.rest.dto.RequestToggleAutomaticInterestBooking;
 import de.nihas101.midas.headless.rest.dto.ResponseInterestRate;
 import de.nihas101.midas.headless.rest.dto.ResponseInterestRow;
+import de.nihas101.midas.headless.rest.dto.ResponseToggleAutomaticInterestBooking;
 import de.nihas101.midas.headless.rest.dto.UpdateInterestRate;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -188,7 +189,51 @@ public class InterestController {
         return ResponseEntity.ok(ResponseInterestRate.toDto(saved));
     }
 
-    // TODO: Also need a get endpoint for the toggle state + return the current state in this endpoint
+    @Operation(
+            summary = "Get the automatic interest booking status",
+            description = "Returns whether automatic interest booking generation is active for a shareholder and year."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Success"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Shareholder not found"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(
+                                    example = "{\"error\":\"Internal Server Error\"}"
+                            )
+                    )
+            )
+    })
+    @GetMapping("/booking")
+    public ResponseEntity<ResponseToggleAutomaticInterestBooking> getInterestBookingStatus(
+            @NotNull
+            @Positive
+            @RequestParam final Integer shareholderId,
+
+            @NotNull
+            @RequestParam final Year year
+    ) {
+        final Shareholder shareholder = shareholdersReader.shareholder(shareholderId);
+        if (shareholder == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        final Booking booking = interestBookingsReader.systemGeneratedInterestForShareholderAndYear(shareholder, year);
+        return ResponseEntity.ok(
+                ResponseToggleAutomaticInterestBooking.builder()
+                        .active(booking != null)
+                        .build()
+        );
+    }
+
     @Operation(
             summary = "Toggle the automatic generation of the interest booking",
             description = "Toggles weather or not a booking for the interest should be generated automatically."
@@ -218,7 +263,7 @@ public class InterestController {
             )
     })
     @PostMapping("/booking")
-    public ResponseEntity<Void> toggleInterestBooking(
+    public ResponseEntity<ResponseToggleAutomaticInterestBooking> toggleInterestBooking(
             @NotNull
             @RequestBody final RequestToggleAutomaticInterestBooking request,
 
@@ -237,8 +282,11 @@ public class InterestController {
             createInterestBooking(shareholderId, locale, year, interestRate);
         }
 
-        return ResponseEntity.ok()
-                .build();
+        return ResponseEntity.ok(
+                ResponseToggleAutomaticInterestBooking.builder()
+                        .active(request.isToggleAutomaticBooking())
+                        .build()
+        );
     }
 
     private Source determineSource(final RequestToggleAutomaticInterestBooking request) {

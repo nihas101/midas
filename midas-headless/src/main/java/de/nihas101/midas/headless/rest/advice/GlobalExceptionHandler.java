@@ -45,6 +45,13 @@ public class GlobalExceptionHandler {
                 .body(Map.of("error", "Bad Request", "message", e.getMessage()));
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<Map<String, String>> handleIllegalStateException(final IllegalStateException e) {
+        log.debug("An illegal state occurred", e);
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("error", "Conflict", "message", e.getMessage()));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleGeneralException(final Exception e) {
         log.error("An unexpected error occurred", e);
