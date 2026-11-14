@@ -20,7 +20,7 @@ public class DefaultOpeningBalanceService implements OpeningBalanceService {
 
     @Override
     public OpeningBalance openingBalance(final Integer shareholderId, final Year year) {
-        ShareholderEntity shareholder = shareholdersRepository.findById(shareholderId)
+        final ShareholderEntity shareholder = shareholdersRepository.findById(shareholderId)
                 .orElseThrow(() -> new IllegalArgumentException("Shareholder not found"));
 
         return openingBalanceRepository.findByShareholderAndDate(shareholder, year.atDay(1))
@@ -29,26 +29,39 @@ public class DefaultOpeningBalanceService implements OpeningBalanceService {
     }
 
     @Override
-    public void create(final OpeningBalance openingBalance) {
+    public OpeningBalance create(final OpeningBalance openingBalance) {
         if (openingBalance.getId() != null) {
             throw new IllegalArgumentException("OpeningBalanceService#create with openingBalance.getId() != null");
         }
 
-        upsertEntity(openingBalance);
+        // TODO: Ensure this integrity on a database level
+        // TODO: This will require a migration to ensure we only have one opening balance for a year and shareholder, before we enforce it
+        final Integer shareholderId = openingBalance.getShareholderId();
+        final Year year = openingBalance.getYear();
+        final OpeningBalance existing = openingBalance(shareholderId, year);
+        if (existing != null) {
+            throw new IllegalStateException("Opening balance for shareholder with id " + shareholderId + " and year " + year + " already exists");
+        }
+
+        return upsertEntity(openingBalance);
     }
 
     @Override
-    public void update(final OpeningBalance openingBalance) {
+    public OpeningBalance update(final OpeningBalance openingBalance) {
         if (openingBalance.getId() == null) {
             throw new IllegalArgumentException("OpeningBalanceService#update with openingBalance.getId() == null");
         }
 
-        upsertEntity(openingBalance);
+        return upsertEntity(openingBalance);
     }
 
-    private void upsertEntity(final OpeningBalance openingBalance) {
-        ShareholderEntity shareholder = shareholdersRepository.findById(openingBalance.getShareholderId())
+    private OpeningBalance upsertEntity(final OpeningBalance openingBalance) {
+        final ShareholderEntity shareholder = shareholdersRepository.findById(openingBalance.getShareholderId())
                 .orElseThrow(() -> new IllegalArgumentException("Shareholder not found"));
-        openingBalanceRepository.save(DefaultOpeningBalance.fromDto(openingBalance, shareholder));
+        return DefaultOpeningBalance.fromEntity(
+                openingBalanceRepository.save(
+                        DefaultOpeningBalance.fromDto(openingBalance, shareholder)
+                )
+        );
     }
 }

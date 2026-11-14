@@ -14,5 +14,7 @@ public interface Shareholder {
 
     void setFirstName(String firstName);
 
+    void setId(Integer id);
+
     void setDisplayId(Integer displayId);
 }

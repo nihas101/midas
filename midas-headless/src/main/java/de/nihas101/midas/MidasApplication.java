@@ -12,7 +12,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableConfigurationProperties
 public class MidasApplication {
 
-    // TODO: Add an API, once the project is stable
     public static void main(String[] args) {
         SpringApplication.run(MidasApplication.class, args);
     }

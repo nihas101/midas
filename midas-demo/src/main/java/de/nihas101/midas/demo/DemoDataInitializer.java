@@ -7,6 +7,7 @@ import de.nihas101.midas.api.bookings.BookingFactory;
 import de.nihas101.midas.api.commenttemplate.CommentTemplatesWriter;
 import de.nihas101.midas.api.interest.InterestBookingsReader;
 import de.nihas101.midas.api.interest.InterestCalculation;
+import de.nihas101.midas.api.interest.InterestRateService;
 import de.nihas101.midas.api.lock.LockWriter;
 import de.nihas101.midas.api.openingbalance.OpeningBalanceFactory;
 import de.nihas101.midas.api.openingbalance.OpeningBalanceService;
@@ -19,8 +20,7 @@ import de.nihas101.midas.commons.Source;
 import de.nihas101.midas.core.commenttemplate.dto.DefaultCommentTemplate;
 import de.nihas101.midas.core.config.CoreConfig;
 import de.nihas101.midas.core.interest.DefaultInterestCalculation;
-import de.nihas101.midas.core.interest.dto.InterestRate;
-import de.nihas101.midas.core.interest.service.InterestRateService;
+import de.nihas101.midas.core.interest.dto.DefaultInterestRate;
 import de.nihas101.midas.core.interest.service.bookingupdate.LockingInterestUpdatingBookingsService;
 import de.nihas101.midas.core.shareholders.service.ShareholdersService;
 import lombok.RequiredArgsConstructor;
@@ -226,7 +226,7 @@ public class DemoDataInitializer {
 
         // 4. Interest Rate & System Interest Booking for Alice
         final BigDecimal ratePercent = new BigDecimal("3.50");
-        interestRateService.create(new InterestRate(null, aliceId, ratePercent, DEMO_YEAR));
+        interestRateService.create(new DefaultInterestRate(null, aliceId, ratePercent, DEMO_YEAR));
 
         final InterestCalculation calc = new DefaultInterestCalculation(
                 interestBookingsReader.interestRelatedBookingsForShareholderAndYear(alice.getId(), DEMO_YEAR),
@@ -260,13 +260,10 @@ public class DemoDataInitializer {
 
     private void createOverride(final Shareholder alice) {
         final String locale = coreConfig.getI18n().getDefaultLocale();
-        final BigDecimal amount = Optional.of(OVERRIDES.get(locale))
-                .orElseThrow(() -> new RuntimeException("No overrides configured for " + locale));
-        accountStatementService.saveOverride(
+        accountStatementService.saveExclusion(
                 alice,
                 DEMO_YEAR,
                 BookingType.TAX_PREVIOUS_YEAR,
-                MoneyAmount.of(amount),
                 true
         );
     }

@@ -26,6 +26,8 @@ import de.nihas101.midas.api.interest.InterestBookingsWriter;
 import de.nihas101.midas.api.interest.InterestCalculation;
 import de.nihas101.midas.api.interest.InterestCalculationFactory;
 import de.nihas101.midas.api.interest.InterestCalculationRow;
+import de.nihas101.midas.api.interest.InterestRate;
+import de.nihas101.midas.api.interest.InterestRateService;
 import de.nihas101.midas.api.interest.InterestRowService;
 import de.nihas101.midas.api.interest.Transaction;
 import de.nihas101.midas.api.interest.TransactionType;
@@ -35,13 +37,10 @@ import de.nihas101.midas.api.openingbalance.OpeningBalance;
 import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.api.userconfig.UserConfigFactory;
 import de.nihas101.midas.api.userconfig.UserConfigService;
-import de.nihas101.midas.commons.BookingType;
-import de.nihas101.midas.commons.Source;
 import de.nihas101.midas.core.export.ExportFactory;
 import de.nihas101.midas.core.export.ExportViewName;
 import de.nihas101.midas.core.interest.DefaultInterestCalculation;
-import de.nihas101.midas.core.interest.dto.InterestRate;
-import de.nihas101.midas.core.interest.service.InterestRateService;
+import de.nihas101.midas.core.interest.dto.DefaultInterestRate;
 import de.nihas101.midas.core.lock.ShareholderLock;
 import de.nihas101.midas.core.shareholders.service.ShareholdersService;
 import de.nihas101.midas.vaadin.config.MidasConfig;
@@ -62,7 +61,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.MessageSource;
 
 import java.math.BigDecimal;
-import java.time.Month;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -264,7 +262,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
         );
 
         if (Boolean.TRUE.equals(updateInterestAutomaticallyToggle.getValue())) {
-            updateInterestBooking(shareholder, year, interestCalculation);
+            createInterestBookingIfNeeded(shareholder, year, interestCalculation);
         }
 
         interestCalculationGrid.setItems(
@@ -278,7 +276,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
         );
     }
 
-    private void updateInterestBooking(
+    private void createInterestBookingIfNeeded(
             final Shareholder shareholder,
             final Year year,
             final InterestCalculation interestCalculation
@@ -287,21 +285,17 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
                 shareholder,
                 year
         );
-        // TODO: Move this logic into the service. On interest update -> trigger
         if (booking != null) {
-            booking.setAmount(interestCalculation.interest());
-            bookingsWriter.update(booking);
-        } else {
-            final Booking newBooking = bookingFactory.create(
-                    shareholder.getId(),
-                    year.atMonth(Month.DECEMBER).atEndOfMonth(),
-                    BookingType.INTEREST,
-                    interestCalculation.interest(),
-                    messageSource.getMessage("bookings.type.interest", null, getLocale()),
-                    Source.SYSTEM
-            );
-            bookingsWriter.create(newBooking);
+            // An interest booking already exists
+            return;
         }
+        final Booking newBooking = bookingFactory.createSystemGeneratedInterestBooking(
+                shareholder.getId(),
+                year,
+                interestCalculation.interest(),
+                messageSource.getMessage("bookings.type.interest", null, getLocale())
+        );
+        bookingsWriter.create(newBooking);
     }
 
     private InterestRate updateInterestRate(
@@ -314,7 +308,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
             interestRate.setInterestRate(rate);
             interestRateService.update(interestRate);
         } else {
-            interestRate = new InterestRate(null, shareholder.getId(), rate, year);
+            interestRate = new DefaultInterestRate(null, shareholder.getId(), rate, year);
             interestRateService.create(interestRate);
         }
         return interestRate;
@@ -380,7 +374,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
     private InterestRate interestRate(final Shareholder shareholder, final Year year) {
         InterestRate rate = interestRateService.interestRate(shareholder.getId(), year);
         if (rate == null) {
-            return new InterestRate(null, shareholder.getId(), ZERO, year);
+            return new DefaultInterestRate(null, shareholder.getId(), ZERO, year);
         }
         return rate;
     }

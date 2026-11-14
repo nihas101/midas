@@ -3,6 +3,7 @@ package de.nihas101.midas.vaadin.ui.common;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import de.nihas101.midas.api.export.Export;
+import de.nihas101.midas.api.export.ExportFormat;
 import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.core.export.ExportFactory;
 import de.nihas101.midas.core.export.ExportRequest;
@@ -39,7 +40,7 @@ public class PrintButton extends Button {
                             new ExportViews(viewsToExport, messageSource, locale),
                             year.atMonth(Month.JANUARY).atDay(1),
                             year.atMonth(Month.DECEMBER).atEndOfMonth(),
-                            Set.of("pdf")
+                            Set.of(ExportFormat.PDF)
                     );
 
                     final ByteArrayOutputStream out = new ByteArrayOutputStream();

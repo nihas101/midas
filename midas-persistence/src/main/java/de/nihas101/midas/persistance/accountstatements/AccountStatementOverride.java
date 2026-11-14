@@ -12,7 +12,7 @@ public interface AccountStatementOverride {
 
     BookingType getBookingType();
 
-    String getLabelOverride();
+    String getLabel();
 
     Boolean getHidden();
 

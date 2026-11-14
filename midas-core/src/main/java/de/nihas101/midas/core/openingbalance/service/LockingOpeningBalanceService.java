@@ -22,15 +22,15 @@ public class LockingOpeningBalanceService implements OpeningBalanceService {
     }
 
     @Override
-    public void create(final OpeningBalance openingBalance) {
+    public OpeningBalance create(final OpeningBalance openingBalance) {
         assertUnlocked(openingBalance);
-        delegate.create(openingBalance);
+        return delegate.create(openingBalance);
     }
 
     @Override
-    public void update(final OpeningBalance openingBalance) {
+    public OpeningBalance update(final OpeningBalance openingBalance) {
         assertUnlocked(openingBalance);
-        delegate.update(openingBalance);
+        return delegate.update(openingBalance);
     }
 
     private void assertUnlocked(final OpeningBalance openingBalance) {
