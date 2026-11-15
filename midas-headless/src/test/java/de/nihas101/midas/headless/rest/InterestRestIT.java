@@ -39,6 +39,39 @@ public class InterestRestIT {
     private ObjectMapper objectMapper;
 
     @Test
+    void testCreateDuplicateInterestRate_returns409() throws Exception {
+        // Create a shareholder
+        final RequestShareholder shDto = RequestShareholder.builder()
+                .firstName("Duplicate")
+                .lastName("RateTester")
+                .build();
+        final MvcResult createShResult = mockMvc.perform(post("/api/v1/shareholders")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(shDto)))
+                .andExpect(status().isCreated())
+                .andReturn();
+        final ResponseShareholder sh = objectMapper.readValue(createShResult.getResponse().getContentAsString(), ResponseShareholder.class);
+
+        // Create interest rate for the first time — should succeed
+        final CreateInterestRate rateDto = CreateInterestRate.builder()
+                .shareholderId(sh.getId())
+                .year(Year.of(2025))
+                .interestRate(new BigDecimal("3.00"))
+                .build();
+
+        mockMvc.perform(post("/api/v1/interest")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(rateDto)))
+                .andExpect(status().isOk());
+
+        // Attempt to create a duplicate interest rate — should return 409 Conflict
+        mockMvc.perform(post("/api/v1/interest")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(rateDto)))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
     void testInterestCalculationWorkflow() throws Exception {
         // 1. Create a shareholder
         final RequestShareholder shDto = RequestShareholder.builder()
