@@ -17,14 +17,14 @@ public class ActiveBookingPeriod {
         return LocalDate.now()
                 .minus(config.getCutoff())
                 .plusYears(1)
-                .withDayOfMonth(1)
-                .withMonth(1);
+                .withMonth(1)
+                .withDayOfMonth(1);
     }
 
     public LocalDate end() {
         return LocalDate.now()
                 .plusYears(1)
-                .withDayOfMonth(31)
-                .withMonth(12);
+                .withMonth(12)
+                .withDayOfMonth(31);
     }
 }
