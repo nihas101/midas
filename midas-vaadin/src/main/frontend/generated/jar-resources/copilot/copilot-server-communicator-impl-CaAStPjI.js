@@ -1,6 +1,6 @@
 import { n as e } from "./chunk-DiqZc92J.js";
 import { C as t, w as n } from "./icons-Bzfd0PEL.js";
-import { i as r, r as i } from "./copilot-tree-impl-Dcz14Bij.js";
+import { i as r, r as i } from "./copilot-tree-impl-BLavDNQJ.js";
 import { a, i as o } from "./copilot-ui-state-Dc6l_5DA.js";
 //#region frontend/copilot/copilot-server-communicator-impl.ts
 function s(e) {

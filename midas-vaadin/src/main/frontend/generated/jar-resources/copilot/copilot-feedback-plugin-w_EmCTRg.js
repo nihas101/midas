@@ -1,10 +1,10 @@
 import { n as e } from "./chunk-DiqZc92J.js";
 import { C as t, Ct as n, _t as r, n as i, r as a, t as o, u as s, w as c, yt as l } from "./icons-Bzfd0PEL.js";
-import { l as u, o as d } from "./consts-5dxzGUWk.js";
+import { l as u, o as d } from "./consts-CBLJ9enl.js";
 import { a as f, c as p, d as m, i as h, l as g, n as _, o as v, r as y, s as b, t as x } from "./section-panel-ui-state-COWn2ulI.js";
 import { a as S, i as C, n as w, r as T } from "./copilot-ui-state-Dc6l_5DA.js";
 import { n as E, t as D } from "./copilot-message-box-8CA3gK_h.js";
-import { n as O, t as k } from "./base-panel-XzqYUwrf.js";
+import { n as O, t as k } from "./base-panel-DjDYiibP.js";
 //#region frontend/copilot/plugins/copilot-feedback/copilot-feedback-plugin.ts
 var A, j, M, N, P, F, I, L, R;
 //#endregion

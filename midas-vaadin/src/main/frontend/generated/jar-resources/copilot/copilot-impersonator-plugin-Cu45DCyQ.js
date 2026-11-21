@@ -3,7 +3,7 @@ import { X as t, Y as n, ft as r, n as i, r as a, t as o, u as s, ut as c } from
 import { a as l, d as u, l as d, n as f, o as p, s as m, t as h } from "./section-panel-ui-state-COWn2ulI.js";
 import { n as g, t as _ } from "./copilot-stored-machine-state-D6qB_Peh.js";
 import { n as v, t as y } from "./early-project-state-LGwavSyI.js";
-import { n as b, t as x } from "./base-panel-XzqYUwrf.js";
+import { n as b, t as x } from "./base-panel-DjDYiibP.js";
 //#region frontend/copilot/application-user-switcher.ts
 function S(e) {
 	return t("copilot-switch-user", { username: e }, (e) => e.data.error ? {

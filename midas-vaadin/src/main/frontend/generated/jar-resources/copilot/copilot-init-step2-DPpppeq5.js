@@ -1,18 +1,18 @@
 import { i as e, n as t, t as n } from "./chunk-DiqZc92J.js";
 import { A as r, G as i, I as a, M as o, P as s, St as c, W as l, X as u, Y as d, Z as f, _ as p, _t as m, b as h, bt as g, dt as _, ft as v, g as y, h as ee, i as b, k as te, n as x, o as S, ot as C, r as w, t as T, u as E, v as ne, z as re } from "./icons-Bzfd0PEL.js";
-import { l as ie, o as ae, t as oe } from "./consts-5dxzGUWk.js";
-import { n as se, s as ce } from "./dom-utils-CtCgswnG.js";
-import { a as le, o as ue } from "./copilot-tree-impl-Dcz14Bij.js";
+import { l as ie, o as ae, t as oe } from "./consts-CBLJ9enl.js";
+import { n as se, s as ce } from "./dom-utils-CNYAgfv-.js";
+import { a as le, o as ue } from "./copilot-tree-impl-BLavDNQJ.js";
 import { a as D, c as de, d as fe, i as pe, l as O, n as k, o as me, r as he, s as ge, t as _e, u as ve } from "./section-panel-ui-state-COWn2ulI.js";
 import { a as ye, i as A, n as j, r as be, t as xe } from "./copilot-ui-state-Dc6l_5DA.js";
-import { a as Se, g as Ce, h as we, i as Te, l as Ee, m as De, n as Oe, o as ke, r as Ae, s as je } from "./copilot-unsaved-operation-coordinator-B0brzVh0.js";
-import { a as Me, c as Ne, i as Pe, l as Fe, n as Ie, o as Le, r as Re, s as ze, t as Be, u as Ve } from "./copilot-userinfo-B9cGJ1jO.js";
+import { a as Se, g as Ce, h as we, i as Te, l as Ee, m as De, n as Oe, o as ke, r as Ae, s as je } from "./copilot-unsaved-operation-coordinator-C35mD7w_.js";
+import { a as Me, c as Ne, i as Pe, l as Fe, n as Ie, o as Le, r as Re, s as ze, t as Be, u as Ve } from "./copilot-userinfo-BO47eLZN.js";
 import { t as He } from "./directive-DWLihZIi.js";
-import { a as Ue, c as We, d as Ge, f as Ke, o as qe, p as Je } from "./copilot-error-handler-DbLpVBVy.js";
+import { a as Ue, c as We, d as Ge, f as Ke, o as qe, p as Je } from "./copilot-error-handler-BHmVeUxG.js";
 import { n as Ye, t as Xe } from "./copilot-stored-machine-state-D6qB_Peh.js";
 import { n as Ze, r as Qe, t as $e } from "./copilot-notification-DGCJSVaA.js";
 import { n as et, t as M } from "./early-project-state-LGwavSyI.js";
-import { i as tt, o as nt, s as rt } from "./copilot-development-setup-user-guide-utils-ygVPK2S5.js";
+import { i as tt, o as nt, s as rt } from "./copilot-development-setup-user-guide-utils-Cypnc5wJ.js";
 import { n as it, t as at } from "./track-active-mode-event-BNnPoWDk.js";
 import { n as ot, t as st } from "./copilot-all-components-state-rT6JRTVA.js";
 import { n as ct, r as lt, t as ut } from "./lit-renderer-DVJxWUIs.js";
@@ -2595,7 +2595,7 @@ var Cr, wr, Tr, Er, Dr, Or, kr, Ar, jr, Mr, V, Nr, Pr, Fr, Ir, H, U, W, G, K, Lr
         </vaadin-button>
         <vaadin-popover
           @opened-changed="${(e) => {
-				this.expandModeHandler.devToolsPopoverOpenClosedChanged(e.detail.value), e.detail.value && !this.devToolsDataLoaded && (this.devToolsDataLoading = !0, import("./copilot-devtools-JuKxAjYO.js").then(() => {
+				this.expandModeHandler.devToolsPopoverOpenClosedChanged(e.detail.value), e.detail.value && !this.devToolsDataLoaded && (this.devToolsDataLoading = !0, import("./copilot-devtools-D8LIyuMZ.js").then(() => {
 					De(), k.restorePanelsFromStorage(), Ce(), Ie(), this.devToolsDataLoading = !1, this.devToolsDataLoaded = !0;
 				}));
 			}}"

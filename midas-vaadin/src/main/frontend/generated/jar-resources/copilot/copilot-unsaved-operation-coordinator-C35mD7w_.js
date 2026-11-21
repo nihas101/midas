@@ -1,7 +1,7 @@
 import { i as e, n as t } from "./chunk-DiqZc92J.js";
 import { C as n, w as r } from "./icons-Bzfd0PEL.js";
-import { l as i, n as a, s as o } from "./consts-5dxzGUWk.js";
-import { c as s, s as c } from "./dom-utils-CtCgswnG.js";
+import { l as i, n as a, s as o } from "./consts-CBLJ9enl.js";
+import { c as s, s as c } from "./dom-utils-CNYAgfv-.js";
 import { n as l, t as u } from "./section-panel-ui-state-COWn2ulI.js";
 import { n as d, r as f } from "./copilot-ui-state-Dc6l_5DA.js";
 //#region frontend/copilot/plugins/copilot-plugins.ts
@@ -16,7 +16,7 @@ function p(e) {
 	});
 }
 function m() {
-	_().publicPluginsState === "NOT_INITIALIZED" && (v.push(import("./copilot-log-plugin-BM5VhlM5.js")), v.push(import("./copilot-info-plugin-CGiSn_5r.js")), v.push(import("./copilot-features-plugin-CHwO4kLB.js")), v.push(import("./copilot-feedback-plugin-DdO2prWv.js")), v.push(import("./copilot-settings-panel-T3j6yWTO.js")), v.push(import("./copilot-impersonator-plugin-BkQL1YEK.js")), v.push(import("./copilot-development-setup-user-guide-BwSd6fYG.js")), v.push(import("./copilot-vaadin-versions-D2X-VzZT.js")), b = !0, _().setPublicPluginsState("IMPORTED"));
+	_().publicPluginsState === "NOT_INITIALIZED" && (v.push(import("./copilot-log-plugin-BLAO8lqf.js")), v.push(import("./copilot-info-plugin-D1BTUR6t.js")), v.push(import("./copilot-features-plugin-DAC19Fmc.js")), v.push(import("./copilot-feedback-plugin-w_EmCTRg.js")), v.push(import("./copilot-settings-panel-ChrdeuA5.js")), v.push(import("./copilot-impersonator-plugin-Cu45DCyQ.js")), v.push(import("./copilot-development-setup-user-guide-BlV0DOOE.js")), v.push(import("./copilot-vaadin-versions-C1Yh-HgL.js")), b = !0, _().setPublicPluginsState("IMPORTED"));
 }
 function h() {
 	if (_().privatePluginsState === "NOT_INITIALIZED") {
@@ -53,7 +53,7 @@ var v, y, b, x = t((() => {
 //#endregion
 //#region frontend/copilot/dynamic-module-loader.ts
 async function w() {
-	return (await import("./copilot-focus-trap-DoE_Visi.js")).copilotFocusTrap;
+	return (await import("./copilot-focus-trap-eZPGuX4O.js")).copilotFocusTrap;
 }
 function T() {
 	return import("./typescript-rXzk1P2l.js").then((t) => /* @__PURE__ */ e(t.default, 1));

@@ -2,8 +2,8 @@ import { i as e, n as t } from "./chunk-DiqZc92J.js";
 import { _ as n, b as r, n as i, o as a, r as o, t as s, u as c } from "./icons-Bzfd0PEL.js";
 import { a as l, d as u, i as d, l as f, n as p, o as m, r as h, s as g, t as _ } from "./section-panel-ui-state-COWn2ulI.js";
 import { a as v, i as y, n as b, r as x } from "./copilot-ui-state-Dc6l_5DA.js";
-import { c as S, r as C, s as w } from "./copilot-development-setup-user-guide-utils-ygVPK2S5.js";
-import { n as T, t as E } from "./base-panel-XzqYUwrf.js";
+import { c as S, r as C, s as w } from "./copilot-development-setup-user-guide-utils-Cypnc5wJ.js";
+import { n as T, t as E } from "./base-panel-DjDYiibP.js";
 import { n as D, r as O, t as k } from "./copy-to-clipboard-Cma2E2HP.js";
 //#region frontend/copilot/plugins/copilot-info/copilot-info-plugin.ts
 function A(e, t) {

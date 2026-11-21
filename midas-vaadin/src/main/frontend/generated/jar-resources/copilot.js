@@ -1,18 +1,18 @@
 import { i as e, n as t } from "./copilot/chunk-DiqZc92J.js";
 import { B as n, C as r, D as i, E as ee, N as te, O as a, P as o, R as ne, St as re, T as ie, X as ae, Y as oe, _ as se, _t as s, b as ce, ft as le, h as c, ht as l, i as ue, j as de, l as fe, m as pe, n as me, o as u, pt as he, r as d, t as f, u as p, vt as m, w as h, y as ge, yt as g } from "./copilot/icons-Bzfd0PEL.js";
-import { l as _, o as _e, r as v } from "./copilot/consts-5dxzGUWk.js";
-import { d as y, f as ve, p as ye, r as be, s as b } from "./copilot/dom-utils-CtCgswnG.js";
-import { a as x, o as xe } from "./copilot/copilot-tree-impl-Dcz14Bij.js";
+import { l as _, o as _e, r as v } from "./copilot/consts-CBLJ9enl.js";
+import { d as y, f as ve, p as ye, r as be, s as b } from "./copilot/dom-utils-CNYAgfv-.js";
+import { a as x, o as xe } from "./copilot/copilot-tree-impl-BLavDNQJ.js";
 import { a as S, c as C, d as w, i as Se, l as T, n as E, o as D, r as Ce, s as we, t as Te, u as O } from "./copilot/section-panel-ui-state-COWn2ulI.js";
 import { a as Ee, i as k, n as A, r as De } from "./copilot/copilot-ui-state-Dc6l_5DA.js";
-import { i as Oe, n as j, r as ke, t as Ae } from "./copilot/copilot-server-communicator-impl-BSwkAYwm.js";
+import { i as Oe, n as j, r as ke, t as Ae } from "./copilot/copilot-server-communicator-impl-CaAStPjI.js";
 import { n as je, t as Me } from "./copilot/copilot-message-box-8CA3gK_h.js";
-import { c as M, d as Ne, f as Pe, g as Fe, h as Ie, l as Le, m as Re, p as ze, s as N, u as Be } from "./copilot/copilot-unsaved-operation-coordinator-B0brzVh0.js";
-import { a as Ve, c as He, i as Ue, l as We, n as Ge, o as Ke, s as qe, t as Je, u as Ye } from "./copilot/copilot-userinfo-B9cGJ1jO.js";
-import { i as Xe, o as Ze, s as Qe } from "./copilot/copilot-error-handler-DbLpVBVy.js";
+import { c as M, d as Ne, f as Pe, g as Fe, h as Ie, l as Le, m as Re, p as ze, s as N, u as Be } from "./copilot/copilot-unsaved-operation-coordinator-C35mD7w_.js";
+import { a as Ve, c as He, i as Ue, l as We, n as Ge, o as Ke, s as qe, t as Je, u as Ye } from "./copilot/copilot-userinfo-BO47eLZN.js";
+import { i as Xe, o as Ze, s as Qe } from "./copilot/copilot-error-handler-BHmVeUxG.js";
 import { n as P, t as $e } from "./copilot/copilot-stored-machine-state-D6qB_Peh.js";
-import { n as et, s as tt } from "./copilot/copilot-development-setup-user-guide-utils-ygVPK2S5.js";
-import { i as nt, n as rt, r as it, t as at } from "./copilot/copilot-shortcuts-BCRoRqGC.js";
+import { n as et, s as tt } from "./copilot/copilot-development-setup-user-guide-utils-Cypnc5wJ.js";
+import { i as nt, n as rt, r as it, t as at } from "./copilot/copilot-shortcuts-DWXhsu3x.js";
 //#region frontend/copilot/copilot-eventbus-impl.ts
 var ot, st = t((() => {
 	ot = class {
@@ -1287,9 +1287,9 @@ var G, K, Tt = t((() => {
 			let t = performance.now();
 			await window.Vaadin.copilot._machineState.initializer.promise, a(`init() blocked ${Math.round(performance.now() - t)} ms waiting for machine state`);
 			let n = performance.now();
-			await import("./copilot/copilot-global-vars-later-BTl10mIu.js"), a(`import(copilot-global-vars-later) took ${Math.round(performance.now() - n)} ms`);
+			await import("./copilot/copilot-global-vars-later-6gQ9PXik.js"), a(`import(copilot-global-vars-later) took ${Math.round(performance.now() - n)} ms`);
 			let r = performance.now();
-			await import("./copilot/copilot-init-step2-Zj3D5A25.js"), a(`import(copilot-init-step2) took ${Math.round(performance.now() - r)} ms`), ge(), this.tabIndex = 0, window.addEventListener("keydown", at), this.addEventListener("keydown", it), this.addEventListener("keyup", rt), k.onSend(this.handleSendEvent), this.removers.push(k.on("set-pointer-events", (e) => {
+			await import("./copilot/copilot-init-step2-DPpppeq5.js"), a(`import(copilot-init-step2) took ${Math.round(performance.now() - r)} ms`), ge(), this.tabIndex = 0, window.addEventListener("keydown", at), this.addEventListener("keydown", it), this.addEventListener("keyup", rt), k.onSend(this.handleSendEvent), this.removers.push(k.on("set-pointer-events", (e) => {
 				this.style.pointerEvents = e.detail.enable ? "" : "none";
 			})), this.removers.push(k.on("typescript-load-requested", async (e) => {
 				try {
