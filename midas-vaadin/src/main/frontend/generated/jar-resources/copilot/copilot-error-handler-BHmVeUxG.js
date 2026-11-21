@@ -1,6 +1,6 @@
 import { n as e } from "./chunk-DiqZc92J.js";
 import { A as t, L as n, P as r, X as i, Y as a, _ as o, _t as s, dt as c, ft as l, l as u, n as d, o as f, r as p, s as m, t as h, u as g, xt as ee } from "./icons-Bzfd0PEL.js";
-import { l as te, o as ne } from "./consts-5dxzGUWk.js";
+import { l as te, o as ne } from "./consts-CBLJ9enl.js";
 import { a as _, i as v, n as y, r as b } from "./copilot-ui-state-Dc6l_5DA.js";
 import { i as x, n as S, r as re, t as ie } from "./directive-DWLihZIi.js";
 import { n as ae, t as C } from "./copilot-stored-machine-state-D6qB_Peh.js";

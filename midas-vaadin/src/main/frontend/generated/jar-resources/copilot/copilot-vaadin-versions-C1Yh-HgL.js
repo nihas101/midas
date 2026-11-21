@@ -1,13 +1,13 @@
 import { n as e } from "./chunk-DiqZc92J.js";
 import { St as t, X as n, Y as r, _ as i, _t as a, b as o, dt as s, ft as c, n as l, o as u, r as d, t as f, u as p } from "./icons-Bzfd0PEL.js";
-import { l as m, o as h } from "./consts-5dxzGUWk.js";
+import { l as m, o as h } from "./consts-CBLJ9enl.js";
 import { a as g, d as _, i as v, l as y, o as b, r as x, s as S } from "./section-panel-ui-state-COWn2ulI.js";
 import { n as C, r as w } from "./copilot-ui-state-Dc6l_5DA.js";
 import { n as T, t as E } from "./copilot-message-box-8CA3gK_h.js";
-import { a as D, c as O, i as k, l as A, o as j, u as M } from "./copilot-error-handler-DbLpVBVy.js";
+import { a as D, c as O, i as k, l as A, o as j, u as M } from "./copilot-error-handler-BHmVeUxG.js";
 import { n as N, t as P } from "./copilot-stored-machine-state-D6qB_Peh.js";
 import { n as F, r as I } from "./copilot-notification-DGCJSVaA.js";
-import { n as L, t as R } from "./base-panel-XzqYUwrf.js";
+import { n as L, t as R } from "./base-panel-DjDYiibP.js";
 //#region frontend/copilot/plugins/copilot-vaadin-versions/vaadin-version-request.ts
 function z() {
 	C.setVaadinVersionState({ loading: !0 }), n(`${h}get-new-vaadin-versions`, { includePreReleases: N.getNewVersionPreReleasesVisible() }, (e) => {

@@ -1,6 +1,6 @@
 import { n as e } from "./chunk-DiqZc92J.js";
 import { C as t, _ as n, b as r, w as i } from "./icons-Bzfd0PEL.js";
-import { l as a, o } from "./consts-5dxzGUWk.js";
+import { l as a, o } from "./consts-CBLJ9enl.js";
 import { n as s, t as c } from "./section-panel-ui-state-COWn2ulI.js";
 import { n as l, r as u } from "./copilot-ui-state-Dc6l_5DA.js";
 import { n as d, t as f } from "./early-project-state-LGwavSyI.js";

@@ -54,6 +54,9 @@ function getWithCredentials(uri, onSuccess, onFail) {
 export class SystemErrorHandler {
     #registry;
     #resyncInProgress = false;
+    // Set when the browser starts leaving the page, until the page is used again.
+    #leavingPage = false;
+    #deferredSessionExpiration = null;
     /**
      * Creates a new instance connected to the given registry.
      *
@@ -61,14 +64,46 @@ export class SystemErrorHandler {
      */
     constructor(registry) {
         this.#registry = registry;
+        window.addEventListener('beforeunload', (event) => {
+            // vite-devmode dispatches a synthetic beforeunload when its HMR socket is
+            // closed with 1008, which does not mean the page is being left.
+            if (event.isTrusted) {
+                this.#leavingPage = true;
+            }
+        });
+        // A navigation that does not replace the page, such as a download, leaves
+        // the page in use. The session expiration is handled once it is used.
+        // Whether the navigation is still pending cannot be known, so input while
+        // a slow response loads still handles the expiration and may cancel it.
+        const handlePageInUse = () => {
+            this.#leavingPage = false;
+            const deferred = this.#deferredSessionExpiration;
+            this.#deferredSessionExpiration = null;
+            deferred?.();
+        };
+        window.addEventListener('pointerdown', handlePageInUse, true);
+        window.addEventListener('keydown', handlePageInUse, true);
     }
     /**
-     * Shows the session expiration notification.
+     * Shows the session expiration notification, or defers it while the browser
+     * is leaving the page.
+     *
+     * The request that ended the session, such as a logout URL, typically
+     * responds with the page the browser is navigating to. Going to the session
+     * expired URL meanwhile would cancel that navigation. In web-component mode
+     * the session is resynchronized instead, which does not navigate, so it is
+     * not deferred.
      *
      * @param details - message details or null if there are no details
      */
     handleSessionExpiredError(details) {
-        this.handleUnrecoverableErrorFor(details, this.#registry.getApplicationConfiguration().getSessionExpiredError());
+        const handle = () => this.handleUnrecoverableErrorFor(details, this.#registry.getApplicationConfiguration().getSessionExpiredError());
+        if (this.#leavingPage && !this.#isWebComponentMode()) {
+            Console.debug('Session expiration deferred while leaving the page');
+            this.#deferredSessionExpiration = handle;
+            return;
+        }
+        handle();
     }
     /**
      * Shows an error notification for an error which is unrecoverable.
