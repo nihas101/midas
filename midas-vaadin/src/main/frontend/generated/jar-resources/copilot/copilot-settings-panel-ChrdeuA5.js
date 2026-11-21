@@ -1,13 +1,13 @@
 import { n as e } from "./chunk-DiqZc92J.js";
 import { X as t, Y as n, ft as r, n as i, o as a, r as o, t as s, u as c, ut as l } from "./icons-Bzfd0PEL.js";
-import { l as u, o as d } from "./consts-5dxzGUWk.js";
+import { l as u, o as d } from "./consts-CBLJ9enl.js";
 import { a as f, d as p, l as m, o as h, s as g } from "./section-panel-ui-state-COWn2ulI.js";
 import { a as _, n as v, r as y } from "./copilot-ui-state-Dc6l_5DA.js";
 import { t as b } from "./directive-DWLihZIi.js";
-import { a as x, f as S, o as C, p as w } from "./copilot-error-handler-DbLpVBVy.js";
+import { a as x, f as S, o as C, p as w } from "./copilot-error-handler-BHmVeUxG.js";
 import { n as T, t as E } from "./copilot-stored-machine-state-D6qB_Peh.js";
-import { a as D, i as O } from "./copilot-shortcuts-BCRoRqGC.js";
-import { n as k, t as A } from "./base-panel-XzqYUwrf.js";
+import { a as D, i as O } from "./copilot-shortcuts-DWXhsu3x.js";
+import { n as k, t as A } from "./base-panel-DjDYiibP.js";
 import { n as j, r as M, t as N } from "./lit-renderer-DVJxWUIs.js";
 //#region node_modules/@vaadin/select/src/lit/renderer-directives.js
 var P, F, I = e((() => {

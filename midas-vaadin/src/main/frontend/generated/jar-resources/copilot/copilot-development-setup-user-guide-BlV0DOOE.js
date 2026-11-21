@@ -1,13 +1,13 @@
 import { n as e } from "./chunk-DiqZc92J.js";
 import { Ct as t, X as n, Y as r, _t as i, n as a, o, r as s, t as c, u as l } from "./icons-Bzfd0PEL.js";
-import { a as u, c as d, i as f, l as p, o as m } from "./consts-5dxzGUWk.js";
+import { a as u, c as d, i as f, l as p, o as m } from "./consts-CBLJ9enl.js";
 import { a as h, d as g, i as _, l as v, n as y, o as b, r as x, s as S, t as C } from "./section-panel-ui-state-COWn2ulI.js";
 import { a as w, i as T, n as E, r as D } from "./copilot-ui-state-Dc6l_5DA.js";
-import { l as O, s as k } from "./copilot-unsaved-operation-coordinator-B0brzVh0.js";
-import { i as A, o as j } from "./copilot-error-handler-DbLpVBVy.js";
+import { l as O, s as k } from "./copilot-unsaved-operation-coordinator-C35mD7w_.js";
+import { i as A, o as j } from "./copilot-error-handler-BHmVeUxG.js";
 import { n as M, t as N } from "./early-project-state-LGwavSyI.js";
-import { i as P, o as F, s as I, t as L } from "./copilot-development-setup-user-guide-utils-ygVPK2S5.js";
-import { n as R, t as z } from "./base-panel-XzqYUwrf.js";
+import { i as P, o as F, s as I, t as L } from "./copilot-development-setup-user-guide-utils-Cypnc5wJ.js";
+import { n as R, t as z } from "./base-panel-DjDYiibP.js";
 //#region frontend/copilot/copilot-development-setup-user-guide.ts
 function B(e, t) {
 	if (!t) return !0;

@@ -3,8 +3,8 @@ import { Ct as t, F as n, P as r, _t as i, dt as a, ft as o, n as s, r as c, t a
 import { a as p, d as m, i as h, l as g, n as _, o as v, r as y, s as b, t as x } from "./section-panel-ui-state-COWn2ulI.js";
 import { a as S, i as C, n as w, r as T } from "./copilot-ui-state-Dc6l_5DA.js";
 import { n as E, t as D } from "./copilot-message-box-8CA3gK_h.js";
-import { n as O, o as k, t as A } from "./copilot-error-handler-DbLpVBVy.js";
-import { n as j, t as M } from "./base-panel-XzqYUwrf.js";
+import { n as O, o as k, t as A } from "./copilot-error-handler-BHmVeUxG.js";
+import { n as j, t as M } from "./base-panel-DjDYiibP.js";
 //#region frontend/copilot/copilot-time-formatter.ts
 var N, P, F = e((() => {
 	N = () => {

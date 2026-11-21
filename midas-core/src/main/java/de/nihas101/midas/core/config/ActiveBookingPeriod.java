@@ -17,8 +17,8 @@ public class ActiveBookingPeriod {
         return LocalDate.now()
                 .minus(config.getCutoff())
                 .plusYears(1)
-                .withDayOfMonth(1)
-                .withMonth(1);
+                .withMonth(1)
+                .withDayOfMonth(1);
     }
 
     public LocalDate end() {

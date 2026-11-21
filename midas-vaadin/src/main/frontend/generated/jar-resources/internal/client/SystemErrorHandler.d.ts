@@ -12,7 +12,14 @@ export declare class SystemErrorHandler {
      */
     constructor(registry: Registry);
     /**
-     * Shows the session expiration notification.
+     * Shows the session expiration notification, or defers it while the browser
+     * is leaving the page.
+     *
+     * The request that ended the session, such as a logout URL, typically
+     * responds with the page the browser is navigating to. Going to the session
+     * expired URL meanwhile would cancel that navigation. In web-component mode
+     * the session is resynchronized instead, which does not navigate, so it is
+     * not deferred.
      *
      * @param details - message details or null if there are no details
      */

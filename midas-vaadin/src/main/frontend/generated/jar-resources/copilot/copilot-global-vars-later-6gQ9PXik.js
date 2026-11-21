@@ -1,11 +1,11 @@
 import { n as e } from "./chunk-DiqZc92J.js";
 import { C as t, G as n, H as r, K as i, S as a, X as o, Y as s, _ as c, _t as l, a as u, at as d, it as f, n as p, o as m, ot as h, r as g, t as _, u as v, vt as y, w as b, x, yt as S } from "./icons-Bzfd0PEL.js";
-import { l as C, o as w } from "./consts-5dxzGUWk.js";
-import { g as T, s as E } from "./dom-utils-CtCgswnG.js";
-import { a as D, n as ee, o as te, t as O } from "./copilot-tree-impl-Dcz14Bij.js";
+import { l as C, o as w } from "./consts-CBLJ9enl.js";
+import { g as T, s as E } from "./dom-utils-CNYAgfv-.js";
+import { a as D, n as ee, o as te, t as O } from "./copilot-tree-impl-BLavDNQJ.js";
 import { a as k, i as A } from "./copilot-ui-state-Dc6l_5DA.js";
-import { i as j, n as M } from "./copilot-server-communicator-impl-BSwkAYwm.js";
-import { i as N, o as P } from "./copilot-error-handler-DbLpVBVy.js";
+import { i as j, n as M } from "./copilot-server-communicator-impl-CaAStPjI.js";
+import { i as N, o as P } from "./copilot-error-handler-BHmVeUxG.js";
 //#region frontend/copilot/show-in-ide.ts
 function F(e, t) {
 	I(e) ? (x("show-in-ide", {
