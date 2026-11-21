@@ -1,6 +1,7 @@
 package de.nihas101.midas.headless.rest;
 
 import de.nihas101.midas.commons.BookingType;
+import de.nihas101.midas.headless.rest.dto.AccountStatementOrderRequest;
 import de.nihas101.midas.headless.rest.dto.AccountStatementsResponse;
 import de.nihas101.midas.headless.rest.dto.CreateManualExtraRequest;
 import de.nihas101.midas.headless.rest.dto.ExcludeAccountStatementRequest;
@@ -22,6 +23,7 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDate;
 import java.time.Year;
+import java.util.List;
 
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
@@ -30,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -132,21 +135,17 @@ public class AccountStatementRestIT {
         assertFalse(stillHasManual);
 
         // 8. Update Statement Order
-        // TODO: Do not base this order update on the rowKey
-        /*
-        final String firstKey = updatedResp.getAccountStatements().getFirst().getRowKey();
         final AccountStatementOrderRequest orderReq = AccountStatementOrderRequest.builder()
                 .shareholderId(sh.getId())
                 .year(Year.of(2026))
-                .rowKeys(List.of(firstKey))
+                .rowKeys(List.of("TYPE:DEPOSIT", "TYPE:WITHDRAWAL"))
                 .build();
         mockMvc.perform(put("/api/v1/account-statements/order")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(orderReq)))
                 .andExpect(status().isOk());
-         */
 
-        // 8. Exclude a Statement
+        // 9. Exclude a Statement
         final ExcludeAccountStatementRequest excludeReq = ExcludeAccountStatementRequest.builder()
                 .shareholderId(sh.getId())
                 .year(Year.of(2026))

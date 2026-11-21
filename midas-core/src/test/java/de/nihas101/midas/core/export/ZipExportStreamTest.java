@@ -80,6 +80,19 @@ public class ZipExportStreamTest {
         }
     }
 
+    @Test
+    void testPutEntryWithEmptyBytes() throws Exception {
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (final ZipExport zipExport = new ZipExportStream(null, null, baos)) {
+            zipExport.putEntry("empty.txt", new byte[0]);
+        }
+
+        try (final ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(baos.toByteArray()))) {
+            assertNextEntry(zis, "empty.txt", "");
+            assertNull(zis.getNextEntry());
+        }
+    }
+
     private static void assertNextEntry(
             final ZipInputStream zis,
             final String filePath,

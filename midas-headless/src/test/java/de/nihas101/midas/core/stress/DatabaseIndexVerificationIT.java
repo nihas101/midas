@@ -39,7 +39,7 @@ public class DatabaseIndexVerificationIT {
                 "Interest Rates Lookup",
                 "SELECT * FROM interest_rates WHERE shareholder_id = ? AND date = ?",
                 new Object[]{1, "2026-01-01"},
-                "idx_interest_rates_shareholder_date"
+                "uq_interest_rates_shareholder_date"
         );
 
         // Verify index usage on the opening_balances table
@@ -47,7 +47,7 @@ public class DatabaseIndexVerificationIT {
                 "Opening Balances Lookup",
                 "SELECT * FROM opening_balances WHERE shareholder_id = ? AND date = ?",
                 new Object[]{1, "2026-01-01"},
-                "idx_opening_balances_shareholder_date"
+                "uq_opening_balances_shareholder_date"
         );
 
         // Verify index usage on the account_statement_overrides table

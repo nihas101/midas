@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+
+    <changeSet id="014-deduplicate-and-unique-opening-balances-and-interest-rates" author="midas">
+        <!-- 1. Remove duplicate opening balances, keeping only the highest ID per (shareholder_id, date) -->
+        <sql>
+            DELETE FROM opening_balances
+            WHERE id NOT IN (
+                SELECT MAX(id)
+                FROM opening_balances
+                GROUP BY shareholder_id, date
+            );
+        </sql>
+
+        <!-- 2. Remove duplicate interest rates, keeping only the highest ID per (shareholder_id, date) -->
+        <sql>
+            DELETE FROM interest_rates
+            WHERE id NOT IN (
+                SELECT MAX(id)
+                FROM interest_rates
+                GROUP BY shareholder_id, date
+            );
+        </sql>
+
+        <!-- 3. Replace non-unique index with unique index on opening_balances -->
+        <dropIndex indexName="idx_opening_balances_shareholder_date" tableName="opening_balances"/>
+        <createIndex indexName="uq_opening_balances_shareholder_date" tableName="opening_balances" unique="true">
+            <column name="shareholder_id"/>
+            <column name="date"/>
+        </createIndex>
+
+        <!-- 4. Replace non-unique index with unique index on interest_rates -->
+        <dropIndex indexName="idx_interest_rates_shareholder_date" tableName="interest_rates"/>
+        <createIndex indexName="uq_interest_rates_shareholder_date" tableName="interest_rates" unique="true">
+            <column name="shareholder_id"/>
+            <column name="date"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

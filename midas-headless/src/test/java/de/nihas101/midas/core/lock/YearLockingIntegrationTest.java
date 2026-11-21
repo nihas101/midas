@@ -2,6 +2,8 @@ package de.nihas101.midas.core.lock;
 
 import de.nihas101.midas.api.bookings.Booking;
 import de.nihas101.midas.api.interest.InterestBookingsService;
+import de.nihas101.midas.api.interest.InterestRate;
+import de.nihas101.midas.api.interest.InterestRateService;
 import de.nihas101.midas.api.interest.InterestUpdatingBookingsService;
 import de.nihas101.midas.api.interest.InterestUpdatingOpeningBalanceService;
 import de.nihas101.midas.api.lock.LockWriter;
@@ -11,6 +13,7 @@ import de.nihas101.midas.commons.BookingType;
 import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.commons.Source;
 import de.nihas101.midas.core.bookings.dto.DefaultBooking;
+import de.nihas101.midas.core.interest.dto.DefaultInterestRate;
 import de.nihas101.midas.core.lock.service.LockedException;
 import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
 import de.nihas101.midas.core.shareholders.dto.DefaultShareholder;
@@ -46,6 +49,9 @@ class YearLockingIntegrationTest {
 
     @Autowired
     private InterestBookingsService interestBookingsService;
+
+    @Autowired
+    private InterestRateService interestRateService;
 
     private Shareholder shareholder;
 
@@ -154,5 +160,28 @@ class YearLockingIntegrationTest {
 
         Assertions.assertThrows(LockedException.class, () -> interestBookingsService.create(interestBooking));
         Assertions.assertThrows(LockedException.class, () -> interestBookingsService.deleteInterestBooking(shareholder, year2026));
+    }
+
+    @Test
+    void interestRateMutationsInLockedYear_arePrevented() {
+        final Year year2026 = Year.of(2026);
+        lockWriter.lock(shareholder, year2026);
+
+        final InterestRate interestRate = new DefaultInterestRate(
+                null,
+                shareholder.getId(),
+                new BigDecimal("0.05"),
+                year2026
+        );
+
+        Assertions.assertThrows(LockedException.class, () -> interestRateService.create(interestRate));
+
+        final InterestRate updateRate = new DefaultInterestRate(
+                123,
+                shareholder.getId(),
+                new BigDecimal("0.06"),
+                year2026
+        );
+        Assertions.assertThrows(LockedException.class, () -> interestRateService.update(updateRate));
     }
 }

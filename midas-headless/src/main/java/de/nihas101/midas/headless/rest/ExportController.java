@@ -3,6 +3,7 @@ package de.nihas101.midas.headless.rest;
 import de.nihas101.midas.api.export.Export;
 import de.nihas101.midas.api.export.ExportFormat;
 import de.nihas101.midas.api.shareholder.Shareholder;
+import de.nihas101.midas.api.shareholder.Shareholders;
 import de.nihas101.midas.api.shareholder.ShareholdersReader;
 import de.nihas101.midas.core.export.ExportFactory;
 import de.nihas101.midas.core.export.ExportRequest;
@@ -30,11 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/export")
@@ -118,22 +115,10 @@ public class ExportController {
         }
     }
 
-    // TODO: Request the set of shareholders instead of post-filtering
     private List<Shareholder> shareholders(final List<Integer> shareholderIds) {
-        if (shareholderIds == null || shareholderIds.isEmpty()) {
-            return shareholdersReader.shareholders()
-                    .toList();
-        } else {
-            final Set<Integer> idSet = new HashSet<>(shareholderIds);
-            final Map<Integer, Shareholder> map = shareholdersReader.shareholders()
-                    .toList()
-                    .stream()
-                    .filter(sh -> idSet.contains(sh.getId()))
-                    .collect(Collectors.toMap(Shareholder::getId, Function.identity()));
-            return shareholderIds.stream()
-                    .map(map::get)
-                    .filter(Objects::nonNull)
-                    .toList();
-        }
+        final Shareholders shareholders = shareholderIds == null || shareholderIds.isEmpty()
+                ? shareholdersReader.shareholders()
+                : shareholdersReader.shareholders(shareholderIds);
+        return shareholders.toList();
     }
 }

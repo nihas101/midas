@@ -11,13 +11,11 @@ import de.nihas101.midas.api.interest.InterestRateService;
 import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.api.shareholder.ShareholdersReader;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.time.Year;
 
 @Service
-@Primary // TODO: Also need to consider lock beforehand
 @RequiredArgsConstructor
 public class InterestBookingUpdatingInterestRateService implements InterestRateService {
 
@@ -25,7 +23,7 @@ public class InterestBookingUpdatingInterestRateService implements InterestRateS
     private final InterestBookingsReader bookingsReader;
     private final InterestBookingsWriter bookingsWriter;
     private final ShareholdersReader shareholdersReader;
-    private final InterestRateService delegate;
+    private final DefaultInterestRateService delegate;
 
     @Override
     public InterestRate interestRate(final Integer shareholderId, final Year year) {
