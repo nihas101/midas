@@ -13,7 +13,7 @@ import java.time.Year;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RequestToggleAutomaticInterestBooking {
+public class RequestToggleAutomaticInterestBooking { // TODO: Add @Schema
 
     @NotNull
     @Positive

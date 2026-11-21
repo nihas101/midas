@@ -16,5 +16,5 @@ public class AccountStatementsResponse {
     @Schema(description = "All account statements for the shareholder and year (bookings + manual extras)")
     private List<AccountStatementDto> accountStatements;
     @Schema(description = "Manual statement overrides (label / amount overrides)")
-    private List<ManualStatementDto> overrides;
+    private List<ManualStatementDto> manualStatements;
 }

@@ -115,7 +115,7 @@ public class AccountStatementsController {
                         .build())
                 .toList();
 
-        final List<ManualStatementDto> overrideDtos = statements.manualStatements().stream()
+        final List<ManualStatementDto> manualStatements = statements.manualStatements().stream()
                 .map(m -> ManualStatementDto.builder()
                         .id(m.id())
                         .label(m.label())
@@ -126,7 +126,7 @@ public class AccountStatementsController {
         return ResponseEntity.ok(
                 AccountStatementsResponse.builder()
                         .accountStatements(stmtDtos)
-                        .overrides(overrideDtos)
+                        .manualStatements(manualStatements)
                         .build()
         );
     }

@@ -89,7 +89,7 @@ public class AccountStatementRestIT {
         final MvcResult stmtsResult = mockMvc.perform(get("/api/v1/account-statements?shareholderId=" + sh.getId() + "&year=2026"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accountStatements", hasSize(greaterThan(0))))
-                .andExpect(jsonPath("$.overrides").isArray())
+                .andExpect(jsonPath("$.manualStatements").isArray())
                 .andReturn();
 
         final AccountStatementsResponse resp = objectMapper.readValue(stmtsResult.getResponse().getContentAsString(), AccountStatementsResponse.class);
@@ -116,7 +116,7 @@ public class AccountStatementRestIT {
         assertTrue(hasManual);
 
         // 7. Delete manual extra override
-        final Integer manualExtraId = updatedResp.getOverrides().stream()
+        final Integer manualExtraId = updatedResp.getManualStatements().stream()
                 .filter(m -> "Bonus adjustment".equals(m.getLabel()))
                 .map(ManualStatementDto::getId)
                 .findFirst()
