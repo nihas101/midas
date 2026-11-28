@@ -59,6 +59,7 @@ import de.nihas101.midas.vaadin.ui.common.locale.MidasLocaleResolver;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.MessageSource;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.math.BigDecimal;
 import java.time.Year;
@@ -66,6 +67,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static java.math.BigDecimal.ZERO;
 import static java.util.Collections.emptyList;
@@ -90,6 +92,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
     private final InterestCalculationFactory interestCalculationFactory;
     private final SelectionView selectionView;
     private final SelectionStorage selectionStorage;
+    private final TransactionTemplate transactionTemplate;
 
     private PercentAmountField<OpeningBalance> interestRateField;
     private Grid<InterestCalculationRow> interestCalculationGrid;
@@ -111,7 +114,8 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
             final ExportFactory exportFactory,
             final UserConfigFactory userConfigFactory,
             final BookingFactory bookingFactory,
-            final InterestCalculationFactory interestCalculationFactory
+            final InterestCalculationFactory interestCalculationFactory,
+            final TransactionTemplate transactionTemplate
     ) {
         super(
                 config,
@@ -136,6 +140,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
         this.exportFactory = exportFactory;
         this.bookingFactory = bookingFactory;
         this.interestCalculationFactory = interestCalculationFactory;
+        this.transactionTemplate = transactionTemplate;
 
         VerticalLayout content = new VerticalLayout();
         content.setSizeFull();
@@ -252,25 +257,33 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
             return;
         }
 
-        // TODO: Updating of these two fields should be handled in a transaction
-        final InterestRate interestRate = updateInterestRate(shareholder, year, rate);
-        final Bookings bookings = bookingsReader.interestRelatedBookingsForShareholderAndYear(shareholder.getId(), year);
-        final InterestCalculation interestCalculation = interestCalculationFactory.create(
-                bookings,
-                year,
-                interestRate.getInterestRate()
-        );
+        final boolean updateAutomatically = Boolean.TRUE.equals(updateInterestAutomaticallyToggle.getValue());
+        final AtomicReference<InterestCalculation> calculationHolder = new AtomicReference<>();
+        final AtomicReference<Bookings> bookingsHolder = new AtomicReference<>();
 
-        if (Boolean.TRUE.equals(updateInterestAutomaticallyToggle.getValue())) {
-            createInterestBookingIfNeeded(shareholder, year, interestCalculation);
-        }
+        transactionTemplate.executeWithoutResult(status -> {
+            final InterestRate interestRate = updateInterestRate(shareholder, year, rate);
+            final Bookings bookings = bookingsReader.interestRelatedBookingsForShareholderAndYear(shareholder.getId(), year);
+            final InterestCalculation interestCalculation = interestCalculationFactory.create(
+                    bookings,
+                    year,
+                    interestRate.getInterestRate()
+            );
+
+            if (updateAutomatically) {
+                createInterestBookingIfNeeded(shareholder, year, interestCalculation);
+            }
+
+            bookingsHolder.set(bookings);
+            calculationHolder.set(interestCalculation);
+        });
 
         interestCalculationGrid.setItems(
                 interestRowService.generateRows(
                         year,
-                        bookings,
+                        bookingsHolder.get(),
                         rate,
-                        interestCalculation,
+                        calculationHolder.get(),
                         getLocale()
                 )
         );
@@ -334,9 +347,9 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
         final BigDecimal interestRate = interestRate(shareholder, year).getInterestRate();
         interestRateField.setValue(interestRate);
 
-        // TODO: An exists check is enough
-        final Booking booking = bookingsReader.systemGeneratedInterestForShareholderAndYear(shareholder, year);
-        updateInterestAutomaticallyToggle.setValue(booking != null);
+        updateInterestAutomaticallyToggle.setValue(
+                bookingsReader.existsSystemGeneratedInterestForShareholderAndYear(shareholder, year)
+        );
 
         final Bookings bookings = bookingsReader.interestRelatedBookingsForShareholderAndYear(shareholder.getId(), year);
         if (bookings.isEmpty()) {

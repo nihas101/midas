@@ -50,6 +50,18 @@ public class DefaultInterestBookingsService implements InterestBookingsService {
     }
 
     @Override
+    public boolean existsSystemGeneratedInterestForShareholderAndYear(final Shareholder shareholder, final Year year) {
+        final LocalDate endOfYear = year.atMonth(Month.DECEMBER).atDay(31);
+
+        return bookingsRepository.existsByShareholderAndDateAndTypeAndSource(
+                DefaultShareholder.fromDto(shareholder),
+                endOfYear,
+                BookingType.INTEREST,
+                Source.SYSTEM
+        );
+    }
+
+    @Override
     public Bookings interestRelatedBookingsForShareholderAndYear(final Integer shareholderId, final Year year) {
         final ShareholderEntity shareholder = shareholdersRepository.findById(shareholderId)
                 .orElseThrow(() -> new IllegalArgumentException("Shareholder not found"));

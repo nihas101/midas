@@ -10,5 +10,7 @@ public interface InterestBookingsReader {
 
     Booking systemGeneratedInterestForShareholderAndYear(final Shareholder shareholder, final Year year);
 
+    boolean existsSystemGeneratedInterestForShareholderAndYear(final Shareholder shareholder, final Year year);
+
     Bookings interestRelatedBookingsForShareholderAndYear(final Integer shareholderId, final Year year);
 }

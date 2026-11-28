@@ -27,6 +27,11 @@ public class LockingInterestBookingsService implements InterestBookingsService {
     }
 
     @Override
+    public boolean existsSystemGeneratedInterestForShareholderAndYear(final Shareholder shareholder, final Year year) {
+        return delegate.existsSystemGeneratedInterestForShareholderAndYear(shareholder, year);
+    }
+
+    @Override
     public Bookings interestRelatedBookingsForShareholderAndYear(final Integer shareholderId, final Year year) {
         return delegate.interestRelatedBookingsForShareholderAndYear(shareholderId, year);
     }
