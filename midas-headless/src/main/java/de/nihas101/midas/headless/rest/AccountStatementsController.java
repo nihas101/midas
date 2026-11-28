@@ -220,11 +220,11 @@ public class AccountStatementsController {
     ) {
         final Shareholder shareholder = shareholdersReader.shareholder(shareholderId);
         if (shareholder == null) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.noContent().build();
         }
 
         accountStatementService.deleteOverride(shareholder, year, id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(

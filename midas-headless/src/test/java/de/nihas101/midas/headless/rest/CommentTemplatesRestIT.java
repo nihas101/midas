@@ -99,7 +99,7 @@ public class CommentTemplatesRestIT {
 
         // 5. Delete template
         mockMvc.perform(delete("/api/v1/comment-templates/" + createdTemplate1.getId()))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
         // Verify template 1 is deleted
         final MvcResult listAfterDeleteResult = mockMvc.perform(get("/api/v1/comment-templates"))
@@ -114,8 +114,8 @@ public class CommentTemplatesRestIT {
         assertFalse(templatesAfterDelete.stream().anyMatch(t -> t.getId().equals(createdTemplate1.getId())));
         assertTrue(templatesAfterDelete.stream().anyMatch(t -> t.getId().equals(createdTemplate2.getId())));
 
-        // Deleting non-existing template should return 404
+        // Deleting non-existing template should return 204
         mockMvc.perform(delete("/api/v1/comment-templates/" + createdTemplate1.getId()))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNoContent());
     }
 }

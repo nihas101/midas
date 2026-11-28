@@ -116,6 +116,6 @@ public class ShareholdersRestIT {
                 .andExpect(status().isNoContent());
 
         mockMvc.perform(get("/api/v1/shareholders/" + created.getId()))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNoContent());
     }
 }

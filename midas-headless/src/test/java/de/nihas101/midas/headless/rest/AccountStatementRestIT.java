@@ -123,7 +123,7 @@ public class AccountStatementRestIT {
                 .orElseThrow();
 
         mockMvc.perform(delete("/api/v1/account-statements/manual/" + manualExtraId + "?shareholderId=" + sh.getId() + "&year=2026"))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
         // Verify manual extra is deleted
         final MvcResult afterDeleteStmts = mockMvc.perform(get("/api/v1/account-statements?shareholderId=" + sh.getId() + "&year=2026"))

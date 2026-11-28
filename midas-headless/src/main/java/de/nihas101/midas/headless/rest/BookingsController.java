@@ -240,7 +240,7 @@ public class BookingsController {
     ) {
         final Booking toDelete = bookingsReader.bookingForId(id);
         if (toDelete == null) {
-            return ResponseEntity.notFound()
+            return ResponseEntity.noContent()
                     .build();
         }
         bookingsWriter.delete(toDelete);

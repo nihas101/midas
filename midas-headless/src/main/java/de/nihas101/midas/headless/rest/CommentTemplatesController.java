@@ -157,15 +157,15 @@ public class CommentTemplatesController {
         try {
             final CommentTemplate toDelete = commentTemplatesReader.getTemplate(id);
             if (toDelete == null) {
-                return ResponseEntity.notFound()
+                return ResponseEntity.noContent()
                         .build();
             }
 
             commentTemplatesWriter.delete(toDelete.getId());
-            return ResponseEntity.ok()
+            return ResponseEntity.noContent()
                     .build();
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound()
+            return ResponseEntity.noContent()
                     .build();
         }
     }

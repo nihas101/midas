@@ -100,7 +100,7 @@ public class ShareholdersController {
     ) {
         final Shareholder sh = shareholdersService.shareholder(id);
         if (sh == null) {
-            return ResponseEntity.notFound()
+            return ResponseEntity.noContent()
                     .build();
         }
         return ResponseEntity.ok(ResponseShareholder.toDto(sh));
@@ -260,7 +260,7 @@ public class ShareholdersController {
     ) {
         final Shareholder sh = shareholdersService.shareholder(id);
         if (sh == null) {
-            return ResponseEntity.notFound()
+            return ResponseEntity.noContent()
                     .build();
         }
         shareholdersService.delete(

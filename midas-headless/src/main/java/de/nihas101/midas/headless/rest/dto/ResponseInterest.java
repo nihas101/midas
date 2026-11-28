@@ -36,8 +36,8 @@ public class ResponseInterest {
     @NotNull
     @Positive
     @Schema(
-            description = "Interest rate as a decimal (e.g. 0.05 for 5%)",
-            example = "0.05"
+            description = "Interest rate as a decimal (e.g. 5.00 for 5%)",
+            example = "5.00"
     )
     private BigDecimal interestRate;
 
