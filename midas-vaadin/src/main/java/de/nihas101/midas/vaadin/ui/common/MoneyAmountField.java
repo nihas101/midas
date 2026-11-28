@@ -35,20 +35,45 @@ public class MoneyAmountField<T> extends BigDecimalField {
             final ValueProvider<T, MoneyAmount> amountSupplier,
             final Setter<T, MoneyAmount> amountConsumer
     ) {
+        this(
+                messageSource,
+                binder,
+                label,
+                locale,
+                uiConfig,
+                amountSupplier,
+                amountConsumer,
+                false
+        );
+    }
+
+    public MoneyAmountField(
+            final MessageSource messageSource,
+            final Binder<T> binder,
+            final String label,
+            final Locale locale,
+            final UIConfig uiConfig,
+            final ValueProvider<T, MoneyAmount> amountSupplier,
+            final Setter<T, MoneyAmount> amountConsumer,
+            final boolean allowZero
+    ) {
         this(label, locale, uiConfig);
 
-        binder.forField(this)
-                .asRequired()
-                .withValidator((Validator<BigDecimal>) (value, context) -> value != null && value.longValue() != 0L
-                                ? ValidationResult.ok()
-                                : ValidationResult.error(
-                                messageSource.getMessage(
-                                        "bookings.amount.error",
-                                        null,
-                                        locale
-                                )
-                        )
-                ).withConverter(
+        final Binder.BindingBuilder<T, BigDecimal> bindingBuilder = binder.forField(this).asRequired();
+        if (!allowZero) {
+            bindingBuilder.withValidator((Validator<BigDecimal>) (value, context) ->
+                    value != null && value.compareTo(BigDecimal.ZERO) != 0
+                            ? ValidationResult.ok()
+                            : ValidationResult.error(
+                            messageSource.getMessage(
+                                    "bookings.amount.error",
+                                    null,
+                                    locale
+                            )
+                    )
+            );
+        }
+        bindingBuilder.withConverter(
                         MoneyAmount::of,
                         m -> m != null ? m.toBigDecimalForInput() : null
                 )
