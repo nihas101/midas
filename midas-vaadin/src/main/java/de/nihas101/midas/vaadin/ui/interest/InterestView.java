@@ -39,7 +39,6 @@ import de.nihas101.midas.api.userconfig.UserConfigFactory;
 import de.nihas101.midas.api.userconfig.UserConfigService;
 import de.nihas101.midas.core.export.ExportFactory;
 import de.nihas101.midas.core.export.ExportViewName;
-import de.nihas101.midas.core.interest.DefaultInterestCalculation;
 import de.nihas101.midas.core.interest.dto.DefaultInterestRate;
 import de.nihas101.midas.core.lock.ShareholderLock;
 import de.nihas101.midas.core.shareholders.service.ShareholdersService;
@@ -248,7 +247,6 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
         return actions;
     }
 
-    // TODO: This and recalculateInterestForDisplay duplicate a lot of code and logic
     private void recalculateInterest() {
         final Shareholder shareholder = headerActionBar.getSelectedShareholder();
         final Year year = headerActionBar.getSelectedYear();
@@ -356,7 +354,7 @@ public class InterestView extends MidasView implements BeforeEnterObserver {
             interestCalculationGrid.setItems(emptyList());
             return;
         }
-        final InterestCalculation interestCalculation = new DefaultInterestCalculation(
+        final InterestCalculation interestCalculation = interestCalculationFactory.create(
                 bookings,
                 year,
                 interestRate
