@@ -237,7 +237,8 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
                 locale,
                 getMidasConfig().getUi(),
                 OpeningBalance::getOpeningBalance,
-                OpeningBalance::setOpeningBalance
+                OpeningBalance::setOpeningBalance,
+                true
         );
         openingBalanceField.setMaxWidth("9em");
         openingBalanceField.addValueChangeListener(e -> {
