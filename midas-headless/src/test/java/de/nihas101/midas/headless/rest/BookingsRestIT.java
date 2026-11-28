@@ -1,13 +1,13 @@
 package de.nihas101.midas.headless.rest;
 
 import de.nihas101.midas.commons.BookingType;
-import de.nihas101.midas.headless.rest.dto.BookingsResponse;
-import de.nihas101.midas.headless.rest.dto.CarryOverRequest;
 import de.nihas101.midas.headless.rest.dto.MoneyAmountDto;
 import de.nihas101.midas.headless.rest.dto.RequestBooking;
+import de.nihas101.midas.headless.rest.dto.RequestCarryOver;
 import de.nihas101.midas.headless.rest.dto.RequestOpeningBalance;
 import de.nihas101.midas.headless.rest.dto.RequestShareholder;
 import de.nihas101.midas.headless.rest.dto.ResponseBooking;
+import de.nihas101.midas.headless.rest.dto.ResponseBookings;
 import de.nihas101.midas.headless.rest.dto.ResponseOpeningBalance;
 import de.nihas101.midas.headless.rest.dto.ResponseShareholder;
 import org.junit.jupiter.api.Test;
@@ -112,7 +112,7 @@ public class BookingsRestIT {
                 .andExpect(jsonPath("$.bookings[0].comment").value("Initial deposit updated"));
 
         // 6. Test Carry Over to next year (2027)
-        final CarryOverRequest carryOverRequest = CarryOverRequest.builder()
+        final RequestCarryOver carryOverRequest = RequestCarryOver.builder()
                 .shareholderId(sh.getId())
                 .fromYear(Year.of(2026))
                 .active(true)
@@ -202,7 +202,7 @@ public class BookingsRestIT {
                 .andExpect(status().isCreated());
 
         // Attempt carry over without force overwrite -> 409 Conflict
-        final CarryOverRequest request = CarryOverRequest.builder()
+        final RequestCarryOver request = RequestCarryOver.builder()
                 .shareholderId(sh.getId())
                 .fromYear(Year.of(2026))
                 .forceOverwrite(false)
@@ -216,7 +216,7 @@ public class BookingsRestIT {
                 .andExpect(jsonPath("$.warning").value("OPENING_BALANCE_EXISTS"));
 
         // Carry over with forceOverwrite=true -> 200 OK
-        final CarryOverRequest forceRequest = CarryOverRequest.builder()
+        final RequestCarryOver forceRequest = RequestCarryOver.builder()
                 .shareholderId(sh.getId())
                 .fromYear(Year.of(2026))
                 .forceOverwrite(true)
@@ -244,7 +244,7 @@ public class BookingsRestIT {
         final ResponseShareholder sh = objectMapper.readValue(shResult.getResponse().getContentAsString(), ResponseShareholder.class);
 
         // Initial carry over (active=true)
-        final CarryOverRequest enableReq = CarryOverRequest.builder()
+        final RequestCarryOver enableReq = RequestCarryOver.builder()
                 .shareholderId(sh.getId())
                 .fromYear(Year.of(2026))
                 .active(true)
@@ -256,7 +256,7 @@ public class BookingsRestIT {
                 .andExpect(jsonPath("$.source").value("SYSTEM"));
 
         // Uncheck carry over (active=false)
-        final CarryOverRequest disableReq = CarryOverRequest.builder()
+        final RequestCarryOver disableReq = RequestCarryOver.builder()
                 .shareholderId(sh.getId())
                 .fromYear(Year.of(2026))
                 .active(false)
@@ -346,7 +346,7 @@ public class BookingsRestIT {
                 .andExpect(status().isCreated());
 
         // Enable carry over
-        final CarryOverRequest carryOver = CarryOverRequest.builder()
+        final RequestCarryOver carryOver = RequestCarryOver.builder()
                 .shareholderId(sh.getId())
                 .fromYear(Year.of(2026))
                 .active(true)
@@ -393,7 +393,7 @@ public class BookingsRestIT {
         final MvcResult verifyResult = mockMvc.perform(get("/api/v1/bookings?shareholderId=" + sh.getId() + "&year=2026"))
                 .andExpect(status().isOk())
                 .andReturn();
-        final BookingsResponse resp = objectMapper.readValue(verifyResult.getResponse().getContentAsString(), BookingsResponse.class);
+        final ResponseBookings resp = objectMapper.readValue(verifyResult.getResponse().getContentAsString(), ResponseBookings.class);
         assertEquals(0, resp.getBookings().size());
     }
 }

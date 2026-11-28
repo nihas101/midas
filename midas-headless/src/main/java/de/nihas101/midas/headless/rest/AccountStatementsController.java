@@ -7,12 +7,12 @@ import de.nihas101.midas.api.accountstatement.LabeledAccountStatement;
 import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.api.shareholder.ShareholdersReader;
 import de.nihas101.midas.headless.rest.dto.AccountStatementDto;
-import de.nihas101.midas.headless.rest.dto.AccountStatementOrderRequest;
-import de.nihas101.midas.headless.rest.dto.AccountStatementsResponse;
-import de.nihas101.midas.headless.rest.dto.CreateManualExtraRequest;
-import de.nihas101.midas.headless.rest.dto.ExcludeAccountStatementRequest;
 import de.nihas101.midas.headless.rest.dto.ManualStatementDto;
 import de.nihas101.midas.headless.rest.dto.MoneyAmountDto;
+import de.nihas101.midas.headless.rest.dto.RequestAccountStatementOrder;
+import de.nihas101.midas.headless.rest.dto.RequestCreateManualExtra;
+import de.nihas101.midas.headless.rest.dto.RequestExcludeAccountStatement;
+import de.nihas101.midas.headless.rest.dto.ResponseAccountStatements;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -75,7 +75,7 @@ public class AccountStatementsController {
             )
     })
     @GetMapping
-    public ResponseEntity<AccountStatementsResponse> getAccountStatements(
+    public ResponseEntity<ResponseAccountStatements> getAccountStatements(
             @RequestParam
             @NotNull
             @Positive final Integer shareholderId,
@@ -124,7 +124,7 @@ public class AccountStatementsController {
                 .toList();
 
         return ResponseEntity.ok(
-                AccountStatementsResponse.builder()
+                ResponseAccountStatements.builder()
                         .accountStatements(stmtDtos)
                         .manualStatements(manualStatements)
                         .build()
@@ -162,7 +162,7 @@ public class AccountStatementsController {
     @PutMapping("/order")
     public ResponseEntity<Void> updateOrder(
             @NotNull
-            @RequestBody final AccountStatementOrderRequest orderRequest
+            @RequestBody final RequestAccountStatementOrder orderRequest
     ) {
         accountStatementService.saveOrder(
                 shareholdersReader.shareholder(orderRequest.getShareholderId()),
@@ -262,7 +262,7 @@ public class AccountStatementsController {
     @PostMapping("/manual-extra")
     public ResponseEntity<Void> createManualExtra(
             @NotNull
-            @RequestBody final CreateManualExtraRequest request
+            @RequestBody final RequestCreateManualExtra request
     ) {
         final Shareholder shareholder = shareholdersReader.shareholder(request.getShareholderId());
         if (shareholder == null) {
@@ -316,7 +316,7 @@ public class AccountStatementsController {
     @PostMapping("/exclude")
     public ResponseEntity<Void> excludeStatement(
             @NotNull
-            @RequestBody final ExcludeAccountStatementRequest request
+            @RequestBody final RequestExcludeAccountStatement request
     ) {
         final Shareholder shareholder = shareholdersReader.shareholder(request.getShareholderId());
         if (shareholder == null) {

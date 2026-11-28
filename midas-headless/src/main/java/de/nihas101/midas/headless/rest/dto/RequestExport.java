@@ -17,7 +17,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ExportApiRequest {
+public class RequestExport {
 
     @Schema(description = "List of shareholder IDs to export; omit or leave empty to export all", example = "[1, 2, 3]")
     private List<Integer> shareholderIds;

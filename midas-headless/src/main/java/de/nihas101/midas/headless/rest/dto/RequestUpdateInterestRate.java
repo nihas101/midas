@@ -15,7 +15,7 @@ import java.time.Year;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateInterestRate {
+public class RequestUpdateInterestRate {
 
     @NotNull
     @Positive
@@ -24,7 +24,7 @@ public class CreateInterestRate {
 
     @NotNull
     @Positive
-    @Schema(description = "Interest rate as a decimal (e.g. 0.05 for 5%)", example = "0.05")
+    @Schema(description = "Updated interest rate as a decimal (e.g. 5.00 for 5%)", example = "5.00")
     private BigDecimal interestRate;
 
     @NotNull

@@ -4,9 +4,9 @@ import de.nihas101.midas.api.bookings.Booking;
 import de.nihas101.midas.api.bookings.Bookings;
 import de.nihas101.midas.api.bookings.BookingsReader;
 import de.nihas101.midas.api.bookings.BookingsWriter;
-import de.nihas101.midas.headless.rest.dto.BookingsResponse;
 import de.nihas101.midas.headless.rest.dto.RequestBooking;
 import de.nihas101.midas.headless.rest.dto.ResponseBooking;
+import de.nihas101.midas.headless.rest.dto.ResponseBookings;
 import de.nihas101.midas.headless.rest.dto.ResponseOpeningBalance;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -71,7 +71,7 @@ public class BookingsController {
             )
     })
     @GetMapping
-    public ResponseEntity<BookingsResponse> getBookings(
+    public ResponseEntity<ResponseBookings> getBookings(
             @NotNull
             @Positive
             @RequestParam final Integer shareholderId,
@@ -86,7 +86,7 @@ public class BookingsController {
                 .map(ResponseOpeningBalance::toDto)
                 .orElse(null);
         return ResponseEntity.ok(
-                BookingsResponse.builder()
+                ResponseBookings.builder()
                         .openingBalance(openingBalance)
                         .bookings(bookings.map(ResponseBooking::toDto))
                         .build()

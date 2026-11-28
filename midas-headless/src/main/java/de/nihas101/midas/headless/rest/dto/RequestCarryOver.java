@@ -8,14 +8,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 import java.time.Year;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateInterestRate {
+public class RequestCarryOver {
 
     @NotNull
     @Positive
@@ -23,12 +22,12 @@ public class UpdateInterestRate {
     private Integer shareholderId;
 
     @NotNull
-    @Positive
-    @Schema(description = "Updated interest rate as a decimal (e.g. 5.00 for 5%)", example = "5.00")
-    private BigDecimal interestRate;
+    @Schema(description = "Source year whose closing balance should be carried over", example = "2026")
+    private Year fromYear;
 
-    @NotNull
-    @Schema(description = "Year the interest rate applies to", example = "2026")
-    private Year year;
+    @Schema(description = "Whether to force overwrite an existing user-defined opening balance", example = "false")
+    private boolean forceOverwrite;
 
+    @Schema(description = "Carry over status (true to carry over, false to detach)", example = "true")
+    private boolean active;
 }

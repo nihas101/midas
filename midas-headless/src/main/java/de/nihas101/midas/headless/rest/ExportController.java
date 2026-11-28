@@ -10,7 +10,7 @@ import de.nihas101.midas.core.export.ExportRequest;
 import de.nihas101.midas.core.export.ExportViewName;
 import de.nihas101.midas.core.export.ExportViews;
 import de.nihas101.midas.headless.config.MidasConfig;
-import de.nihas101.midas.headless.rest.dto.ExportApiRequest;
+import de.nihas101.midas.headless.rest.dto.RequestExport;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -81,7 +81,7 @@ public class ExportController {
     @PostMapping
     public void export(
             @NotNull
-            @RequestBody final ExportApiRequest request,
+            @RequestBody final RequestExport request,
 
             final HttpServletResponse response,
             final Locale locale

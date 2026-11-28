@@ -7,7 +7,7 @@ import de.nihas101.midas.api.openingbalance.OpeningBalanceService;
 import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.commons.Source;
 import de.nihas101.midas.core.openingbalance.dto.DefaultOpeningBalance;
-import de.nihas101.midas.headless.rest.dto.CarryOverRequest;
+import de.nihas101.midas.headless.rest.dto.RequestCarryOver;
 import de.nihas101.midas.headless.rest.dto.RequestOpeningBalance;
 import de.nihas101.midas.headless.rest.dto.ResponseOpeningBalance;
 import io.swagger.v3.oas.annotations.Operation;
@@ -244,7 +244,7 @@ public class OpeningBalancesController {
     @PostMapping("/carry-over")
     public ResponseEntity<?> carryOverToNextYear(
             @NotNull
-            @RequestBody final CarryOverRequest request
+            @RequestBody final RequestCarryOver request
     ) {
         final Year nextYear = request.getFromYear().plusYears(1);
         final OpeningBalance nextYearBalance = openingBalanceService.openingBalance(request.getShareholderId(), nextYear);

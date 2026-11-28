@@ -17,13 +17,13 @@ import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.commons.Source;
 import de.nihas101.midas.core.interest.dto.DefaultInterestRate;
 import de.nihas101.midas.headless.config.MidasConfig;
-import de.nihas101.midas.headless.rest.dto.CreateInterestRate;
-import de.nihas101.midas.headless.rest.dto.InterestResponse;
+import de.nihas101.midas.headless.rest.dto.RequestCreateInterestRate;
 import de.nihas101.midas.headless.rest.dto.RequestToggleAutomaticInterestBooking;
+import de.nihas101.midas.headless.rest.dto.RequestUpdateInterestRate;
+import de.nihas101.midas.headless.rest.dto.ResponseInterest;
 import de.nihas101.midas.headless.rest.dto.ResponseInterestRate;
 import de.nihas101.midas.headless.rest.dto.ResponseInterestRow;
 import de.nihas101.midas.headless.rest.dto.ResponseToggleAutomaticInterestBooking;
-import de.nihas101.midas.headless.rest.dto.UpdateInterestRate;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -95,7 +95,7 @@ public class InterestController {
             )
     })
     @GetMapping
-    public ResponseEntity<InterestResponse> getInterest(
+    public ResponseEntity<ResponseInterest> getInterest(
             @NotNull
             @Positive
             @RequestParam final Integer shareholderId,
@@ -110,7 +110,7 @@ public class InterestController {
         final InterestRate interestRate = interestRateService.interestRate(shareholderId, y);
         if (interestRate == null) {
             return ResponseEntity.ok(
-                    InterestResponse.builder()
+                    ResponseInterest.builder()
                             .interestRate(null)
                             .rows(emptyList())
                             .build()
@@ -136,7 +136,7 @@ public class InterestController {
                 .toList();
 
         return ResponseEntity.ok(
-                InterestResponse.builder()
+                ResponseInterest.builder()
                         .shareholderId(interestRate.getShareholderId())
                         .year(interestRate.getYear())
                         .interestRate(interestRate.getInterestRate())
@@ -176,7 +176,7 @@ public class InterestController {
     @PostMapping
     public ResponseEntity<ResponseInterestRate> createInterestRate(
             @NotNull
-            @RequestBody final CreateInterestRate createRequest
+            @RequestBody final RequestCreateInterestRate createRequest
     ) {
         final InterestRate toSave = new DefaultInterestRate(
                 null,
@@ -328,7 +328,7 @@ public class InterestController {
     @PutMapping
     public ResponseEntity<ResponseInterestRate> updateInterestRate(
             @NotNull
-            @RequestBody final UpdateInterestRate updateRequest
+            @RequestBody final RequestUpdateInterestRate updateRequest
     ) {
         final Year year = updateRequest.getYear();
 

@@ -2,9 +2,9 @@ package de.nihas101.midas.headless.rest;
 
 import de.nihas101.midas.api.export.ExportFormat;
 import de.nihas101.midas.commons.BookingType;
-import de.nihas101.midas.headless.rest.dto.ExportApiRequest;
 import de.nihas101.midas.headless.rest.dto.MoneyAmountDto;
 import de.nihas101.midas.headless.rest.dto.RequestBooking;
+import de.nihas101.midas.headless.rest.dto.RequestExport;
 import de.nihas101.midas.headless.rest.dto.RequestOpeningBalance;
 import de.nihas101.midas.headless.rest.dto.RequestShareholder;
 import de.nihas101.midas.headless.rest.dto.ResponseShareholder;
@@ -84,7 +84,7 @@ public class ExportRestIT {
 
     @Test
     void testPdfExportReturnsPdfBytes() throws Exception {
-        final ExportApiRequest request = ExportApiRequest.builder()
+        final RequestExport request = RequestExport.builder()
                 .shareholderIds(List.of(shareholder.getId()))
                 .views(Set.of(BOOKINGS))
                 .from(LocalDate.of(2026, 1, 1))
@@ -106,7 +106,7 @@ public class ExportRestIT {
 
     @Test
     void testXlsxExportReturnsExcelBytes() throws Exception {
-        final ExportApiRequest request = ExportApiRequest.builder()
+        final RequestExport request = RequestExport.builder()
                 .shareholderIds(List.of(shareholder.getId()))
                 .views(Set.of(BOOKINGS))
                 .from(LocalDate.of(2026, 1, 1))
@@ -128,7 +128,7 @@ public class ExportRestIT {
 
     @Test
     void testExportAllShareholdersWhenNoListProvided() throws Exception {
-        final ExportApiRequest request = ExportApiRequest.builder()
+        final RequestExport request = RequestExport.builder()
                 .shareholderIds(null)
                 .views(Set.of(BOOKINGS))
                 .from(LocalDate.of(2026, 1, 1))

@@ -1,15 +1,15 @@
 package de.nihas101.midas.headless.rest;
 
 import de.nihas101.midas.commons.BookingType;
-import de.nihas101.midas.headless.rest.dto.AccountStatementOrderRequest;
-import de.nihas101.midas.headless.rest.dto.AccountStatementsResponse;
-import de.nihas101.midas.headless.rest.dto.CreateManualExtraRequest;
-import de.nihas101.midas.headless.rest.dto.ExcludeAccountStatementRequest;
 import de.nihas101.midas.headless.rest.dto.ManualStatementDto;
 import de.nihas101.midas.headless.rest.dto.MoneyAmountDto;
+import de.nihas101.midas.headless.rest.dto.RequestAccountStatementOrder;
 import de.nihas101.midas.headless.rest.dto.RequestBooking;
+import de.nihas101.midas.headless.rest.dto.RequestCreateManualExtra;
+import de.nihas101.midas.headless.rest.dto.RequestExcludeAccountStatement;
 import de.nihas101.midas.headless.rest.dto.RequestOpeningBalance;
 import de.nihas101.midas.headless.rest.dto.RequestShareholder;
+import de.nihas101.midas.headless.rest.dto.ResponseAccountStatements;
 import de.nihas101.midas.headless.rest.dto.ResponseShareholder;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,10 +92,10 @@ public class AccountStatementRestIT {
                 .andExpect(jsonPath("$.manualStatements").isArray())
                 .andReturn();
 
-        final AccountStatementsResponse resp = objectMapper.readValue(stmtsResult.getResponse().getContentAsString(), AccountStatementsResponse.class);
+        final ResponseAccountStatements resp = objectMapper.readValue(stmtsResult.getResponse().getContentAsString(), ResponseAccountStatements.class);
 
         // 5. Add a Manual Statement
-        final CreateManualExtraRequest manualReq = CreateManualExtraRequest.builder()
+        final RequestCreateManualExtra manualReq = RequestCreateManualExtra.builder()
                 .shareholderId(sh.getId())
                 .year(Year.of(2026))
                 .label("Bonus adjustment")
@@ -110,7 +110,7 @@ public class AccountStatementRestIT {
         final MvcResult updatedStmts = mockMvc.perform(get("/api/v1/account-statements?shareholderId=" + sh.getId() + "&year=2026"))
                 .andExpect(status().isOk())
                 .andReturn();
-        final AccountStatementsResponse updatedResp = objectMapper.readValue(updatedStmts.getResponse().getContentAsString(), AccountStatementsResponse.class);
+        final ResponseAccountStatements updatedResp = objectMapper.readValue(updatedStmts.getResponse().getContentAsString(), ResponseAccountStatements.class);
         final boolean hasManual = updatedResp.getAccountStatements().stream()
                 .anyMatch(s -> "Bonus adjustment".equals(s.getLabel()));
         assertTrue(hasManual);
@@ -129,13 +129,13 @@ public class AccountStatementRestIT {
         final MvcResult afterDeleteStmts = mockMvc.perform(get("/api/v1/account-statements?shareholderId=" + sh.getId() + "&year=2026"))
                 .andExpect(status().isOk())
                 .andReturn();
-        final AccountStatementsResponse afterDeleteResp = objectMapper.readValue(afterDeleteStmts.getResponse().getContentAsString(), AccountStatementsResponse.class);
+        final ResponseAccountStatements afterDeleteResp = objectMapper.readValue(afterDeleteStmts.getResponse().getContentAsString(), ResponseAccountStatements.class);
         final boolean stillHasManual = afterDeleteResp.getAccountStatements().stream()
                 .anyMatch(s -> "Bonus adjustment".equals(s.getLabel()));
         assertFalse(stillHasManual);
 
         // 8. Update Statement Order
-        final AccountStatementOrderRequest orderReq = AccountStatementOrderRequest.builder()
+        final RequestAccountStatementOrder orderReq = RequestAccountStatementOrder.builder()
                 .shareholderId(sh.getId())
                 .year(Year.of(2026))
                 .rowKeys(List.of("TYPE:DEPOSIT", "TYPE:WITHDRAWAL"))
@@ -146,7 +146,7 @@ public class AccountStatementRestIT {
                 .andExpect(status().isOk());
 
         // 9. Exclude a Statement
-        final ExcludeAccountStatementRequest excludeReq = ExcludeAccountStatementRequest.builder()
+        final RequestExcludeAccountStatement excludeReq = RequestExcludeAccountStatement.builder()
                 .shareholderId(sh.getId())
                 .year(Year.of(2026))
                 .exclude(true)

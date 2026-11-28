@@ -1,10 +1,10 @@
 package de.nihas101.midas.headless.rest;
 
 import de.nihas101.midas.commons.BookingType;
-import de.nihas101.midas.headless.rest.dto.BookingsResponse;
-import de.nihas101.midas.headless.rest.dto.CreateInterestRate;
+import de.nihas101.midas.headless.rest.dto.RequestCreateInterestRate;
 import de.nihas101.midas.headless.rest.dto.RequestShareholder;
 import de.nihas101.midas.headless.rest.dto.RequestToggleAutomaticInterestBooking;
+import de.nihas101.midas.headless.rest.dto.ResponseBookings;
 import de.nihas101.midas.headless.rest.dto.ResponseShareholder;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +53,7 @@ public class InterestRestIT {
         final ResponseShareholder sh = objectMapper.readValue(createShResult.getResponse().getContentAsString(), ResponseShareholder.class);
 
         // Create interest rate for the first time — should succeed
-        final CreateInterestRate rateDto = CreateInterestRate.builder()
+        final RequestCreateInterestRate rateDto = RequestCreateInterestRate.builder()
                 .shareholderId(sh.getId())
                 .year(Year.of(2025))
                 .interestRate(new BigDecimal("3.00"))
@@ -86,7 +86,7 @@ public class InterestRestIT {
         final ResponseShareholder sh = objectMapper.readValue(createShResult.getResponse().getContentAsString(), ResponseShareholder.class);
 
         // 2. Set interest rate
-        final CreateInterestRate rateDto = CreateInterestRate.builder()
+        final RequestCreateInterestRate rateDto = RequestCreateInterestRate.builder()
                 .shareholderId(sh.getId())
                 .year(Year.of(2026))
                 .interestRate(new BigDecimal("2.50"))
@@ -132,7 +132,7 @@ public class InterestRestIT {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        final BookingsResponse bookingsResponse = objectMapper.readValue(bookingsResult.getResponse().getContentAsString(), BookingsResponse.class);
+        final ResponseBookings bookingsResponse = objectMapper.readValue(bookingsResult.getResponse().getContentAsString(), ResponseBookings.class);
         final boolean hasInterestBooking = bookingsResponse.getBookings().stream()
                 .anyMatch(b -> BookingType.INTEREST.equals(b.getType()));
         assertTrue(hasInterestBooking, "Expected interest booking in bookings list");

@@ -12,7 +12,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookingsResponse {
+public class ResponseBookings {
     @Schema(description = "Opening balance for this shareholder and year")
     private ResponseOpeningBalance openingBalance;
     @Schema(description = "List of bookings for this shareholder and year")
