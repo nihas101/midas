@@ -532,14 +532,14 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         final Bookings bookings = bookingsReader.bookingsForShareholderAndYear(shareholder.getId(), year);
         if (bookings.isEmpty()) {
             if (!isLocked) {
-                updateNextYearsBalanceIfNeeded(shareholder, year, emptyList());
+                updateNextYearsBalanceIfNeeded(shareholder, year, bookings);
             }
             grid.setItems(emptyList());
             return;
         }
         final List<BookingRow> bookingRows = bookingRowService.generateRows(bookings, getLocale(), year);
         if (!isLocked) {
-            updateNextYearsBalanceIfNeeded(shareholder, year, bookingRows);
+            updateNextYearsBalanceIfNeeded(shareholder, year, bookings);
         }
         grid.setItems(bookingRows);
     }
@@ -584,7 +584,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
     private void updateNextYearsBalanceIfNeeded(
             final Shareholder shareholder,
             final Year year,
-            final List<BookingRow> bookings
+            final Bookings bookings
     ) {
         final OpeningBalance nextYearsOpeningBalance = openingBalanceService.openingBalance(
                 shareholder.getId(),
@@ -602,7 +602,7 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
         // We only update the balance for next year.
         // We DON'T trigger a chain here and recalculate all amounts of the next year,
         // which would mean we would need to update the balance for the following year as well and so on.
-        final MoneyAmount nextYearsOpening = getNextYearsOpening(bookings);
+        final MoneyAmount nextYearsOpening = bookings.closingBalance();
 
         if (nextYearsOpeningBalance != null) {
             nextYearsOpeningBalance.setOpeningBalance(nextYearsOpening);
@@ -619,11 +619,6 @@ public class BookingsView extends MidasView implements BeforeEnterObserver {
             );
             openingBalanceService.create(openingBalance);
         }
-    }
-
-    private MoneyAmount getNextYearsOpening(final List<BookingRow> bookings) {
-        // TODO: This .getLast is a bad assumption
-        return bookings.isEmpty() ? MoneyAmount.ZERO : bookings.getLast().balance();
     }
 
     public static Icon icon() {

@@ -1,6 +1,7 @@
 package de.nihas101.midas.api.bookings;
 
 import de.nihas101.midas.api.openingbalance.OpeningBalance;
+import de.nihas101.midas.commons.MoneyAmount;
 
 import java.time.Month;
 import java.util.List;
@@ -24,4 +25,6 @@ public interface Bookings {
     FilteredBookings filter(Function<Booking, Boolean> condition);
 
     boolean isEmpty();
+
+    MoneyAmount closingBalance();
 }

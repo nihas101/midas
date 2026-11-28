@@ -42,7 +42,7 @@ class TotalSumCalculatorTest {
 
     @Test
     void monthlyTotals_emptyMonthReturnsZeros() {
-        Bookings mockBookings = new Bookings() {
+        final Bookings mockBookings = new Bookings() {
             @Override
             public OpeningBalance openingBalance() {
                 return new DefaultOpeningBalance(MoneyAmount.ZERO);
@@ -75,6 +75,11 @@ class TotalSumCalculatorTest {
             @Override
             public boolean isEmpty() {
                 return true;
+            }
+
+            @Override
+            public MoneyAmount closingBalance() {
+                return MoneyAmount.ZERO;
             }
         };
 
@@ -141,6 +146,11 @@ class TotalSumCalculatorTest {
             @Override
             public boolean isEmpty() {
                 return false;
+            }
+
+            @Override
+            public MoneyAmount closingBalance() {
+                return MoneyAmount.ZERO;
             }
         };
 

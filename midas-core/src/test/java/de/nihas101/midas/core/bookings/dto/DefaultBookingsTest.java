@@ -24,29 +24,47 @@ class DefaultBookingsTest {
 
     @Test
     void openingBalance_sumsOnlySaldovortrag() {
-        List<Booking> bookings = List.of(
+        final List<Booking> bookings = List.of(
                 createBooking(BookingType.WITHDRAWAL, 2000L, Month.JANUARY)
         );
-        Bookings defaultBookings = new DefaultBookings(bookings, new DefaultOpeningBalance(1, 2, MoneyAmount.ofCents(1500L), Year.of(2026), Source.USER));
+        final Bookings defaultBookings = new DefaultBookings(bookings, new DefaultOpeningBalance(1, 2, MoneyAmount.ofCents(1500L), Year.of(2026), Source.USER));
         assertEquals(MoneyAmount.ofCents(1500L), defaultBookings.openingBalance().getOpeningBalance());
     }
 
     @Test
     void openingBalance_emptyReturnsZero() {
-        Bookings defaultBookings = new DefaultBookings(List.of(), null);
+        final Bookings defaultBookings = new DefaultBookings(List.of(), null);
         assertEquals(MoneyAmount.ZERO, defaultBookings.openingBalance().getOpeningBalance());
+    }
+
+    @Test
+    void closingBalance_sums() {
+        final List<Booking> bookings = List.of(
+                createBooking(BookingType.WITHDRAWAL, 2000L, Month.JANUARY),
+                createBooking(BookingType.WITHDRAWAL, 2000L, Month.FEBRUARY),
+                createBooking(BookingType.WITHDRAWAL, -1000L, Month.MARCH),
+                createBooking(BookingType.COMPENSATION, 10L, Month.DECEMBER)
+        );
+        final Bookings defaultBookings = new DefaultBookings(bookings, new DefaultOpeningBalance(1, 2, MoneyAmount.ofCents(1500L), Year.of(2026), Source.USER));
+        assertEquals(MoneyAmount.ofCents(4510L), defaultBookings.closingBalance());
+    }
+
+    @Test
+    void closingBalance_emptyReturnsZero() {
+        final Bookings defaultBookings = new DefaultBookings(List.of(), null);
+        assertEquals(MoneyAmount.ZERO, defaultBookings.closingBalance());
     }
 
     @ParameterizedTest
     @EnumSource(Month.class)
     void bookingsInMonth_filtersByMonth(Month month) {
-        Booking correctMonth = createBooking(BookingType.WITHDRAWAL, 1000L, month);
-        Month otherMonth = (month == Month.DECEMBER) ? Month.JANUARY : month.plus(1);
-        Booking wrongMonth = createBooking(BookingType.WITHDRAWAL, 2000L, otherMonth);
+        final Booking correctMonth = createBooking(BookingType.WITHDRAWAL, 1000L, month);
+        final Month otherMonth = (month == Month.DECEMBER) ? Month.JANUARY : month.plus(1);
+        final Booking wrongMonth = createBooking(BookingType.WITHDRAWAL, 2000L, otherMonth);
 
-        Bookings defaultBookings = new DefaultBookings(List.of(correctMonth, wrongMonth), new DefaultOpeningBalance(1, 2, MoneyAmount.ofCents(5000L), Year.of(2026), Source.USER));
+        final Bookings defaultBookings = new DefaultBookings(List.of(correctMonth, wrongMonth), new DefaultOpeningBalance(1, 2, MoneyAmount.ofCents(5000L), Year.of(2026), Source.USER));
 
-        FilteredBookings result = defaultBookings.bookingsInMonth(month);
+        final FilteredBookings result = defaultBookings.bookingsInMonth(month);
 
         assertEquals(1, result.bookings().size(), "Should only contain one booking for " + month);
         assertTrue(result.bookings().contains(correctMonth));

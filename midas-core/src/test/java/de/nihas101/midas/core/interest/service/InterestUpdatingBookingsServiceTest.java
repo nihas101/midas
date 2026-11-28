@@ -112,6 +112,11 @@ class InterestUpdatingBookingsServiceTest {
             public boolean isEmpty() {
                 return false;
             }
+
+            @Override
+            public MoneyAmount closingBalance() {
+                return MoneyAmount.ZERO;
+            }
         };
 
         when(shareholdersRepository.getReferenceById(shareholderEntity.getId()))

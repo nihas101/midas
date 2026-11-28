@@ -337,6 +337,11 @@ class MonthlyTotalSummaryBookingRowTest {
             public boolean isEmpty() {
                 return false;
             }
+
+            @Override
+            public MoneyAmount closingBalance() {
+                return MoneyAmount.ZERO;
+            }
         };
     }
 

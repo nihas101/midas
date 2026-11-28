@@ -58,6 +58,15 @@ public class DefaultBookings implements Bookings {
     }
 
     @Override
+    public MoneyAmount closingBalance() {
+        return reduce(
+                openingBalance().getOpeningBalance(),
+                (balance, booking) -> balance.plus(booking.getAmount()),
+                MoneyAmount::plus
+        );
+    }
+
+    @Override
     public boolean isEmpty() {
         return bookings.isEmpty() && openingBalance == null;
     }
