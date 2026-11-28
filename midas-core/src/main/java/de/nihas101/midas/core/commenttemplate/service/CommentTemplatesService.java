@@ -22,6 +22,13 @@ public class CommentTemplatesService implements CommentTemplatesReader, CommentT
     private final CommentTemplateRepository commentTemplateRepository;
 
     @Override
+    public CommentTemplate getTemplate(final Integer id) {
+        return commentTemplateRepository.findById(id)
+                .map(DefaultCommentTemplate::fromEntity)
+                .orElseThrow(() -> new IllegalArgumentException("Unknown template ID: " + id));
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public CommentTemplates getTemplates() {
         return new DefaultCommentTemplates(

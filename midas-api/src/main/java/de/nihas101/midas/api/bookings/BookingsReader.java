@@ -7,6 +7,9 @@ import java.time.Year;
 import java.util.List;
 
 public interface BookingsReader {
+
+    Booking bookingForId(final Integer id);
+
     Bookings bookingsForShareholderAndYear(final Integer shareholderId, final Year year);
 
     Bookings bookingsForShareholderAndDates(

@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.Month;
 import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
 import java.util.function.Function;
 
 @RequiredArgsConstructor
@@ -28,6 +30,16 @@ public class DefaultBookings implements Bookings {
     @Override
     public FilteredBookings bookingsInMonth(final Month month) {
         return filter(b -> month.equals(b.getDate().getMonth()));
+    }
+
+    @Override
+    public <T> T reduce(
+            T identity,
+            BiFunction<T, ? super Booking, T> accumulator,
+            BinaryOperator<T> combiner
+    ) {
+        return bookings.stream()
+                .reduce(identity, accumulator, combiner);
     }
 
     @Override

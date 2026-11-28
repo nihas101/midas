@@ -5,8 +5,9 @@ import de.nihas101.midas.api.bookings.Bookings;
 import de.nihas101.midas.api.bookings.BookingsWriter;
 import de.nihas101.midas.api.interest.InterestBookingsReader;
 import de.nihas101.midas.api.interest.InterestCalculation;
+import de.nihas101.midas.api.interest.InterestRate;
 import de.nihas101.midas.core.interest.DefaultInterestCalculation;
-import de.nihas101.midas.core.interest.dto.InterestRate;
+import de.nihas101.midas.core.interest.dto.DefaultInterestRate;
 import de.nihas101.midas.persistance.interest.InterestRateRepository;
 import de.nihas101.midas.persistance.shareholders.ShareholderEntity;
 
@@ -52,7 +53,7 @@ public class InterestUpdate {
     private Optional<InterestRate> interestRate(final ShareholderEntity shareholder, final Year year) {
         final LocalDate date = year.atMonth(Month.JANUARY).atDay(1);
         return interestRateRepository.findByShareholderAndDate(shareholder, date)
-                .map(InterestRate::fromEntity);
+                .map(DefaultInterestRate::fromEntity);
     }
 
     private InterestCalculation interestCalculation(

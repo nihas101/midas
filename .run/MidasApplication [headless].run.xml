@@ -1,5 +1,8 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="MidasApplication [headless]" type="Application" factoryName="Application">
+    <envs>
+      <env name="spring_profiles_active" value="dev" />
+    </envs>
     <option name="MAIN_CLASS_NAME" value="de.nihas101.midas.MidasApplication" />
     <module name="midas-headless" />
     <extension name="coverage">

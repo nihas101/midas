@@ -4,14 +4,14 @@ import de.nihas101.midas.api.bookings.Bookings;
 import de.nihas101.midas.api.bookings.BookingsReader;
 import de.nihas101.midas.api.interest.Interest;
 import de.nihas101.midas.api.interest.InterestCalculation;
+import de.nihas101.midas.api.interest.InterestRate;
+import de.nihas101.midas.api.interest.InterestRateService;
 import de.nihas101.midas.api.interest.TransactionType;
 import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.commons.MoneyAmount;
 import de.nihas101.midas.core.export.sort.DisplayIdExportRowSort;
 import de.nihas101.midas.core.export.sort.ExportRowSort;
 import de.nihas101.midas.core.interest.DefaultInterestCalculation;
-import de.nihas101.midas.core.interest.dto.InterestRate;
-import de.nihas101.midas.core.interest.service.InterestRateService;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;

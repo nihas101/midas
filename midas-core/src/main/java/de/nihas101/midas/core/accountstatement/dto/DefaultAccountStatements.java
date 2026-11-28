@@ -157,7 +157,7 @@ public class DefaultAccountStatements implements AccountStatements {
                                 o.getId(),
                                 year,
                                 o.getAmount(),
-                                o.getLabelOverride(),
+                                o.getLabel(),
                                 false
                         )
                 )

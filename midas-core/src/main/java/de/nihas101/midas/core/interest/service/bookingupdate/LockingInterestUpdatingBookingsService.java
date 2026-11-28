@@ -16,15 +16,15 @@ public class LockingInterestUpdatingBookingsService implements InterestUpdatingB
     private final DefaultInterestUpdatingBookingsService delegate;
 
     @Override
-    public void create(final Booking booking) {
+    public Booking create(final Booking booking) {
         lock.assertUnlocked(booking);
-        delegate.create(booking);
+        return delegate.create(booking);
     }
 
     @Override
-    public void update(final Booking booking) {
+    public Booking update(final Booking booking) {
         lock.assertUnlocked(booking);
-        delegate.update(booking);
+        return delegate.update(booking);
     }
 
     @Override

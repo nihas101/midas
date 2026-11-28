@@ -161,11 +161,10 @@ class DefaultAccountStatementServiceTest {
                         .findByShareholderIdAndYearAndBookingType(shareholder.getId(), year.getValue(), withdrawal)
         ).thenReturn(Optional.empty());
 
-        defaultAccountStatementService.saveOverride(
+        defaultAccountStatementService.saveExclusion(
                 shareholder,
                 year,
                 withdrawal,
-                MoneyAmount.ofCents(1000L),
                 true
         );
 
@@ -176,7 +175,7 @@ class DefaultAccountStatementServiceTest {
                 withdrawal,
                 null,
                 true,
-                MoneyAmount.ofCents(1000L)
+                null
         );
         Mockito.verify(
                 accountStatementOverridesRepository,
@@ -201,16 +200,15 @@ class DefaultAccountStatementServiceTest {
                                 BookingType.WITHDRAWAL,
                                 "label",
                                 true,
-                                MoneyAmount.ZERO
+                                MoneyAmount.ofCents(100L)
                         )
                 )
         );
 
-        defaultAccountStatementService.saveOverride(
+        defaultAccountStatementService.saveExclusion(
                 shareholder,
                 year,
                 withdrawal,
-                MoneyAmount.ofCents(1000L),
                 false
         );
 
@@ -225,7 +223,7 @@ class DefaultAccountStatementServiceTest {
                         withdrawal,
                         "label",
                         false,
-                        MoneyAmount.ofCents(1000L)
+                        MoneyAmount.ofCents(100L)
                 ))
         );
     }
@@ -289,7 +287,7 @@ class DefaultAccountStatementServiceTest {
 
     @Test
     void deleteOverride() {
-        defaultAccountStatementService.deleteOverride(1);
+        defaultAccountStatementService.deleteOverride(null, null, 1);
         Mockito.verify(accountStatementOverridesRepository, Mockito.times(1)).deleteById(1);
     }
 

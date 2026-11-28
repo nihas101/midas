@@ -54,15 +54,17 @@ public class DefaultInterestUpdatingOpeningBalanceService implements InterestUpd
     }
 
     @Override
-    public void create(final OpeningBalance openingBalance) {
-        delegate.create(openingBalance);
+    public OpeningBalance create(final OpeningBalance openingBalance) {
+        final OpeningBalance ob = delegate.create(openingBalance);
         updateInterest(openingBalance);
+        return ob;
     }
 
     @Override
-    public void update(final OpeningBalance openingBalance) {
-        delegate.update(openingBalance);
+    public OpeningBalance update(final OpeningBalance openingBalance) {
+        final OpeningBalance ob = delegate.update(openingBalance);
         updateInterest(openingBalance);
+        return ob;
     }
 
     private void updateInterest(final OpeningBalance openingBalance) {

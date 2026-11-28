@@ -90,51 +90,45 @@ public class DefaultAccountStatementService implements AccountStatementService {
 
     @Transactional
     @Override
-    public void saveOverride(
+    public void saveExclusion(
             final Shareholder shareholder,
             final Year year,
             final BookingType bookingType,
-            final MoneyAmount amount,
-            final boolean hidden
+            final boolean exclude
     ) {
-        final AccountStatementOverrideEntity entity = accountStatementOverrideEntity(
-                shareholder,
-                year,
-                bookingType,
-                amount,
-                hidden,
-                accountStatementOverridesRepository
-                        .findByShareholderIdAndYearAndBookingType(
-                                shareholder.getId(),
-                                year.getValue(),
-                                bookingType
-                        )
+        accountStatementOverridesRepository.save(
+                entity(
+                        shareholder,
+                        year,
+                        bookingType,
+                        exclude
+                )
         );
-        accountStatementOverridesRepository.save(entity);
     }
 
-    private AccountStatementOverrideEntity accountStatementOverrideEntity(
+    private AccountStatementOverrideEntity entity(
             final Shareholder shareholder,
             final Year year,
             final BookingType bookingType,
-            final MoneyAmount amount,
-            final boolean hidden,
-            final Optional<AccountStatementOverrideEntity> existing
+            final boolean exclude
     ) {
-        if (existing.isPresent()) {
-            final AccountStatementOverrideEntity entity = existing.get();
-            entity.setAmount(amount);
-            entity.setHidden(hidden);
-            return entity;
-        } else {
-            return AccountStatementOverrideEntity.builder()
-                    .shareholder(DefaultShareholder.fromDto(shareholder))
-                    .year(year.getValue())
-                    .bookingType(bookingType)
-                    .amount(amount)
-                    .hidden(hidden)
-                    .build();
+        final AccountStatementOverrideEntity existing = accountStatementOverridesRepository.findByShareholderIdAndYearAndBookingType(
+                shareholder.getId(),
+                year.getValue(),
+                bookingType
+        ).orElse(null);
+        if (existing != null) {
+            existing.setHidden(exclude);
+            return existing;
         }
+
+        return AccountStatementOverrideEntity.builder()
+                .shareholder(DefaultShareholder.fromDto(shareholder))
+                .year(year.getValue())
+                .bookingType(bookingType)
+                .hidden(exclude)
+                .build();
+
     }
 
     @Transactional
@@ -147,14 +141,39 @@ public class DefaultAccountStatementService implements AccountStatementService {
             final MoneyAmount amount
     ) {
         accountStatementOverridesRepository.save(
-                updateAccountStatementOverrideEntity(
+                getManualExtra(
+                        id,
                         shareholder,
                         year,
                         label,
-                        amount,
-                        fetchAccountStatementOverrideEntity(id)
+                        amount
                 )
         );
+    }
+
+    private AccountStatementOverrideEntity getManualExtra(
+            final Integer id,
+            final Shareholder shareholder,
+            final Year year,
+            final String label,
+            final MoneyAmount amount
+    ) {
+        final AccountStatementOverrideEntity entity = fetchAccountStatementOverrideEntity(id)
+                .orElse(null);
+        if (entity != null) {
+            entity.setLabelOverride(label);
+            entity.setAmount(amount);
+            return entity;
+        }
+
+        return AccountStatementOverrideEntity.builder()
+                .shareholder(DefaultShareholder.fromDto(shareholder))
+                .year(year.getValue())
+                .bookingType(null)
+                .labelOverride(label)
+                .amount(amount)
+                .hidden(false)
+                .build();
     }
 
     private Optional<AccountStatementOverrideEntity> fetchAccountStatementOverrideEntity(final Integer id) {
@@ -165,33 +184,13 @@ public class DefaultAccountStatementService implements AccountStatementService {
         return accountStatementOverridesRepository.findById(id);
     }
 
-    private AccountStatementOverrideEntity updateAccountStatementOverrideEntity(
-            final Shareholder shareholder,
-            final Year year,
-            final String label,
-            final MoneyAmount amount,
-            final Optional<AccountStatementOverrideEntity> entity
-    ) {
-        if (entity.isPresent()) {
-            AccountStatementOverrideEntity en = entity.get();
-            en.setLabelOverride(label);
-            en.setAmount(amount);
-            return en;
-        } else {
-            return AccountStatementOverrideEntity.builder()
-                    .shareholder(DefaultShareholder.fromDto(shareholder))
-                    .year(year.getValue())
-                    .bookingType(null)
-                    .labelOverride(label)
-                    .amount(amount)
-                    .hidden(false)
-                    .build();
-        }
-    }
-
     @Transactional
     @Override
-    public void deleteOverride(final Integer id) {
+    public void deleteOverride(
+            final Shareholder shareholder,
+            final Year year,
+            final Integer id
+    ) {
         accountStatementOverridesRepository.deleteById(id);
     }
 
@@ -203,7 +202,6 @@ public class DefaultAccountStatementService implements AccountStatementService {
             final List<String> rowKeys
     ) {
         accountStatementOrdersRepository.deleteByShareholderIdAndYear(shareholder.getId(), year.getValue());
-        accountStatementOrdersRepository.flush();
 
         final ShareholderEntity shareholderEntity = DefaultShareholder.fromDto(shareholder);
         for (int i = 0; i < rowKeys.size(); i++) {

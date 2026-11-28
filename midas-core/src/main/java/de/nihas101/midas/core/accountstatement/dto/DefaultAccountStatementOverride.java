@@ -23,7 +23,7 @@ public class DefaultAccountStatementOverride implements AccountStatementOverride
 
     private BookingType bookingType;
 
-    private String labelOverride;
+    private String label;
 
     private Boolean hidden;
 

@@ -54,6 +54,13 @@ public interface BookingsRepository extends JpaRepository<BookingEntity, Integer
             final Source source
     );
 
+    boolean existsByShareholderAndDateAndTypeAndSource(
+            final ShareholderEntity shareholder,
+            final LocalDate date,
+            final BookingType bookingType,
+            final Source source
+    );
+
     boolean existsByShareholderAndDateAndTypeAndCommentAndIdNot(
             final ShareholderEntity shareholder,
             final LocalDate date,

@@ -19,4 +19,5 @@
     <include file="db/changelog/011-create-locked-years-table.xml"/>
     <include file="db/changelog/012-create-comment-templates-table.xml"/>
     <include file="db/changelog/013-create-sqlite-optimization-status-table.xml"/>
+    <include file="db/changelog/014-deduplicate-and-unique-opening-balances-and-interest-rates.xml"/>
 </databaseChangeLog>

@@ -40,6 +40,16 @@ public class ShareholdersService implements ShareholdersReader, ShareholdersWrit
     }
 
     @Override
+    public Shareholders shareholders(final Iterable<Integer> shareholderIds) {
+        return new DefaultShareholders(
+                repository.findAllById(shareholderIds)
+                        .stream()
+                        .map(DefaultShareholder::fromEntity)
+                        .toList()
+        );
+    }
+
+    @Override
     public void create(final Shareholder shareholder) {
         if (shareholder == null) {
             throw new IllegalArgumentException("ShareholdersService#create with shareholder == null");

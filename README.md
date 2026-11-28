@@ -25,10 +25,10 @@ To run Midas, you can use the standalone JAR or the launcher scripts provided in
 
 ### Standalone Execution
 
-1. Download the latest `midas.jar`.
+1. Download the latest `midas-vaadin.jar`.
 2. Run the jar by:
-    - Double-clicking on `midas.jar`.
-    - or running `java -jar midas.jar` in a terminal.
+    - Double-clicking on `midas-vaadin.jar`.
+    - or running `java -jar midas-vaadin.jar` in a terminal.
 
 The application will launch a local web server, and the user interface will be accessible in your web browser at
 `http://localhost:8082` (or the configured port).
@@ -147,3 +147,17 @@ The application can be configured using `application.properties`. Below are some
 - [Bookings PDF](documentation/export/en/Alice_Johnson_(101-1)_Bookings_2026-01-01_2026-12-31.pdf)
 - [Interest PDF](documentation/export/en/Alice_Johnson_(101-1)_Interest%20Calculation_2026-01-01_2026-12-31.pdf)
 - [XLSX Export](documentation/export/en/export_2026-01-01_2026-12-31.xlsx)
+
+## Headless
+
+`midas-headless.jar` can be used to run a headless version of the service that offers an API to interact with.
+
+- The [OpenAPI docs](https://www.openapis.org/) are available at `http://localhost:8082/api-docs` (or the configured
+  port)
+- The [SwaggerUI](https://swagger.io/open-source/swagger-ui/) is available at `http://localhost:8082/swagger-ui` (or the
+  configured port)
+
+The API und SwaggerUI endpoints can be deactivated in production via
+
+- `springdoc.api-docs.enabled=false`
+- `springdoc.swagger-ui.enabled=false`

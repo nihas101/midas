@@ -12,37 +12,40 @@ import java.util.Locale;
 
 public interface AccountStatementService {
     AccountStatements accountStatements(
-            Shareholder shareholder,
-            Year year,
-            MessageSource messageSource,
-            Locale locale
+            final Shareholder shareholder,
+            final Year year,
+            final MessageSource messageSource,
+            final Locale locale
     );
 
     @Transactional
-    void saveOverride(
-            Shareholder shareholder,
-            Year year,
-            BookingType bookingType,
-            MoneyAmount amount,
-            boolean hidden
+    void saveExclusion(
+            final Shareholder shareholder,
+            final Year year,
+            final BookingType bookingType,
+            final boolean hidden
     );
 
     @Transactional
     void saveManualExtra(
-            Integer id,
-            Shareholder shareholder,
-            Year year,
-            String label,
-            MoneyAmount amount
+            final Integer id,
+            final Shareholder shareholder,
+            final Year year,
+            final String label,
+            final MoneyAmount amount
     );
 
     @Transactional
-    void deleteOverride(Integer id);
+    void deleteOverride(
+            final Shareholder shareholder,
+            final Year year,
+            final Integer id
+    );
 
     @Transactional
     void saveOrder(
-            Shareholder shareholder,
-            Year year,
-            List<String> rowKeys
+            final Shareholder shareholder,
+            final Year year,
+            final List<String> rowKeys
     );
 }

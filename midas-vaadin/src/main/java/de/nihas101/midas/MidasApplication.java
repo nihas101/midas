@@ -5,15 +5,16 @@ import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.theme.lumo.Lumo;
 import de.nihas101.midas.core.browser.WebPage;
+import de.nihas101.midas.vaadin.PropertyLoader;
+import de.nihas101.midas.vaadin.PropertyResolver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
+import java.net.BindException;
+import java.util.List;
 
 @Slf4j
 @Push
@@ -24,13 +25,16 @@ import java.util.Properties;
 @EnableConfigurationProperties
 public class MidasApplication implements AppShellConfigurator {
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         try {
             SpringApplication.run(MidasApplication.class, args);
         } catch (Exception e) {
             if (isPortInUse(e)) {
+                log.warn("Port is already in use. Assuming an instance is already running.", e);
                 // Another instance is likely running, defer to it
-                openBrowser(args); // TODO: Also need to check if launchBrowser is enabled before trying this
+                if (resolveLaunchBrowser(args)) {
+                    openBrowser(args);
+                }
             } else {
                 throw e;
             }
@@ -39,7 +43,7 @@ public class MidasApplication implements AppShellConfigurator {
 
     private static boolean isPortInUse(Throwable e) {
         while (e != null) {
-            if (e instanceof java.net.BindException) {
+            if (e instanceof BindException) {
                 return true;
             }
             e = e.getCause();
@@ -47,10 +51,10 @@ public class MidasApplication implements AppShellConfigurator {
         return false;
     }
 
-    private static void openBrowser(String[] args) {
+    private static void openBrowser(final String[] args) {
         String port = resolvePort(args);
         String url = "http://localhost:" + port;
-        System.out.println("Port " + port + " is already in use. Opening browser at " + url);
+        log.info("Port {} is already in use. Opening browser at {}", port, url);
         try {
             new WebPage(url).open();
         } catch (Exception e) {
@@ -58,46 +62,29 @@ public class MidasApplication implements AppShellConfigurator {
         }
     }
 
-    private static String resolvePort(String[] args) {
-        // 1. Check command line arguments
-        for (String arg : args) {
-            if (arg.startsWith("--server.port=")) {
-                return arg.substring("--server.port=".length());
-            }
-        }
-
-        // 2. Check environment variables
-        String envPort = System.getenv("SERVER_PORT");
-        if (envPort != null) return envPort;
-
-        // 3. Load from properties files
-        Properties props = new Properties();
-
-        // Load default
-        loadProperties(props, "application.properties");
-
-        // Check for active profiles
-        String activeProfiles = System.getProperty("spring.profiles.active");
-        if (activeProfiles == null) {
-            activeProfiles = props.getProperty("spring.profiles.active");
-        }
-
-        if (activeProfiles != null) {
-            for (String profile : activeProfiles.split(",")) {
-                loadProperties(props, "application-" + profile.trim() + ".properties");
-            }
-        }
-
-        return props.getProperty("server.port", "8080");
+    static boolean resolveLaunchBrowser(final String[] args) {
+        final PropertyResolver<Boolean> pr = new PropertyResolver<>(
+                new PropertyLoader(),
+                List.of("desktop.launch-browser", "desktop.launchBrowser"),
+                "DESKTOP_LAUNCH_BROWSER",
+                Boolean::parseBoolean
+        );
+        return pr.fromCommandLine(args).orElseGet(
+                () -> pr.fromEnvironmentVariables().orElseGet(
+                        () -> pr.fromProperties().orElse(true)));
     }
 
-    private static void loadProperties(Properties props, String resourceName) {
-        try (InputStream is = MidasApplication.class.getClassLoader().getResourceAsStream(resourceName)) {
-            if (is != null) {
-                props.load(is);
-            }
-        } catch (IOException ignored) {
-        }
+    private static String resolvePort(final String[] args) {
+        final PropertyResolver<String> pr = new PropertyResolver<>(
+                new PropertyLoader(),
+                List.of("server.port"),
+                "SERVER_PORT",
+                a -> a
+        );
+
+        return pr.fromCommandLine(args).orElseGet(
+                () -> pr.fromEnvironmentVariables().orElseGet(
+                        () -> pr.fromProperties().orElse("8080")));
     }
 
 }

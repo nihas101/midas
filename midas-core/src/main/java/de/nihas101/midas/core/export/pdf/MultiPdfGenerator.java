@@ -1,9 +1,11 @@
 package de.nihas101.midas.core.export.pdf;
 
+import de.nihas101.midas.api.export.ZipExport;
 import de.nihas101.midas.api.shareholder.Shareholder;
 import de.nihas101.midas.core.export.ExportRequest;
 import de.nihas101.midas.core.export.ExportViews;
 import de.nihas101.midas.core.export.LocalizedExportView;
+import de.nihas101.midas.core.export.ZipExportStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -13,8 +15,6 @@ import java.io.OutputStream;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -26,8 +26,8 @@ public class MultiPdfGenerator implements PdfGenerator {
     private final LocalDate endDate;
     private final PdfService pdfService;
     private final Locale locale;
-    private final OutputStream outputStream;
     private final PdfViewDataExtractor pdfViewDataExtractor;
+    private final ZipExport zipExport;
 
     public MultiPdfGenerator(
             final ExportRequest request,
@@ -43,31 +43,35 @@ public class MultiPdfGenerator implements PdfGenerator {
                 request.endDate(),
                 pdfService,
                 locale,
-                outputStream,
-                pdfViewDataExtractor
+                pdfViewDataExtractor,
+                new ZipExportStream(
+                        request.startDate(),
+                        request.endDate(),
+                        outputStream
+                )
         );
     }
 
     public void generate() {
-        try (final ZipOutputStream zos = new ZipOutputStream(outputStream)) {
+        try (final ZipExport zos = zipExport) {
             generatePdfPerShareholder(zos);
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("Failed to generate ZIP of PDFs", e);
-            throw new RuntimeException("Export failed", e);
+            throw new PdfExportException("Export failed", e);
         }
     }
 
     @Override
     public String fileName() {
-        return "export_" + startDate + "_" + endDate + ".zip";
+        return zipExport.name();
     }
 
     @Override
     public String mimeType() {
-        return "application/zip";
+        return zipExport.mimeType();
     }
 
-    private void generatePdfPerShareholder(final ZipOutputStream zos) throws IOException {
+    private void generatePdfPerShareholder(final ZipExport zos) throws IOException {
         final int startYear = startDate != null ? startDate.getYear() : 0;
         final int endYear = endDate != null ? endDate.getYear() : startYear;
 
@@ -98,18 +102,24 @@ public class MultiPdfGenerator implements PdfGenerator {
     }
 
     private void generatePdfPerView(
-            final ZipOutputStream zos,
+            final ZipExport zos,
             final Shareholder shareholder,
             final LocalDate currentStartDate,
             final LocalDate currentEndDate
     ) throws IOException {
         for (final LocalizedExportView view : views.iterator()) {
-            createEntryForView(zos, shareholder, view, currentStartDate, currentEndDate);
+            createEntryForView(
+                    zos,
+                    shareholder,
+                    view,
+                    currentStartDate,
+                    currentEndDate
+            );
         }
     }
 
     private void createEntryForView(
-            final ZipOutputStream zos,
+            final ZipExport zos,
             final Shareholder shareholder,
             final LocalizedExportView view,
             final LocalDate currentStartDate,
@@ -121,9 +131,18 @@ public class MultiPdfGenerator implements PdfGenerator {
                 currentStartDate,
                 currentEndDate
         );
-        zos.putNextEntry(new ZipEntry(pdfFile.name()));
+        zos.putEntry(
+                pdfFile.name(),
+                singlePdfStream(shareholder, view, currentStartDate, currentEndDate).toByteArray()
+        );
+    }
 
-
+    private ByteArrayOutputStream singlePdfStream(
+            final Shareholder shareholder,
+            final LocalizedExportView view,
+            final LocalDate currentStartDate,
+            final LocalDate currentEndDate
+    ) {
         // We need a temporary buffer because PdfService writes to the stream
         // and we don't want it to close the ZipOutputStream prematurely
         // (though OpenHTMLToPDF shouldn't close it, it's safer this way
@@ -139,7 +158,6 @@ public class MultiPdfGenerator implements PdfGenerator {
                 baos,
                 pdfViewDataExtractor
         ).generate();
-        zos.write(baos.toByteArray());
-        zos.closeEntry();
+        return baos;
     }
 }
